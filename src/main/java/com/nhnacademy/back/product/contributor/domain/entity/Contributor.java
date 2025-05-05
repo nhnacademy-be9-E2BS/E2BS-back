@@ -21,11 +21,9 @@ public class Contributor {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long contributorId;
 
-	@Setter
 	@Column(length = 20, nullable = false)
 	private String contributorName;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "position_id")
 	private Position position;

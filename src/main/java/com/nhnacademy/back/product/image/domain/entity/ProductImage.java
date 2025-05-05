@@ -23,12 +23,10 @@ public class ProductImage {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productImageId;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
-	@Setter
 	@Column(nullable = false)
 	private String productImagePath;
 }

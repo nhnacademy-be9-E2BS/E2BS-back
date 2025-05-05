@@ -19,7 +19,6 @@ public class Publisher {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long publisherId;
 
-	@Setter
 	@Column(length = 50, nullable = false)
 	private String publisherName;
 

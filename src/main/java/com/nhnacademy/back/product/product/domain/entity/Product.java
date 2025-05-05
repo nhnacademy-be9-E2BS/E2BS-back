@@ -27,49 +27,39 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
 
-	@Setter
 	@OneToOne(optional = false)
 	@JoinColumn(name = "product_status_id")
 	private ProductStatus productStatus;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Setter
 	@Column(length = 30, nullable = false)
 	private String productTitle;
 
-	@Setter
 	@Column(nullable = false)
 	private String productContent;
 
-	@Setter
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String productDescription;
 
-	@Setter
 	@Column(nullable = false)
 	private LocalDate productPublishedAt;
 
-	@Setter
 	@Column(length = 20, nullable = false)
 	private String productIsbn;
 
-	@Setter
 	@Column(nullable = false)
 	private long productRegularPrice;
 
-	@Setter
 	@Column(nullable = false)
 	private long productSalePrice;
 
-	@Setter
 	@Column(nullable = false, columnDefinition = "TINYINT(1)")
 	private boolean productPackageable;
 
-	@Setter
 	@Column(nullable = false)
 	private int productStock;
+
 }
