@@ -1,33 +1,31 @@
-package com.nhnacademy.back.product.category.domain.entity;
+package com.nhnacademy.back.coupon.coupon.domain.entity;
 
-import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.category.domain.entity.Category;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductCategory {
+public class CategoryCoupon {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long productCategoryId;
+	private Long couponId;
 
+	@MapsId
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "product_id")
-	private Product product;
+	@JoinColumn(name = "coupon_id")
+	private Coupon coupon;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "category_id")
 	private Category category;
-
+	
 }

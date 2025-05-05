@@ -19,7 +19,6 @@ public class Position {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long positionId;
 
-	@Setter
 	@Column(length = 10, nullable = false)
 	private String positionName;
 

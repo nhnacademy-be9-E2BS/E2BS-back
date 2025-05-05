@@ -21,7 +21,6 @@ public class ProductStatus {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productStatusId;
 
-	@Setter
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private ProductStatusName productStatusName;

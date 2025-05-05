@@ -21,12 +21,10 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long categoryId;
 
-	@Setter
 	@ManyToOne
 	@JoinColumn(name = "category_id2")
 	private Category parent;
 
-	@Setter
 	@Column(length = 30, nullable = false)
 	private String categoryName;
 

@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.like.domain.entity;
 
+import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 
 import jakarta.persistence.Entity;
@@ -22,14 +23,11 @@ public class Like {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long likeId;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
-	// Customer 테이블 연결 시키기
-	// @Setter
-	// @ManyToOne(optional = false)
-	// @JoinColumn(name = "customer_id")
-	// private Customer customer;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
 }

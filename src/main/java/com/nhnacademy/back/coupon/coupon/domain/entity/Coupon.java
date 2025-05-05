@@ -1,7 +1,8 @@
-package com.nhnacademy.back.product.category.domain.entity;
+package com.nhnacademy.back.coupon.coupon.domain.entity;
 
-import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.coupon.couponpolicy.domain.entity.CouponPolicy;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,23 +12,20 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductCategory {
+public class Coupon {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long productCategoryId;
+	private long couponId;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "product_id")
-	private Product product;
+	@JoinColumn(name = "coupon_policy_id")
+	private CouponPolicy couponPolicy;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "category_id")
-	private Category category;
-
+	@Column(length = 30, nullable = false)
+	private String couponName;
 }
