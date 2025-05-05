@@ -1,0 +1,21 @@
+spring:
+  config:
+    import: db-dev.yml
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create           # create, update, create-drop, validate, none 중 하나
+    show-sql: true               # JPA가 실행하는 SQL 쿼리를 콘솔에 출력함
+    properties:
+      hibernate:
+        format_sql: true         # SQL을 정렬해서 보여줌
+        use_sql_comments: true   # 실행되는 쿼리에 주석으로 JPA 내부 설명을 추가
+        auto_quote_keyword: true # 테이블이나 컬럼명이 예약어(user, order 등)인 경우, 자동으로 백틱(\``) 으로 감싸줌. → select * from `user``
+        dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate가 사용할 SQL 문법(방언)을 지정
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace # (JPA 사용 시) SQL 파라미터 바인딩 로그를 trace 레벨로 출력
+    org.springframework.transaction.interceptor: trace # 스프링 트랜잭션 관련 로그를 trace 레벨로 출력
