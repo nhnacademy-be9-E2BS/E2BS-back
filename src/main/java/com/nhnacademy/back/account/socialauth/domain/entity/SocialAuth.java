@@ -13,7 +13,7 @@ public class SocialAuth {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int socialAuthId;
+	private long socialAuthId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)

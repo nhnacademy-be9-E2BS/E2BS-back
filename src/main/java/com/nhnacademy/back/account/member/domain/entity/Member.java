@@ -30,7 +30,7 @@ public class Member {
 
 	@OneToOne
 	@MapsId  // 공유 기본 키 사용
-	@JoinColumn(name = "customerId")
+	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
 	@Column(nullable = false, length = 20)
