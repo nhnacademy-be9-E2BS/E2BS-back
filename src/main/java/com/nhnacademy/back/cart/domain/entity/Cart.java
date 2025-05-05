@@ -1,13 +1,14 @@
-package com.nhnacademy.back.coupon.coupon.domain.entity;
+package com.nhnacademy.back.cart.domain.entity;
 
+import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,18 +16,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductCoupon {
+public class Cart {
 
 	@Id
-	private Long couponId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long cartId;
 
-	@MapsId
-	@OneToOne(optional = false)
-	@JoinColumn(name = "coupon_id")
-	private Coupon coupon;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	private int cartQuantity;
 }
