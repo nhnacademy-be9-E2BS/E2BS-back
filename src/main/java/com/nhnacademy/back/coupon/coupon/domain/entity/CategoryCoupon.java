@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class CategoryCoupon {
 	private Long couponId;
 
 	@MapsId
-	@ManyToOne(optional = false)
+	@OneToOne(optional = false)
 	@JoinColumn(name = "coupon_id")
 	private Coupon coupon;
 
