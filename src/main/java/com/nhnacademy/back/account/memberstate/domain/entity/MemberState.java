@@ -1,25 +1,24 @@
-package com.nhnacademy.back.customer;
+package com.nhnacademy.back.account.memberstate.domain.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Customer {
+public class MemberState {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private long memberStateId;
 
-	@NotNull
-	private String email;
-
-	@NotNull
-	private String password;
+	@Column(nullable = false)
+	private MemberStateName memberStateName;
 
 }
