@@ -1,3 +1,5 @@
+-- 이 파일의 구문 실행 전에 product.sql 실행하기
+
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_name) VALUES ('TOSS');
 

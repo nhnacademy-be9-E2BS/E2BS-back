@@ -43,13 +43,34 @@ INSERT INTO member (
              1,  -- USER
              1   -- GOOGLE
          );
-) VALUES (
-             '서울특별시 강남구',
-             '06000',
-             '3층 301호',
-             '테헤란로 123',
-             '회사',
-             TRUE,
-             NOW(),
-             1
-         );
+
+INSERT INTO address (
+    address_name,
+    address_code,
+    address_info,
+    address_extra,
+    address_alias,
+    address_default,
+    address_created_at,
+    member_customer_id
+) VALUES
+      (
+          '서울특별시 강남구 테헤란로',
+          '06130',
+          '삼성동 123-45',
+          '위워크 10층',
+          '회사',
+          true,
+          NOW(),
+          1
+      ),
+      (
+          '경기도 성남시 분당구 정자동',
+          '13560',
+          '정자역 5번 출구',
+          'OO오피스텔 101호',
+          '집',
+          false,
+          NOW(),
+          1
+      );
