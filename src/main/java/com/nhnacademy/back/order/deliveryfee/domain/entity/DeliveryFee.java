@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.deliveryfee.domain;
+package com.nhnacademy.back.order.deliveryfee.domain.entity;
 
 import java.time.LocalDate;
 

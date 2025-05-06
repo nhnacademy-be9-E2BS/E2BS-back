@@ -1,6 +1,6 @@
 package com.nhnacademy.back.order.orderdetail.domain.entity;
 
-import com.nhnacademy.back.order.order.domain.Order;
+import com.nhnacademy.back.order.order.domain.entity.Order;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.product.product.domain.entity.Product;

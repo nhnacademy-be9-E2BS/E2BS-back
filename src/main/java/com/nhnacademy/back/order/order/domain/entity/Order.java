@@ -1,9 +1,9 @@
-package com.nhnacademy.back.order.order.domain;
+package com.nhnacademy.back.order.order.domain.entity;
 
 import java.time.LocalDateTime;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
-import com.nhnacademy.back.order.deliveryfee.domain.DeliveryFee;
+import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.payment.domain.entity.Payment;
 
 import jakarta.persistence.Column;

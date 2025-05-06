@@ -38,10 +38,10 @@ INSERT INTO member (
              '01012345678',
              '2024-01-01',
              '2024-05-01',
-             1,  -- BRONZE
+             1,  -- NORMAL
              1,  -- ACTIVE
-             1,  -- USER
-             1   -- GOOGLE
+             1,  -- ADMIN
+             1   -- PAYCO
          );
 
 INSERT INTO address (
@@ -75,5 +75,5 @@ INSERT INTO address (
           1
       );
 
-INSERT INTO point_history (customer_id, point_amount, point_created_at, point_reason)
-VALUES (1, 5000, '2025-05-04', '회원가입');
+INSERT INTO point_history (point_amount, point_created_at, point_reason, customer_id)
+VALUES (5000, '2025-05-04', '회원가입', 1);
