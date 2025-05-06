@@ -27,7 +27,7 @@ public class Product {
 	private long productId;
 
 	@OneToOne(optional = false)
-	@JoinColumn(name = "product_status_id")
+	@JoinColumn(name = "product_state_id")
 	private ProductState productState;
 
 	@ManyToOne(optional = false)
