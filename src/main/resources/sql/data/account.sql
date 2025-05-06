@@ -27,10 +27,10 @@ INSERT INTO member (
     member_phone,
     member_created_at,
     member_login_latest,
-    rank_member_rank_id,
-    member_state_member_state_id,
-    member_role_member_role_id,
-    social_auth_social_auth_id
+    member_rank_id,
+    member_state_id,
+    member_role_id,
+    social_auth_id
 ) VALUES (
              1,
              'member01',
