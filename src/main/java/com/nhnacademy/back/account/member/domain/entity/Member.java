@@ -1,6 +1,6 @@
 package com.nhnacademy.back.account.member.domain.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
@@ -37,15 +37,15 @@ public class Member {
 	private String memberId;
 
 	@Column(nullable = false)
-	private Date memberBirth;
+	private LocalDate memberBirth;
 
 	@Column(nullable = false, length = 11)
 	private String memberPhone;
 
 	@Column(nullable = false)
-	private Date memberCreatedAt;
+	private LocalDate memberCreatedAt;
 
-	private Date memberLoginLatest;
+	private LocalDate memberLoginLatest;
 
 	@ManyToOne(optional = false)
 	private Rank rank;
