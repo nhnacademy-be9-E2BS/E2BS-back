@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,6 +45,7 @@ public class Address {
 	private LocalDateTime addressCreatedAt;
 
 	@ManyToOne(optional = false)
+	@JoinColumn(name = "customer_id")
 	private Member member;
 
 }

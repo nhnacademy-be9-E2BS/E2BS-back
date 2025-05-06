@@ -8,7 +8,7 @@ CREATE TABLE address
     address_alias      VARCHAR(20)  NULL,
     address_default    BIT(1)       NOT NULL,
     address_created_at datetime     NOT NULL,
-    member_customer_id BIGINT       NOT NULL,
+    customer_id        BIGINT       NOT NULL,
     CONSTRAINT pk_address PRIMARY KEY (address_id)
 );
 
@@ -213,7 +213,7 @@ CREATE TABLE point_history
     point_amount       BIGINT       NOT NULL,
     point_reason       VARCHAR(255) NOT NULL,
     point_created_at   datetime     NOT NULL,
-    member_customer_id BIGINT       NOT NULL,
+    customer_id        BIGINT       NOT NULL,
     CONSTRAINT pk_pointhistory PRIMARY KEY (point_history_id)
 );
 
@@ -360,7 +360,7 @@ ALTER TABLE product
     ADD CONSTRAINT uc_product_product_state UNIQUE (product_state_id);
 
 ALTER TABLE address
-    ADD CONSTRAINT FK_ADDRESS_ON_MEMBER_CUSTOMER FOREIGN KEY (member_customer_id) REFERENCES member (customer_id);
+    ADD CONSTRAINT FK_ADDRESS_ON_MEMBER_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
 
 ALTER TABLE cart
     ADD CONSTRAINT FK_CART_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
@@ -438,7 +438,7 @@ ALTER TABLE payment
     ADD CONSTRAINT FK_PAYMENT_ON_PAYMENT_METHOD FOREIGN KEY (payment_method_id) REFERENCES payment_method (payment_method_id);
 
 ALTER TABLE point_history
-    ADD CONSTRAINT FK_POINTHISTORY_ON_MEMBER_CUSTOMER FOREIGN KEY (member_customer_id) REFERENCES member (customer_id);
+    ADD CONSTRAINT FK_POINTHISTORY_ON_MEMBER_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
 
 ALTER TABLE product_category
     ADD CONSTRAINT FK_PRODUCTCATEGORY_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (category_id);
