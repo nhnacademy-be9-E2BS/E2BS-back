@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.status.domain.entity;
+package com.nhnacademy.back.product.state.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,19 +10,18 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductStatus {
+public class ProductState {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long productStatusId;
+	private long productStateId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private ProductStatusName productStatusName;
+	private ProductStateName productStateName;
 
 }
