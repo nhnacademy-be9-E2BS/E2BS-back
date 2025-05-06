@@ -52,7 +52,7 @@ INSERT INTO address (
     address_alias,
     address_default,
     address_created_at,
-    member_customer_id
+    customer_id
 ) VALUES
       (
           '서울특별시 강남구 테헤란로',
@@ -74,3 +74,6 @@ INSERT INTO address (
           NOW(),
           1
       );
+
+INSERT INTO point_history (customer_id, point_amount, point_created_at, point_reason)
+VALUES (1, 5000, '2025-05-04', '회원가입');
