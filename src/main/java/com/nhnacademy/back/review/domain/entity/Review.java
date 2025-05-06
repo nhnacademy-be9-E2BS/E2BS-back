@@ -29,9 +29,6 @@ public class Review {
 	@JoinColumn(name = "product_id")
 	private Product product;
 
-	// OrderDetail이랑 엮기
-
-
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
