@@ -61,4 +61,10 @@ public class Product {
 	@Column(nullable = false)
 	private int productStock;
 
+	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private long productHits = 0;
+
+	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private long productSearches = 0;
+
 }
