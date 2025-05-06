@@ -3,6 +3,7 @@ package com.nhnacademy.back.order.orderdetail.domain.entity;
 import com.nhnacademy.back.order.order.domain.Order;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
+import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.review.domain.entity.Review;
 
 import jakarta.persistence.Column;
@@ -31,6 +32,10 @@ public class OrderDetail {
 
 	@Column(nullable = false)
 	private long orderDetailPerPrice;
+
+	@OneToOne
+	@JoinColumn(name = "product_id")
+	private Product product;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "order_code")
