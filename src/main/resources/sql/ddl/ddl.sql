@@ -23,7 +23,7 @@ CREATE TABLE cart
 
 CREATE TABLE category
 (
-    category_id   BIGINT  AUTO_INCREMENT    NOT NULL,
+    category_id   BIGINT   AUTO_INCREMENT   NOT NULL,
     category_id2  BIGINT      NULL,
     category_name VARCHAR(30) NOT NULL,
     CONSTRAINT pk_category PRIMARY KEY (category_id)
@@ -46,7 +46,7 @@ CREATE TABLE contributor
 
 CREATE TABLE coupon
 (
-    coupon_id        BIGINT   AUTO_INCREMENT   NOT NULL,
+    coupon_id        BIGINT  AUTO_INCREMENT    NOT NULL,
     coupon_policy_id BIGINT      NOT NULL,
     coupon_name      VARCHAR(30) NOT NULL,
     CONSTRAINT pk_coupon PRIMARY KEY (coupon_id)
@@ -54,7 +54,7 @@ CREATE TABLE coupon
 
 CREATE TABLE coupon_policy
 (
-    coupon_policy_id             BIGINT    AUTO_INCREMENT    NOT NULL,
+    coupon_policy_id             BIGINT   AUTO_INCREMENT     NOT NULL,
     coupon_policy_minimum        INT DEFAULT 0 NOT NULL,
     coupon_policy_maximum_amount INT           NULL,
     coupon_policy_sale_price     INT           NULL,
@@ -66,7 +66,7 @@ CREATE TABLE coupon_policy
 
 CREATE TABLE customer
 (
-    customer_id       BIGINT   AUTO_INCREMENT    NOT NULL,
+    customer_id       BIGINT    AUTO_INCREMENT   NOT NULL,
     customer_email    VARCHAR(100) NOT NULL,
     customer_password VARCHAR(20)  NOT NULL,
     customer_name     VARCHAR(20)  NOT NULL,
@@ -92,16 +92,16 @@ CREATE TABLE `like`
 
 CREATE TABLE member
 (
-    customer_id                  BIGINT   AUTO_INCREMENT   NOT NULL,
-    member_id                    VARCHAR(20) NOT NULL,
-    member_birth                 datetime    NOT NULL,
-    member_phone                 VARCHAR(11) NOT NULL,
-    member_created_at            datetime    NOT NULL,
-    member_login_latest          datetime    NULL,
-    member_rank_id        		 BIGINT      NOT NULL,
-    member_state_id 			BIGINT      NOT NULL,
-    member_role_id   			BIGINT      NOT NULL,
-    social_auth_id   			BIGINT      NOT NULL,
+    customer_id         BIGINT      NOT NULL,
+    member_id           VARCHAR(20) NOT NULL,
+    member_birth        date        NOT NULL,
+    member_phone        VARCHAR(11) NOT NULL,
+    member_created_at   date        NOT NULL,
+    member_login_latest date        NULL,
+    member_rank_id      BIGINT      NOT NULL,
+    member_state_id     BIGINT      NOT NULL,
+    member_role_id      BIGINT      NOT NULL,
+    social_auth_id      BIGINT      NOT NULL,
     CONSTRAINT pk_member PRIMARY KEY (customer_id)
 );
 
@@ -117,6 +117,15 @@ CREATE TABLE member_coupon
     CONSTRAINT pk_membercoupon PRIMARY KEY (member_coupon_id)
 );
 
+CREATE TABLE member_rank
+(
+    member_rank_id              BIGINT   AUTO_INCREMENT    NOT NULL,
+    member_rank_name            VARCHAR(255) NOT NULL,
+    member_rank_tier_bonus_rate INT          NOT NULL,
+    member_rank_require_amount  INT          NOT NULL,
+    CONSTRAINT pk_memberrank PRIMARY KEY (member_rank_id)
+);
+
 CREATE TABLE member_role
 (
     member_role_id   BIGINT   AUTO_INCREMENT    NOT NULL,
@@ -126,8 +135,8 @@ CREATE TABLE member_role
 
 CREATE TABLE member_state
 (
-    member_state_id   BIGINT  AUTO_INCREMENT  NOT NULL,
-    member_state_name SMALLINT NOT NULL,
+    member_state_id   BIGINT   AUTO_INCREMENT    NOT NULL,
+    member_state_name VARCHAR(255) NOT NULL,
     CONSTRAINT pk_memberstate PRIMARY KEY (member_state_id)
 );
 
@@ -166,7 +175,7 @@ CREATE TABLE order_detail
 
 CREATE TABLE order_return
 (
-    order_return_id     BIGINT   AUTO_INCREMENT    NOT NULL,
+    order_return_id     BIGINT    AUTO_INCREMENT   NOT NULL,
     order_return_reason TEXT         NOT NULL,
     return_category     VARCHAR(255) NOT NULL,
     order_detail_id     BIGINT       NOT NULL,
@@ -182,7 +191,7 @@ CREATE TABLE order_state
 
 CREATE TABLE payment
 (
-    payment_id           BIGINT   AUTO_INCREMENT    NOT NULL,
+    payment_id           BIGINT    AUTO_INCREMENT   NOT NULL,
     payment_key          VARCHAR(255) NOT NULL,
     total_payment_amount BIGINT       NOT NULL,
     payment_requested_at datetime     NOT NULL,
@@ -294,18 +303,9 @@ CREATE TABLE publisher
     CONSTRAINT pk_publisher PRIMARY KEY (publisher_id)
 );
 
-CREATE TABLE member_rank
-(
-    member_rank_id             		BIGINT   AUTO_INCREMENT    NOT NULL,
-    member_rank_name           		VARCHAR(255) NOT NULL,
-    member_rank_tier_bonus_rate     INT          NOT NULL,
-    member_rank_require_amount 		INT          NOT NULL,
-    CONSTRAINT pk_member_rank PRIMARY KEY (member_rank_id)
-);
-
 CREATE TABLE review
 (
-    review_id         BIGINT    AUTO_INCREMENT   NOT NULL,
+    review_id         BIGINT   AUTO_INCREMENT    NOT NULL,
     product_id        BIGINT       NOT NULL,
     customer_id       BIGINT       NOT NULL,
     review_content    TEXT         NULL,
@@ -317,14 +317,14 @@ CREATE TABLE review
 
 CREATE TABLE social_auth
 (
-    social_auth_id   BIGINT    AUTO_INCREMENT   NOT NULL,
+    social_auth_id   BIGINT   AUTO_INCREMENT    NOT NULL,
     social_auth_name VARCHAR(255) NOT NULL,
     CONSTRAINT pk_socialauth PRIMARY KEY (social_auth_id)
 );
 
 CREATE TABLE tag
 (
-    tag_id   BIGINT   AUTO_INCREMENT   NOT NULL,
+    tag_id   BIGINT  AUTO_INCREMENT    NOT NULL,
     tag_name VARCHAR(30) NOT NULL,
     CONSTRAINT pk_tag PRIMARY KEY (tag_id)
 );
@@ -397,16 +397,16 @@ ALTER TABLE member
     ADD CONSTRAINT FK_MEMBER_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
 
 ALTER TABLE member
-    ADD CONSTRAINT FK_MEMBER_ON_MEMBERROLE_MEMBERROLEID FOREIGN KEY (member_role_id) REFERENCES member_role (member_role_id);
+    ADD CONSTRAINT FK_MEMBER_ON_MEMBER_RANK FOREIGN KEY (member_rank_id) REFERENCES member_rank (member_rank_id);
 
 ALTER TABLE member
-    ADD CONSTRAINT FK_MEMBER_ON_MEMBERSTATE_MEMBERSTATEID FOREIGN KEY (member_state_id) REFERENCES member_state (member_state_id);
+    ADD CONSTRAINT FK_MEMBER_ON_MEMBER_ROLE FOREIGN KEY (member_role_id) REFERENCES member_role (member_role_id);
 
 ALTER TABLE member
-    ADD CONSTRAINT FK_MEMBER_ON_RANK_RANKID FOREIGN KEY (member_rank_id) REFERENCES member_rank (member_rank_id);
+    ADD CONSTRAINT FK_MEMBER_ON_MEMBER_STATE FOREIGN KEY (member_state_id) REFERENCES member_state (member_state_id);
 
 ALTER TABLE member
-    ADD CONSTRAINT FK_MEMBER_ON_SOCIALAUTH_SOCIALAUTHID FOREIGN KEY (social_auth_id) REFERENCES social_auth (social_auth_id);
+    ADD CONSTRAINT FK_MEMBER_ON_SOCIAL_AUTH FOREIGN KEY (social_auth_id) REFERENCES social_auth (social_auth_id);
 
 ALTER TABLE order_detail
     ADD CONSTRAINT FK_ORDERDETAIL_ON_ORDER_CODE FOREIGN KEY (order_code) REFERENCES `order` (order_code);

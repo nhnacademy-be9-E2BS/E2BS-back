@@ -58,3 +58,7 @@ values (1, 1),
        (2, 4),
        (4, 2),
        (3, 3);
+
+insert into `like` (customer_id, product_id)
+values (1, 1),
+       (1, 3);
