@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
-public interface ProductStatusJpaRepository extends JpaRepository<ProductState, Long> {
+public interface ProductStateJpaRepository extends JpaRepository<ProductState, Long> {
 }
