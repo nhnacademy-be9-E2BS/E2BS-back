@@ -48,15 +48,19 @@ public class Member {
 	private LocalDate memberLoginLatest;
 
 	@ManyToOne(optional = false)
-	private MemberRank rank;
+	@JoinColumn(name = "member_rank_id")
+	private MemberRank memberRank;
 
 	@ManyToOne(optional = false)
+	@JoinColumn(name = "member_state_id")
 	private MemberState memberState;
 
 	@ManyToOne(optional = false)
+	@JoinColumn(name = "member_role_id")
 	private MemberRole memberRole;
 
 	@ManyToOne(optional = false)
+	@JoinColumn(name = "social_auth_id")
 	private SocialAuth socialAuth;
 
 }
