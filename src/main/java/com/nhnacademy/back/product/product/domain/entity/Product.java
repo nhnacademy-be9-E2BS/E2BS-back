@@ -3,7 +3,7 @@ package com.nhnacademy.back.product.product.domain.entity;
 import java.time.LocalDate;
 
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
-import com.nhnacademy.back.product.status.domain.entity.ProductStatus;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,6 @@ import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -29,7 +28,7 @@ public class Product {
 
 	@OneToOne(optional = false)
 	@JoinColumn(name = "product_status_id")
-	private ProductStatus productStatus;
+	private ProductState productState;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "publisher_id")
