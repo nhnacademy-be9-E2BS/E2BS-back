@@ -14,3 +14,7 @@ values (1, 1),
 
 insert into product_coupon (coupon_id, product_id)
 values (2, 1);
+
+insert into member_coupon (member_coupon_used, coupon_id, customer_id, member_coupon_created_at, member_coupon_period, member_coupon_code)
+values (0, 1, 1, '2025-03-12', '2025-07-01', 'qwer1234'),
+       (0, 3, 1, '2025-01-01', '2025-05-01', 'awsd5678');
