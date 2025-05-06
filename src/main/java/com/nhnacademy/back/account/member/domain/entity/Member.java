@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
-import com.nhnacademy.back.account.rank.domain.entity.MemberRank;
+import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 
 import jakarta.persistence.Column;

@@ -1,4 +1,4 @@
-package com.nhnacademy.back.account.rank.domain.entity;
+package com.nhnacademy.back.account.memberrank.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
