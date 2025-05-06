@@ -26,4 +26,5 @@ public class Customer {
 
 	@Column(nullable = false, length = 20)
 	private String customerName;
+
 }

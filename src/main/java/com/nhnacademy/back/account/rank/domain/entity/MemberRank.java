@@ -14,20 +14,20 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Rank {
+public class MemberRank {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long rankId;
+	private long memberRankId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private RankName rankName;
+	private RankName memberRankName;
 
 	@Column(nullable = false)
-	private int tierBonusRate;
+	private int memberRankTierBonusRate;
 
 	@Column(nullable = false)
-	private int rankRequireAmount;
+	private int memberRankRequireAmount;
 
 }
