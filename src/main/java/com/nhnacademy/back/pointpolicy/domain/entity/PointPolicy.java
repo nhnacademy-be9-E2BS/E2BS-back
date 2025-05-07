@@ -24,7 +24,7 @@ public class PointPolicy {
 	private String pointPolicyName;
 
 	@Column(nullable = false)
-	private int pointPolicyFigure;
+	private long pointPolicyFigure;
 
 	@Column(nullable = false)
 	private LocalDateTime pointPolicyCreatedAt;

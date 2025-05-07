@@ -20,8 +20,8 @@ public class CouponPolicy {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long couponPolicyId;
 
-	@Column(nullable = false, columnDefinition = "integer DEFAULT 0")
-	private int couponPolicyMinimum = 0;
+	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private long couponPolicyMinimum = 0;
 
 	private Long couponPolicyMaximumAmount;
 

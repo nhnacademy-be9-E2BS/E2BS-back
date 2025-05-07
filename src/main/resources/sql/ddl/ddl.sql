@@ -55,12 +55,12 @@ CREATE TABLE coupon
 CREATE TABLE coupon_policy
 (
     coupon_policy_id             BIGINT   AUTO_INCREMENT     NOT NULL,
-    coupon_policy_minimum        INT DEFAULT 0 NOT NULL,
-    coupon_policy_maximum_amount INT           NULL,
-    coupon_policy_sale_price     INT           NULL,
-    coupon_policy_discount_rate  INT           NULL,
-    coupon_policy_created_at     datetime      NOT NULL,
-    coupon_policy_name           VARCHAR(50)   NOT NULL,
+    coupon_policy_minimum        BIGINT DEFAULT 0 NOT NULL,
+    coupon_policy_maximum_amount BIGINT           NULL,
+    coupon_policy_sale_price     BIGINT           NULL,
+    coupon_policy_discount_rate  INT              NULL,
+    coupon_policy_created_at     datetime         NOT NULL,
+    coupon_policy_name           VARCHAR(50)      NOT NULL,
     CONSTRAINT pk_couponpolicy PRIMARY KEY (coupon_policy_id)
 );
 
@@ -122,7 +122,7 @@ CREATE TABLE member_rank
     member_rank_id              BIGINT   AUTO_INCREMENT    NOT NULL,
     member_rank_name            VARCHAR(255) NOT NULL,
     member_rank_tier_bonus_rate INT          NOT NULL,
-    member_rank_require_amount  INT          NOT NULL,
+    member_rank_require_amount  BIGINT       NOT NULL,
     CONSTRAINT pk_memberrank PRIMARY KEY (member_rank_id)
 );
 
@@ -150,7 +150,7 @@ CREATE TABLE `order`
     order_address_info   VARCHAR(255)  NOT NULL,
     order_address_detail VARCHAR(255)  NULL,
     order_address_extra  VARCHAR(255)  NOT NULL,
-    payment_point_amount INT DEFAULT 0 NULL,
+    payment_point_amount BIGINT DEFAULT 0 NULL,
     order_memo           TEXT          NULL,
     order_receive_date   datetime      NULL,
     order_shipment_date  datetime      NULL,
@@ -221,7 +221,7 @@ CREATE TABLE point_policy
 (
     point_policy_id         BIGINT   AUTO_INCREMENT   NOT NULL,
     point_policy_name       VARCHAR(20) NOT NULL,
-    point_policy_figure     INT         NOT NULL,
+    point_policy_figure     BIGINT      NOT NULL,
     point_policy_created_at datetime    NOT NULL,
     CONSTRAINT pk_pointpolicy PRIMARY KEY (point_policy_id)
 );
