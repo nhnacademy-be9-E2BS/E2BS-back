@@ -23,14 +23,11 @@ public class CouponPolicy {
 	@Column(nullable = false, columnDefinition = "integer DEFAULT 0")
 	private int couponPolicyMinimum = 0;
 
-	@Column()
-	private int couponPolicyMaximumAmount;
+	private Integer couponPolicyMaximumAmount;
 
-	@Column()
-	private int couponPolicySalePrice;
+	private Integer couponPolicySalePrice;
 
-	@Column()
-	private int couponPolicyDiscountRate;
+	private Integer couponPolicyDiscountRate;
 
 	@Column(nullable = false)
 	private LocalDateTime couponPolicyCreatedAt;
