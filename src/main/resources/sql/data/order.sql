@@ -1,14 +1,10 @@
--- 이 파일의 구문 실행 전에 product.sql 실행하기
+-- 이 파일의 구문 실행 전에 account.sql, product.sql, coupon.sql 실행하기
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_name) VALUES ('TOSS');
 
 -- OrderState
 INSERT INTO order_state (order_state_name) VALUES ('WAIT'), ('DELIVERY'), ('COMPLETE'), ('RETURN'), ('CANCEL');
-
--- Customer (Order와 연결할 고객)
-INSERT INTO customer (customer_email, customer_password, customer_name)
-VALUES ('user@example.com', 'securepw', '홍길동');
 
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_free_amount, delivery_fee_date)
@@ -33,6 +29,7 @@ INSERT INTO `order` (
     order_receive_date,
     order_shipment_date,
     order_created_at,
+    member_coupon_id,
     delivery_fee_id,
     customer_id,
     payment_id
@@ -50,6 +47,7 @@ INSERT INTO `order` (
              NOW(),
              NOW(),
              NOW(),
+          1,
              1,
              1,
              1
