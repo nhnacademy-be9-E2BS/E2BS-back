@@ -23,9 +23,9 @@ public class CouponPolicy {
 	@Column(nullable = false, columnDefinition = "integer DEFAULT 0")
 	private int couponPolicyMinimum = 0;
 
-	private Integer couponPolicyMaximumAmount;
+	private Long couponPolicyMaximumAmount;
 
-	private Integer couponPolicySalePrice;
+	private Long couponPolicySalePrice;
 
 	private Integer couponPolicyDiscountRate;
 

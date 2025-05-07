@@ -28,6 +28,6 @@ public class MemberRank {
 	private int memberRankTierBonusRate;
 
 	@Column(nullable = false)
-	private int memberRankRequireAmount;
+	private long memberRankRequireAmount;
 
 }
