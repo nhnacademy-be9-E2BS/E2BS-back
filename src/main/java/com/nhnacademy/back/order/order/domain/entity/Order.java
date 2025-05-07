@@ -3,6 +3,7 @@ package com.nhnacademy.back.order.order.domain.entity;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.payment.domain.entity.Payment;
 
@@ -57,6 +58,10 @@ public class Order {
 
 	@Column(nullable = false)
 	private LocalDateTime orderCreatedAt;
+
+	@OneToOne
+	@JoinColumn(name = "member_coupon_id")
+	private MemberCoupon memberCoupon;
 
 	@OneToOne(optional = false)
 	@JoinColumn(name = "delivery_fee_id")

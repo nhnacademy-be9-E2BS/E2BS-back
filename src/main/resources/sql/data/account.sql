@@ -1,13 +1,20 @@
--- MemberRole ENUM 기반
+-- sql 실행 순서
+-- 1.account.sql
+-- 2.product.sql
+-- 3.coupon.sql
+-- 4.order.sql
+-- 5.cart.sql, pointpolicy.sql
+
+-- MemberRole
 INSERT INTO member_role (member_role_name) VALUES ('ADMIN'), ('MEMBER');
 
--- MemberState ENUM 기반
+-- MemberState
 INSERT INTO member_state (member_state_name) VALUES ('ACTIVE'), ('DORMANT'), ('WITHDRAW');
 
--- SocialAuth ENUM 기반
+-- SocialAuth
 INSERT INTO social_auth (social_auth_name) VALUES ('PAYCO'), ('WEB');
 
--- MemberRank (ENUM + 숫자 필드)
+-- MemberRank
 INSERT INTO member_rank (member_rank_name, member_rank_tier_bonus_rate, member_rank_require_amount)
 VALUES
     ('NORMAL', 0, 0),
@@ -19,7 +26,7 @@ VALUES
 INSERT INTO customer (customer_email, customer_password, customer_name)
 VALUES ('testuser@example.com', 'password123', '홍길동');
 
--- Member 삽입
+-- Member
 INSERT INTO member (
     customer_id,
     member_id,
@@ -44,6 +51,7 @@ INSERT INTO member (
              1   -- PAYCO
          );
 
+-- Address
 INSERT INTO address (
     address_name,
     address_code,
