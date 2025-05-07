@@ -22,12 +22,10 @@ public class ProductCategory {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productCategoryId;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "category_id")
 	private Category category;

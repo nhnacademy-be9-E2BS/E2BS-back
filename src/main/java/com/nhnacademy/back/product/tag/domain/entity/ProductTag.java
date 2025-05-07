@@ -22,12 +22,10 @@ public class ProductTag {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productTagId;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "tag_id")
 	private Tag tag;

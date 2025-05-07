@@ -22,12 +22,10 @@ public class ProductContributor {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productContributorId;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "contributor_id")
 	private Contributor contributor;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;

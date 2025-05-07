@@ -3,7 +3,7 @@ package com.nhnacademy.back.product.product.domain.entity;
 import java.time.LocalDate;
 
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
-import com.nhnacademy.back.product.status.domain.entity.ProductStatus;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,6 @@ import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -27,49 +26,45 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
 
-	@Setter
 	@OneToOne(optional = false)
-	@JoinColumn(name = "product_status_id")
-	private ProductStatus productStatus;
+	@JoinColumn(name = "product_state_id")
+	private ProductState productState;
 
-	@Setter
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Setter
 	@Column(length = 30, nullable = false)
 	private String productTitle;
 
-	@Setter
 	@Column(nullable = false)
 	private String productContent;
 
-	@Setter
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String productDescription;
 
-	@Setter
 	@Column(nullable = false)
 	private LocalDate productPublishedAt;
 
-	@Setter
 	@Column(length = 20, nullable = false)
 	private String productIsbn;
 
-	@Setter
 	@Column(nullable = false)
 	private long productRegularPrice;
 
-	@Setter
 	@Column(nullable = false)
 	private long productSalePrice;
 
-	@Setter
 	@Column(nullable = false, columnDefinition = "TINYINT(1)")
 	private boolean productPackageable;
 
-	@Setter
 	@Column(nullable = false)
 	private int productStock;
+
+	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private long productHits = 0;
+
+	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
+	private long productSearches = 0;
+
 }
