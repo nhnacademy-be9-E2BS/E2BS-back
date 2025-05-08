@@ -6,9 +6,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.nhnacademy.back.product.publisher.domain.dto.RequestPublisherDTO;
+import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
-import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
@@ -22,14 +21,10 @@ public class PublisherServiceImpl implements PublisherService {
 
 	/**
 	 * Publisher을 DB에 저장하는 로직
-	 * publisher_id가 이미 존재하는 경우에는 Exception 발생
 	 */
 	@Override
 	public void createPublisher(RequestPublisherDTO request) {
-		if (publisherJpaRepository.existsById(request.getPublisherId())) {
-			throw new PublisherAlreadyExistsException();
-		}
-		Publisher publisher = new Publisher(request.getPublisherId(), request.getPublisherName());
+		Publisher publisher = new Publisher(request.getPublisherName());
 		publisherJpaRepository.save(publisher);
 	}
 
@@ -47,11 +42,11 @@ public class PublisherServiceImpl implements PublisherService {
 	 * publisher_id가 없는 경우에는 Exception 발생
 	 */
 	@Override
-	public void updatePublisher(RequestPublisherDTO request) {
+	public void updatePublisher(long publisherId, RequestPublisherDTO request) {
 		if (Objects.isNull(request)) {
 			throw new IllegalArgumentException();
 		}
-		Optional<Publisher> publisher = publisherJpaRepository.findById(request.getPublisherId());
+		Optional<Publisher> publisher = publisherJpaRepository.findById(publisherId);
 		if (publisher.isEmpty()) {
 			throw new PublisherNotFoundException();
 		}

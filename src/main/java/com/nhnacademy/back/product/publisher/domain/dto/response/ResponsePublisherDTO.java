@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.publisher.domain.dto;
+package com.nhnacademy.back.product.publisher.domain.dto.response;
 
 import java.util.List;
 

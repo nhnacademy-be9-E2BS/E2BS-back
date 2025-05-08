@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.product.publisher.domain.dto.RequestPublisherDTO;
-import com.nhnacademy.back.product.publisher.domain.dto.ResponseDTO;
-import com.nhnacademy.back.product.publisher.domain.dto.ResponsePublisherDTO;
+import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
+import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
 
@@ -30,7 +29,7 @@ public class PublisherController {
 	 * Publisher 리스트 조회
 	 */
 	@GetMapping
-	public ResponseEntity<ResponsePublisherDTO> getAllPublishers() {
+	public ResponseEntity<ResponsePublisherDTO> getPublishers() {
 		List<Publisher> publishers = publisherService.getPublishers();
 		ResponsePublisherDTO response = new ResponsePublisherDTO(publishers);
 
@@ -41,22 +40,19 @@ public class PublisherController {
 	 * Publisher 저장
 	 */
 	@PostMapping
-	public ResponseEntity<ResponseDTO> createPublisher(@RequestBody RequestPublisherDTO request) {
+	public ResponseEntity<?> createPublisher(@RequestBody RequestPublisherDTO request) {
 		publisherService.createPublisher(request);
-		ResponseDTO response = new ResponseDTO(HttpStatus.CREATED, "Publisher created");
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	/**
 	 * Publisher 수정
 	 */
 	@PutMapping("/{publisherId}")
-	public ResponseEntity<ResponseDTO> updatePublisher(@PathVariable Long publisherId,
-		@RequestBody RequestPublisherDTO request) {
-		publisherService.updatePublisher(request);
-		ResponseDTO response = new ResponseDTO(HttpStatus.CREATED, "Publisher updated");
+	public ResponseEntity<?> updatePublisher(@PathVariable Long publisherId, @RequestBody RequestPublisherDTO request) {
+		publisherService.updatePublisher(publisherId, request);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }

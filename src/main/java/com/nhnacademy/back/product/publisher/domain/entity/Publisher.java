@@ -21,8 +21,7 @@ public class Publisher {
 	@Column(length = 50, nullable = false)
 	private String publisherName;
 
-	public Publisher(long publisherId, String publisherName) {
-		this.publisherId = publisherId;
+	public Publisher(String publisherName) {
 		this.publisherName = publisherName;
 	}
 
