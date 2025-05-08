@@ -6,10 +6,6 @@ INSERT INTO payment_method (payment_method_name) VALUES ('TOSS');
 -- OrderState
 INSERT INTO order_state (order_state_name) VALUES ('WAIT'), ('DELIVERY'), ('COMPLETE'), ('RETURN'), ('CANCEL');
 
--- Customer (Order와 연결할 고객)
-INSERT INTO customer (customer_email, customer_password, customer_name)
-VALUES ('user@example.com', 'securepw', '홍길동');
-
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_free_amount, delivery_fee_date)
 VALUES (3000, 50000, CURDATE());
