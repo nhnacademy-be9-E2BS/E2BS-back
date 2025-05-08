@@ -58,6 +58,9 @@ public class Order {
 	@Column(nullable = false)
 	private LocalDateTime orderCreatedAt;
 
+	@Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	private boolean orderPaymentStatus = false;
+
 	@OneToOne
 	@JoinColumn(name = "member_coupon_id")
 	private MemberCoupon memberCoupon;
