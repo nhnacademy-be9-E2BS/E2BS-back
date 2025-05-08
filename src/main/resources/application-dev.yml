@@ -3,6 +3,9 @@
 # characterEncoding=UTF-8   : 한글 깨짐 방지
 
 # 로컬 유레카 환경 + 개발용 dev DB
+server:
+  port: 10236
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

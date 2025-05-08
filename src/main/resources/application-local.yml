@@ -1,4 +1,4 @@
-# 로컬 단일 실행용 + H2
+# 로컬 단일 실행용 + H2, 기본 8080 포트
 spring:
   datasource:
     driver-class-name: org.h2.Driver
