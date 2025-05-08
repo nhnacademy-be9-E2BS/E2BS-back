@@ -30,4 +30,18 @@ public class Wrapper {
 	@Column(nullable = false)
 	private boolean wrapperSaleable;
 
+	public Wrapper(long wrapperPrice, String wrapperName, String wrapperImage, boolean wrapperSaleable) {
+		this.wrapperPrice = wrapperPrice;
+		this.wrapperName = wrapperName;
+		this.wrapperImage = wrapperImage;
+		this.wrapperSaleable = wrapperSaleable;
+	}
+
+	public void setWrapper(long wrapperPrice, String wrapperName, String wrapperImage, boolean wrapperSaleable) {
+		this.wrapperPrice = wrapperPrice;
+		this.wrapperName = wrapperName;
+		this.wrapperImage = wrapperImage;
+		this.wrapperSaleable = wrapperSaleable;
+	}
+
 }
