@@ -9,32 +9,47 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
+import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
-import com.nhnacademy.back.product.publisher.service.PublisherService;
+import com.nhnacademy.back.product.publisher.service.impl.PublisherServiceImpl;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class PublisherServiceTest {
-	@Autowired
-	private PublisherService publisherService;
-	@MockitoBean
+	@InjectMocks
+	private PublisherServiceImpl publisherService;
+	@Mock
 	private PublisherJpaRepository publisherJpaRepository;
 
 	@Test
-	@DisplayName("create publisher")
+	@DisplayName("create publisher - success")
 	void create_publisher_success_test() {
 		RequestPublisherDTO request = new RequestPublisherDTO("Publisher A");
 		publisherService.createPublisher(request);
 
 		verify(publisherJpaRepository, times(1)).save(any(Publisher.class));
+	}
+
+	@Test
+	@DisplayName("create publisher - fail")
+	void create_publisher_fail_test() {
+		RequestPublisherDTO request = new RequestPublisherDTO("Publisher A");
+
+		when(publisherJpaRepository.existsByPublisherName("Publisher A"))
+			.thenReturn(false)    // 첫 번째 호출에는 false return
+			.thenReturn(true);    // 두 번째 호출에는 true return
+
+		publisherService.createPublisher(request);
+
+		assertThatThrownBy(() -> publisherService.createPublisher(request))
+			.isInstanceOf(PublisherAlreadyExistsException.class);
 	}
 
 	@Test
