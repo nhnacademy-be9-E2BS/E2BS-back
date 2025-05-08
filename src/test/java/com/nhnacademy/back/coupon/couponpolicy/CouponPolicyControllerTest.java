@@ -16,6 +16,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,20 +38,26 @@ class CouponPolicyControllerTest {
 	private CouponPolicyService couponPolicyService;
 
 	@Test
-	@DisplayName("관리자 모든 쿠폰 정책 조회")
-	void getCouponPolicies() throws Exception {
+	@DisplayName("관리자 모든 쿠폰 정책 조회 (페이징 처리)")
+	void getCouponPolicies_withPaging() throws Exception {
 		List<ResponseCouponPolicyDTO> mockList = List.of(
 			new ResponseCouponPolicyDTO(1L, 5000L, 10000L, 1000L, 10, LocalDateTime.now(), "정책A"),
 			new ResponseCouponPolicyDTO(2L, 3000L, 8000L, 1500L, 15, LocalDateTime.now(), "정책B")
 		);
 
-		when(couponPolicyService.getCouponPolicies()).thenReturn(mockList);
+		Page<ResponseCouponPolicyDTO> mockPage = new PageImpl<>(mockList);
+		Pageable pageable = PageRequest.of(0, 10);
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/couponPolicies"))
+		when(couponPolicyService.getCouponPolicies(pageable)).thenReturn(mockPage);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/couponPolicies")
+				.param("page", "0")
+				.param("size", "10"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.size()").value(2))
-			.andExpect(jsonPath("$[0].couponPolicyName").value("정책A"));
+			.andExpect(jsonPath("$.content.length()").value(2))
+			.andExpect(jsonPath("$.content[0].couponPolicyName").value("정책A"));
 	}
+
 
 	@Test
 	@DisplayName("관리자 단일 쿠폰 정책 조회")

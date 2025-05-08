@@ -14,6 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.RequestCouponPolicyDTO;
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.ResponseCouponPolicyDTO;
@@ -41,12 +45,7 @@ public class CouponPolicyServiceTest {
 	void createCouponPolicySuccess() {
 		// given
 		RequestCouponPolicyDTO requestDTO = new RequestCouponPolicyDTO(
-			50000L,
-			5000L,
-			3000L,
-			5,
-			LocalDateTime.now(),
-			"Test Coupon Policy"
+			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy"
 		);
 		when(couponPolicyJpaRepository.existsByCouponPolicyName(anyString())).thenReturn(false);
 
@@ -63,12 +62,7 @@ public class CouponPolicyServiceTest {
 	void createCouponPolicyFail() {
 		// given
 		RequestCouponPolicyDTO requestDTO = new RequestCouponPolicyDTO(
-			50000L,
-			5000L,
-			3000L,
-			5,
-			LocalDateTime.now(),
-			"Test Coupon Policy"
+			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy"
 		);
 		when(couponPolicyJpaRepository.existsByCouponPolicyName(anyString())).thenReturn(true);
 
@@ -78,48 +72,37 @@ public class CouponPolicyServiceTest {
 	}
 
 	@Test
-	@DisplayName("관리자 쿠폰 정책 전체 조회")
-	void getCouponPolicies() {
+	@DisplayName("관리자 쿠폰 정책 전체 조회 - 페이징")
+	void getCouponPolicies_withPaging() {
 		// given
 		CouponPolicy couponPolicy1 = new CouponPolicy(
-			50000L,
-			5000L,
-			3000L,
-			5,
-			LocalDateTime.now(),
-			"Test Coupon Policy1"
+			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy1"
 		);
 		CouponPolicy couponPolicy2 = new CouponPolicy(
-			50000L,
-			5000L,
-			3000L,
-			3,
-			LocalDateTime.now(),
-			"Test Coupon Policy2"
+			50000L, 5000L, 3000L, 3, LocalDateTime.now(), "Test Coupon Policy2"
 		);
+
 		List<CouponPolicy> dummyData = Arrays.asList(couponPolicy1, couponPolicy2);
-		when(couponPolicyJpaRepository.findAll()).thenReturn(dummyData);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<CouponPolicy> dummyPage = new PageImpl<>(dummyData, pageable, dummyData.size());
+
+		when(couponPolicyJpaRepository.findAll(any(Pageable.class))).thenReturn(dummyPage);
 
 		// when
-		List<ResponseCouponPolicyDTO> responseCouponPolicyDTOs = couponPolicyService.getCouponPolicies();
+		Page<ResponseCouponPolicyDTO> result = couponPolicyService.getCouponPolicies(pageable);
 
 		// then
-		verify(couponPolicyJpaRepository, times(1)).findAll();
-		assertThat(responseCouponPolicyDTOs).hasSize(2);
+		verify(couponPolicyJpaRepository, times(1)).findAll(any(Pageable.class));
+		assertThat(result.getContent()).hasSize(2);
+		assertThat(result.getContent().get(0).getCouponPolicyName()).isEqualTo("Test Coupon Policy1");
 	}
-
 
 	@Test
 	@DisplayName("관리자 쿠폰 정책 단건 조회 성공")
 	void getCouponPolicyByIdSuccess() {
 		// given
 		CouponPolicy couponPolicy = new CouponPolicy(
-			50000L,
-			5000L,
-			3000L,
-			5,
-			LocalDateTime.now(),
-			"Test Coupon Policy"
+			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy"
 		);
 		when(couponPolicyJpaRepository.findById(1L)).thenReturn(Optional.of(couponPolicy));
 

@@ -2,6 +2,8 @@ package com.nhnacademy.back.coupon.couponpolicy.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.RequestCouponPolicyDTO;
@@ -37,8 +39,8 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	}
 
 	@Override
-	public List<ResponseCouponPolicyDTO> getCouponPolicies() {
-		return couponPolicyJpaRepository.findAll().stream()
+	public Page<ResponseCouponPolicyDTO> getCouponPolicies(Pageable pageable) {
+		return couponPolicyJpaRepository.findAll(pageable)
 			.map(couponPolicy -> new ResponseCouponPolicyDTO(
 				couponPolicy.getCouponPolicyId(),
 				couponPolicy.getCouponPolicyMinimum(),
@@ -46,9 +48,10 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 				couponPolicy.getCouponPolicySalePrice(),
 				couponPolicy.getCouponPolicyDiscountRate(),
 				couponPolicy.getCouponPolicyCreatedAt(),
-				couponPolicy.getCouponPolicyName()))
-			.toList();
+				couponPolicy.getCouponPolicyName()
+			));
 	}
+
 
 	@Override
 	public ResponseCouponPolicyDTO getCouponPolicyById(Long id) {
