@@ -14,10 +14,6 @@ VALUES ('user@example.com', 'securepw', '홍길동');
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_free_amount, delivery_fee_date)
 VALUES (3000, 50000, CURDATE());
 
--- Payment
-INSERT INTO payment (payment_key, total_payment_amount, payment_requested_at, payment_approved_at, payment_method_id)
-VALUES ('PAY1234567890', 10000, NOW(), NOW(), 1);
-
 -- Order (order_code는 PK이므로 임의의 유일한 값)
 INSERT INTO `order` (
     order_code,
@@ -57,13 +53,17 @@ INSERT INTO `order` (
              1
          );
 
--- OrderDetail 적용 전에 proudct.sql 실행해서 데이터 넣어 놓기
+-- OrderDetail
 INSERT INTO order_detail (order_code, order_quantity, order_detail_per_price, product_id, order_state_id, wrapper_id, review_id)
 VALUES
     ('ORD20240506', 1, 1200000, 1, 1, null, NULL),
     ('ORD20240506', 2, 700000, 2, 2, null, NULL);
 
--- OrderReturn(OrderDetail이 있어야함)
+-- Payment
+INSERT INTO payment (payment_key, total_payment_amount, payment_requested_at, payment_approved_at, payment_method_id, order_code)
+VALUES ('PAY1234567890', 10000, NOW(), NOW(), 1, 'ORD20240506');
+
+-- OrderReturn
 INSERT INTO order_return (order_return_reason, return_category, order_detail_id)
 VALUES
     ('상품이 파손되어 도착했습니다.', 'CHANGE_MIND', 1),

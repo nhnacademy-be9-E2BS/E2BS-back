@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
-import com.nhnacademy.back.order.payment.domain.entity.Payment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -70,9 +69,5 @@ public class Order {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
-
-	@OneToOne(optional = false)
-	@JoinColumn(name = "payment_id")
-	private Payment payment;
 
 }
