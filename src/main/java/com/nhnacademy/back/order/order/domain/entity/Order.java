@@ -51,6 +51,9 @@ public class Order {
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
 
+	@Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	private boolean orderPaymentStatus = false;
+
 	private LocalDateTime orderReceiveDate;
 
 	private LocalDateTime orderShipmentDate;

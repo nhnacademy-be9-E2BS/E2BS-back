@@ -159,9 +159,11 @@ CREATE TABLE `order`
     order_address_extra  VARCHAR(255)  NOT NULL,
     payment_point_amount BIGINT DEFAULT 0 NULL,
     order_memo           TEXT          NULL,
+    order_payment_status TINYINT(1) DEFAULT 0 NOT NULL,
     order_receive_date   datetime      NULL,
     order_shipment_date  datetime      NULL,
     order_created_at     datetime      NOT NULL,
+    member_coupon_id     BIGINT        NULL,
     delivery_fee_id      BIGINT        NOT NULL,
     customer_id          BIGINT        NOT NULL,
     CONSTRAINT pk_order PRIMARY KEY (order_code)
