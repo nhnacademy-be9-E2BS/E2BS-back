@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -22,4 +21,11 @@ public class Publisher {
 	@Column(length = 50, nullable = false)
 	private String publisherName;
 
+	public Publisher(String publisherName) {
+		this.publisherName = publisherName;
+	}
+
+	public void setPublisher(String publisherName) {
+		this.publisherName = publisherName;
+	}
 }
