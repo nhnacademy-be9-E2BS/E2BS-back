@@ -1,13 +1,14 @@
 package com.nhnacademy.back.order.wrapper.service.impl;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
@@ -35,8 +36,15 @@ public class WrapperServiceImpl implements WrapperService {
 	 * DB에 저장 되어 있는 모든 Wrapper를 조회하여 List로 return 하는 로직
 	 */
 	@Override
-	public List<Wrapper> getWrappers(Pageable pageable) {
-		return wrapperJpaRepository.findAll(pageable).getContent();
+	public Page<ResponseWrapperDTO> getWrappers(Pageable pageable) {
+		return wrapperJpaRepository.findAll(pageable)
+			.map(wrapper -> new ResponseWrapperDTO(
+				wrapper.getWrapperId(),
+				wrapper.getWrapperPrice(),
+				wrapper.getWrapperName(),
+				wrapper.getWrapperImage(),
+				wrapper.isWrapperSaleable()
+			));
 	}
 
 	/**
@@ -44,8 +52,15 @@ public class WrapperServiceImpl implements WrapperService {
 	 * 고객이 선택 가능한 포장지 리스트를 조회할 때 사용 (isSaleable = true)
 	 */
 	@Override
-	public List<Wrapper> getWrappersBySaleable(boolean isSaleable, Pageable pageable) {
-		return wrapperJpaRepository.findAllByWrapperSaleable(isSaleable, pageable).getContent();
+	public Page<ResponseWrapperDTO> getWrappersBySaleable(boolean isSaleable, Pageable pageable) {
+		return wrapperJpaRepository.findAllByWrapperSaleable(isSaleable, pageable)
+			.map(wrapper -> new ResponseWrapperDTO(
+				wrapper.getWrapperId(),
+				wrapper.getWrapperPrice(),
+				wrapper.getWrapperName(),
+				wrapper.getWrapperImage(),
+				wrapper.isWrapperSaleable()
+			));
 	}
 
 	/**

@@ -1,18 +1,17 @@
 package com.nhnacademy.back.order.wrapper.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
-import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
+import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 
 public interface WrapperService {
 	void createWrapper(RequestWrapperDTO request);
 
-	List<Wrapper> getWrappers(Pageable pageable);
+	Page<ResponseWrapperDTO> getWrappers(Pageable pageable);
 
-	List<Wrapper> getWrappersBySaleable(boolean isSaleable, Pageable pageable);
+	Page<ResponseWrapperDTO> getWrappersBySaleable(boolean isSaleable, Pageable pageable);
 
 	void updateWrapper(long wrapperId, RequestWrapperDTO request);
 }
