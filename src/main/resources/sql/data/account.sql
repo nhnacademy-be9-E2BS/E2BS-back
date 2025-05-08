@@ -11,10 +11,10 @@ INSERT INTO member_role (member_role_name) VALUES ('ADMIN'), ('MEMBER');
 -- MemberState
 INSERT INTO member_state (member_state_name) VALUES ('ACTIVE'), ('DORMANT'), ('WITHDRAW');
 
--- SocialAuth
+-- SocialAuth ENUM 기반
 INSERT INTO social_auth (social_auth_name) VALUES ('PAYCO'), ('WEB');
 
--- MemberRank
+-- MemberRank (ENUM + 숫자 필드)
 INSERT INTO member_rank (member_rank_name, member_rank_tier_bonus_rate, member_rank_require_amount)
 VALUES
     ('NORMAL', 0, 0),
@@ -26,7 +26,7 @@ VALUES
 INSERT INTO customer (customer_email, customer_password, customer_name)
 VALUES ('testuser@example.com', 'password123', '홍길동');
 
--- Member
+-- Member 삽입
 INSERT INTO member (
     customer_id,
     member_id,
