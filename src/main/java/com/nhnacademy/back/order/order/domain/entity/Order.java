@@ -3,8 +3,8 @@ package com.nhnacademy.back.order.order.domain.entity;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
-import com.nhnacademy.back.order.payment.domain.entity.Payment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,12 +51,19 @@ public class Order {
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
 
+	@Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	private boolean orderPaymentStatus = false;
+
 	private LocalDateTime orderReceiveDate;
 
 	private LocalDateTime orderShipmentDate;
 
 	@Column(nullable = false)
 	private LocalDateTime orderCreatedAt;
+
+	@OneToOne
+	@JoinColumn(name = "member_coupon_id")
+	private MemberCoupon memberCoupon;
 
 	@OneToOne(optional = false)
 	@JoinColumn(name = "delivery_fee_id")
@@ -65,9 +72,5 @@ public class Order {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
-
-	@OneToOne(optional = false)
-	@JoinColumn(name = "payment_id")
-	private Payment payment;
 
 }

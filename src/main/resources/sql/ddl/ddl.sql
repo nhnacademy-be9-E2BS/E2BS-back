@@ -14,11 +14,18 @@ CREATE TABLE address
 
 CREATE TABLE cart
 (
-    cart_id       BIGINT AUTO_INCREMENT NOT NULL,
-    customer_id   BIGINT NOT NULL,
-    product_id    BIGINT NOT NULL,
-    cart_quantity INT    NOT NULL,
+    cart_id     BIGINT NOT NULL,
+    customer_id BIGINT NOT NULL,
     CONSTRAINT pk_cart PRIMARY KEY (cart_id)
+);
+
+CREATE TABLE cart_items
+(
+    cart_items_id       BIGINT NOT NULL,
+    cart_id             BIGINT NOT NULL,
+    product_id          BIGINT NOT NULL,
+    cart_items_quantity INT    NOT NULL,
+    CONSTRAINT pk_cartitems PRIMARY KEY (cart_items_id)
 );
 
 CREATE TABLE category
@@ -152,12 +159,13 @@ CREATE TABLE `order`
     order_address_extra  VARCHAR(255)  NOT NULL,
     payment_point_amount BIGINT DEFAULT 0 NULL,
     order_memo           TEXT          NULL,
+    order_payment_status TINYINT(1) DEFAULT 0 NOT NULL,
     order_receive_date   datetime      NULL,
     order_shipment_date  datetime      NULL,
     order_created_at     datetime      NOT NULL,
+    member_coupon_id     BIGINT        NULL,
     delivery_fee_id      BIGINT        NOT NULL,
     customer_id          BIGINT        NOT NULL,
-    payment_id           BIGINT        NOT NULL,
     CONSTRAINT pk_order PRIMARY KEY (order_code)
 );
 
@@ -197,6 +205,7 @@ CREATE TABLE payment
     payment_requested_at datetime     NOT NULL,
     payment_approved_at  datetime     NULL,
     payment_method_id    BIGINT       NOT NULL,
+    order_code           VARCHAR(255) NOT NULL,
     CONSTRAINT pk_payment PRIMARY KEY (payment_id)
 );
 
@@ -341,6 +350,9 @@ CREATE TABLE wrapper
     CONSTRAINT pk_wrapper PRIMARY KEY (wrapper_id)
 );
 
+ALTER TABLE cart
+    ADD CONSTRAINT uc_cart_customer UNIQUE (customer_id);
+
 ALTER TABLE member_coupon
     ADD CONSTRAINT uc_membercoupon_membercouponcode UNIQUE (member_coupon_code);
 
@@ -348,10 +360,16 @@ ALTER TABLE `order`
     ADD CONSTRAINT uc_order_delivery_fee UNIQUE (delivery_fee_id);
 
 ALTER TABLE `order`
-    ADD CONSTRAINT uc_order_payment UNIQUE (payment_id);
+    ADD CONSTRAINT uc_order_member_coupon UNIQUE (member_coupon_id);
+
+ALTER TABLE order_detail
+    ADD CONSTRAINT uc_orderdetail_product UNIQUE (product_id);
 
 ALTER TABLE order_detail
     ADD CONSTRAINT uc_orderdetail_review UNIQUE (review_id);
+
+ALTER TABLE payment
+    ADD CONSTRAINT uc_payment_order_code UNIQUE (order_code);
 
 ALTER TABLE payment
     ADD CONSTRAINT uc_payment_payment_method UNIQUE (payment_method_id);
@@ -360,13 +378,16 @@ ALTER TABLE product
     ADD CONSTRAINT uc_product_product_state UNIQUE (product_state_id);
 
 ALTER TABLE address
-    ADD CONSTRAINT FK_ADDRESS_ON_MEMBER_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
+    ADD CONSTRAINT FK_ADDRESS_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
+
+ALTER TABLE cart_items
+    ADD CONSTRAINT FK_CARTITEMS_ON_CART FOREIGN KEY (cart_id) REFERENCES cart (cart_id);
+
+ALTER TABLE cart_items
+    ADD CONSTRAINT FK_CARTITEMS_ON_PRODUCT FOREIGN KEY (product_id) REFERENCES product (product_id);
 
 ALTER TABLE cart
     ADD CONSTRAINT FK_CART_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
-
-ALTER TABLE cart
-    ADD CONSTRAINT FK_CART_ON_PRODUCT FOREIGN KEY (product_id) REFERENCES product (product_id);
 
 ALTER TABLE category_coupon
     ADD CONSTRAINT FK_CATEGORYCOUPON_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (category_id);
@@ -417,6 +438,9 @@ ALTER TABLE order_detail
     ADD CONSTRAINT FK_ORDERDETAIL_ON_ORDER_STATE FOREIGN KEY (order_state_id) REFERENCES order_state (order_state_id);
 
 ALTER TABLE order_detail
+    ADD CONSTRAINT FK_ORDERDETAIL_ON_PRODUCT FOREIGN KEY (product_id) REFERENCES product (product_id);
+
+ALTER TABLE order_detail
     ADD CONSTRAINT FK_ORDERDETAIL_ON_REVIEW FOREIGN KEY (review_id) REFERENCES review (review_id);
 
 ALTER TABLE order_detail
@@ -432,13 +456,16 @@ ALTER TABLE `order`
     ADD CONSTRAINT FK_ORDER_ON_DELIVERY_FEE FOREIGN KEY (delivery_fee_id) REFERENCES delivery_fee (delivery_fee_id);
 
 ALTER TABLE `order`
-    ADD CONSTRAINT FK_ORDER_ON_PAYMENT FOREIGN KEY (payment_id) REFERENCES payment (payment_id);
+    ADD CONSTRAINT FK_ORDER_ON_MEMBER_COUPON FOREIGN KEY (member_coupon_id) REFERENCES member_coupon (member_coupon_id);
+
+ALTER TABLE payment
+    ADD CONSTRAINT FK_PAYMENT_ON_ORDER_CODE FOREIGN KEY (order_code) REFERENCES `order` (order_code);
 
 ALTER TABLE payment
     ADD CONSTRAINT FK_PAYMENT_ON_PAYMENT_METHOD FOREIGN KEY (payment_method_id) REFERENCES payment_method (payment_method_id);
 
 ALTER TABLE point_history
-    ADD CONSTRAINT FK_POINTHISTORY_ON_MEMBER_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
+    ADD CONSTRAINT FK_POINTHISTORY_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES member (customer_id);
 
 ALTER TABLE product_category
     ADD CONSTRAINT FK_PRODUCTCATEGORY_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (category_id);

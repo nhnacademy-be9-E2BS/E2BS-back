@@ -1,7 +1,14 @@
--- MemberRole ENUM 기반
+-- sql 실행 순서
+-- 1.account.sql
+-- 2.product.sql
+-- 3.coupon.sql
+-- 4.order.sql
+-- 5.cart.sql, pointpolicy.sql
+
+-- MemberRole
 INSERT INTO member_role (member_role_name) VALUES ('ADMIN'), ('MEMBER');
 
--- MemberState ENUM 기반
+-- MemberState
 INSERT INTO member_state (member_state_name) VALUES ('ACTIVE'), ('DORMANT'), ('WITHDRAW');
 
 -- SocialAuth ENUM 기반
@@ -44,6 +51,7 @@ INSERT INTO member (
              1   -- PAYCO
          );
 
+-- Address
 INSERT INTO address (
     address_name,
     address_code,
