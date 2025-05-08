@@ -14,7 +14,7 @@ VALUES ('user@example.com', 'securepw', '홍길동');
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_free_amount, delivery_fee_date)
 VALUES (3000, 50000, CURDATE());
 
--- Order (order_code는 PK이므로 임의의 유일한 값)
+-- Order
 INSERT INTO `order` (
     order_code,
     order_receiver_name,
@@ -26,13 +26,13 @@ INSERT INTO `order` (
     order_address_extra,
     payment_point_amount,
     order_memo,
+    order_payment_status,
     order_receive_date,
     order_shipment_date,
     order_created_at,
     member_coupon_id,
     delivery_fee_id,
-    customer_id,
-    payment_id
+    customer_id
 ) VALUES (
              'ORD20240506',
              '수신자',
@@ -44,10 +44,10 @@ INSERT INTO `order` (
              '3층',
              1000,
              '문 앞에 놓아주세요',
+             false,
              NOW(),
              NOW(),
              NOW(),
-             1,
              1,
              1,
              1
