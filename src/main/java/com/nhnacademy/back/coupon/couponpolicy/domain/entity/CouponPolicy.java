@@ -34,4 +34,18 @@ public class CouponPolicy {
 
 	@Column(length = 50, nullable = false)
 	private String couponPolicyName;
+
+	public CouponPolicy(long couponPolicyMinimum,
+						Long couponPolicyMaximumAmount,
+						Long couponPolicySalePrice,
+						Integer couponPolicyDiscountRate,
+						LocalDateTime couponPolicyCreatedAt,
+						String couponPolicyName) {
+		this.couponPolicyMinimum = couponPolicyMinimum;
+		this.couponPolicyMaximumAmount = couponPolicyMaximumAmount;
+		this.couponPolicySalePrice = couponPolicySalePrice;
+		this.couponPolicyDiscountRate = couponPolicyDiscountRate;
+		this.couponPolicyCreatedAt = couponPolicyCreatedAt;
+		this.couponPolicyName = couponPolicyName;
+	}
 }
