@@ -24,4 +24,7 @@ public class ProductState {
 	@Enumerated(EnumType.STRING)
 	private ProductStateName productStateName;
 
+	public ProductState(ProductStateName productStateName) {
+		this.productStateName = productStateName;
+	}
 }

@@ -33,4 +33,14 @@ public class CartItems {
 	@Column(nullable = false)
 	private int cartItemsQuantity;
 
+	public CartItems(Cart cart, Product product, int cartItemsQuantity) {
+		this.cart = cart;
+		this.product = product;
+		this.cartItemsQuantity = cartItemsQuantity;
+	}
+
+	public void changeCartItemsQuantity(int quantity) {
+		this.cartItemsQuantity = quantity;
+	}
+
 }
