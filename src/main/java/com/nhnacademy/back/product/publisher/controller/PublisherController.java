@@ -1,7 +1,8 @@
 package com.nhnacademy.back.product.publisher.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
-import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,10 +29,9 @@ public class PublisherController {
 	 * Publisher 리스트 조회
 	 */
 	@GetMapping
-	public ResponseEntity<ResponsePublisherDTO> getPublishers() {
-		List<Publisher> publishers = publisherService.getPublishers();
-		ResponsePublisherDTO response = new ResponsePublisherDTO(publishers);
-
+	public ResponseEntity<Page<ResponsePublisherDTO>> getPublishers(
+		@PageableDefault(page = 0, size = 10) Pageable pageable) {
+		Page<ResponsePublisherDTO> response = publisherService.getPublishers(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
