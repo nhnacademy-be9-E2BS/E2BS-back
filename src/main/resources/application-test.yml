@@ -1,28 +1,21 @@
-# Jpa 테스트를 동작하기 위한 프로필임. H2 사용
+# Jpa 테스트 구동 프로필
 spring:
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
     username: sa
     password:
-
   jpa:
-    hibernate:
-      ddl-auto: create-drop  # 테스트 후 자동으로 테이블 제거
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.H2Dialect
-    open-in-view: false
-
   h2:
     console:
       enabled: true
 
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
-    org.springframework.transaction.interceptor: trace
+eureka:
+  client:
+    enabled: false

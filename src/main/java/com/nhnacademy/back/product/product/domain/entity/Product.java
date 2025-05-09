@@ -61,7 +61,7 @@ public class Product {
 	@Column(nullable = false)
 	private long productSalePrice;
 
-	@Column(nullable = false, columnDefinition = "TINYINT(1)")
+	@Column(nullable = false)
 	private boolean productPackageable;
 
 	@Column(nullable = false)

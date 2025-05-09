@@ -1,0 +1,24 @@
+# useSSL=false              : SSL 연결을 사용하지 않도록 설정 (개발 환경에서는 보통 꺼둠)
+# serverTimezone=Asia/Seoul : MySQL 서버와 애플리케이션 간의 시간대 일치
+# characterEncoding=UTF-8   : 한글 깨짐 방지
+
+# 로컬 유레카 환경 + 개발용 dev DB
+server:
+  port: 10236
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://s4.java21.net:13306/project_be9_team2_dev?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    # 개발용 MySQL DB 접속 URL, SSL 사용 안 함, 시간대/인코딩 설정 포함
+    username: project_be9_team2
+    password: "*gzxziN[g9kwl]Ln"
+
+eureka:
+  client:
+    fetch-registry: true # Eureka에서 다른 서비스 정보를 받아올지 여부
+    register-with-eureka: true # 현재 애플리케이션을 Eureka에 등록할지 여부
+    service-url:
+      defaultZone: http://admin:1234@localhost:10230/eureka # 로컬 Eureka 서버의 주소
+  instance:
+    prefer-ip-address: true # 서비스 등록 시 도메인 대신 IP 주소로 등록
