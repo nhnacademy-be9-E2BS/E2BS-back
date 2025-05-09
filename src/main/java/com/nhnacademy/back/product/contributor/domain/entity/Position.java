@@ -19,7 +19,12 @@ public class Position {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long positionId;
 
+	@Setter
 	@Column(length = 10, nullable = false)
 	private String positionName;
+
+	public Position(String positionName) {
+		this.positionName = positionName;
+	}
 
 }
