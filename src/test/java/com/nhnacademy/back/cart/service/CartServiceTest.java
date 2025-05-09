@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
@@ -76,10 +77,10 @@ public class CartServiceTest {
 
 
 	@Test
-	@DisplayName("장바구니 항목 추가 테스트")
+	@DisplayName("비회원/회원 장바구니 항목 추가 테스트")
 	void createCartItem() {
 		// given
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, productId, 2);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, "", productId, 2);
 
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -95,9 +96,9 @@ public class CartServiceTest {
 	}
 
 	@Test
-	@DisplayName("장바구니 항목 추가 테스트 - 실패(아이템 항목 이미 존재한 경우)")
+	@DisplayName("비회원/회원 장바구니 항목 추가 테스트 - 실패(아이템 항목 이미 존재한 경우)")
 	void createCartItem_AlreadyExists() {
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, productId, 2);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, "", productId, 2);
 
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -109,13 +110,13 @@ public class CartServiceTest {
 	}
 
 	@Test
-	@DisplayName("장바구니 수량 변경 테스트")
+	@DisplayName("비회원/회원 장바구니 수량 변경 테스트")
 	void updateCartItem() {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 1);
 		when(cartItemsRepository.findById(cartItemId)).thenReturn(Optional.of(cartItem));
 
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", 5);
 
 		// when
 		cartService.updateCartItem(cartItemId, request);
@@ -125,21 +126,21 @@ public class CartServiceTest {
 	}
 
 	@Test
-	@DisplayName("장바구니 항목 삭제 테스트")
+	@DisplayName("비회원/회원 장바구니 항목 삭제 테스트")
 	void deleteCartItem() {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 1);
 		when(cartItemsRepository.findById(cartItemId)).thenReturn(Optional.of(cartItem));
 
 		// when
-		cartService.deleteCartItem(cartItemId);
+		cartService.deleteCartItem(cartItemId, new RequestDeleteCartItemsDTO());
 
 		// then
 		verify(cartItemsRepository).delete(cartItem);
 	}
 
 	@Test
-	@DisplayName("고객의 장바구니 목록 조회 테스트")
+	@DisplayName("비회원/회원의 장바구니 목록 조회 테스트")
 	void getCartItemsByCustomer() {
 		// given
 		Pageable pageable = PageRequest.of(0, 10);
