@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
+import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
 	 * 이미 존재하는 경우의 에러 핸들러
 	 */
 	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
-		BadRequestException.class, LoginMemberIsNotExistsException.class})
+		BadRequestException.class, LoginMemberIsNotExistsException.class, })
 	public ResponseEntity<?> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), LocalDateTime.now());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
@@ -41,7 +42,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
 	}
 
-
+	/**
+	 * 값의 충돌
+	 */
+	@ExceptionHandler({AlreadyExistsMemberIdException.class})
+	public ResponseEntity<?> handleConflictException(Exception ex) {
+		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+	}
 
 
 }

@@ -4,5 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
 
-public interface MemberStateJpaRepository extends JpaRepository<MemberState,Long> {
+public interface MemberStateJpaRepository extends JpaRepository<MemberState, Long> {
+
+	MemberState getMemberStateByMemberStateId(long memberStateId);
+
 }

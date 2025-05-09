@@ -4,5 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
 
-public interface MemberRoleJpaRepository extends JpaRepository<MemberRole,Long> {
+public interface MemberRoleJpaRepository extends JpaRepository<MemberRole, Long> {
+
+	MemberRole getMemberRoleByMemberRoleId(long memberRoleId);
+
 }
