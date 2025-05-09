@@ -21,4 +21,11 @@ public class Position {
 	@Column(length = 10, nullable = false)
 	private String positionName;
 
+	public Position(String positionName) {
+		this.positionName = positionName;
+	}
+
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
 }

@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.nhnacademy.back.product.contributor.domain.entity.Position;
 
 public interface PositionJpaRepository extends JpaRepository<Position, Long> {
+	boolean existsByPositionName(String positionName);
 }
