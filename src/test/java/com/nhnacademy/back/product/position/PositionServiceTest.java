@@ -102,7 +102,7 @@ public class PositionServiceTest {
 	@Test
 	@DisplayName("관리자 역할 아이디로 역할 단건 조회 성공 ")
 	public void getPositionByIdSuccess() {
-		Position position = new Position("position1");
+		Position position = new Position( "position1");
 		when(positionJpaRepository.findById(anyLong())).thenReturn(Optional.of(position));
 
 		ResponsePositionDTO responsePositionDTO = positionService.getPosition(1L);

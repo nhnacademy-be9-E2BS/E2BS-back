@@ -18,7 +18,6 @@ public class Position {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long positionId;
 
-	@Setter
 	@Column(length = 10, nullable = false)
 	private String positionName;
 
@@ -26,4 +25,7 @@ public class Position {
 		this.positionName = positionName;
 	}
 
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
 }

@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestPositionDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
 
 import com.nhnacademy.back.product.contributor.service.PositionService;
+
+import io.micrometer.core.instrument.config.validate.ValidationException;
 
 @RestController
 @RequestMapping("/api/admin/positions")
@@ -48,7 +53,10 @@ public class PositionController {
 	 * position 생성
 	 */
 	@PostMapping()
-	public ResponseEntity<?> createPosition(@RequestBody RequestPositionDTO request) {
+	public ResponseEntity<?> createPosition(@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			throw new ValidationFailedException(bindingResult);
+		}
 		positionService.createPosition(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -56,7 +64,10 @@ public class PositionController {
 	 * position 수정
 	 */
 	@PutMapping("/{positionId}")
-	public ResponseEntity<?> updatePosition(@PathVariable Long positionId, @RequestBody RequestPositionDTO request) {
+	public ResponseEntity<?> updatePosition(@PathVariable Long positionId, @Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			throw new ValidationFailedException(bindingResult);
+		}
 		ResponsePositionDTO responsePositionDTO = positionService.updatePosition(positionId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responsePositionDTO);
 	}

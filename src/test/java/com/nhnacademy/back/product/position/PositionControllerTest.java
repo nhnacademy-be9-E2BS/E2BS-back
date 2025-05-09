@@ -53,8 +53,8 @@ public class PositionControllerTest {
 	@DisplayName("position 목록 조회(페이징 처리)")
 	void getPositionsTest() throws Exception {
 		List<ResponsePositionDTO> mockList = List.of(
-			new ResponsePositionDTO("position1"),
-			new ResponsePositionDTO("position2")
+			new ResponsePositionDTO(1L,"position1"),
+			new ResponsePositionDTO(2L,"position2")
 		);
 
 		Page<ResponsePositionDTO> mockPage = new PageImpl<>(mockList);
@@ -75,7 +75,7 @@ public class PositionControllerTest {
 	@Test
 	@DisplayName("positionId로 position 조회")
 	void getPositionByIdTest() throws Exception {
-		ResponsePositionDTO responsePositionDTO = new ResponsePositionDTO("position1");
+		ResponsePositionDTO responsePositionDTO = new ResponsePositionDTO(1L,"position1");
 		when(positionService.getPosition(1L)).thenReturn(responsePositionDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/positions/1"))
@@ -88,7 +88,7 @@ public class PositionControllerTest {
 	void updatePositionTest() {
 
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("newPosition");
-		ResponsePositionDTO responseDTO = new ResponsePositionDTO("newPosition");
+		ResponsePositionDTO responseDTO = new ResponsePositionDTO(1L,"newPosition");
 
 
 		when(positionService.updatePosition(1L, requestPositionDTO)).thenReturn(responseDTO);
