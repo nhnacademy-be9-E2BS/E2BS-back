@@ -66,7 +66,8 @@ class MemberServiceImplTest {
 
 		// Given
 		String memberId = "nhn1";
-		Member member = new Member();
+		Member member = Member.builder()
+			.build();
 
 		// When
 		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(member);
@@ -120,7 +121,7 @@ class MemberServiceImplTest {
 		String memberId = "nhn1";
 		RequestLoginMemberDTO requestLoginMemberDTO = new RequestLoginMemberDTO(memberId);
 
-		Member member = new Member();
+		Member member = Member.builder().build();
 
 		// When
 		when(memberService.existsMemberByMemberId(requestLoginMemberDTO.getMemberId())).thenReturn(true);
@@ -193,10 +194,10 @@ class MemberServiceImplTest {
 			memberBirth, memberPhone
 		);
 
-		MemberRank memberRank = new MemberRank();
-		MemberState memberState = new MemberState();
-		MemberRole memberRole = new MemberRole();
-		SocialAuth socialAuth = new SocialAuth();
+		MemberRank memberRank = MemberRank.builder().build();
+		MemberState memberState = MemberState.builder().build();
+		MemberRole memberRole = MemberRole.builder().build();
+		SocialAuth socialAuth = SocialAuth.builder().build();
 
 		// When
 		when(memberRankJpaRepository.getMemberRankByMemberRankId(1)).thenReturn(memberRank);
