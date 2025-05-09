@@ -1,10 +1,13 @@
 package com.nhnacademy.back.product.product.domain.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,13 +15,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
 
@@ -55,7 +61,7 @@ public class Product {
 	@Column(nullable = false)
 	private long productSalePrice;
 
-	@Column(nullable = false, columnDefinition = "TINYINT(1)")
+	@Column(nullable = false)
 	private boolean productPackageable;
 
 	@Column(nullable = false)
@@ -66,5 +72,26 @@ public class Product {
 
 	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
 	private long productSearches = 0;
+
+	@OneToMany(mappedBy = "product")
+	private List<ProductImage> productImage;
+
+	public Product(ProductState productState, Publisher publisher,
+		           String productTitle, String productContent, String productDescription, LocalDate productPublishedAt, String productIsbn,
+				   long productRegularPrice, long productSalePrice, boolean productPackageable, int productStock, long productHits, long productSearches) {
+		this.productState = productState;
+		this.publisher = publisher;
+		this.productTitle = productTitle;
+		this.productContent = productContent;
+		this.productDescription = productDescription;
+		this.productPublishedAt = productPublishedAt;
+		this.productIsbn = productIsbn;
+		this.productRegularPrice = productRegularPrice;
+		this.productSalePrice = productSalePrice;
+		this.productPackageable = productPackageable;
+		this.productStock = productStock;
+		this.productHits = productHits;
+		this.productSearches = productSearches;
+	}
 
 }

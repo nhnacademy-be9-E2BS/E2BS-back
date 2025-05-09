@@ -1,59 +1,29 @@
+# 공통 설정
 spring:
   application:
     name: BACK
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
-  config:
-    import: db-dev.yml
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update           # create, update, create-drop, validate, none 중 하나
-    show-sql: true               # JPA가 실행하는 SQL 쿼리를 콘솔에 출력함
+      ddl-auto: update # DB 테이블 자동 생성/업데이트 방식 설정 (개발 중에는 update, 운영에는 validate 추천)
+    show-sql: true # JPA 가 실행하는 SQL 쿼리 로그 출력 여부
     properties:
       hibernate:
-        format_sql: true         # SQL을 정렬해서 보여줌
-        use_sql_comments: true   # 실행되는 쿼리에 주석으로 JPA 내부 설명을 추가
-        auto_quote_keyword: true # 테이블이나 컬럼명이 예약어(user, order 등)인 경우, 자동으로 백틱(\``) 으로 감싸줌. → select * from `user``
-        dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate가 사용할 SQL 문법(방언)을 지정
-    open-in-view: false
+        format_sql: true # 보기 좋게 정렬
+        use_sql_comments: true # 실행되는 쿼리에 주석 추가로 출력
+        auto_quote_keyword: true # 컬럼명이 예약어일 경우 자동으로 감쌈
+        dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate 가 사용할 SQL 문법(방언)을 지정
+    open-in-view: false # 영속성 컨텍스트를 뷰까지 열지 않음
 
 logging:
   level:
-    org.hibernate.orm.jdbc.bind: trace # (JPA 사용 시) SQL 파라미터 바인딩 로그를 trace 레벨로 출력
-    org.springframework.transaction.interceptor: trace # 스프링 트랜잭션 관련 로그를 trace 레벨로 출력
-
-
+    org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 로그를 trace 레벨로 출력
+    org.springframework.transaction.interceptor: trace # 트랜잭션 처리 로그를 trace 로 출력
 
 server:
   shutdown: graceful
 
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://admin:1234@s1.java21.net:10230/eureka
-    # registry-fetch-interval-seconds: 5
-  instance:
-    prefer-ip-address: true
-
 management:
-  health:
-    status:
-      order: [DOWN, UP]
-  endpoint:
-    jolokia:
-      enabled: true
-    pause:
-      enabled: true
-    resume:
-      enabled: true
   endpoints:
     web:
       exposure:
-        include: "*"
-  info:
-    env:
-      enabled: true
+        include: "*" # Actuator 의 모든 엔드포인트를 웹에서 노출 (운영환경에선 최소화 필요)

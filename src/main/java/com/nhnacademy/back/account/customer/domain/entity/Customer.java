@@ -27,4 +27,9 @@ public class Customer {
 	@Column(nullable = false, length = 20)
 	private String customerName;
 
+	public Customer(String customerEmail, String customerPassword, String customerName) {
+		this.customerEmail = customerEmail;
+		this.customerPassword = customerPassword;
+		this.customerName = customerName;
+	}
 }

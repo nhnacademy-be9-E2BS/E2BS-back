@@ -1,22 +1,15 @@
-# 개발한 기능을 로컬에서 H2 로 테스트하기 위한 프로필
+# 로컬 단일 실행용 + H2, 기본 8080 포트
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
     driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
     username: sa
     password:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
   h2:
     console:
       enabled: true
-      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
 
 eureka:
   client:
