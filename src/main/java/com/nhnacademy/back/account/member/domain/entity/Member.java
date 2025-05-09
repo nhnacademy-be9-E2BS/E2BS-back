@@ -2,11 +2,10 @@ package com.nhnacademy.back.account.member.domain.entity;
 
 import java.time.LocalDate;
 
-
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
-import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 
 import jakarta.persistence.Column;
@@ -17,12 +16,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Builder
+@Setter
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 public class Member {
 
 	@Id

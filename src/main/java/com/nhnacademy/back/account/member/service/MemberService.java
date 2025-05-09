@@ -1,6 +1,8 @@
 package com.nhnacademy.back.account.member.service;
 
+import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 
 public interface MemberService {
@@ -9,6 +11,8 @@ public interface MemberService {
 
 	Member getMemberByMemberId(String memberId);
 
-	Member loginMember(RequestLoginMemberDTO requestLoginMemberDTO);
+	MemberDTO loginMember(RequestLoginMemberDTO requestLoginMemberDTO);
+
+	void registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO);
 
 }
