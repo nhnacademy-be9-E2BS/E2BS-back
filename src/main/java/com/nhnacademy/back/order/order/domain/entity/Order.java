@@ -45,8 +45,8 @@ public class Order {
 	@Column(nullable = false)
 	private String orderAddressExtra;
 
-	@Column(columnDefinition = "BIGINT DEFAULT 0")
-	private Long paymentPointAmount = 0L;
+	@Column(nullable = false)
+	private long orderPointAmount = 0L;
 
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;

@@ -20,7 +20,7 @@ INSERT INTO `order` (
     order_address_info,
     order_address_detail,
     order_address_extra,
-    payment_point_amount,
+    order_point_amount,
     order_memo,
     order_payment_status,
     order_receive_date,
