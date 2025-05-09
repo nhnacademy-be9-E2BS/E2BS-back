@@ -120,7 +120,7 @@ CREATE TABLE member_coupon
     member_coupon_created_at datetime             NULL,
     member_coupon_period     datetime             NULL,
     member_coupon_code       VARCHAR(255)         NOT NULL,
-    member_coupon_used       TINYINT(1) DEFAULT 0 NOT NULL,
+    member_coupon_used       BIT(1) NOT NULL,
     CONSTRAINT pk_membercoupon PRIMARY KEY (member_coupon_id)
 );
 
@@ -159,7 +159,7 @@ CREATE TABLE `order`
     order_address_extra  VARCHAR(255)  NOT NULL,
     payment_point_amount BIGINT DEFAULT 0 NULL,
     order_memo           TEXT          NULL,
-    order_payment_status TINYINT(1) DEFAULT 0 NOT NULL,
+    order_payment_status BIT(1) NOT NULL,
     order_receive_date   datetime      NULL,
     order_shipment_date  datetime      NULL,
     order_created_at     datetime      NOT NULL,
@@ -254,7 +254,7 @@ CREATE TABLE product
     product_isbn          VARCHAR(20)  NOT NULL,
     product_regular_price BIGINT       NOT NULL,
     product_sale_price    BIGINT       NOT NULL,
-    product_packageable   TINYINT(1)   NOT NULL,
+    product_packageable   BIT(1)   NOT NULL,
     product_stock         INT          NOT NULL,
     product_hits          BIGINT DEFAULT 0 NOT NULL,
     product_searches      BIGINT DEFAULT 0 NOT NULL,
