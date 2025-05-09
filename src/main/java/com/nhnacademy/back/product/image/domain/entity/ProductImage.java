@@ -29,4 +29,5 @@ public class ProductImage {
 
 	@Column(nullable = false)
 	private String productImagePath;
+
 }
