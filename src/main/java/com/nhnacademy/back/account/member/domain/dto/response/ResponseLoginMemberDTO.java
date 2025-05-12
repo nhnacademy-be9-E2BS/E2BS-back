@@ -15,6 +15,6 @@ public class ResponseLoginMemberDTO {
 
 	private String memberId;
 	private String customerPassword;
-	private MemberRoleName memberRankName;
+	private MemberRoleName memberRoleName;
 
 }

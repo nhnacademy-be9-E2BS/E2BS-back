@@ -14,6 +14,11 @@ spring:
     username: project_be9_team2
     password: "*gzxziN[g9kwl]Ln"
 
+  # resources -> sql -> data 에 있는 데이터 사용 가능
+  sql:
+    init:
+      mode: always
+
 eureka:
   client:
     fetch-registry: true # Eureka에서 다른 서비스 정보를 받아올지 여부
