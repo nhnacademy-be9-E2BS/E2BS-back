@@ -18,7 +18,7 @@ import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class WrapperJpaRepositoryTest {
+class WrapperJpaRepositoryTest {
 	@Autowired
 	private WrapperJpaRepository wrapperJpaRepository;
 
