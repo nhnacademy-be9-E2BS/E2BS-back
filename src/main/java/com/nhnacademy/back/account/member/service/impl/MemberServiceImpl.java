@@ -9,6 +9,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
@@ -81,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 없다면 member 테이블에 회원 저장
 	 */
 	@Override
-	public void registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO) {
+	public ResponseRegisterMemberDTO registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO) {
 		if (Objects.isNull(requestRegisterMemberDTO)) {
 			throw new BadRequestException("회원가입 요청 DTO를 받지 못했습니다.");
 		}
@@ -116,6 +117,10 @@ public class MemberServiceImpl implements MemberService {
 
 		memberJpaRepository.saveAndFlush(member);
 
+		return new ResponseRegisterMemberDTO(
+			member.getMemberId(), member.getCustomer().getCustomerName(), member.getCustomer().getCustomerPassword(),
+			member.getCustomer().getCustomerEmail(), member.getMemberBirth(), member.getMemberPhone()
+		);
 	}
 
 }

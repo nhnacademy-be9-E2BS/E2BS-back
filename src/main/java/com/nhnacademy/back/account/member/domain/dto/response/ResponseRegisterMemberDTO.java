@@ -1,20 +1,21 @@
 package com.nhnacademy.back.account.member.domain.dto.response;
 
-import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseLoginMemberDTO {
+public class ResponseRegisterMemberDTO {
 
 	private String memberId;
+	private String customerName;
 	private String customerPassword;
-	private MemberRoleName memberRoleName;
+	private String customerEmail;
+	private LocalDate memberBirth;
+	private String memberPhone;
 
 }

@@ -75,8 +75,8 @@ CREATE TABLE customer
 (
     customer_id       BIGINT    AUTO_INCREMENT   NOT NULL,
     customer_email    VARCHAR(100) NOT NULL,
-    customer_password VARCHAR(20)  NOT NULL,
-    customer_name     VARCHAR(20)  NOT NULL,
+    customer_password VARCHAR(255)  NOT NULL,
+    customer_name     VARCHAR(255)  NOT NULL,
     CONSTRAINT pk_customer PRIMARY KEY (customer_id)
 );
 
@@ -158,6 +158,7 @@ CREATE TABLE `order`
     order_address_detail VARCHAR(255)  NULL,
     order_address_extra  VARCHAR(255)  NOT NULL,
     order_point_amount   BIGINT        NOT NULL,
+    order_total_amount   BIGINT       NOT NULL,
     order_memo           TEXT          NULL,
     order_payment_status BIT(1) NOT NULL,
     order_receive_date   datetime      NULL,
