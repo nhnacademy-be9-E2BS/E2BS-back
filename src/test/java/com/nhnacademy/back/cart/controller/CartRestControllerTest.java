@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsDTO;
 import com.nhnacademy.back.cart.service.CartService;
@@ -37,10 +38,10 @@ public class CartRestControllerTest {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	@DisplayName("POST /api/carts/items - 장바구니 항목 추가 테스트")
+	@DisplayName("POST /api/carts/items - 비회원/회원 장바구니 항목 추가 테스트")
 	void createCartItem() throws Exception {
 		// given
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(1L, 1L, 3);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(1L, "", 1L, 3);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -56,7 +57,7 @@ public class CartRestControllerTest {
 	@DisplayName("PUT /api/carts/items/{cartItemsId} - 장바구니 항목 수량 변경 테스트")
 	void updateCartItem() throws Exception {
 		// given
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, 5);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -71,11 +72,17 @@ public class CartRestControllerTest {
 	@Test
 	@DisplayName("DELETE /api/carts/items/{cartItemsId} - 장바구니 항목 삭제 테스트")
 	void testDeleteCartItem() throws Exception {
+		// given
+		RequestDeleteCartItemsDTO request = new RequestDeleteCartItemsDTO("");
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
 		// when & then
-		mockMvc.perform(delete("/api/carts/items/1"))
+		mockMvc.perform(delete("/api/carts/items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartItem(1L);
+		verify(cartService).deleteCartItem(eq(1L), any(RequestDeleteCartItemsDTO.class));
 	}
 
 	@Test

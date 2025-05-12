@@ -1,5 +1,6 @@
 package com.nhnacademy.back.cart.domain.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestAddCartItemsDTO {
-	private long customerId;
+
+	private Long customerId;
+
+	private String sessionId;
+
+	@NotNull
 	private long productId;
+
+	@NotNull
 	private int quantity;
+
 }
