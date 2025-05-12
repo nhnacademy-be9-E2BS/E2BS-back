@@ -13,6 +13,7 @@ import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsExcept
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
+import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.common.error.dto.GlobalErrorResponse;
 import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
@@ -38,7 +39,8 @@ public class GlobalExceptionHandler {
 	/**
 	 * 찾지 못한 경우의 에러 핸들러
 	 */
-	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class, CartItemNotFoundException.class,
+	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class,
+		CartItemNotFoundException.class, CartNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,})
 	public ResponseEntity<?> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
