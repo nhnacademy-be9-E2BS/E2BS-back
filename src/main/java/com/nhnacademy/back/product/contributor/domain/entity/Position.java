@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -22,4 +21,11 @@ public class Position {
 	@Column(length = 10, nullable = false)
 	private String positionName;
 
+	public Position(String positionName) {
+		this.positionName = positionName;
+	}
+
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
 }
