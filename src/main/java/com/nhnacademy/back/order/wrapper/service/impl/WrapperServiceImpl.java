@@ -7,7 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
@@ -25,9 +26,9 @@ public class WrapperServiceImpl implements WrapperService {
 	 * Wrapper를 DB에 저장하는 로직
 	 */
 	@Override
-	public void createWrapper(RequestWrapperDTO request) {
-		Wrapper wrapper = new Wrapper(request.getWrapperPrice(), request.getWrapperName(),
-			request.getWrapperImage(), request.isWrapperSaleable());
+	public void createWrapper(RequestRegisterWrapperDTO registerRequest) {
+		Wrapper wrapper = new Wrapper(registerRequest.getWrapperPrice(), registerRequest.getWrapperName(),
+			registerRequest.getWrapperImage(), registerRequest.isWrapperSaleable());
 
 		wrapperJpaRepository.save(wrapper);
 	}
@@ -68,8 +69,8 @@ public class WrapperServiceImpl implements WrapperService {
 	 * 수정 가능한 값 : wrapper_price, wrapper_name, wrapper_image, wrapper_saleable
 	 */
 	@Override
-	public void updateWrapper(long wrapperId, RequestWrapperDTO request) {
-		if (Objects.isNull(request)) {
+	public void updateWrapper(long wrapperId, RequestModifyWrapperDTO modifyRequest) {
+		if (Objects.isNull(modifyRequest)) {
 			throw new IllegalArgumentException();
 		}
 		Optional<Wrapper> wrapper = wrapperJpaRepository.findById(wrapperId);
@@ -77,8 +78,7 @@ public class WrapperServiceImpl implements WrapperService {
 			throw new WrapperNotFoundException("wrapper not found, id: %d".formatted(wrapperId));
 		}
 
-		wrapper.get().setWrapper(request.getWrapperPrice(), request.getWrapperName(),
-			request.getWrapperImage(), request.isWrapperSaleable());
+		wrapper.get().setWrapper(modifyRequest.isWrapperSaleable());
 		wrapperJpaRepository.save(wrapper.get());
 	}
 }

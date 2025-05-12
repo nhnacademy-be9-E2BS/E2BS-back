@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.wrapper.domain.dto.response;
+package com.nhnacademy.back.order.wrapper.domain.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ResponseWrapperDTO {
-	@NotNull
-	private long wrapperId;
+public class RequestRegisterWrapperDTO {
 	@NotNull
 	private long wrapperPrice;
 	@NotNull

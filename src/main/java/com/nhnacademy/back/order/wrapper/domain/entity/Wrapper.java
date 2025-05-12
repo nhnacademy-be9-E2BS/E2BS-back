@@ -37,10 +37,7 @@ public class Wrapper {
 		this.wrapperSaleable = wrapperSaleable;
 	}
 
-	public void setWrapper(long wrapperPrice, String wrapperName, String wrapperImage, boolean wrapperSaleable) {
-		this.wrapperPrice = wrapperPrice;
-		this.wrapperName = wrapperName;
-		this.wrapperImage = wrapperImage;
+	public void setWrapper(boolean wrapperSaleable) {
 		this.wrapperSaleable = wrapperSaleable;
 	}
 

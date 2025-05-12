@@ -20,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.order.wrapper.controller.WrapperController;
-import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
@@ -88,7 +89,7 @@ class WrapperControllerTest {
 	@DisplayName("Wrapper 저장")
 	void create_wrapper_test() throws Exception {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
+		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -102,7 +103,7 @@ class WrapperControllerTest {
 	@DisplayName("Wrapper 수정")
 	void update_wrapper_test() throws Exception {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "update after Wrapper A", "a.jpg", true);
+		RequestModifyWrapperDTO request = new RequestModifyWrapperDTO(true);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
