@@ -25,7 +25,7 @@ import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
 @WebMvcTest(controllers = WrapperController.class)
-public class WrapperControllerTest {
+class WrapperControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean
@@ -39,7 +39,6 @@ public class WrapperControllerTest {
 	void get_wrappers_by_saleable_test() throws Exception {
 		// given
 		ResponseWrapperDTO responseA = new ResponseWrapperDTO(1L, 700L, "Wrapper A", "a.jpg", true);
-		ResponseWrapperDTO responseB = new ResponseWrapperDTO(2L, 1000L, "Wrapper B", "b.jpg", false);
 		ResponseWrapperDTO responseC = new ResponseWrapperDTO(3L, 900L, "Wrapper C", "c.jpg", true);
 		List<ResponseWrapperDTO> dtos = List.of(responseA, responseC);
 

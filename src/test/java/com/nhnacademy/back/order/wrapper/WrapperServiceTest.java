@@ -74,7 +74,6 @@ public class WrapperServiceTest {
 	void get_wrappers_by_saleable_test() {
 		// given
 		Wrapper wrapperA = new Wrapper(700L, "Wrapper A", "a.jpg", true);
-		Wrapper wrapperB = new Wrapper(1000L, "Wrapper B", "b.jpg", false);
 		Wrapper wrapperC = new Wrapper(900L, "Wrapper C", "c.jpg", true);
 		List<Wrapper> wrappers = List.of(wrapperA, wrapperC);
 
