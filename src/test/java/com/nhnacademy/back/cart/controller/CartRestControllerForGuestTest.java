@@ -1,0 +1,125 @@
+package com.nhnacademy.back.cart.controller;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.service.CartService;
+
+@WebMvcTest(controllers = CartRestController.class)
+class CartRestControllerForGuestTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private CartService cartService;
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	
+	@Test
+	@DisplayName("POST /api/guests/carts/items - 게스트 장바구니 항목 추가 테스트")
+	void createCartItemForGuest() throws Exception {
+		// given
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1, 2);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(post("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isCreated());
+
+		verify(cartService).createCartItemForGuest(any(RequestAddCartItemsDTO.class));
+	}
+
+	@Test
+	@DisplayName("PUT /api/guests/carts/items - 게스트 장바구니 항목 수량 변경 테스트")
+	void updateCartItemForGuest() throws Exception {
+		// given
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("session123", 1L,3);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(put("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isNoContent());
+
+		verify(cartService).updateCartItemForGuest(any(RequestUpdateCartItemsDTO.class));
+	}
+
+	@Test
+	@DisplayName("DELETE /api/guests/carts/items - 게스트 장바구니 항목 삭제 테스트")
+	void deleteCartItemForGuest() throws Exception {
+		// given
+		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(1L, "session123");
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(delete("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isNoContent());
+
+		verify(cartService).deleteCartItemForGuest(any(RequestDeleteCartItemsForGuestDTO.class));
+	}
+
+	@Test
+	@DisplayName("DELETE /api/guests/{sessionId}/carts/- 게스트 장바구니 항목 전체 삭제 테스트")
+	void deleteCartForGuest() throws Exception {
+		String sessionId = "sessionId-123";
+
+		mockMvc.perform(delete("/api/guests/{sessionId}/carts", sessionId))
+			.andExpect(status().isNoContent());
+
+		verify(cartService).deleteCartForGuest(sessionId);
+	}
+
+	@Test
+	@DisplayName("GET /api/guests/{sessionId}/carts/- 게스트 장바구니 목록 페이징 조회 테스트")
+	void getCartItemsByGuest() throws Exception {
+		// given
+		String sessionId = "session123";
+		Pageable pageable = PageRequest.of(0, 5);
+		List<ResponseCartItemsForGuestDTO> items = List.of(
+			new ResponseCartItemsForGuestDTO(1L, "Product 1", 1000, "/image1.jpg", 2)
+		);
+		Page<ResponseCartItemsForGuestDTO> page = new PageImpl<>(items, pageable, items.size());
+
+		when(cartService.getCartItemsByGuest(eq(sessionId), any(Pageable.class))).thenReturn(page);
+
+		// when & then
+		mockMvc.perform(get("/api/guests/{sessionId}/carts", sessionId)
+				.param("page", "0")
+				.param("size", "5"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].productId").value(1L))
+			.andExpect(jsonPath("$.content[0].productTitle").value("Product 1"))
+			.andExpect(jsonPath("$.content.length()").value(1));
+
+		verify(cartService).getCartItemsByGuest(eq(sessionId), any(Pageable.class));
+	}
+
+}

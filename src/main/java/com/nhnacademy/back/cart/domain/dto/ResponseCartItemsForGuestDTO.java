@@ -11,10 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseCartItemsDTO {
-
-	@NotNull
-	private long cartItemId;
+public class ResponseCartItemsForGuestDTO {
 
 	@NotNull
 	private long productId;
