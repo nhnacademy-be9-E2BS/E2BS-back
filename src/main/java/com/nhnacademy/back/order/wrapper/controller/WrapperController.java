@@ -49,7 +49,7 @@ public class WrapperController {
 	 * Wrapper 저장
 	 */
 	@PostMapping("/api/admin/wrappers")
-	public ResponseEntity<?> createWrapper(@RequestBody RequestWrapperDTO request) {
+	public ResponseEntity<Void> createWrapper(@RequestBody RequestWrapperDTO request) {
 		wrapperService.createWrapper(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -59,7 +59,7 @@ public class WrapperController {
 	 * Wrapper 수정
 	 */
 	@PutMapping("/api/admin/wrappers/{wrapperId}")
-	public ResponseEntity<?> updateWrapper(@PathVariable Long wrapperId, @RequestBody RequestWrapperDTO request) {
+	public ResponseEntity<Void> updateWrapper(@PathVariable Long wrapperId, @RequestBody RequestWrapperDTO request) {
 		wrapperService.updateWrapper(wrapperId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
