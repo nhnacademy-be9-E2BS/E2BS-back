@@ -20,6 +20,11 @@ spring:
       mode: always
       data-locations: classpath:sql/data/account.sql, classpath:sql/data/product.sql, classpath:sql/data/coupon.sql, classpath:sql/data/order.sql, classpath:sql/data/cart.sql, classpath:sql/data/pointpolicy.sql
 
+  # resources -> sql -> data 에 있는 데이터 사용 가능
+  sql:
+    init:
+      mode: always
+
 eureka:
   client:
     fetch-registry: true # Eureka에서 다른 서비스 정보를 받아올지 여부

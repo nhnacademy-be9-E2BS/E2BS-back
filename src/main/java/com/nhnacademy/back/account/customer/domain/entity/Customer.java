@@ -25,10 +25,10 @@ public class Customer {
 	@Column(nullable = false, length = 100)
 	private String customerEmail;
 
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false)
 	private String customerPassword;
 
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false)
 	private String customerName;
 
 	public Customer(String customerEmail, String customerPassword, String customerName) {

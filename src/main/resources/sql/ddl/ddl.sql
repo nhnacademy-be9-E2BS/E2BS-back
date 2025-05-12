@@ -75,8 +75,8 @@ CREATE TABLE customer
 (
     customer_id       BIGINT    AUTO_INCREMENT   NOT NULL,
     customer_email    VARCHAR(100) NOT NULL,
-    customer_password VARCHAR(20)  NOT NULL,
-    customer_name     VARCHAR(20)  NOT NULL,
+    customer_password VARCHAR(255)  NOT NULL,
+    customer_name     VARCHAR(255)  NOT NULL,
     CONSTRAINT pk_customer PRIMARY KEY (customer_id)
 );
 
