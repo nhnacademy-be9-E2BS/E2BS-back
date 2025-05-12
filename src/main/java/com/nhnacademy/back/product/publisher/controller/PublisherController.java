@@ -39,7 +39,7 @@ public class PublisherController {
 	 * Publisher 저장
 	 */
 	@PostMapping
-	public ResponseEntity<?> createPublisher(@RequestBody RequestPublisherDTO request) {
+	public ResponseEntity<Void> createPublisher(@RequestBody RequestPublisherDTO request) {
 		publisherService.createPublisher(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -49,7 +49,8 @@ public class PublisherController {
 	 * Publisher 수정
 	 */
 	@PutMapping("/{publisherId}")
-	public ResponseEntity<?> updatePublisher(@PathVariable Long publisherId, @RequestBody RequestPublisherDTO request) {
+	public ResponseEntity<Void> updatePublisher(@PathVariable Long publisherId,
+		@RequestBody RequestPublisherDTO request) {
 		publisherService.updatePublisher(publisherId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();

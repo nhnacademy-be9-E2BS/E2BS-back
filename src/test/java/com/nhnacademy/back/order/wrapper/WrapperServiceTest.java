@@ -17,7 +17,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
@@ -35,7 +36,7 @@ public class WrapperServiceTest {
 	@DisplayName("create wrapper")
 	void create_wrapper_test() {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
+		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
 
 		// when
 		wrapperService.createWrapper(request);
@@ -74,7 +75,6 @@ public class WrapperServiceTest {
 	void get_wrappers_by_saleable_test() {
 		// given
 		Wrapper wrapperA = new Wrapper(700L, "Wrapper A", "a.jpg", true);
-		Wrapper wrapperB = new Wrapper(1000L, "Wrapper B", "b.jpg", false);
 		Wrapper wrapperC = new Wrapper(900L, "Wrapper C", "c.jpg", true);
 		List<Wrapper> wrappers = List.of(wrapperA, wrapperC);
 
@@ -99,15 +99,15 @@ public class WrapperServiceTest {
 	@DisplayName("update wrapper - success")
 	void update_wrapper_success_test() {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "update after Wrapper A", "a.jpg", true);
-		Wrapper wrapper = new Wrapper(800L, "update before Wrapper A", "a.jpg", true);
+		RequestModifyWrapperDTO request = new RequestModifyWrapperDTO(false);
+		Wrapper wrapper = new Wrapper(800L, "update Wrapper A", "a.jpg", true);
 		when(wrapperJpaRepository.findById(1L)).thenReturn(Optional.of(wrapper));
 
 		// when
 		wrapperService.updateWrapper(1L, request);
 
 		// then
-		assertThat(wrapper.getWrapperName()).isEqualTo("update after Wrapper A");
+		assertThat(wrapper.isWrapperSaleable()).isFalse();
 		verify(wrapperJpaRepository, times(1)).save(wrapper);
 	}
 
@@ -123,7 +123,7 @@ public class WrapperServiceTest {
 	@DisplayName("update wrapper - fail2")
 	void update_wrapper_fail2_test() {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "update Wrapper A", "a.jpg", true);
+		RequestModifyWrapperDTO request = new RequestModifyWrapperDTO(true);
 		when(wrapperJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		// when & then
