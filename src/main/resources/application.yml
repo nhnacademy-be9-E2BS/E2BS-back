@@ -4,7 +4,7 @@ spring:
     name: BACK
   jpa:
     hibernate:
-      ddl-auto: update   # DB 테이블 자동 생성/업데이트 방식 설정 (개발 중에는 update, 운영에는 validate 추천)
+      ddl-auto: validate  # DB 테이블 자동 생성/업데이트 방식 설정 (개발 중에는 update, 운영에는 validate 추천)
     show-sql: true       # JPA 가 실행하는 SQL 쿼리 로그 출력 여부
     properties:
       hibernate:
