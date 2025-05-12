@@ -1,8 +1,11 @@
 package com.nhnacademy.back.product.tag.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -32,15 +35,20 @@ public class TagServiceImpl implements TagService {
 		}
 
 		Tag tag = new Tag(tagName);
-
+		tagJpaRepository.save(tag);
 	}
 
 	/**
 	 * DB에 저장된 Tag 목록 전체 조회
+	 *
 	 */
 	@Override
-	public List<Tag> getTags() {
-		return tagJpaRepository.findAll();
+	public Page<ResponseTagDTO> getTags(Pageable pageable) {
+		return tagJpaRepository.findAll(pageable)
+			.map(tag -> new ResponseTagDTO(
+				tag.getTagId(),
+				tag.getTagName()
+			));
 	}
 
 	/**
@@ -48,10 +56,17 @@ public class TagServiceImpl implements TagService {
 	 */
 
 	@Override
-	public ResponseTagDTO updateTag(long tagId, RequestTagDTO request) {
-		if (tagJpaRepository.findById(tagId).isEmpty()) {
-			throw new TagNotFoundException("Tag Not Found");
+	public void updateTag(long tagId, RequestTagDTO request) {
+		if (Objects.isNull(request)) {
+			throw new IllegalArgumentException("Request cannot be null");
 		}
-		return tagJpaRepository.updateByTagId(tagId, request);
+		if (tagJpaRepository.findById(tagId).isEmpty()) {
+			throw new TagNotFoundException("Tag Not Found, id: %d".formatted(tagId));
+		}
+
+		if (tagJpaRepository.existsByTagName(request.getTagName())) {
+			throw new TagAlreadyExistsException("Tag Already Exists: %s".formatted(request.getTagName()));
+		}
+		tagJpaRepository.updateByTagId(tagId, request);
 	}
 }
