@@ -28,4 +28,16 @@ public class Contributor {
 	@JoinColumn(name = "position_id")
 	private Position position;
 
+	public Contributor(String contributorName, Position position) {
+		this.contributorName = contributorName;
+		this.position = position;
+	}
+
+	public void setContributorName(String contributorName) {
+		this.contributorName = contributorName;
+	}
+
+	public void setPosition(Position position) {
+		this.position = position;
+	}
 }
