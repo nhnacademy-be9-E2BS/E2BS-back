@@ -13,7 +13,7 @@ import com.nhnacademy.back.coupon.coupon.domain.dto.response.ResponseCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.entity.CategoryCoupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.ProductCoupon;
-import com.nhnacademy.back.coupon.coupon.exception.CouponNotFounException;
+import com.nhnacademy.back.coupon.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.back.coupon.coupon.repository.CategoryCouponJpaRepository;
 import com.nhnacademy.back.coupon.coupon.repository.CouponJpaRepository;
 import com.nhnacademy.back.coupon.coupon.repository.ProductCouponJpaRepository;
@@ -113,7 +113,7 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public ResponseCouponDTO getCoupon(Long couponId) {
 		Coupon coupon = couponJpaRepository.findById(couponId)
-			.orElseThrow(() -> new CouponNotFounException("존재하지 않는 쿠폰입니다."));
+			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
 
 		CategoryCoupon categoryCoupon = categoryCouponJpaRepository.findById(coupon.getCouponId())
 			.orElse(null);
