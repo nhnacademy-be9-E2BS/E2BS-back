@@ -11,8 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseTagDTO {
-	@NotNull
 	private long tagId;
-	@NotNull
 	private String tagName;
 }

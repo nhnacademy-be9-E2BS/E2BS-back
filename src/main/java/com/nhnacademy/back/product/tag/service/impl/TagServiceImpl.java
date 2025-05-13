@@ -71,7 +71,7 @@ public class TagServiceImpl implements TagService {
 			throw new TagAlreadyExistsException("Tag Already Exists: %s".formatted(request.getTagName()));
 		}
 
-		tag.get().setTagName(request.getTagName());
+		tag.get().setTag(request.getTagName());
 		tagJpaRepository.save(tag.get());
 	}
 }
