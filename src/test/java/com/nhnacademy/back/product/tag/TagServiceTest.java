@@ -37,6 +37,7 @@ public class TagServiceTest {
 	@Mock
 	private TagJpaRepository tagJpaRepository;
 
+
 	@Test
 	@DisplayName("create tag - success")
 	void createTagSuccess() {
