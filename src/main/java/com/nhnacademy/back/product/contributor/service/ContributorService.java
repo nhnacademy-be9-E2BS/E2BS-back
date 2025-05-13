@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
+import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 
 public interface ContributorService {
