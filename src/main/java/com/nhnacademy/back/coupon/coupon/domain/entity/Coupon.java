@@ -28,4 +28,9 @@ public class Coupon {
 
 	@Column(length = 30, nullable = false)
 	private String couponName;
+
+	public Coupon(CouponPolicy couponPolicy, String couponName) {
+		this.couponPolicy = couponPolicy;
+		this.couponName = couponName;
+	}
 }
