@@ -1,5 +1,6 @@
 package com.nhnacademy.back.cart.domain.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
@@ -12,11 +13,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Cart {
 
@@ -29,7 +32,7 @@ public class Cart {
 	private Customer customer;
 
 	@OneToMany(mappedBy = "cart")
-	private List<CartItems> cartItems;
+	private final List<CartItems> cartItems = new ArrayList<>();
 
 	public Cart(Customer customer) {
 		this.customer = customer;
