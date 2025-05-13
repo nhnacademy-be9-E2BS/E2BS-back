@@ -28,13 +28,14 @@ public class PositionServiceImpl implements PositionService {
 	private final PositionJpaRepository positionJpaRepository;
 
 	@Override
-	public void createPosition(RequestPositionDTO request) {
+	public ResponsePositionDTO createPosition(RequestPositionDTO request) {
 		String positionName = request.getPositionName();
 		if (positionJpaRepository.existsByPositionName(request.getPositionName())) {
 			throw new PositionAlreadyExistsException("PositionName already exists : %s".formatted(request.getPositionName()));
 		}
 		Position position = new Position(positionName);
-		positionJpaRepository.save(position);
+		Position saved = positionJpaRepository.save(position);
+		return new ResponsePositionDTO(saved.getPositionId(), saved.getPositionName());
 	}
 
 	@Override
@@ -42,14 +43,14 @@ public class PositionServiceImpl implements PositionService {
 		Position position = positionJpaRepository.findById(positionId).orElseThrow(
 			() -> new PositionNotFoundException("Position not found : %s".formatted(positionId)));
 
-		return new ResponsePositionDTO(position.getPositionName());
+		return new ResponsePositionDTO(position.getPositionId(), position.getPositionName());
 	}
 
 
 	@Override
 	public Page<ResponsePositionDTO> getPositions(Pageable pageable) {
 		return positionJpaRepository.findAll(pageable)
-			.map(position -> new ResponsePositionDTO(position.getPositionName()));
+			.map(position -> new ResponsePositionDTO(position.getPositionId(), position.getPositionName()));
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class PositionServiceImpl implements PositionService {
 			() -> new PositionNotFoundException("Position Not Found : %s".formatted(positionId)));
 		position.setPositionName(request.getPositionName());
 		positionJpaRepository.save(position);
-		return new ResponsePositionDTO(position.getPositionName());
+		return new ResponsePositionDTO(position.getPositionId(), position.getPositionName());
 	}
 
 
