@@ -54,6 +54,7 @@ public class PositionServiceImpl implements PositionService {
 	}
 
 
+
 	@Override
 	public ResponsePositionDTO updatePosition(Long positionId, RequestPositionDTO request) {
 		Position position = positionJpaRepository.findById(positionId).orElseThrow(
