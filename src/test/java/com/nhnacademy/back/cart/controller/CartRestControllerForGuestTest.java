@@ -10,10 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -98,28 +94,23 @@ class CartRestControllerForGuestTest {
 	}
 
 	@Test
-	@DisplayName("GET /api/guests/{sessionId}/carts/- 게스트 장바구니 목록 페이징 조회 테스트")
+	@DisplayName("GET /api/guests/{sessionId}/carts/- 게스트 장바구니 목록 조회 테스트")
 	void getCartItemsByGuest() throws Exception {
 		// given
 		String sessionId = "session123";
-		Pageable pageable = PageRequest.of(0, 5);
-		List<ResponseCartItemsForGuestDTO> items = List.of(
-			new ResponseCartItemsForGuestDTO(1L, "Product 1", 1000, "/image1.jpg", 2)
+		List<ResponseCartItemsForGuestDTO> cartItems = List.of(
+			new ResponseCartItemsForGuestDTO(1L, List.of(), "Product 1", 1000, "/image1.jpg", 2)
 		);
-		Page<ResponseCartItemsForGuestDTO> page = new PageImpl<>(items, pageable, items.size());
 
-		when(cartService.getCartItemsByGuest(eq(sessionId), any(Pageable.class))).thenReturn(page);
+		when(cartService.getCartItemsByGuest(eq(sessionId))).thenReturn(cartItems);
 
 		// when & then
-		mockMvc.perform(get("/api/guests/{sessionId}/carts", sessionId)
-				.param("page", "0")
-				.param("size", "5"))
+		mockMvc.perform(get("/api/guests/{sessionId}/carts", sessionId))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content[0].productId").value(1L))
-			.andExpect(jsonPath("$.content[0].productTitle").value("Product 1"))
-			.andExpect(jsonPath("$.content.length()").value(1));
+			.andExpect(jsonPath("$.[0].productId").value(1L))
+			.andExpect(jsonPath("$.[0].productTitle").value("Product 1"));
 
-		verify(cartService).getCartItemsByGuest(eq(sessionId), any(Pageable.class));
+		verify(cartService).getCartItemsByGuest(eq(sessionId));
 	}
 
 }
