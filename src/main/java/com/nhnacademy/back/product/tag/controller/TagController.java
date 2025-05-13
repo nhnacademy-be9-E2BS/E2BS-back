@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/admin/tags")
 public class TagController {
 	private final TagService tagService;
 
@@ -31,7 +31,7 @@ public class TagController {
 	 * Tag 전체 조회
 	 * 200 상태코드와 태그를 리스트 타입으로 반환
 	 */
-	@GetMapping("/tags")
+	@GetMapping
 	public ResponseEntity<Page<ResponseTagDTO>> getTags(@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseTagDTO> tags = tagService.getTags(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(tags);
@@ -41,7 +41,7 @@ public class TagController {
 	 * RequestTagDTO를 받아 DB에 생성하여 저장
 	 * 201 상태코드 반환
 	 */
-	@PostMapping("/admin/tags")
+	@PostMapping
 	public ResponseEntity<Void> createTag(@RequestBody RequestTagDTO request) {
 		tagService.createTag(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -51,7 +51,7 @@ public class TagController {
 	 * tagId와 RequestTagDTO를 받아 DB에 기존 정보를 업데이트
 	 * 200 상태코드 반환
 	 */
-	@PutMapping("/admin/tags/{tagId}")
+	@PutMapping("/{tagId}")
 	public ResponseEntity<Void> updateTag(@PathVariable Long tagId, @RequestBody RequestTagDTO request) {
 		tagService.updateTag(tagId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
