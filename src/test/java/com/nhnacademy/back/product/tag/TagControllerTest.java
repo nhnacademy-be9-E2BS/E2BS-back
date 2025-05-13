@@ -53,7 +53,7 @@ public class TagControllerTest {
 		when(tagService.getTags(pageable)).thenReturn(wrappers);
 
 		//when & then
-		mockMvc.perform(get("/api/tags")
+		mockMvc.perform(get("/api/admin/tags")
 				.param("page", "0")
 				.param("size", "0")
 				.accept(MediaType.APPLICATION_JSON))
