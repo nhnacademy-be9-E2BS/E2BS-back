@@ -52,7 +52,7 @@ public class TagController {
 	 * 200 상태코드 반환
 	 */
 	@PutMapping("/admin/tags/{tagId}")
-	public ResponseEntity<Void> updateTag(@PathVariable long tagId, @RequestBody RequestTagDTO request) {
+	public ResponseEntity<Void> updateTag(@PathVariable Long tagId, @RequestBody RequestTagDTO request) {
 		tagService.updateTag(tagId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
