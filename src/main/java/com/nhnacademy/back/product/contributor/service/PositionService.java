@@ -14,7 +14,7 @@ public interface PositionService {
 	/**
 	 * 관리자가 역할 생성
 	 */
-	void createPosition(RequestPositionDTO request);
+	ResponsePositionDTO createPosition(RequestPositionDTO request);
 
 	/**
 	 * 관리자가 아이디로 역할 단건 조회

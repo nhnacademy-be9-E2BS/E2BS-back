@@ -53,12 +53,12 @@ public class PositionController {
 	 * position 생성
 	 */
 	@PostMapping()
-	public ResponseEntity<?> createPosition(@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
+	public ResponseEntity<ResponsePositionDTO> createPosition(@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
-		positionService.createPosition(request);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		ResponsePositionDTO response = positionService.createPosition(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	/**
 	 * position 수정
