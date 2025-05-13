@@ -2,6 +2,7 @@ package com.nhnacademy.back.product.tag.service.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -60,13 +61,17 @@ public class TagServiceImpl implements TagService {
 		if (Objects.isNull(request)) {
 			throw new IllegalArgumentException("Request cannot be null");
 		}
-		if (tagJpaRepository.findById(tagId).isEmpty()) {
+
+		Optional<Tag> tag = tagJpaRepository.findById(tagId);
+		if (tag.isEmpty()) {
 			throw new TagNotFoundException("Tag Not Found, id: %d".formatted(tagId));
 		}
 
 		if (tagJpaRepository.existsByTagName(request.getTagName())) {
 			throw new TagAlreadyExistsException("Tag Already Exists: %s".formatted(request.getTagName()));
 		}
-		tagJpaRepository.updateByTagId(tagId, request);
+
+		tag.get().setTagName(request.getTagName());
+		tagJpaRepository.save(tag.get());
 	}
 }

@@ -9,6 +9,4 @@ import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 
 public interface TagJpaRepository extends JpaRepository<Tag, Long> {
-	boolean existsByTagName(String tagName);
-	void updateByTagId(long tagId, RequestTagDTO request);
-}
+	boolean existsByTagName(String tagName);}
