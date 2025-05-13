@@ -28,5 +28,9 @@ public class CategoryCoupon {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "category_id")
 	private Category category;
-	
+
+	public CategoryCoupon(Coupon coupon, Category category) {
+		this.coupon = coupon;
+		this.category = category;
+	}
 }

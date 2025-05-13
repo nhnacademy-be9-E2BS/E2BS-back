@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -29,6 +26,7 @@ import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -40,6 +38,9 @@ public class CartServiceForGuestTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
+
+	@Mock
+	private ProductCategoryJpaRepository productCategoryRepository;
 
 	@Mock
 	private RedisTemplate<String, Object> redisTemplate;
@@ -56,7 +57,6 @@ public class CartServiceForGuestTest {
 
 
 	private final String sessionId = "guest-session-123";
-	private final long productId = 1L;
 	private Product product;
 
 
@@ -64,7 +64,7 @@ public class CartServiceForGuestTest {
 	void setUp() {
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-		product = new Product(productId, new ProductState(ProductStateName.SALE), new Publisher("a"),
+		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
 			"title1", "content1", "description", LocalDate.now(), "isbn",
 			10000, 8000, false, 1, 0, 0, null);
 	}
@@ -79,6 +79,7 @@ public class CartServiceForGuestTest {
 		CartDTO cart = new CartDTO();
 
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+		when(productCategoryRepository.findByProduct_ProductId(1L)).thenReturn(List.of());
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(Object.class);
 		when(objectMapper.convertValue(Object.class, CartDTO.class)).thenReturn(cart);
 
@@ -95,7 +96,7 @@ public class CartServiceForGuestTest {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(sessionId, 1L, 5);
 
-		CartItemDTO cartItem = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
+		CartItemDTO cartItem = new CartItemDTO(1L, List.of(), "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(cartItem));
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
@@ -113,7 +114,7 @@ public class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 항목 삭제 테스트")
 	void deleteCartItemForGuest_shouldRemoveItem() {
 		// given
-		CartItemDTO item = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
+		CartItemDTO item = new CartItemDTO(1L, List.of(), "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(new ArrayList<>(List.of(item)));
 		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(1L, sessionId);
 
@@ -144,23 +145,21 @@ public class CartServiceForGuestTest {
 	}
 
 	@Test
-	@DisplayName("게스트 장바구니 목록 페이징 조회 테스트")
+	@DisplayName("게스트 장바구니 목록 조회 테스트")
 	void getCartItemsByGuest() {
 		// given
-		CartItemDTO item1 = new CartItemDTO(1L, "Product1", 1000, "img1.jpg", 1);
-		CartItemDTO item2 = new CartItemDTO(2L, "Product2", 2000, "img2.jpg", 2);
+		CartItemDTO item1 = new CartItemDTO(1L, List.of(), "Product1", 1000, "img1.jpg", 1);
+		CartItemDTO item2 = new CartItemDTO(2L, List.of(), "Product2", 2000, "img2.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(item1, item2));
 
-		Pageable pageable = PageRequest.of(0, 1);
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
 
 		// when
-		Page<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest(sessionId, pageable);
+		List<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest(sessionId);
 
 		// then
-		assertThat(result.getContent().size()).isEqualTo(1);
-		assertThat(result.getTotalElements()).isEqualTo(2);
+		assertThat(result.size()).isEqualTo(2);
 	}
 
 }

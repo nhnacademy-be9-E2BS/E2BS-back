@@ -1,9 +1,8 @@
 package com.nhnacademy.back.cart.controller;
 
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
@@ -37,7 +35,7 @@ public class CartRestController {
 	 * 비회원/회원
 	 */
 	@PostMapping("/api/customers/carts/items")
-	public ResponseEntity<?> createCartItemForCustomer(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Void> createCartItemForCustomer(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -47,7 +45,7 @@ public class CartRestController {
 	}
 
 	@PutMapping("/api/customers/carts/items/{cartItemId}")
-	public ResponseEntity<?> updateCartItemForCustomer(@PathVariable Long cartItemId, @Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Void> updateCartItemForCustomer(@PathVariable long cartItemId, @Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -57,20 +55,20 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/api/customers/carts/items/{cartItemId}")
-	public ResponseEntity<?> deleteCartItemForCustomer(@PathVariable Long cartItemId) {
+	public ResponseEntity<Void> deleteCartItemForCustomer(@PathVariable Long cartItemId) {
 		cartService.deleteCartItemForCustomer(cartItemId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@DeleteMapping("/api/customers/{customerId}/carts")
-	public ResponseEntity<?> deleteCartForCustomer(@PathVariable long customerId) {
+	public ResponseEntity<Void> deleteCartForCustomer(@PathVariable long customerId) {
 		cartService.deleteCartForCustomer(customerId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/api/customers/{customerId}/carts")
-	public ResponseEntity<Page<ResponseCartItemsForCustomerDTO>> getCartItemsByCustomer(@PathVariable Long customerId, @PageableDefault(size = 5) Pageable pageable) {
-		Page<ResponseCartItemsForCustomerDTO> body = cartService.getCartItemsByCustomer(customerId, pageable);
+	public ResponseEntity<List<ResponseCartItemsForCustomerDTO>> getCartItemsByCustomer(@PathVariable long customerId) {
+		List<ResponseCartItemsForCustomerDTO> body = cartService.getCartItemsByCustomer(customerId);
 		return ResponseEntity.ok(body);
 	}
 
@@ -79,7 +77,7 @@ public class CartRestController {
 	 * 게스트
 	 */
 	@PostMapping("/api/guests/carts/items")
-	public ResponseEntity<?> createCartItemForGuest(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Void> createCartItemForGuest(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -89,7 +87,7 @@ public class CartRestController {
 	}
 
 	@PutMapping("/api/guests/carts/items")
-	public ResponseEntity<?> updateCartItemForGuest(@Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Void> updateCartItemForGuest(@Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -99,7 +97,7 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/api/guests/carts/items")
-	public ResponseEntity<?> deleteCartItemForGuest(@Validated @RequestBody RequestDeleteCartItemsForGuestDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Void> deleteCartItemForGuest(@Validated @RequestBody RequestDeleteCartItemsForGuestDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -109,14 +107,14 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/api/guests/{sessionId}/carts")
-	public ResponseEntity<?> deleteCartForGuest(@PathVariable String sessionId) {
+	public ResponseEntity<Void> deleteCartForGuest(@PathVariable String sessionId) {
 		cartService.deleteCartForGuest(sessionId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/api/guests/{sessionId}/carts")
-	public ResponseEntity<Page<ResponseCartItemsForGuestDTO>> getCartItemsByGuest(@PathVariable String sessionId, @PageableDefault(size = 5) Pageable pageable) {
-		Page<ResponseCartItemsForGuestDTO> body = cartService.getCartItemsByGuest(sessionId, pageable);
+	public ResponseEntity<List<ResponseCartItemsForGuestDTO>> getCartItemsByGuest(@PathVariable String sessionId) {
+		List<ResponseCartItemsForGuestDTO> body = cartService.getCartItemsByGuest(sessionId);
 		return ResponseEntity.ok(body);
 	}
 }

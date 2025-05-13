@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +13,7 @@ import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
+import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
@@ -29,6 +27,8 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
+import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
+import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -43,6 +43,7 @@ public class CartServiceImpl implements CartService {
 
 	private final CustomerJpaRepository customerRepository;
 	private final ProductJpaRepository productRepository;
+	private final ProductCategoryJpaRepository productCategoryRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -117,30 +118,40 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 비회원/회원인 고객의 장바구니 페이징 목록 조회 메소드
+	 * 비회원/회원인 고객의 장바구니 목록 조회 메소드
 	 */
 	@Override
-	public Page<ResponseCartItemsForCustomerDTO> getCartItemsByCustomer(long customerId, Pageable pageable) {
-		// 고객이 담은 장바구니들을 페이지로 담음
-		Page<CartItems> cartItemsPage = cartItemsRepository.findByCart_Customer_CustomerId(customerId, pageable);
+	public List<ResponseCartItemsForCustomerDTO> getCartItemsByCustomer(long customerId) {
+		// 고객이 담은 장바구니들을 리스트로 담음
+		List<CartItems> cartItems = cartItemsRepository.findByCart_Customer_CustomerId(customerId);
 
 		// 필요한 api 스펙에 맞춰 response 재가공해서 반환
-		return cartItemsPage.map(cartItem -> {
-			Product product = cartItem.getProduct();
-			String productImagePath = "default.jpg";
+		return cartItems.stream()
+			.map(cartItem -> {
+				// 기본 이미지 설정
+				Product product = cartItem.getProduct();
+				String productImagePath = "default.jpg";
 
-			if (Objects.nonNull(product.getProductImage())) {
-				productImagePath = product.getProductImage().getFirst().getProductImagePath();
-			}
+				if (Objects.nonNull(product.getProductImage())) {
+					productImagePath = product.getProductImage().getFirst().getProductImagePath();
+				}
 
-			return new ResponseCartItemsForCustomerDTO(
-				cartItem.getCartItemsId(),
-				product.getProductId(),
-				product.getProductTitle(),
-				product.getProductSalePrice(),
-				productImagePath,
-				cartItem.getCartItemsQuantity());
-		});
+				List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(product.getProductId());
+				List<ProductCategoryDTO> findProductCategoriesDto = findProductCategories.stream()
+					.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
+					.toList();
+
+				// ResponseCartItemsForCustomerDTO 객체 반환
+				return new ResponseCartItemsForCustomerDTO(
+					cartItem.getCartItemsId(),
+					product.getProductId(),
+					findProductCategoriesDto,
+					product.getProductTitle(),
+					product.getProductSalePrice(),
+					productImagePath,
+					cartItem.getCartItemsQuantity());
+			})
+			.toList();
 	}
 
 
@@ -152,6 +163,11 @@ public class CartServiceImpl implements CartService {
 		// 상품 존재 검증
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(() -> new ProductNotFoundException("Product not found"));
+
+		List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(findProduct.getProductId());
+		List<ProductCategoryDTO> findProductCategoriesDto = findProductCategories.stream()
+			.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
+			.toList();
 
 		// Redis에서 장바구니 가져오기 (없으면 생성)
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
@@ -174,6 +190,7 @@ public class CartServiceImpl implements CartService {
 
 		CartItemDTO newItem = new CartItemDTO(
 			findProduct.getProductId(),
+			findProductCategoriesDto,
 			findProduct.getProductTitle(),
 			findProduct.getProductSalePrice(),
 			image,
@@ -242,38 +259,33 @@ public class CartServiceImpl implements CartService {
 			throw new CartItemNotFoundException("Cart not found in session");
 		}
 
-		redisTemplate.delete(String.valueOf(sessionId));
+		redisTemplate.delete(sessionId);
 	}
 
 	/**
-	 * 게스트인 고객의 장바구니 페이징 목록 조회
+	 * 게스트인 고객의 장바구니 목록 조회
 	 */
 	@Override
-	public Page<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId, Pageable pageable) {
+	public List<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId) {
 		Object o = redisTemplate.opsForValue().get(sessionId);
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart) || cart.getCartItems().isEmpty()) {
-			return Page.empty(pageable);
+			return List.of();
 		}
 
 		List<CartItemDTO> cartItems = cart.getCartItems();
 
-		// 페이징 처리
-		int start = (int) pageable.getOffset();
-		int end = Math.min(start + pageable.getPageSize(), cartItems.size());
-
 		// DTO 가공
-		List<ResponseCartItemsForGuestDTO> pagedList = cartItems.subList(start, end).stream()
-			.map(item -> new ResponseCartItemsForGuestDTO(
-				item.getProductId(),
-				item.getProductTitle(),
-				item.getProductSalePrice(),
-				item.getProductImagePath(),
-				item.getCartItemsQuantity()
+		return cartItems.stream()
+			.map(cartItem -> new ResponseCartItemsForGuestDTO(
+				cartItem.getProductId(),
+				cartItem.getCategoryIds(),
+				cartItem.getProductTitle(),
+				cartItem.getProductSalePrice(),
+				cartItem.getProductImagePath(),
+				cartItem.getCartItemsQuantity()
 			))
 			.collect(Collectors.toList());
-
-		return new PageImpl<>(pagedList, pageable, cartItems.size());
 	}
 
 }

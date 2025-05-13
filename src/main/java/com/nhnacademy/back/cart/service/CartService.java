@@ -1,7 +1,6 @@
 package com.nhnacademy.back.cart.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
@@ -14,11 +13,11 @@ public interface CartService {
 	void updateCartItemForCustomer(long cartItemId, RequestUpdateCartItemsDTO request);
 	void deleteCartItemForCustomer(long cartItemId);
 	void deleteCartForCustomer(long customerId);
-	Page<ResponseCartItemsForCustomerDTO> getCartItemsByCustomer(long customerId, Pageable pageable);
+	List<ResponseCartItemsForCustomerDTO> getCartItemsByCustomer(long customerId);
 
 	void createCartItemForGuest(RequestAddCartItemsDTO request);
 	void updateCartItemForGuest(RequestUpdateCartItemsDTO request);
 	void deleteCartItemForGuest(RequestDeleteCartItemsForGuestDTO request);
 	void deleteCartForGuest(String sessionId);
-	Page<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId, Pageable pageable);
+	List<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId);
 }
