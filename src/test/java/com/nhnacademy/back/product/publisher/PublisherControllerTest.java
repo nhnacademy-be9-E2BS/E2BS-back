@@ -25,7 +25,7 @@ import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublish
 import com.nhnacademy.back.product.publisher.service.PublisherService;
 
 @WebMvcTest(controllers = PublisherController.class)
-public class PublisherControllerTest {
+class PublisherControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean

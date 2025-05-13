@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
@@ -49,7 +50,7 @@ public class WrapperController {
 	 * Wrapper 저장
 	 */
 	@PostMapping("/api/admin/wrappers")
-	public ResponseEntity<?> createWrapper(@RequestBody RequestWrapperDTO request) {
+	public ResponseEntity<Void> createWrapper(@RequestBody RequestRegisterWrapperDTO request) {
 		wrapperService.createWrapper(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -59,7 +60,8 @@ public class WrapperController {
 	 * Wrapper 수정
 	 */
 	@PutMapping("/api/admin/wrappers/{wrapperId}")
-	public ResponseEntity<?> updateWrapper(@PathVariable Long wrapperId, @RequestBody RequestWrapperDTO request) {
+	public ResponseEntity<Void> updateWrapper(@PathVariable Long wrapperId,
+		@RequestBody RequestModifyWrapperDTO request) {
 		wrapperService.updateWrapper(wrapperId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();

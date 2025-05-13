@@ -20,12 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.order.wrapper.controller.WrapperController;
-import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
+import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
 @WebMvcTest(controllers = WrapperController.class)
-public class WrapperControllerTest {
+class WrapperControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean
@@ -39,7 +40,6 @@ public class WrapperControllerTest {
 	void get_wrappers_by_saleable_test() throws Exception {
 		// given
 		ResponseWrapperDTO responseA = new ResponseWrapperDTO(1L, 700L, "Wrapper A", "a.jpg", true);
-		ResponseWrapperDTO responseB = new ResponseWrapperDTO(2L, 1000L, "Wrapper B", "b.jpg", false);
 		ResponseWrapperDTO responseC = new ResponseWrapperDTO(3L, 900L, "Wrapper C", "c.jpg", true);
 		List<ResponseWrapperDTO> dtos = List.of(responseA, responseC);
 
@@ -89,7 +89,7 @@ public class WrapperControllerTest {
 	@DisplayName("Wrapper 저장")
 	void create_wrapper_test() throws Exception {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
+		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -103,7 +103,7 @@ public class WrapperControllerTest {
 	@DisplayName("Wrapper 수정")
 	void update_wrapper_test() throws Exception {
 		// given
-		RequestWrapperDTO request = new RequestWrapperDTO(1000L, "update after Wrapper A", "a.jpg", true);
+		RequestModifyWrapperDTO request = new RequestModifyWrapperDTO(true);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then

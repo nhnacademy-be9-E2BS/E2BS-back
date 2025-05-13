@@ -13,7 +13,7 @@ import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class PublisherJpaRepositoryTest {
+class PublisherJpaRepositoryTest {
 	@Autowired
 	private PublisherJpaRepository publisherJpaRepository;
 

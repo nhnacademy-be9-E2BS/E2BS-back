@@ -48,6 +48,9 @@ public class Order {
 	@Column(nullable = false)
 	private long orderPointAmount = 0L;
 
+	@Column(nullable = false)
+	private long orderTotalAmount = 0L;
+
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
 
