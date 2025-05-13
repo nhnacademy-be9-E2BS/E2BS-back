@@ -53,6 +53,7 @@ public class PositionServiceImpl implements PositionService {
 			.map(position -> new ResponsePositionDTO(position.getPositionId(), position.getPositionName()));
 	}
 
+
 	@Override
 	public ResponsePositionDTO updatePosition(Long positionId, RequestPositionDTO request) {
 		Position position = positionJpaRepository.findById(positionId).orElseThrow(
