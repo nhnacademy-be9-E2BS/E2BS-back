@@ -92,7 +92,7 @@ class CartRestControllerForCustomerTest {
 	void getCartItemsByCustomer() throws Exception {
 		// given
 		List<ResponseCartItemsForCustomerDTO> cartItems = List.of(
-			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2)
+			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2, 2000)
 		);
 
 		when(cartService.getCartItemsByCustomer(eq(1L))).thenReturn(cartItems);
