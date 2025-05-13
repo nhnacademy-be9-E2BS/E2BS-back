@@ -22,4 +22,5 @@ public interface CouponService {
 	 * 쿠폰 단건 조회
 	 */
 	ResponseCouponDTO getCoupon(Long couponId);
+
 }

@@ -29,4 +29,8 @@ public class ProductCoupon {
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	public ProductCoupon(Coupon coupon, Product product) {
+		this.coupon = coupon;
+		this.product = product;
+	}
 }
