@@ -13,5 +13,5 @@ public interface CartItemsJpaRepository extends JpaRepository<CartItems, Long> {
 	boolean existsByCartAndProduct(Cart cart, Product product);
 
 	/// 특정 고객의 cartItems 목록 조회 메소드
-	List<CartItems> findByCart_Customer_CustomerId(Long customerId);
+	List<CartItems> findByCart_Customer_CustomerId(long customerId);
 }

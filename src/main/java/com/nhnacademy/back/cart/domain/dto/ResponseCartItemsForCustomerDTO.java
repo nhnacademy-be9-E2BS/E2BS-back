@@ -2,8 +2,6 @@ package com.nhnacademy.back.cart.domain.dto;
 
 import java.util.List;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,24 +13,20 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseCartItemsForCustomerDTO {
 
-	@NotNull
 	private long cartItemId;
 
-	@NotNull
 	private long productId;
 
-	@NotNull
 	private List<ProductCategoryDTO> categoryIds;
 
-	@NotBlank
 	private String productTitle;
 
-	@NotNull
 	private long productSalePrice;
 
 	private String productImagePath;
 
-	@NotNull
 	private int cartItemsQuantity;
+
+	private long productTotalPrice;
 
 }
