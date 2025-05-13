@@ -19,11 +19,14 @@ public class Tag {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long tagId;
 
-	@Setter
 	@Column(length = 30, nullable = false)
 	private String tagName;
 
 	public Tag(String tagName) {
+		this.tagName = tagName;
+	}
+
+	public void setTag(String tagName) {
 		this.tagName = tagName;
 	}
 
