@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -20,5 +21,13 @@ public class Tag {
 
 	@Column(length = 30, nullable = false)
 	private String tagName;
+
+	public Tag(String tagName) {
+		this.tagName = tagName;
+	}
+
+	public void setTag(String tagName) {
+		this.tagName = tagName;
+	}
 
 }

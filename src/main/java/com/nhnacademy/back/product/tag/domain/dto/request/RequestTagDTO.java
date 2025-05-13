@@ -1,6 +1,7 @@
-package com.nhnacademy.back.cart.domain.dto;
+package com.nhnacademy.back.product.tag.domain.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,11 +9,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class RequestUpdateCartItemsDTO {
-	private String sessionId;
-	private Long productId;
+@NoArgsConstructor
+public class RequestTagDTO {
 	@NotNull
-	private int quantity;
+	private String tagName;
 }
