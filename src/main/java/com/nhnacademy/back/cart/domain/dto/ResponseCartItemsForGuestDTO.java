@@ -1,5 +1,7 @@
 package com.nhnacademy.back.cart.domain.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,9 @@ public class ResponseCartItemsForGuestDTO {
 
 	@NotNull
 	private long productId;
+
+	@NotNull
+	private List<ProductCategoryDTO> categoryIds;
 
 	@NotBlank
 	private String productTitle;

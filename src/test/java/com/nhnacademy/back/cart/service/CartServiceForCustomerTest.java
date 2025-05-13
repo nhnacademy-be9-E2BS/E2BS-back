@@ -14,10 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
@@ -31,6 +27,7 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -45,6 +42,9 @@ class CartServiceForCustomerTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
+
+	@Mock
+	private ProductCategoryJpaRepository productCategoryRepository;
 
 	@Mock
 	private CartJpaRepository cartRepository;
@@ -171,17 +171,17 @@ class CartServiceForCustomerTest {
 	@DisplayName("비회원/회원의 장바구니 목록 조회 테스트")
 	void getCartItemsByCustomer() {
 		// given
-		Pageable pageable = PageRequest.of(0, 10);
 		CartItems cartItem = new CartItems(cart, product, 2);
-		Page<CartItems> page = new PageImpl<>(List.of(cartItem));
+		List<CartItems> cartItems = List.of(cartItem);
 
-		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId, pageable)).thenReturn(page);
+		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId)).thenReturn(cartItems);
+		when(productCategoryRepository.findByProduct_ProductId(customerId)).thenReturn(List.of());
 
 		// when
-		Page<ResponseCartItemsForCustomerDTO> result = cartService.getCartItemsByCustomer(customerId, pageable);
+		List<ResponseCartItemsForCustomerDTO> result = cartService.getCartItemsByCustomer(customerId);
 
 		// then
-		assertEquals(1, result.getTotalElements());
-		assertEquals(productId, result.getContent().getFirst().getProductId());
+		assertEquals(1, result.size());
+		assertEquals(productId, result.getFirst().getProductId());
 	}
 }

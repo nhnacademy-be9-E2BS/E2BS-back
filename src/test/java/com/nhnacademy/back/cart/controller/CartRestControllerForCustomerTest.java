@@ -11,9 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -91,24 +88,23 @@ class CartRestControllerForCustomerTest {
 	}
 
 	@Test
-	@DisplayName("GET /api/customers/{customerId}/carts - 고객 장바구니 목록 페이징 조회 테스트")
+	@DisplayName("GET /api/customers/{customerId}/carts - 고객 장바구니 목록 조회 테스트")
 	void getCartItemsByCustomer() throws Exception {
 		// given
 		List<ResponseCartItemsForCustomerDTO> cartItems = List.of(
-			new ResponseCartItemsForCustomerDTO(1L, 100L, "Product A", 1000, "path/image.jpg", 2)
+			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2)
 		);
-		Page<ResponseCartItemsForCustomerDTO> page = new PageImpl<>(cartItems);
 
-		when(cartService.getCartItemsByCustomer(eq(1L), any(Pageable.class))).thenReturn(page);
+		when(cartService.getCartItemsByCustomer(eq(1L))).thenReturn(cartItems);
 
 		// when & then
 		mockMvc.perform(get("/api/customers/1/carts"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content[0].productId").value(100L))
-			.andExpect(jsonPath("$.content[0].productTitle").value("Product A"))
-			.andExpect(jsonPath("$.content[0].productSalePrice").value(1000))
-			.andExpect(jsonPath("$.content[0].productImagePath").value("path/image.jpg"))
-			.andExpect(jsonPath("$.content[0].cartItemsQuantity").value(2));
+			.andExpect(jsonPath("$.[0].productId").value(100L))
+			.andExpect(jsonPath("$.[0].productTitle").value("Product A"))
+			.andExpect(jsonPath("$.[0].productSalePrice").value(1000))
+			.andExpect(jsonPath("$.[0].productImagePath").value("path/image.jpg"))
+			.andExpect(jsonPath("$.[0].cartItemsQuantity").value(2));
 	}
 
 }
