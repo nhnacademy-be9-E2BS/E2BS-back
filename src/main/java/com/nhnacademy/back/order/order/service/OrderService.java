@@ -9,6 +9,8 @@ import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentCo
 public interface OrderService {
 	ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
 
+	ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
+
 	ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount);
 
 	ResponseEntity<Void> cancelOrder(String orderId);

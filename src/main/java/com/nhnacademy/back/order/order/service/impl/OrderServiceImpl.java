@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
 		RequestOrderDTO requestOrderDTO = requestOrderWrapperDTO.getOrder();
 		Customer customer = customerJpaRepository.findById(requestOrderDTO.getCustomerId()).orElseThrow();
 		MemberCoupon memberCoupon = null;
-		// 사용한 쿠폰이 있는 경우에만 Repository 검색
+		// 사용한 쿠폰이 있는 경우에만 Repository 검색, 사용 가능한 쿠폰이 맞는지도 봐야함
 		if (requestOrderDTO.getMemberCouponId() != null) {
 			memberCoupon = memberCouponJpaRepository.findById(requestOrderDTO.getMemberCouponId()).orElseThrow();
 		}
@@ -98,6 +98,21 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return ResponseEntity.ok(new ResponseOrderResultDTO(orderCode, order.getOrderPaymentAmount()));
+	}
+
+	/**
+	 * 포인트 주문 시 주문서 저장 및 결제 차감을 진행함
+	 *
+	 */
+	@Override
+	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
+		ResponseEntity<ResponseOrderResultDTO> response = createOrder(requestOrderWrapperDTO);
+		//포인트 차감,적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
+
+		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
+		order.updatePaymentStatus(true);
+		orderJpaRepository.save(order);
+		return response;
 	}
 
 	/**

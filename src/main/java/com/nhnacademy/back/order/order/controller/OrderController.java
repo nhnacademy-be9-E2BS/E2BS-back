@@ -27,13 +27,26 @@ public class OrderController {
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
-	@PostMapping("/api/createOrder")
+	@PostMapping("/api/createOrder/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 		return orderService.createOrder(request);
+	}
+
+	/**
+	 * 포인트 주문에 대한 처리
+	 */
+	@PostMapping("/api/createOrder/point")
+	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(
+		@Validated @RequestBody RequestOrderWrapperDTO request,
+		BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			throw new ValidationFailedException(bindingResult);
+		}
+		return orderService.createPointOrder(request);
 	}
 
 	/**
