@@ -1,5 +1,6 @@
 package com.nhnacademy.back.cart.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -128,20 +129,34 @@ public class CartServiceImpl implements CartService {
 		// 필요한 api 스펙에 맞춰 response 재가공해서 반환
 		return cartItems.stream()
 			.map(cartItem -> {
-				// 기본 이미지 설정
+				// 해당 상품 조회 및 검증
 				Product product = cartItem.getProduct();
+				if (Objects.isNull(product)) {
+					throw new ProductNotFoundException("Product not found");
+				}
+
+				// 기본 이미지 설정
 				String productImagePath = "default.jpg";
 
-				if (Objects.nonNull(product.getProductImage())) {
+				// 해당 상품의 이미지 검증
+				if (Objects.nonNull(product.getProductImage()) && !product.getProductImage().isEmpty()) {
 					productImagePath = product.getProductImage().getFirst().getProductImagePath();
 				}
 
+				// 상품 카테고리 리스트 가져오기
 				List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(product.getProductId());
-				List<ProductCategoryDTO> findProductCategoriesDto = findProductCategories.stream()
-					.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-					.toList();
+				List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
 
-				// ResponseCartItemsForCustomerDTO 객체 반환
+				// 카테고리 리스트가 null이 아니면 DTO로 변환
+				if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
+					findProductCategoriesDto = findProductCategories.stream()
+						.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
+						.toList();
+				}
+
+				//  DTO 가공
+				long productTotalPrice = product.getProductSalePrice() * cartItem.getCartItemsQuantity();
+
 				return new ResponseCartItemsForCustomerDTO(
 					cartItem.getCartItemsId(),
 					product.getProductId(),
@@ -149,7 +164,8 @@ public class CartServiceImpl implements CartService {
 					product.getProductTitle(),
 					product.getProductSalePrice(),
 					productImagePath,
-					cartItem.getCartItemsQuantity());
+					cartItem.getCartItemsQuantity(),
+					productTotalPrice);
 			})
 			.toList();
 	}
@@ -184,7 +200,7 @@ public class CartServiceImpl implements CartService {
 
 		// 장바구니 항목 생성 및 Cart에 추가
 		String image = "";
-		if(Objects.nonNull(findProduct.getProductImage())) {
+		if (Objects.nonNull(findProduct.getProductImage())) {
 			image = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
 
@@ -277,14 +293,19 @@ public class CartServiceImpl implements CartService {
 
 		// DTO 가공
 		return cartItems.stream()
-			.map(cartItem -> new ResponseCartItemsForGuestDTO(
-				cartItem.getProductId(),
-				cartItem.getCategoryIds(),
-				cartItem.getProductTitle(),
-				cartItem.getProductSalePrice(),
-				cartItem.getProductImagePath(),
-				cartItem.getCartItemsQuantity()
-			))
+			.map(cartItem -> {
+				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
+
+				return new ResponseCartItemsForGuestDTO(
+					cartItem.getProductId(),
+					cartItem.getCategoryIds(),
+					cartItem.getProductTitle(),
+					cartItem.getProductSalePrice(),
+					cartItem.getProductImagePath(),
+					cartItem.getCartItemsQuantity(),
+					productTotalPrice
+				);
+			})
 			.collect(Collectors.toList());
 	}
 
