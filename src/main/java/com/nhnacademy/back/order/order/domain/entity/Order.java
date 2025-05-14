@@ -88,6 +88,10 @@ public class Order {
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
+	public void updatePaymentStatus(boolean status) {
+		this.orderPaymentStatus = status;
+	}
+
 	public Order(RequestOrderDTO requestOrderDTO, MemberCoupon memberCoupon, DeliveryFee deliveryFee,
 		Customer customer) {
 		this.orderCode = generateSecureOrderId();

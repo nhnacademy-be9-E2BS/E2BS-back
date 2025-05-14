@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
@@ -58,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
 	 * null이면 안되는 외래키의 경우 orElseThrow로 예외 발생 예정
 	 * 추후 해당 도메인 담당자가 Exception을 만들면 추가할 예정
 	 */
+	@Transactional
 	@Override
 	public ResponseEntity<ResponseOrderResultDTO> CreateOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
 		// 주문서 저장
@@ -104,6 +106,23 @@ public class OrderServiceImpl implements OrderService {
 	public ResponseEntity<Void> confirmOrder(String orderId, String paymentKey, long amount) {
 		RequestTossConfirmDTO requestTossConfirmDTO = new RequestTossConfirmDTO(orderId, paymentKey, amount);
 		ResponseEntity<Void> response = tossConfirmAdaptor.confirmOrder(requestTossConfirmDTO, secretKey);
+		// 만약 승인된 경우 결제 상태 업데이트
+		if (response.getStatusCode().is2xxSuccessful()) {
+			Order order = orderJpaRepository.findById(orderId).orElseThrow();
+			order.updatePaymentStatus(true);
+			orderJpaRepository.save(order);
+		}
 		return response;
 	}
+
+	// 요소 제거 시 트랜잭션 없을 시 에러 발생
+	// 재고 복구 추가해야 함
+	@Transactional
+	@Override
+	public ResponseEntity<Void> cancelOrder(String orderId) {
+		orderDetailJpaRepository.deleteByOrderOrderCode(orderId);
+		orderJpaRepository.deleteById(orderId);
+		return ResponseEntity.ok().build();
+	}
+
 }

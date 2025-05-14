@@ -49,4 +49,9 @@ public class OrderController {
 		}
 		return response;
 	}
+
+	@PostMapping("/api/order/cancel")
+	public ResponseEntity<Void> cancelOrder(@RequestParam String orderId) {
+		return orderService.cancelOrder(orderId);
+	}
 }
