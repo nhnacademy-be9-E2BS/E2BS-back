@@ -4,11 +4,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 
 public interface OrderService {
-	ResponseEntity<ResponseOrderResultDTO> CreateOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
+	ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
 
-	ResponseEntity<Void> confirmOrder(String orderId, String paymentKey, long amount);
+	ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount);
 
 	ResponseEntity<Void> cancelOrder(String orderId);
 }

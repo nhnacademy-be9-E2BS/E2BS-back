@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 
 @FeignClient(name = "tossPaymentClient", url = "${order.url.toss}")
 public interface TossConfirmAdaptor {
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Void> confirmOrder(@RequestBody RequestTossConfirmDTO requestTossConfirmDTO,
+	ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(@RequestBody RequestTossConfirmDTO requestTossConfirmDTO,
 		@RequestHeader("Authorization") String authHeader);
 }

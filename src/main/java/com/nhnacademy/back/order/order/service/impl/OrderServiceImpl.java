@@ -19,6 +19,7 @@ import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.domain.entity.Order;
 import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
@@ -61,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Transactional
 	@Override
-	public ResponseEntity<ResponseOrderResultDTO> CreateOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
+	public ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
 		// 주문서 저장
 		RequestOrderDTO requestOrderDTO = requestOrderWrapperDTO.getOrder();
 		Customer customer = customerJpaRepository.findById(requestOrderDTO.getCustomerId()).orElseThrow();
@@ -103,9 +104,11 @@ public class OrderServiceImpl implements OrderService {
 	 * 결제 완료 시 토스에 결제 승인 요청을 보내는 서비스
 	 */
 	@Override
-	public ResponseEntity<Void> confirmOrder(String orderId, String paymentKey, long amount) {
+	public ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount) {
 		RequestTossConfirmDTO requestTossConfirmDTO = new RequestTossConfirmDTO(orderId, paymentKey, amount);
-		ResponseEntity<Void> response = tossConfirmAdaptor.confirmOrder(requestTossConfirmDTO, secretKey);
+		// 결제 승인 결과를 받아 온 응답
+		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossConfirmAdaptor.confirmOrder(requestTossConfirmDTO,
+			secretKey);
 		// 만약 승인된 경우 결제 상태 업데이트
 		if (response.getStatusCode().is2xxSuccessful()) {
 			Order order = orderJpaRepository.findById(orderId).orElseThrow();
