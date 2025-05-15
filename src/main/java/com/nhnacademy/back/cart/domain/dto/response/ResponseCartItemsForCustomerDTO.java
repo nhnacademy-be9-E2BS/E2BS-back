@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseCartItemsForCustomerDTO {
 
-	private long cartItemId;
+	private long cartItemsId;
 
 	private long productId;
 
