@@ -214,4 +214,15 @@ VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.0
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
-VALUES (1, 'TOSS')
+VALUES (1, 'TOSS');
+
+-- Cart (비회원/회원용 장바구니)
+INSERT INTO cart (cart_id, customer_id)
+VALUES (1, 1);
+
+-- CartItems
+INSERT INTO cart_items (cart_items_id, cart_id, product_id, cart_items_quantity)
+VALUES (1, 1, 1, 5),
+       (2, 1, 2, 2),
+       (3, 1, 3, 6),
+       (4, 1, 4, 1);
