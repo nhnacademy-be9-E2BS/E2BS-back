@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -29,8 +30,13 @@ public class Coupon {
 	@Column(length = 30, nullable = false)
 	private String couponName;
 
+	@Setter
+	@Column(nullable = false)
+	private boolean couponIsActive = true;
+
 	public Coupon(CouponPolicy couponPolicy, String couponName) {
 		this.couponPolicy = couponPolicy;
 		this.couponName = couponName;
 	}
+
 }

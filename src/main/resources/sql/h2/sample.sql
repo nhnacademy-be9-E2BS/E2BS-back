@@ -177,3 +177,37 @@ VALUES (1, 1),
        (2, 4),
        (4, 2),
        (3, 3);
+
+-- 주문 테스트를 위한 데이터
+
+-- DeliveryFee
+INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_date, delivery_fee_free_amount)
+VALUES (5000, DATE '2025-01-01', 30000);
+
+-- Wrapper
+INSERT INTO wrapper (wrapper_image, wrapper_name, wrapper_price, wrapper_saleable)
+VALUES ('', '포장 안함', 0, true),
+       ('', '빨간 포장지', 700, true);
+
+-- OrderState
+INSERT INTO order_state (order_state_name)
+VALUES ('CANCEL'), ('COMPLETE'),('DELIVERY'), ('RETURN'), ('WAIT');
+
+-- CouponPolicy
+INSERT INTO coupon_policy (coupon_policy_id ,coupon_policy_created_at, coupon_policy_discount_rate, coupon_policy_maximum_amount, coupon_policy_minimum, coupon_policy_name, coupon_policy_sale_price)
+VALUES (0,DATE '2025-01-01', null, null, 10000, '만원 이상 구매 시 1000원 할인', 1000),
+       (1, DATE '2025-01-01', 10, 3000, 10000, '만원 이상 구매 시 10% 할인(최대 3천원)', null);
+
+-- Coupon
+INSERT INTO coupon (coupon_id,coupon_name, coupon_policy_id)
+VALUES (0,'천원 쿠폰', 0),
+       (1,'10% 쿠폰',1);
+
+-- MemberCoupon
+INSERT INTO member_coupon (member_coupon_code, member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
+VALUES ('testCoupon1', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 0, 1),
+       ('testCoupon2', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1);
+
+-- PaymentMethod
+INSERT INTO payment_method (payment_method_id, payment_method_name)
+VALUES (1, 'TOSS')
