@@ -56,7 +56,7 @@ class CouponControllerTest {
 	@DisplayName("쿠폰 전체 조회")
 	void getCoupons_success() throws Exception {
 		Pageable pageable = PageRequest.of(0, 10);
-		ResponseCouponDTO dto = new ResponseCouponDTO(1L, 1L, "테스트 쿠폰", null, null);
+		ResponseCouponDTO dto = new ResponseCouponDTO(1L, 1L, "테스트 쿠폰", null, null, null, null, null);
 		Page<ResponseCouponDTO> page = new PageImpl<>(Collections.singletonList(dto), pageable, 1);
 
 		when(couponService.getCoupons(any(Pageable.class))).thenReturn(page);
@@ -69,7 +69,7 @@ class CouponControllerTest {
 	@Test
 	@DisplayName("쿠폰 단건 조회")
 	void getCoupon_success() throws Exception {
-		ResponseCouponDTO dto = new ResponseCouponDTO(1L, 1L, "테스트 쿠폰", null, null);
+		ResponseCouponDTO dto = new ResponseCouponDTO(1L, 1L, "테스트 정책", "테스트 쿠폰", null, null, null, null);
 
 		when(couponService.getCoupon(1L)).thenReturn(dto);
 

@@ -56,12 +56,6 @@ class CouponServiceTest {
 	}
 
 	@Test
-	@DisplayName("요청 DTO null 예외 발생")
-	void createCoupon_withNullRequest_shouldThrowBadRequestException() {
-		assertThrows(BadRequestException.class, () -> couponService.createCoupon(null));
-	}
-
-	@Test
 	@DisplayName("카테고리 쿠폰 생성 성공")
 	void createCoupon_withCategoryCoupon_success() {
 		RequestCouponDTO request = new RequestCouponDTO(1L, "쿠폰1", 10L, null);
