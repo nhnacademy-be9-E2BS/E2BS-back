@@ -32,12 +32,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService {
 
-	private CouponPolicyJpaRepository couponPolicyJpaRepository;
-	private CouponJpaRepository couponJpaRepository;
-	private CategoryCouponJpaRepository categoryCouponJpaRepository;
-	private ProductCouponJpaRepository productCouponJpaRepository;
-	private CategoryJpaRepository categoryJpaRepository;
-	private ProductJpaRepository productJpaRepository;
+	private final CouponPolicyJpaRepository couponPolicyJpaRepository;
+	private final CouponJpaRepository couponJpaRepository;
+	private final CategoryCouponJpaRepository categoryCouponJpaRepository;
+	private final ProductCouponJpaRepository productCouponJpaRepository;
+	private final CategoryJpaRepository categoryJpaRepository;
+	private final ProductJpaRepository productJpaRepository;
 
 	/**
 	 * 관리자가 쿠폰을 생성
@@ -46,14 +46,11 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public void createCoupon(RequestCouponDTO request) {
-		if(Objects.isNull(request)) {
-			throw new BadRequestException("쿠폰 생성 요청 DTO 를 받지 못했습니다.");
-		}
-
 		CouponPolicy couponPolicy = couponPolicyJpaRepository.findById(request.getCouponPolicyId())
 			.orElseThrow(()-> new CouponPolicyNotFoundException("존재하지 않는 쿠폰 정책입니다"));
 
 		Coupon coupon = new Coupon(couponPolicy, request.getCouponName());
+		couponJpaRepository.save(coupon);
 
 		if(request.getCategoryId() != null) {
 			Category category = categoryJpaRepository.findById(request.getCategoryId())
@@ -84,25 +81,33 @@ public class CouponServiceImpl implements CouponService {
 			ProductCoupon productCoupon = productCouponJpaRepository.findById(coupon.getCouponId())
 				.orElse(null);
 
-			Long categoryId = Optional.ofNullable(categoryCoupon)
-				.map(CategoryCoupon::getCategory)
-				.map(Category::getCategoryId)
-				.orElse(null);
+			Long categoryId = null;
+			String categoryName = null;
+			if (categoryCoupon != null && categoryCoupon.getCategory() != null) {
+				categoryId = categoryCoupon.getCategory().getCategoryId();
+				categoryName = categoryCoupon.getCategory().getCategoryName();
+			}
 
-			Long productId = Optional.ofNullable(productCoupon)
-				.map(ProductCoupon::getProduct)
-				.map(Product::getProductId)
-				.orElse(null);
+			Long productId = null;
+			String productTitle = null;
+			if (productCoupon != null && productCoupon.getProduct() != null) {
+				productId = productCoupon.getProduct().getProductId();
+				productTitle = productCoupon.getProduct().getProductTitle();
+			}
 
 			return new ResponseCouponDTO(
 				coupon.getCouponId(),
 				coupon.getCouponPolicy().getCouponPolicyId(),
+				coupon.getCouponPolicy().getCouponPolicyName(),
 				coupon.getCouponName(),
 				categoryId,
-				productId
+				categoryName,
+				productId,
+				productTitle
 			);
 		});
 	}
+
 
 	/**
 	 * 쿠폰 ID로 쿠폰 조회
@@ -122,21 +127,28 @@ public class CouponServiceImpl implements CouponService {
 			.orElse(null);
 
 		Long categoryId = null;
+		String categoryName = null;
 		if (categoryCoupon != null && categoryCoupon.getCategory() != null) {
 			categoryId = categoryCoupon.getCategory().getCategoryId();
+			categoryName = categoryCoupon.getCategory().getCategoryName();
 		}
 
 		Long productId = null;
+		String productTitle = null;
 		if (productCoupon != null && productCoupon.getProduct() != null) {
 			productId = productCoupon.getProduct().getProductId();
+			productTitle = productCoupon.getProduct().getProductTitle();
 		}
 
 		return new ResponseCouponDTO(
 			coupon.getCouponId(),
 			coupon.getCouponPolicy().getCouponPolicyId(),
+			coupon.getCouponPolicy().getCouponPolicyName(),
 			coupon.getCouponName(),
 			categoryId,
-			productId
+			categoryName,
+			productId,
+			productTitle
 		);
 
 	}
