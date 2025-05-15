@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
-import com.nhnacademy.back.product.category.domain.dto.response.ResponseSideBarCategoryDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
-import com.nhnacademy.back.product.category.service.ProductCategoryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryController {
 	private final CategoryService categoryService;
-	private final ProductCategoryService productCategoryService;
 
 	// 유저 페이지
 
@@ -38,11 +35,11 @@ public class CategoryController {
 	}
 
 	/**
-	 * 도서 리스트 조회 시 사이드바에 표시할 카테고리 리스트
+	 * 도서 리스트 조회 시 사이드 바에 표시할 카테고리 리스트
 	 */
 	@GetMapping("/api/categories/{categoryId}")
-	public ResponseEntity<List<ResponseSideBarCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
-		List<ResponseSideBarCategoryDTO> response = categoryService.getCategoriesById(categoryId);
+	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
+		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -58,11 +55,11 @@ public class CategoryController {
 	}
 
 	/**
-	 * 부모 + 자식 카테고리 저장
+	 * 최상위 + 하위 카테고리 저장
 	 */
 	@PostMapping("/api/admin/categories")
-	public ResponseEntity<Void> createCategory(@RequestBody List<RequestCategoryDTO> request) {
-		categoryService.createCategory(request);
+	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
+		categoryService.createCategoryTree(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -71,9 +68,9 @@ public class CategoryController {
 	 * 이미 존재하는 카테고리에 자식 카테고리 저장
 	 */
 	@PostMapping("/api/admin/categories/{categoryId}")
-	public ResponseEntity<Void> createCategory(@PathVariable Long categoryId,
+	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
-		categoryService.createCategory(categoryId, request);
+		categoryService.createChildCategory(categoryId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}

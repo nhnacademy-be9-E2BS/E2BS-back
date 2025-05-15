@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
-import com.nhnacademy.back.product.category.domain.dto.response.ResponseSideBarCategoryDTO;
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
@@ -31,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
 	@Override
-	public void createCategory(long parentId, RequestCategoryDTO request) {
+	public void createChildCategory(long parentId, RequestCategoryDTO request) {
 		String categoryName = request.getCategoryName();
 
 		Category parent = categoryJpaRepository.findById(parentId)
@@ -42,6 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 
 		Category category = new Category(categoryName, parent);
+		parent.getChildren().add(category); // 부모 카테고리에 자식 카테고리 추가
 		categoryJpaRepository.save(category);
 	}
 
@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
 	@Override
-	public void createCategory(List<RequestCategoryDTO> request) {
+	public void createCategoryTree(List<RequestCategoryDTO> request) {
 		if (request.size() != 2) {
 			throw new IllegalArgumentException();
 		}
@@ -118,19 +118,16 @@ public class CategoryServiceImpl implements CategoryService {
 
 	/**
 	 * 사용자가 카테고리 선택 시 그에 해당하는 하위 카테고리들을 side bar에서 보여주기 위해
-	 * categoryId 기준 하위 카테고리들을 조회하여 return 하는 로직
-	 * ex) A-B-C-D-E에서 C를 누른 경우 side bar에서 D를 보여줌
+	 * categoryId의 하위 카테고리들을 조회하여 return 하는 로직
+	 * ex) A-B-C-D-E에서 C를 누른 경우 side bar에서 D-E를 보여줌
 	 */
 	@Override
-	public List<ResponseSideBarCategoryDTO> getCategoriesById(long categoryId) {
+	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
 		Category parent = categoryJpaRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
 
 		return parent.getChildren().stream()
-			.map(child -> new ResponseSideBarCategoryDTO(
-				child.getCategoryId(),
-				child.getCategoryName()
-			))
+			.map(this::buildTree)
 			.collect(Collectors.toList());
 	}
 
@@ -209,5 +206,16 @@ public class CategoryServiceImpl implements CategoryService {
 			category.getCategoryName(),
 			childDtos
 		);
+	}
+
+	/**
+	 * getCategoriesById(long categoryId) 메소드에서 카테고리를 트리 구조로 만들기 위한 메소드
+	 */
+	private ResponseCategoryDTO buildTree(Category category) {
+		List<ResponseCategoryDTO> children = category.getChildren().stream()
+			.map(this::buildTree)
+			.collect(Collectors.toList());
+
+		return new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), children);
 	}
 }
