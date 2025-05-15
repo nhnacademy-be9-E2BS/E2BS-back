@@ -129,17 +129,11 @@ VALUES (1, 'Science'),
        (4, 'Statistics');
 
 -- Product
-INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
-                     product_sale_price, product_state_id, publisher_id, product_isbn, product_title, product_content,
-                     product_description)
-VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Spring 입문', 'Spring 프레임워크 소개',
-        '초보자를 위한 Spring 가이드입니다.'),
-       (0, '2023-11-30', 50, 2, 18000, 14000, 2, 2, '978-89-12345-02-2', 'JPA 기초', 'JPA 사용법 정리',
-        'Entity 설계부터 관계 매핑까지 JPA의 핵심을 담았습니다.'),
-       (1, '2022-06-10', 20, 3, 25000, 20000, 3, 1, '978-89-12345-03-3', 'Docker 실전', '컨테이너 기술',
-        'Docker를 활용한 배포 환경 구성 실전서입니다.'),
-       (0, '2025-03-01', 70, 4, 22000, 18000, 4, 2, '978-89-12345-04-4', 'CI/CD 이해하기', '지속적 통합과 배포',
-        'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.');
+INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price, product_sale_price, product_state_id, publisher_id, product_isbn, product_title, product_content, product_description)
+VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Spring 입문', 'Spring 프레임워크 소개', '초보자를 위한 Spring 가이드입니다.'),
+       (0, '2023-11-30', 50, 2, 18000, 14000, 2, 2, '978-89-12345-02-2', 'JPA 기초', 'JPA 사용법 정리', 'Entity 설계부터 관계 매핑까지 JPA의 핵심을 담았습니다.'),
+       (1, '2022-06-10', 20, 3, 25000, 20000, 3, 1, '978-89-12345-03-3', 'Docker 실전', '컨테이너 기술', 'Docker를 활용한 배포 환경 구성 실전서입니다.'),
+       (0, '2025-03-01', 70, 4, 22000, 18000, 4, 2, '978-89-12345-04-4', 'CI/CD 이해하기', '지속적 통합과 배포', 'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.');
 
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
@@ -184,32 +178,28 @@ VALUES ('', '포장 안함', 0, true),
 
 -- OrderState
 INSERT INTO order_state (order_state_name)
-VALUES ('CANCEL'),
-       ('COMPLETE'),
-       ('DELIVERY'),
-       ('RETURN'),
-       ('WAIT');
+VALUES ('CANCEL'), ('COMPLETE'),('DELIVERY'), ('RETURN'), ('WAIT');
 
 -- CouponPolicy
-INSERT INTO coupon_policy (coupon_policy_id, coupon_policy_created_at, coupon_policy_discount_rate,
-                           coupon_policy_maximum_amount, coupon_policy_minimum, coupon_policy_name,
-                           coupon_policy_sale_price)
-VALUES (1, DATE '2025-01-01', null, null, 10000, '만원 이상 구매 시 1000원 할인', 1000),
-       (2, DATE '2025-01-01', 10, 3000, 10000, '만원 이상 구매 시 10% 할인(최대 3천원)', null),
-       (3, DATE '2025-01-01', null, null, 30000, '3만원 이상 구매 시 3000원 할인', 3000);
+INSERT INTO coupon_policy (coupon_policy_id ,coupon_policy_created_at, coupon_policy_discount_rate, coupon_policy_maximum_amount, coupon_policy_minimum, coupon_policy_name, coupon_policy_sale_price)
+VALUES (1,DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,000원 할인', 1000),
+       (2, DATE '2025-01-01', 10, 3000, 10000, '10,000원 이상 구매 시 10% 할인 (최대 3,000원)', null),
+       (3, DATE '2025-01-01', null, null, 50000, '50,000원 이상 구매 시 10,000원 할인', 10000),
+       (4, DATE '2025-01-01', null, null, 20000, '20,000원 이상 구매 시 3,000원 할인', 3000),
+       (5, DATE '2025-01-01', 20, 10000, 20000, '20,000원 이상 구매 시 20% 할인 (최대 10,000원)', null);
+
 
 -- Coupon
-INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id)
-VALUES (1, '천원 쿠폰', 1),
-       (2, '10% 쿠폰', 2),
-       (3, '3000원 쿠폰', 3);
+INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
+VALUES (1,'1,000원 쿠폰', 1, true),
+       (2,'10% 쿠폰',2, true),
+       (3, '3000원 쿠폰', 3, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_code, member_coupon_created_at, member_coupon_period, member_coupon_used,
-                           coupon_id, customer_id)
-VALUES ('testCoupon1', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
-       ('testCoupon2', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
-       ('testCoupon3', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
+VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
@@ -223,3 +213,14 @@ VALUES (1, 'TOSS');
 # -- OrderDetail
 # INSERT INTO order_detail
 # VALUES (1, 1100, 1, 'TEST-ORDER-CODE', 5, 1, null, 1)
+
+-- Cart (비회원/회원용 장바구니)
+INSERT INTO cart (cart_id, customer_id)
+VALUES (1, 1);
+
+-- CartItems
+INSERT INTO cart_items (cart_items_id, cart_id, product_id, cart_items_quantity)
+VALUES (1, 1, 1, 5),
+       (2, 1, 2, 2),
+       (3, 1, 3, 6),
+       (4, 1, 4, 1);

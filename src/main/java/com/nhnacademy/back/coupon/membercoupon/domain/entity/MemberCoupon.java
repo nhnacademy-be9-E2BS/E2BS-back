@@ -37,9 +37,6 @@ public class MemberCoupon {
 
 	private LocalDateTime memberCouponPeriod;
 
-	@Column(unique = true, nullable = false)
-	private String memberCouponCode;
-
 	@Column(nullable = false)
 	private boolean memberCouponUsed = false;
 }

@@ -15,11 +15,11 @@ import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
@@ -89,7 +89,11 @@ public class CartServiceImpl implements CartService {
 			.orElseThrow(() -> new CartItemNotFoundException("Cart item not found"));
 
 		// 해당 장바구니 아이템의 수량 변경
-		findCartItem.changeCartItemsQuantity(request.getQuantity());
+		if (request.getQuantity() > 0) {
+			findCartItem.changeCartItemsQuantity(request.getQuantity());
+		} else {
+			cartItemsRepository.delete(findCartItem);
+		}
 	}
 
 	/**
@@ -180,11 +184,6 @@ public class CartServiceImpl implements CartService {
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
-		List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(findProduct.getProductId());
-		List<ProductCategoryDTO> findProductCategoriesDto = findProductCategories.stream()
-			.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-			.toList();
-
 		// Redis에서 장바구니 가져오기 (없으면 생성)
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
@@ -199,9 +198,20 @@ public class CartServiceImpl implements CartService {
 		}
 
 		// 장바구니 항목 생성 및 Cart에 추가
-		String image = "";
-		if (Objects.nonNull(findProduct.getProductImage())) {
-			image = findProduct.getProductImage().getFirst().getProductImagePath();
+		String productImagePath = "default.jpg";
+		if (Objects.nonNull(findProduct.getProductImage()) && !findProduct.getProductImage().isEmpty()) {
+			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
+		}
+
+		// 카테고리 가져오기
+		List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(findProduct.getProductId());
+		List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
+
+		// 카테고리 리스트가 null이 아니면 DTO로 변환
+		if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
+			findProductCategoriesDto = findProductCategories.stream()
+				.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
+				.toList();
 		}
 
 		CartItemDTO newItem = new CartItemDTO(
@@ -209,7 +219,7 @@ public class CartServiceImpl implements CartService {
 			findProductCategoriesDto,
 			findProduct.getProductTitle(),
 			findProduct.getProductSalePrice(),
-			image,
+			productImagePath,
 			request.getQuantity()
 		);
 		cart.getCartItems().add(newItem);
