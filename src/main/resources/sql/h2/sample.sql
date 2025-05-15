@@ -195,18 +195,22 @@ VALUES ('CANCEL'), ('COMPLETE'),('DELIVERY'), ('RETURN'), ('WAIT');
 
 -- CouponPolicy
 INSERT INTO coupon_policy (coupon_policy_id ,coupon_policy_created_at, coupon_policy_discount_rate, coupon_policy_maximum_amount, coupon_policy_minimum, coupon_policy_name, coupon_policy_sale_price)
-VALUES (0,DATE '2025-01-01', null, null, 10000, '만원 이상 구매 시 1000원 할인', 1000),
-       (1, DATE '2025-01-01', 10, 3000, 10000, '만원 이상 구매 시 10% 할인(최대 3천원)', null);
+VALUES (1,DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,000원 할인', 1000),
+       (2, DATE '2025-01-01', 10, 3000, 10000, '10,000원 이상 구매 시 10% 할인 (최대 3,000원)', null),
+       (3, DATE '2025-01-01', null, null, 50000, '50,000원 이상 구매 시 10,000원 할인', 10000),
+       (4, DATE '2025-01-01', null, null, 20000, '20,000원 이상 구매 시 3,000원 할인', 3000),
+       (5, DATE '2025-01-01', 20, 10000, 20000, '20,000원 이상 구매 시 20% 할인 (최대 10,000원)', null);
+
 
 -- Coupon
-INSERT INTO coupon (coupon_id,coupon_name, coupon_policy_id)
-VALUES (0,'천원 쿠폰', 0),
-       (1,'10% 쿠폰',1);
+INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
+VALUES (1,'1,000원 쿠폰', 1, true),
+       (2,'10% 쿠폰',2, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_code, member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
-VALUES ('testCoupon1', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 0, 1),
-       ('testCoupon2', TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1);
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
+VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
