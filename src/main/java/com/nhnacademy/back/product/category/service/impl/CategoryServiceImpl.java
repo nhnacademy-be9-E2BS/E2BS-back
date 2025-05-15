@@ -9,15 +9,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.nhnacademy.back.product.category.domain.dto.request.RequestModifyCategoryDTO;
-import com.nhnacademy.back.product.category.domain.dto.request.RequestRegisterCategoryDTO;
+import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseSideBarCategoryDTO;
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
-import com.nhnacademy.back.product.category.exception.CategoryUpdateNotAllowedException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.service.CategoryService;
 
@@ -33,8 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
 	@Override
-	public void createCategory(long parentId, RequestRegisterCategoryDTO registerRequest) {
-		String categoryName = registerRequest.getCategoryName();
+	public void createCategory(long parentId, RequestCategoryDTO request) {
+		String categoryName = request.getCategoryName();
 
 		Category parent = categoryJpaRepository.findById(parentId)
 			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(parentId)));
@@ -45,8 +43,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 		Category category = new Category(categoryName, parent);
 		categoryJpaRepository.save(category);
-
-		// TODO: 추후에 카테고리상품 관계 테이블에서도 추가해주는 코드 필요
 	}
 
 	/**
@@ -54,30 +50,28 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
 	@Override
-	public void createCategory(List<RequestRegisterCategoryDTO> registerRequests) {
-		if (registerRequests.size() != 2) {
+	public void createCategory(List<RequestCategoryDTO> request) {
+		if (request.size() != 2) {
 			throw new IllegalArgumentException();
 		}
 
 		// 최상위 카테고리 이름 중복 검사
-		if (categoryJpaRepository.existsByParentIsNullAndCategoryName(registerRequests.get(0).getCategoryName())) {
+		if (categoryJpaRepository.existsByParentIsNullAndCategoryName(request.get(0).getCategoryName())) {
 			throw new CategoryAlreadyExistsException(
-				"Category Already Exists: %s".formatted(registerRequests.get(0).getCategoryName()));
+				"Category Already Exists: %s".formatted(request.get(0).getCategoryName()));
 		}
 
 		// 최상위 카테고리 저장
 		Category parentCategory = categoryJpaRepository.save(
-			new Category(registerRequests.get(0).getCategoryName(), null));
+			new Category(request.get(0).getCategoryName(), null));
 
 		// 하위 카테고리 저장
-		Category childCategory = new Category(registerRequests.get(1).getCategoryName(), parentCategory);
+		Category childCategory = new Category(request.get(1).getCategoryName(), parentCategory);
 		categoryJpaRepository.save(childCategory);
-
-		// TODO: 추후에 카테고리상품 관계 테이블에서도 추가해주는 코드 필요
 	}
 
 	/**
-	 * 관리자 페이지에서 모든 Category를 볼 수 있도록 조회하는 로직
+	 * 관리자 페이지 카테고리 탭 & 상품 등록 & 상품 수정 창에서 모든 Category를 볼 수 있도록 조회하는 로직
 	 * 폴더 구조로 구현할 예정이기 때문에 페이징 처리 X
 	 */
 	@Override
@@ -145,56 +139,22 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 수정 가능한 값 : category_name, category_id2(parent)
 	 * 수정 조건
 	 * category_name : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
-	 * category_id2 : 자식 카테고리가 없는 최하위 카테고리인 경우에만 이동 가능하며, 해당 카테고리에 속한 도서들도 같이 이동
+	 * category_id2 : 자식 카테고리가 없는 최하위 카테고리인 경우에만 이동 가능하며, 해당 카테고리에 속한 도서들도 같이 이동, 최상위 카테고리로 이동은 불가능
 	 */
 	@Override
-	public void updateCategory(long categoryId, RequestModifyCategoryDTO modifyRequest) {
+	public void updateCategory(long categoryId, RequestCategoryDTO request) {
 		Category originCategory = categoryJpaRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
 
-		String newName = modifyRequest.getCategoryName();
-		long newParentId = modifyRequest.getCategoryId2();
+		String newName = request.getCategoryName();
 
-		Category currentParent = originCategory.getParent();
-		long currentParentId = currentParent != null ? currentParent.getCategoryId() : 0;
-
-		// 이름과 부모 카테고리 변경 여부
-		boolean isNameChanged = newName != null && !newName.equals(originCategory.getCategoryName());
-		boolean isParentChanged = newParentId != 0 && (currentParent == null || currentParentId != newParentId);
-
-		Category newParent = currentParent;
-
-		// 부모 변경 처리
-		if (isParentChanged) {
-			// 본인이 최하위 카테고리인지 확인
-			if (!originCategory.getChildren().isEmpty()) {
-				throw new CategoryUpdateNotAllowedException("카테고리 수정 불가");
-			}
-
-			newParent = categoryJpaRepository.findById(newParentId)
-				.orElseThrow(
-					() -> new CategoryNotFoundException("Parent Category Not Found, id: %d".formatted(newParentId)));
-
-			// 새 부모 기준으로 이름 중복 확인
-			if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(newParentId,
-				originCategory.getCategoryName())) {
-				throw new CategoryAlreadyExistsException("Category Already Exists: %s".formatted(newName));
-			}
-		}
-
-		// 이름 변경 처리
-		String finalName = isNameChanged ? newName : originCategory.getCategoryName();
-
-		// 이름 중복 체크 (같은 parent 기준)
-		if (isNameChanged && categoryJpaRepository.existsByParentCategoryIdAndCategoryName(
-			newParent != null ? newParent.getCategoryId() : 0, newName)) {
+		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(originCategory.getParent().getCategoryId(),
+			newName)) {
 			throw new CategoryAlreadyExistsException("Category Already Exists: %s".formatted(newName));
 		}
 
-		originCategory.setCategory(newParent, finalName);
+		originCategory.setCategory(newName);
 		categoryJpaRepository.save(originCategory);
-
-		// TODO: 추후에 카테고리상품 관계 테이블에서도 바꿔주는 코드 필요
 	}
 
 	/**
@@ -208,21 +168,25 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryJpaRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
 
-		if (category.getChildren().isEmpty()) {
-			Category parent = category.getParent();
+		// 최하위 카테고리가 아닌 경우 삭제 불가능 (자식이 있으면 삭제 불가)
+		if (!category.getChildren().isEmpty()) {
+			throw new CategoryDeleteNotAllowedException("하위 카테고리가 존재하여 삭제 불가");
+		}
 
-			boolean isTopLevelParent = parent.getParent() == null;
-			boolean parentHasOtherChildren = parent.getChildren().size() >= 2;
+		Category parent = category.getParent();
+		boolean isSecondLevel = parent.getParent() == null;
 
-			if (!isTopLevelParent || parentHasOtherChildren) {
-				categoryJpaRepository.delete(category);
-
-				// TODO: 추후에 카테고리상품 관계 테이블에서도 바꿔주는 코드 필요
-
-				return;
+		if (isSecondLevel) {
+			// 본인이 2단계 → 부모의 자식이 2개 이상이어야 삭제 가능 (최상위 카테고리 하나만 있는 경우 방지)
+			if (parent.getChildren().size() < 2) {
+				throw new CategoryDeleteNotAllowedException("최소 2단계로 구성해야 하므로 삭제 불가");
 			}
 		}
-		throw new CategoryDeleteNotAllowedException("카테고리 삭제 불가");
+
+		// 3단계 이상 → 항상 삭제 가능
+		parent.getChildren().remove(category);    // 먼저 부모 카테고리의 자식 카테고리 리스트에서 현재 카테고리 제거
+		categoryJpaRepository.save(parent);
+		categoryJpaRepository.deleteById(categoryId);
 	}
 
 	/**

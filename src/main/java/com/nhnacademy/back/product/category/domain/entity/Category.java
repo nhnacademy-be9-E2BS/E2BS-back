@@ -41,8 +41,7 @@ public class Category {
 		this.parent = parent;
 	}
 
-	public void setCategory(Category parent, String categoryName) {
-		this.parent = parent;
+	public void setCategory(String categoryName) {
 		this.categoryName = categoryName;
 	}
 }

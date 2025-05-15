@@ -2,16 +2,15 @@ package com.nhnacademy.back.product.category.service;
 
 import java.util.List;
 
-import com.nhnacademy.back.product.category.domain.dto.request.RequestModifyCategoryDTO;
-import com.nhnacademy.back.product.category.domain.dto.request.RequestRegisterCategoryDTO;
+import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseSideBarCategoryDTO;
 
 public interface CategoryService {
 
-	void createCategory(long parentId, RequestRegisterCategoryDTO registerRequest);
+	void createCategory(long parentId, RequestCategoryDTO request);
 
-	void createCategory(List<RequestRegisterCategoryDTO> registerRequests);
+	void createCategory(List<RequestCategoryDTO> requests);
 
 	List<ResponseCategoryDTO> getCategories();
 
@@ -19,7 +18,7 @@ public interface CategoryService {
 
 	List<ResponseSideBarCategoryDTO> getCategoriesById(long categoryId);
 
-	void updateCategory(long categoryId, RequestModifyCategoryDTO modifyRequest);
+	void updateCategory(long categoryId, RequestCategoryDTO request);
 
 	void deleteCategory(long categoryId);
 }

@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class RequestRegisterCategoryDTO {
+public class RequestCategoryDTO {
 	@NotNull
 	private String categoryName;
 }

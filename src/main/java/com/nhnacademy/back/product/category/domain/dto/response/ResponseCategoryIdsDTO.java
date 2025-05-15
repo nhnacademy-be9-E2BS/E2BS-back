@@ -1,4 +1,6 @@
-package com.nhnacademy.back.product.category.domain.dto.request;
+package com.nhnacademy.back.product.category.domain.dto.response;
+
+import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,9 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class RequestModifyCategoryDTO {
+public class ResponseCategoryIdsDTO {
 	@NotNull
-	private String categoryName;
+	private long productId;
 
-	private long categoryId2;
+	@NotNull
+	private List<Long> categoryIds;
 }
