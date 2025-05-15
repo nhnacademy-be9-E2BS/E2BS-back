@@ -8,18 +8,20 @@ server:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://s4.java21.net:13306/project_be9_team2_dev?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    # 개발용 MySQL DB 접속 URL, SSL 사용 안 함, 시간대/인코딩 설정 포함
-    username: project_be9_team2
-    password: "*gzxziN[g9kwl]Ln"
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     defer-datasource-initialization: true # Spring Boot에서 SQL 초기화 스크립트 실행 시점을 JPA(Hibernate)의 테이블 생성 이후로 지연시키는 설정
-  sql: # 실행할 때 sample 데이터 넣기
+  sql: # 실행할 때 h2 환경의 sample 데이터 넣기
     init:
       mode: always
-      ## auto-ddl을 create로 사용할 때 한번에 샘플 데이터 넣을 때 사용
-      ## data-locations: classpath:sql/data/account.sql, classpath:sql/data/product.sql, classpath:sql/data/coupon.sql, classpath:sql/data/order.sql, classpath:sql/data/cart.sql, classpath:sql/data/pointpolicy.sql
+      data-locations: classpath:sql/h2/sample.sql
 
 eureka:
   client:
@@ -29,3 +31,8 @@ eureka:
       defaultZone: http://admin:1234@localhost:10230/eureka # 로컬 Eureka 서버의 주소
   instance:
     prefer-ip-address: true # 서비스 등록 시 도메인 대신 IP 주소로 등록
+
+order:
+  url:
+    toss: https://api.tosspayments.com/v1/payments/confirm
+  sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
