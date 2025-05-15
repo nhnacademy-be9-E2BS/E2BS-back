@@ -140,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
 	public ResponseEntity<Void> cancelOrder(String orderId) {
 		orderDetailJpaRepository.deleteByOrderOrderCode(orderId);
 		orderJpaRepository.deleteById(orderId);
+		// orderDetails를 가져와서 순회 돌면서 재고 복구 추가
 		return ResponseEntity.ok().build();
 	}
 

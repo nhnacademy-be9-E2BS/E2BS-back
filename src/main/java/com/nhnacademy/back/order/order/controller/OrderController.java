@@ -27,7 +27,7 @@ public class OrderController {
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
-	@PostMapping("/api/createOrder/tossPay")
+	@PostMapping("/api/order/create/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -39,7 +39,7 @@ public class OrderController {
 	/**
 	 * 포인트 주문에 대한 처리
 	 */
-	@PostMapping("/api/createOrder/point")
+	@PostMapping("/api/order/create/point")
 	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(
 		@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -55,7 +55,7 @@ public class OrderController {
 	 * 이는 이후 다른 부분 구현 완료 시 진행할 예정
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
-	@PostMapping("/api/orderConfirm")
+	@PostMapping("/api/order/confirm")
 	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
 		@RequestParam long amount) {
 		// 승인 하고 이후에 결과에 따른 롤백처리 필요 할 수 있음
@@ -63,11 +63,15 @@ public class OrderController {
 		if (response.getStatusCode().is2xxSuccessful()) {
 			//결제 승인 완료 시 포인트 차감, 쿠폰 사용, 포인트 적립 호출, 결제 정보 저장
 			paymentService.createPayment(response.getBody());
-
+		} else { // 승인 실패 시 롤백
+			cancelOrder(orderId);
 		}
 		return ResponseEntity.status(response.getStatusCode()).build();
 	}
 
+	/**
+	 * 특정 주문서를 삭제하는 기능, 안에서 재고 복구도 진행함
+	 */
 	@PostMapping("/api/order/cancel")
 	public ResponseEntity<Void> cancelOrder(@RequestParam String orderId) {
 		return orderService.cancelOrder(orderId);
