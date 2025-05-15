@@ -6,6 +6,7 @@ import java.util.List;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -92,6 +93,22 @@ public class Product {
 		this.productStock = productStock;
 		this.productHits = productHits;
 		this.productSearches = productSearches;
+	}
+
+	public Product(Publisher publisher, String productTitle, String productContent,
+		String productDescription, String productIsbn, long productRegularPrice, long productSalePrice,
+		boolean productPackageable, int productStock) {
+		productState = new ProductState(ProductStateName.SALE);
+		this.publisher = publisher;
+		this.productTitle = productTitle;
+		this.productContent = productContent;
+		this.productDescription = productDescription;
+		this.productIsbn = productIsbn;
+		this.productRegularPrice = productRegularPrice;
+		this.productSalePrice = productSalePrice;
+		this.productPackageable = productPackageable;
+		this.productStock = productStock;
+
 	}
 
 }
