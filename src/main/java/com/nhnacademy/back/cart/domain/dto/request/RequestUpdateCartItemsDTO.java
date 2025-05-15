@@ -1,4 +1,4 @@
-package com.nhnacademy.back.cart.domain.dto;
+package com.nhnacademy.back.cart.domain.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestDeleteCartItemsForGuestDTO {
-	@NotNull
-	private long productId;
-	@NotNull
+public class RequestUpdateCartItemsDTO {
 	private String sessionId;
+	private Long productId;
+	@NotNull
+	private int quantity;
 }
