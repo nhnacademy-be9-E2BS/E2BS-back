@@ -26,7 +26,7 @@ import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 import com.nhnacademy.back.product.publisher.service.impl.PublisherServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class PublisherServiceTest {
+class PublisherServiceTest {
 	@InjectMocks
 	private PublisherServiceImpl publisherService;
 	@Mock

@@ -63,6 +63,30 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional
 	@Override
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
+		return saveOrder(requestOrderWrapperDTO);
+	}
+
+	/**
+	 * 포인트 주문 시 주문서 저장 및 결제 차감을 진행함
+	 *
+	 */
+	@Transactional
+	@Override
+	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
+		ResponseEntity<ResponseOrderResultDTO> response = saveOrder(requestOrderWrapperDTO);
+		//포인트 차감,적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
+
+		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
+		order.updatePaymentStatus(true);
+		orderJpaRepository.save(order);
+		return response;
+	}
+
+	/*
+	 * 주문서를 저장하고 저장 결과를 반환하는 메서드
+	 * 트랜잭션 내에서 재사용을 위해 분리함
+	 */
+	private ResponseEntity<ResponseOrderResultDTO> saveOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
 		// 주문서 저장
 		RequestOrderDTO requestOrderDTO = requestOrderWrapperDTO.getOrder();
 		Customer customer = customerJpaRepository.findById(requestOrderDTO.getCustomerId()).orElseThrow();
@@ -81,9 +105,7 @@ public class OrderServiceImpl implements OrderService {
 		List<RequestOrderDetailDTO> requestOrderDetailDTOs = requestOrderWrapperDTO.getOrderDetails();
 
 		// 실제 주문서 ID와 맞추기
-		requestOrderDetailDTOs.forEach(orderDetailDTO -> {
-			orderDetailDTO.setOrderCode(orderCode);
-		});
+		requestOrderDetailDTOs.forEach(orderDetailDTO -> orderDetailDTO.setOrderCode(orderCode));
 
 		for (RequestOrderDetailDTO requestOrderDetailDTO : requestOrderDetailDTOs) {
 			Product product = productJpaRepository.findById(requestOrderDetailDTO.getProductId()).orElseThrow();
@@ -98,21 +120,6 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return ResponseEntity.ok(new ResponseOrderResultDTO(orderCode, order.getOrderPaymentAmount()));
-	}
-
-	/**
-	 * 포인트 주문 시 주문서 저장 및 결제 차감을 진행함
-	 *
-	 */
-	@Override
-	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
-		ResponseEntity<ResponseOrderResultDTO> response = createOrder(requestOrderWrapperDTO);
-		//포인트 차감,적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
-
-		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
-		order.updatePaymentStatus(true);
-		orderJpaRepository.save(order);
-		return response;
 	}
 
 	/**

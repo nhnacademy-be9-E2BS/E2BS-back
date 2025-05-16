@@ -16,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.service.impl.MemberServiceImpl;
 
 @SpringBootTest
@@ -85,8 +86,13 @@ class MemberRegisterControllerTest {
 			customerEmail, memberBirth, memberPhone
 		);
 
+		ResponseRegisterMemberDTO responseRegisterMemberDTO = new ResponseRegisterMemberDTO(
+			memberId, customerName, customerPassword,
+			customerEmail, memberBirth, memberPhone
+		);
+
 		// When
-		doNothing().when(memberService).registerMember(any());
+		when(memberService.registerMember(any())).thenReturn(responseRegisterMemberDTO);
 
 		// Then
 		mockMvc.perform(post("/api/register")

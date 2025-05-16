@@ -137,7 +137,7 @@ class OrderControllerTest {
 		long amount = 1000L;
 
 		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
-		when(orderService.confirmOrder(eq(orderId), eq(paymentKey), eq(amount)))
+		when(orderService.confirmOrder(orderId, paymentKey, amount))
 			.thenReturn(ResponseEntity.ok(confirmDTO));
 
 		mockMvc.perform(post("/api/order/confirm")
@@ -157,10 +157,10 @@ class OrderControllerTest {
 		ResponseEntity<ResponseTossPaymentConfirmDTO> failedResponse =
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-		Mockito.when(orderService.confirmOrder(eq(orderId), eq(paymentKey), eq(amount)))
+		Mockito.when(orderService.confirmOrder(orderId, paymentKey, amount))
 			.thenReturn(failedResponse);
 
-		Mockito.when(orderService.cancelOrder(eq(orderId)))
+		Mockito.when(orderService.cancelOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/order/confirm")
@@ -169,7 +169,7 @@ class OrderControllerTest {
 				.param("amount", String.valueOf(amount)))
 			.andExpect(status().isBadRequest());
 
-		Mockito.verify(orderService).cancelOrder(eq(orderId));
+		Mockito.verify(orderService).cancelOrder(orderId);
 	}
 
 	@Test
@@ -177,7 +177,7 @@ class OrderControllerTest {
 	void testCancelOrder() throws Exception {
 		String orderId = "orderToCancel";
 
-		when(orderService.cancelOrder(eq(orderId)))
+		when(orderService.cancelOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/order/cancel")
