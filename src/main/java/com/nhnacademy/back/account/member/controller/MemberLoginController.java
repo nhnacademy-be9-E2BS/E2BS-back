@@ -1,6 +1,5 @@
 package com.nhnacademy.back.account.member.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,12 +15,14 @@ import com.nhnacademy.back.account.member.domain.dto.response.ResponseLoginMembe
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/login")
 public class MemberLoginController {
 
-	@Autowired
-	private MemberService memberService;
+	private final MemberService memberService;
 
 	/**
 	 * Member 테이블에 사용자가 입력한 ID 값이 존재하는지 확인
