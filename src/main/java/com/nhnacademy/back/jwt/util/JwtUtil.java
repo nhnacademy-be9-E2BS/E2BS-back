@@ -54,7 +54,8 @@ public class JwtUtil {
 
 			return claims.get("Role", List.class);
 		} catch (JwtException e) {
-			return null;
+			// null 리턴 방지
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -64,17 +65,16 @@ public class JwtUtil {
 	 */
 	public Claims getClaimsIfExpired(String token, Key secretKey) {
 		try {
-			Claims claims = Jwts.parserBuilder()
+			return Jwts.parserBuilder()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
-
-			return claims;
 		} catch (ExpiredJwtException e) {
 			return e.getClaims();
 		} catch (JwtException e) {
-			return null;
+			// null 리턴 방지
+			throw new RuntimeException(e);
 		}
 	}
 
