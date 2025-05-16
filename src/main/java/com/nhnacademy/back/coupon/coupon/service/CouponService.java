@@ -23,4 +23,8 @@ public interface CouponService {
 	 */
 	ResponseCouponDTO getCoupon(Long couponId);
 
+	/**
+	 * 쿠폰 상태 변경 (활성 <-> 비활성)
+	 */
+	void updateCouponIsActive(Long couponId);
 }

@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;

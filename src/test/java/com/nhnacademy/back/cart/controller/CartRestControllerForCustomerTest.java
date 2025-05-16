@@ -16,9 +16,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
 import com.nhnacademy.back.cart.service.CartService;
 
 @WebMvcTest(controllers = CartRestController.class)

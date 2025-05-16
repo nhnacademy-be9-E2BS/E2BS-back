@@ -1,6 +1,8 @@
-package com.nhnacademy.back.cart.domain.dto;
+package com.nhnacademy.back.cart.domain.dto.response;
 
 import java.util.List;
+
+import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseCartItemsForCustomerDTO {
 
-	private long cartItemId;
+	private long cartItemsId;
 
 	private long productId;
 
