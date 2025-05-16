@@ -62,7 +62,7 @@ class CartRestControllerForCustomerTest {
 				.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).updateCartItemForCustomer(eq(1L), any(RequestUpdateCartItemsDTO.class));
+		verify(cartService).updateCartItemForCustomer(1L, any(RequestUpdateCartItemsDTO.class));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ class CartRestControllerForCustomerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartItemForCustomer(eq(1L));
+		verify(cartService).deleteCartItemForCustomer(1L);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ class CartRestControllerForCustomerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartForCustomer(eq(1L));
+		verify(cartService).deleteCartForCustomer(1L);
 	}
 
 	@Test

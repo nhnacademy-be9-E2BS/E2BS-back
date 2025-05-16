@@ -110,7 +110,7 @@ class CartRestControllerForGuestTest {
 			.andExpect(jsonPath("$.[0].productId").value(1L))
 			.andExpect(jsonPath("$.[0].productTitle").value("Product 1"));
 
-		verify(cartService).getCartItemsByGuest(eq(sessionId));
+		verify(cartService).getCartItemsByGuest(sessionId);
 	}
 
 }
