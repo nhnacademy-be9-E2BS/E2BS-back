@@ -1,8 +1,5 @@
 package com.nhnacademy.back.product.product.domain.dto.response;
 
-import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
-import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +16,4 @@ public class ResponseProductCouponDTO {
 	private long productId;
 	private String productTitle;
 	private String publisherName;
-	private String contributorName;
 }

@@ -2,7 +2,6 @@ package com.nhnacademy.back.product.product.kim.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -48,9 +47,9 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	public void createProduct(RequestProductCreateDTO request) {
-		// todo front에서 출판사 리스트를 선택하게 해서 없으면 생성하게 만들게 할 것
+		// (현규) front에서 출판사 리스트를 선택하게 해서 없으면 생성하게 만들게 할 것
 		// 인스턴스 빼서 변수 선언
-		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId()).get();
+		Publisher publisher = publisherJpaRepository.findByPublisherId(request.getPublisherId());
 		String productTitle = request.getProductTitle();
 		String productContent = request.getProductContent();
 		String productDescription = request.getProductDescription();
@@ -139,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	/**
-	 * 특정 도r서 ID 목록으로 도서 조회
+	 * 특정 도서 ID 목록으로 도서 조회
 	 */
 	@Override
 	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(List<Long> products) {
@@ -189,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
 
 
 		List<String> imagePaths = request.getProductImagePaths();
-		// todo 사진 수정 시 전부 삭제하고 다시 저장, 뷰에서 가진 이미지 전부 보여주고 삭제 여부 넣기
+		// (현규) 사진 수정 시 전부 삭제하고 다시 저장, 뷰에서 가진 이미지 전부 보여주고 삭제 여부 넣기
 		for (String imagePath : imagePaths) {
 			productImageJpaRepository.save(new ProductImage(product, imagePath));
 		}
@@ -204,7 +203,7 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productJpaRepository.findById(request.getProductId())
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 		//내부 메서드 사용
-		decrementProductStock(request.getProductStock(), product);
+		decrementProductStock(request.getProductDecrementStock(), product);
 		return ResponseEntity.status(HttpStatus.OK).build();
 
 	}
@@ -221,28 +220,25 @@ public class ProductServiceImpl implements ProductService {
 		productJpaRepository.save(product);
 	}
 
+
 	/**
 	 * 쿠폰 적용 가능한 도서 목록 조회 (재고 있고 판매 상태인 도서)
 	 */
 	@Override
 	public Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable) {
-		List<Product> saleProducts = productJpaRepository.findAllByProductStateName(ProductStateName.SALE);
+		Page<Product> saleProducts = productJpaRepository.findAllByProductStateName(ProductStateName.SALE, pageable);
 
-
-
-
-
-		productJpaRepository.findByProductStockGreaterThanAndProductState_ProductStateName(
-			0, ProductStateName.SALE, pageable
-		).map(product -> new ResponseProductCouponDTO(
-			product.getProductId(),
-			product.getProductTitle(),
-			product.getPublisher().getPublisherName(),
-			null // Contributor 정보는 제공된 코드에서 명확하지 않아 null로 설정
+		return saleProducts.map(product ->
+			new ResponseProductCouponDTO(
+				product.getProductId(),
+				product.getProductTitle(),
+				publisherJpaRepository.findByPublisherName(product.getPublisher().getPublisherName())
 		));
-
-		return null;
 	}
+
+
+
+
 
 
 
