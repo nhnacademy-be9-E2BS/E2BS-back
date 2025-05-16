@@ -15,20 +15,21 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCo
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 
 public interface ProductService {
+	//관리자 - 도서 DB에 저장
 	void createProduct(RequestProductCreateDTO request);
-
+	//공통 - 도서 한권 조회
 	ResponseProductReadDTO getProduct(RequestProductGetDTO request);
-
+	//공통 - 도서 여러권 페이지로 조회
 	Page<ResponseProductReadDTO> getProducts(Pageable pageable);
-
+	//Order전용 - 도서 여러권 리스트와 응답코드 반환
 	ResponseEntity<List<ResponseProductReadDTO>> getProducts(List<Long> products);
-
+	//관리자 - 도서 수정
 	void updateProduct(RequestProductUpdateDTO request);
-
+	//관리자 - 재고 수동 수정
 	ResponseEntity<Void> updateProductStock(RequestProductStockUpdateDTO request);
-
+	//관리자 - 판매가 수정
 	void updateProductSalePrice(RequestProductSalePriceUpdateDTO request);
-
+	//Coupon전용 - Sale중인 전체 도서 페이지로 조회
 	Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable);
 
 
