@@ -55,7 +55,7 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/api/customers/carts/items/{cartItemId}")
-	public ResponseEntity<Void> deleteCartItemForCustomer(@PathVariable Long cartItemId) {
+	public ResponseEntity<Void> deleteCartItemForCustomer(@PathVariable long cartItemId) {
 		cartService.deleteCartItemForCustomer(cartItemId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

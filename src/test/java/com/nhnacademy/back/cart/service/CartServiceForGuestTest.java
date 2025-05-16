@@ -1,6 +1,7 @@
 package com.nhnacademy.back.cart.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 @ExtendWith(MockitoExtension.class)
-public class CartServiceForGuestTest {
+class CartServiceForGuestTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
@@ -125,7 +126,7 @@ public class CartServiceForGuestTest {
 		cartService.deleteCartItemForGuest(request);
 
 		// then
-		assertThat(cart.getCartItems().size()).isEqualTo(0);
+		assertEquals(0, cart.getCartItems().size());
 		verify(redisTemplate.opsForValue()).set(eq(sessionId), any(CartDTO.class));
 	}
 
@@ -159,7 +160,7 @@ public class CartServiceForGuestTest {
 		List<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest(sessionId);
 
 		// then
-		assertThat(result.size()).isEqualTo(2);
+		assertEquals(2, result.size());
 	}
 
 }
