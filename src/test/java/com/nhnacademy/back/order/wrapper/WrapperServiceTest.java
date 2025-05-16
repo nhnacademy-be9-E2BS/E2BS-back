@@ -26,7 +26,7 @@ import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
 import com.nhnacademy.back.order.wrapper.service.impl.WrapperServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class WrapperServiceTest {
+class WrapperServiceTest {
 	@InjectMocks
 	private WrapperServiceImpl wrapperService;
 	@Mock
