@@ -27,7 +27,7 @@ import com.nhnacademy.back.coupon.couponpolicy.exception.CouponPolicyNotFoundExc
 import com.nhnacademy.back.coupon.couponpolicy.repository.CouponPolicyJpaRepository;
 import com.nhnacademy.back.coupon.couponpolicy.service.impl.CouponPolicyServiceImpl;
 
-public class CouponPolicyServiceTest {
+class CouponPolicyServiceTest {
 
 	@Mock
 	private CouponPolicyJpaRepository couponPolicyJpaRepository;
