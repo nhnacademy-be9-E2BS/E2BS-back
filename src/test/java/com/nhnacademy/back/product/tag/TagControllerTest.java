@@ -26,7 +26,7 @@ import com.nhnacademy.back.product.tag.service.TagService;
 
 
 @WebMvcTest(controllers = TagController.class)
-public class TagControllerTest {
+class TagControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

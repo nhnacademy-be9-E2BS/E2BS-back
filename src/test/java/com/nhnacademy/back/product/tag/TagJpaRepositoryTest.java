@@ -14,7 +14,7 @@ import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class TagJpaRepositoryTest {
+class TagJpaRepositoryTest {
 	@Autowired
 	private TagJpaRepository tagJpaRepository;
 

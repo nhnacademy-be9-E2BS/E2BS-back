@@ -26,7 +26,7 @@ import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 import com.nhnacademy.back.product.tag.service.impl.TagServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class TagServiceTest {
+class TagServiceTest {
 	@InjectMocks
 	private TagServiceImpl tagService;
 	@Mock
