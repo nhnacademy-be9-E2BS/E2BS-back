@@ -123,8 +123,44 @@ class OrderServiceImplTest {
 	@DisplayName("포인트 주문 시 결제 성공")
 	void testCreatePointOrder_Success() {
 		// given
-		RequestOrderWrapperDTO wrapperDTO = mock(RequestOrderWrapperDTO.class);
-		ResponseOrderResultDTO resultDTO = new ResponseOrderResultDTO("TEST-ORDER-CODE", 15000L);
+
+		// given
+		RequestOrderDTO orderDTO = new RequestOrderDTO();
+		orderDTO.setCustomerId(1L);
+		orderDTO.setDeliveryFeeId(1L);
+		orderDTO.setOrderReceiverName("테스트");
+		orderDTO.setOrderReceiverPhone("01012345678");
+		orderDTO.setOrderAddressCode("12345");
+		orderDTO.setOrderAddressInfo("서울시");
+		orderDTO.setOrderAddressExtra("A동");
+		orderDTO.setOrderPointAmount(5000L);
+		orderDTO.setOrderPaymentStatus(true);
+		orderDTO.setOrderPaymentAmount(15000L);
+
+		RequestOrderDetailDTO detailDTO = new RequestOrderDetailDTO();
+		detailDTO.setOrderCode("TEST-ORDER-CODE");
+		detailDTO.setProductId(1L);
+		detailDTO.setOrderStateId(1L);
+		detailDTO.setWrapperId(1L);
+		detailDTO.setOrderQuantity(1);
+		detailDTO.setOrderDetailPerPrice(15000L);
+
+		RequestOrderWrapperDTO wrapperDTO = new RequestOrderWrapperDTO();
+		wrapperDTO.setOrder(orderDTO);
+		wrapperDTO.setOrderDetails(List.of(detailDTO));
+
+		Customer customer = mock(Customer.class);
+		DeliveryFee deliveryFee = mock(DeliveryFee.class);
+		Product product = mock(Product.class);
+		OrderState orderState = mock(OrderState.class);
+		Wrapper wrapper = mock(Wrapper.class);
+
+		when(customerJpaRepository.findById(anyLong())).thenReturn(Optional.of(customer));
+		when(deliveryFeeJpaRepository.findById(anyLong())).thenReturn(Optional.of(deliveryFee));
+		when(productJpaRepository.findById(anyLong())).thenReturn(Optional.of(product));
+		when(orderStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(orderState));
+		when(wrapperJpaRepository.findById(anyLong())).thenReturn(Optional.of(wrapper));
+
 		Order order = mock(Order.class);
 
 		when(orderJpaRepository.findById(anyString())).thenReturn(Optional.of(order));
@@ -132,15 +168,18 @@ class OrderServiceImplTest {
 
 		// 스파이로 createOrder() 모킹
 		OrderServiceImpl spyService = Mockito.spy(orderService);
-		doReturn(ResponseEntity.ok(resultDTO)).when(spyService).createOrder(any());
 
 		// when
 		ResponseEntity<ResponseOrderResultDTO> response = spyService.createPointOrder(wrapperDTO);
 
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		// saveOrder에서 한 번, 이후 결제 완료 상태 변경에서 한 번으로 2번 진행
+		verify(orderJpaRepository, times(2)).save(any(Order.class));
+		verify(orderDetailJpaRepository).save(any(OrderDetail.class));
 		verify(order).updatePaymentStatus(true);
-		verify(orderJpaRepository).save(order);
+
 	}
 
 	@Test

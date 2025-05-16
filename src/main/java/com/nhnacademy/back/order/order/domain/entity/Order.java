@@ -57,11 +57,6 @@ public class Order {
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
 
-	// 원래는 이랬음. 확인했으면 지워도됨
-	// 동일한 수정 : Product.productPackageable, MemberCoupon.memberCouponUsed
-	// @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-	// private boolean orderPaymentStatus = false;
-
 	@Column(nullable = false)
 	private boolean orderPaymentStatus = false;
 
