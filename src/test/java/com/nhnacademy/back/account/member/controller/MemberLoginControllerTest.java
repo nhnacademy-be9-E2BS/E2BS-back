@@ -45,16 +45,4 @@ class MemberLoginControllerTest {
 
 	}
 
-	@Test
-	@DisplayName("로그인 성공 시 201 응답")
-	void successLoginReturnCREATEDTest() throws Exception {
-
-		// Given
-
-		// When
-
-		// Then
-
-	}
-
 }
