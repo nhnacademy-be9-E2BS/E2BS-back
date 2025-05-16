@@ -24,11 +24,9 @@ import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.service.TagService;
 
-import lombok.RequiredArgsConstructor;
 
 @WebMvcTest(controllers = TagController.class)
-
-public class TagControllerTest {
+class TagControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

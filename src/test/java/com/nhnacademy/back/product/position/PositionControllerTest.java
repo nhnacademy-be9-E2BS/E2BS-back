@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,7 @@ import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePosit
 import com.nhnacademy.back.product.contributor.service.PositionService;
 
 @WebMvcTest(PositionController.class)
-public class PositionControllerTest {
+class PositionControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -43,18 +42,17 @@ public class PositionControllerTest {
 	void createPositionTest() throws Exception {
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("newPosition");
 		mockMvc.perform(post("/api/admin/positions")
-			.content(objectMapper.writeValueAsString(requestPositionDTO))
-			.contentType(MediaType.APPLICATION_JSON))
+				.content(objectMapper.writeValueAsString(requestPositionDTO))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
 	}
-
 
 	@Test
 	@DisplayName("position 목록 조회(페이징 처리)")
 	void getPositionsTest() throws Exception {
 		List<ResponsePositionDTO> mockList = List.of(
-			new ResponsePositionDTO(1L,"position1"),
-			new ResponsePositionDTO(2L,"position2")
+			new ResponsePositionDTO(1L, "position1"),
+			new ResponsePositionDTO(2L, "position2")
 		);
 
 		Page<ResponsePositionDTO> mockPage = new PageImpl<>(mockList);
@@ -69,13 +67,12 @@ public class PositionControllerTest {
 			.andExpect(jsonPath("$.content.length()").value(2))
 			.andExpect(jsonPath("$.content[0].positionName").value("position1"));
 
-
 	}
 
 	@Test
 	@DisplayName("positionId로 position 조회")
 	void getPositionByIdTest() throws Exception {
-		ResponsePositionDTO responsePositionDTO = new ResponsePositionDTO(1L,"position1");
+		ResponsePositionDTO responsePositionDTO = new ResponsePositionDTO(1L, "position1");
 		when(positionService.getPosition(1L)).thenReturn(responsePositionDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/positions/1"))
@@ -88,17 +85,13 @@ public class PositionControllerTest {
 	void updatePositionTest() {
 
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("newPosition");
-		ResponsePositionDTO responseDTO = new ResponsePositionDTO(1L,"newPosition");
-
+		ResponsePositionDTO responseDTO = new ResponsePositionDTO(1L, "newPosition");
 
 		when(positionService.updatePosition(1L, requestPositionDTO)).thenReturn(responseDTO);
-
 
 		ResponsePositionDTO result = positionService.updatePosition(1L, requestPositionDTO);
 		assertEquals("newPosition", result.getPositionName());
 		verify(positionService).updatePosition(1L, requestPositionDTO);
 	}
-
-
 
 }

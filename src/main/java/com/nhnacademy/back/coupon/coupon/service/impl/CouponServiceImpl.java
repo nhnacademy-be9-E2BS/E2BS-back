@@ -54,13 +54,13 @@ public class CouponServiceImpl implements CouponService {
 
 		if(request.getCategoryId() != null) {
 			Category category = categoryJpaRepository.findById(request.getCategoryId())
-				.orElseThrow(); // todo CategoryNotFoundException 추가 예정
+				.orElseThrow(); // 상준; CategoryNotFoundException 추가 예정
 			CategoryCoupon categoryCoupon = new CategoryCoupon(coupon, category);
 			categoryCouponJpaRepository.save(categoryCoupon);
 		}
 		else if(request.getProductId() != null) {
 			Product product = productJpaRepository.findById(request.getProductId())
-				.orElseThrow(); // todo ProductNotFoundException 추가 예정
+				.orElseThrow(); // 상준; ProductNotFoundException 추가 예정
 			ProductCoupon productCoupon = new ProductCoupon(coupon, product);
 			productCouponJpaRepository.save(productCoupon);
 		}
@@ -103,11 +103,11 @@ public class CouponServiceImpl implements CouponService {
 				categoryId,
 				categoryName,
 				productId,
-				productTitle
+				productTitle,
+				coupon.isCouponIsActive()
 			);
 		});
 	}
-
 
 	/**
 	 * 쿠폰 ID로 쿠폰 조회
@@ -148,8 +148,21 @@ public class CouponServiceImpl implements CouponService {
 			categoryId,
 			categoryName,
 			productId,
-			productTitle
+			productTitle,
+			coupon.isCouponIsActive()
 		);
+	}
 
+	/**
+	 * 쿠폰활성여부를 변경
+	 * 활성, 비활성 2가지 상태만 있기 때문에 현재 상태를 다른 상태로 변경
+	 */
+	@Override
+	public void updateCouponIsActive(Long couponId) {
+		Coupon coupon = couponJpaRepository.findById(couponId)
+			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+
+		coupon.setCouponIsActive(!coupon.isCouponIsActive());
+		couponJpaRepository.save(coupon);
 	}
 }

@@ -8,7 +8,6 @@ import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -78,8 +77,10 @@ public class Product {
 	private List<ProductImage> productImage;
 
 	public Product(ProductState productState, Publisher publisher,
-		           String productTitle, String productContent, String productDescription, LocalDate productPublishedAt, String productIsbn,
-				   long productRegularPrice, long productSalePrice, boolean productPackageable, int productStock, long productHits, long productSearches) {
+		String productTitle, String productContent, String productDescription, LocalDate productPublishedAt,
+		String productIsbn,
+		long productRegularPrice, long productSalePrice, boolean productPackageable, int productStock, long productHits,
+		long productSearches) {
 		this.productState = productState;
 		this.publisher = publisher;
 		this.productTitle = productTitle;

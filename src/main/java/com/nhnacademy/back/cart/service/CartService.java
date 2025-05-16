@@ -2,11 +2,11 @@ package com.nhnacademy.back.cart.service;
 
 import java.util.List;
 
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 
 public interface CartService {
 	void createCartItemForCustomer(RequestAddCartItemsDTO request);

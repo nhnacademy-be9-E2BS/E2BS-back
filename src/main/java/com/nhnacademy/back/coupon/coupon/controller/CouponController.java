@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,15 @@ public class CouponController {
 	public ResponseEntity<ResponseCouponDTO> getCoupon(@PathVariable Long couponId) {
 		ResponseCouponDTO response = couponService.getCoupon(couponId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	/**
+	 * 관리자 쿠폰 활성 여부 변경
+	 */
+	@PutMapping("/{couponId}")
+	public ResponseEntity<Void> updateCoupon(@PathVariable Long couponId) {
+		couponService.updateCouponIsActive(couponId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }

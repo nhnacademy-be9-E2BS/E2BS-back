@@ -12,12 +12,12 @@ import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class PositionJpaRepositoryTest {
+class PositionJpaRepositoryTest {
 	@Autowired
 	private PositionJpaRepository positionJpaRepository;
 
 	@Test
-	public void existsByPositionName() {
+	void existsByPositionName() {
 		positionJpaRepository.save(new Position("new"));
 		assertTrue(positionJpaRepository.existsByPositionName("new"));
 	}
