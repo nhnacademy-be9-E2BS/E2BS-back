@@ -21,7 +21,7 @@ import com.nhnacademy.back.order.paymentmethod.domain.entity.PaymentMethod;
 import com.nhnacademy.back.order.paymentmethod.repository.PaymentMethodJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentServiceImplTest {
+class PaymentServiceImplTest {
 	@InjectMocks
 	private PaymentServiceImpl paymentService;
 
