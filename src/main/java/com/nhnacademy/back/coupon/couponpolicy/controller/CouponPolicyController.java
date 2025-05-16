@@ -1,7 +1,5 @@
 package com.nhnacademy.back.coupon.couponpolicy.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.RequestCouponPolicyDTO;
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.ResponseCouponPolicyDTO;
 import com.nhnacademy.back.coupon.couponpolicy.service.CouponPolicyService;
@@ -29,6 +28,7 @@ public class CouponPolicyController {
 	/**
 	 * 관리자 쿠폰 정책 등록
 	 */
+	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createCouponPolicy(@RequestBody RequestCouponPolicyDTO requestCouponPolicyDTO) {
 		couponPolicyService.createCouponPolicy(requestCouponPolicyDTO);
@@ -38,6 +38,7 @@ public class CouponPolicyController {
 	/**
 	 * 관리자 쿠폰 정책 전체 조회
 	 */
+	@Admin
 	@GetMapping
 	public ResponseEntity<Page<ResponseCouponPolicyDTO>> getCouponPolicies(Pageable pageable) {
 		Page<ResponseCouponPolicyDTO> couponPolicyDTOs = couponPolicyService.getCouponPolicies(pageable);
@@ -47,6 +48,7 @@ public class CouponPolicyController {
 	/**
 	 * 관리자 쿠폰 정책 ID로 단건 조회
 	 */
+	@Admin
 	@GetMapping("/{couponPolicyId}")
 	public ResponseEntity<ResponseCouponPolicyDTO> getCouponPolicyById(@PathVariable Long couponPolicyId) {
 		ResponseCouponPolicyDTO responseCouponPolicyDTO = couponPolicyService.getCouponPolicyById(couponPolicyId);
