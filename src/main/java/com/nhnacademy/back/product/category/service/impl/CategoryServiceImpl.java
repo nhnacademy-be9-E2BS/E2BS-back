@@ -34,10 +34,10 @@ public class CategoryServiceImpl implements CategoryService {
 		String categoryName = request.getCategoryName();
 
 		Category parent = categoryJpaRepository.findById(parentId)
-			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(parentId)));
+			.orElseThrow(CategoryNotFoundException::new);
 
 		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(parentId, categoryName)) {
-			throw new CategoryAlreadyExistsException("Category Already Exists: %s".formatted(categoryName));
+			throw new CategoryAlreadyExistsException();
 		}
 
 		Category category = new Category(categoryName, parent);
@@ -57,8 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		// 최상위 카테고리 이름 중복 검사
 		if (categoryJpaRepository.existsByParentIsNullAndCategoryName(request.get(0).getCategoryName())) {
-			throw new CategoryAlreadyExistsException(
-				"Category Already Exists: %s".formatted(request.get(0).getCategoryName()));
+			throw new CategoryAlreadyExistsException();
 		}
 
 		// 최상위 카테고리 저장
@@ -124,7 +123,7 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
 		Category parent = categoryJpaRepository.findById(categoryId)
-			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
+			.orElseThrow(CategoryNotFoundException::new);
 
 		return parent.getChildren().stream()
 			.map(this::buildTree)
@@ -141,13 +140,13 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public void updateCategory(long categoryId, RequestCategoryDTO request) {
 		Category originCategory = categoryJpaRepository.findById(categoryId)
-			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
+			.orElseThrow(CategoryNotFoundException::new);
 
 		String newName = request.getCategoryName();
 
 		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(originCategory.getParent().getCategoryId(),
 			newName)) {
-			throw new CategoryAlreadyExistsException("Category Already Exists: %s".formatted(newName));
+			throw new CategoryAlreadyExistsException();
 		}
 
 		originCategory.setCategory(newName);
@@ -163,9 +162,9 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public void deleteCategory(long categoryId) {
 		Category category = categoryJpaRepository.findById(categoryId)
-			.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: %d".formatted(categoryId)));
+			.orElseThrow(CategoryNotFoundException::new);
 
-		// 최하위 카테고리가 아닌 경우 삭제 불가능 (자식이 있으면 삭제 불가)
+		// 최하위 카테고리가 아닌 경우 삭제 불가능 (자식이 있으면 삭제 불가
 		if (!category.getChildren().isEmpty()) {
 			throw new CategoryDeleteNotAllowedException("하위 카테고리가 존재하여 삭제 불가");
 		}

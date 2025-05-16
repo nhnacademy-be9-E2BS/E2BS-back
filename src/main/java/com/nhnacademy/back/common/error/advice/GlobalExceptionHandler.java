@@ -21,6 +21,7 @@ import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
@@ -34,7 +35,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
 		BadRequestException.class, LoginMemberIsNotExistsException.class,
 		PublisherAlreadyExistsException.class, CategoryAlreadyExistsException.class,
-		CategoryDeleteNotAllowedException.class})
+		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class})
 	public ResponseEntity<?> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());

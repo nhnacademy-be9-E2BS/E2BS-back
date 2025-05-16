@@ -13,6 +13,7 @@ import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategory
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
@@ -31,6 +32,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
 	/**
 	 * 상품 등록 & 수정 시 상품카테고리 관계를 추가하는 로직
+	 * 한 상품에 카테고리는 최대 10개까지 설정 가능 (하위 카테고리 기준)
 	 * isUpdate = true는 상품 수정
 	 * isUpdate = false는 상품 등록
 	 * (선택한 카테고리의 상위 카테고리들도 전부 저장)
@@ -38,6 +40,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 	 */
 	@Override
 	public void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate) {
+		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
+		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
+			throw new ProductCategoryCreateNotAllowException();
+		}
+
 		if (isUpdate) {
 			productCategoryJpaRepository.deleteAllByProductId(productId);
 		}
@@ -46,7 +53,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
 		for (Long categoryId : categoryIds) {
 			Category category = categoryJpaRepository.findById(categoryId)
-				.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: " + categoryId));
+				.orElseThrow(CategoryNotFoundException::new);
 
 			while (category != null) {
 				uniqueCategoryIds.add(category.getCategoryId());
@@ -55,11 +62,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 		}
 
 		Product product = productJpaRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException("Product Not Found, id: " + productId));
+			.orElseThrow(ProductNotFoundException::new);
 
 		for (Long id : uniqueCategoryIds) {
 			Category category = categoryJpaRepository.findById(id)
-				.orElseThrow(() -> new CategoryNotFoundException("Category Not Found, id: " + id));
+				.orElseThrow(CategoryNotFoundException::new);
 			productCategoryJpaRepository.save(new ProductCategory(product, category));
 		}
 	}
