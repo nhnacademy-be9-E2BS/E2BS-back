@@ -217,6 +217,16 @@ VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.0
 INSERT INTO payment_method (payment_method_id, payment_method_name)
 VALUES (1, 'TOSS');
 
+
+-- Order
+INSERT INTO `order`
+VALUES ('TEST-ORDER-CODE', '12345', 'detail', 'extra', 'info', TIMESTAMP '2025-01-01 00:00:00.000000', '', FALSE, 100,
+        DATE '2025-01-01', 'name', '01012345678', null, null, 100, 1, 1, null);
+
+-- OrderDetail
+INSERT INTO order_detail
+VALUES (1, 1100, 1, 'TEST-ORDER-CODE', 5, 1, null, 1);
+
 -- Cart (비회원/회원용 장바구니)
 INSERT INTO cart (cart_id, customer_id)
 VALUES (1, 1);
