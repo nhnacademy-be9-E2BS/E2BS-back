@@ -3,7 +3,6 @@ package com.nhnacademy.back.cart.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -316,7 +315,7 @@ public class CartServiceImpl implements CartService {
 					productTotalPrice
 				);
 			})
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 }

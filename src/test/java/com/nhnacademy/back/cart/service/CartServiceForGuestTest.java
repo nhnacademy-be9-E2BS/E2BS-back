@@ -86,7 +86,7 @@ class CartServiceForGuestTest {
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cart);
 
 		CartItemDTO cartItem = Mockito.mock(CartItemDTO.class);
-		when(cart.getCartItems()).thenReturn(new ArrayList<>(List.of(cartItem)));;
+		when(cart.getCartItems()).thenReturn(new ArrayList<>(List.of(cartItem)));
 
 		// when
 		cartService.createCartItemForGuest(request);
