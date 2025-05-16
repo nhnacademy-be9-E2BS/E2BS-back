@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
@@ -28,6 +30,7 @@ public class CategoryController {
 	/**
 	 * html 헤더에 표시할 카테고리 리스트
 	 */
+	@Member
 	@GetMapping("/api/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesToDepth3() {
 		List<ResponseCategoryDTO> response = categoryService.getCategoriesToDepth3();
@@ -37,6 +40,7 @@ public class CategoryController {
 	/**
 	 * 도서 리스트 조회 시 사이드 바에 표시할 카테고리 리스트
 	 */
+	@Member
 	@GetMapping("/api/categories/{categoryId}")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
 		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
@@ -48,6 +52,7 @@ public class CategoryController {
 	/**
 	 * 관리자 페이지에서 전체 카테고리 리스트 조회
 	 */
+	@Admin
 	@GetMapping("/api/admin/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategories() {
 		List<ResponseCategoryDTO> response = categoryService.getCategories();
@@ -57,6 +62,7 @@ public class CategoryController {
 	/**
 	 * 최상위 + 하위 카테고리 저장
 	 */
+	@Admin
 	@PostMapping("/api/admin/categories")
 	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
 		categoryService.createCategoryTree(request);
@@ -67,6 +73,7 @@ public class CategoryController {
 	/**
 	 * 이미 존재하는 카테고리에 자식 카테고리 저장
 	 */
+	@Admin
 	@PostMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
@@ -78,6 +85,7 @@ public class CategoryController {
 	/**
 	 * 카테고리 수정
 	 */
+	@Admin
 	@PutMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
@@ -89,6 +97,7 @@ public class CategoryController {
 	/**
 	 * 카테고리 삭제
 	 */
+	@Admin
 	@DeleteMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
 		categoryService.deleteCategory(categoryId);
