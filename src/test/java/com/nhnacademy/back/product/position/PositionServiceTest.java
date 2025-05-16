@@ -45,6 +45,9 @@ public class PositionServiceTest {
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("position");
 		when(positionJpaRepository.existsByPositionName(anyString())).thenReturn(false);
 
+		Position mockPosition = new Position("position");
+		when(positionJpaRepository.save(any())).thenReturn(mockPosition);
+
 		positionService.createPosition(requestPositionDTO);
 
 		verify(positionJpaRepository, times(1)).existsByPositionName(anyString());
@@ -52,7 +55,7 @@ public class PositionServiceTest {
 	}
 
 	@Test
-	@DisplayName("관리자 역할 생성 실퍄")
+	@DisplayName("관리자 역할 생성 실패")
 	public void createPositionFail() {
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("position");
 		when(positionJpaRepository.existsByPositionName(anyString())).thenReturn(true);
