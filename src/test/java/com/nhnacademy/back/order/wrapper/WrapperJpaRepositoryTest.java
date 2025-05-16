@@ -24,7 +24,7 @@ class WrapperJpaRepositoryTest {
 
 	@Test
 	@DisplayName("findAllByWrapperSaleable 메소드 테스트")
-	public void find_all_by_wrapper_saleable_test() {
+	void find_all_by_wrapper_saleable_test() {
 		// given
 		Wrapper wrapper1 = new Wrapper(1000, "wrapper A", "a.jpg", true);
 		Wrapper wrapper2 = new Wrapper(1300, "wrapper B", "b.jpg", false);

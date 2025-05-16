@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -27,21 +27,17 @@ import com.nhnacademy.back.product.contributor.exception.PositionNotFoundExcepti
 import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.service.impl.PositionServiceImpl;
 
-public class PositionServiceTest {
+@ExtendWith(MockitoExtension.class)
+class PositionServiceTest {
 	@Mock
 	private PositionJpaRepository positionJpaRepository;
 
 	@InjectMocks
 	private PositionServiceImpl positionService;
 
-	@BeforeEach
-	void setUp() {
-		MockitoAnnotations.initMocks(this);
-	}
-
 	@Test
 	@DisplayName("관리자 역할 생성 성공")
-	public void createPositionSuccess() {
+	void createPositionSuccess() {
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("position");
 		when(positionJpaRepository.existsByPositionName(anyString())).thenReturn(false);
 
@@ -56,7 +52,7 @@ public class PositionServiceTest {
 
 	@Test
 	@DisplayName("관리자 역할 생성 실패")
-	public void createPositionFail() {
+	void createPositionFail() {
 		RequestPositionDTO requestPositionDTO = new RequestPositionDTO("position");
 		when(positionJpaRepository.existsByPositionName(anyString())).thenReturn(true);
 
@@ -66,7 +62,7 @@ public class PositionServiceTest {
 
 	@Test
 	@DisplayName("관리자 역할 수정 성공")
-	public void updatePositionSuccess() {
+	void updatePositionSuccess() {
 		Long positionId = 1L;
 		RequestPositionDTO requestDTO = new RequestPositionDTO("newPosition");
 
@@ -83,10 +79,9 @@ public class PositionServiceTest {
 		verify(positionJpaRepository).save(existing);
 	}
 
-
 	@Test
 	@DisplayName("관리자 역할 수정 실퍄")
-	public void updatePositionFail() {
+	void updatePositionFail() {
 		Long positionId = 999L;
 		RequestPositionDTO requestDTO = new RequestPositionDTO("newPosition");
 
@@ -101,11 +96,10 @@ public class PositionServiceTest {
 		verify(positionJpaRepository, never()).save(any());
 	}
 
-
 	@Test
 	@DisplayName("관리자 역할 아이디로 역할 단건 조회 성공 ")
-	public void getPositionByIdSuccess() {
-		Position position = new Position( "position1");
+	void getPositionByIdSuccess() {
+		Position position = new Position("position1");
 		when(positionJpaRepository.findById(anyLong())).thenReturn(Optional.of(position));
 
 		ResponsePositionDTO responsePositionDTO = positionService.getPosition(1L);
@@ -116,15 +110,14 @@ public class PositionServiceTest {
 
 	@Test
 	@DisplayName("관리자 역할 아이디로 역할 단건 조회 실패 ")
-	public void getPositionByIdFail() {
+	void getPositionByIdFail() {
 		when(positionJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 		assertThatThrownBy(() -> positionService.getPosition(1L)).isInstanceOf(PositionNotFoundException.class);
-
 	}
 
 	@Test
 	@DisplayName("관리자 역할 전체 조회 - 페이징")
-	public void getPositionsWithPaging() {
+	void getPositionsWithPaging() {
 		Position position1 = new Position("position1");
 		Position position2 = new Position("position2");
 
@@ -134,14 +127,11 @@ public class PositionServiceTest {
 
 		when(positionJpaRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-
 		Page<ResponsePositionDTO> result = positionService.getPositions(pageable);
 
 		verify(positionJpaRepository, times(1)).findAll(pageable);
 		assertThat(result).isNotNull();
-		assertThat(result.getContent().size()).isEqualTo(2);
+		assertEquals(2, result.getContent().size());
 		assertThat(result.getContent().get(0).getPositionName()).isEqualTo("position1");
-
-
 	}
 }

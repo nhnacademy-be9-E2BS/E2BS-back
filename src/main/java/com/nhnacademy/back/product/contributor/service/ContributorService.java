@@ -5,8 +5,6 @@ import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
-import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
-import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 
 public interface ContributorService {
 	/**
@@ -28,6 +26,5 @@ public interface ContributorService {
 	 * 기여자 수정
 	 */
 	ResponseContributorDTO updateContributor(long contributorId, RequestContributorDTO request);
-
 
 }
