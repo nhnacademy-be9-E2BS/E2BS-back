@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 		BadRequestException.class, LoginMemberIsNotExistsException.class,
 		PublisherAlreadyExistsException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class})
-	public ResponseEntity<?> handleAlreadyExistsException(Exception ex) {
+	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
 		CartItemNotFoundException.class, CartNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class,
 		WrapperNotFoundException.class, CategoryNotFoundException.class})
-	public ResponseEntity<?> handleNotFoundException(Exception ex) {
+	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
 	 * 값의 충돌
 	 */
 	@ExceptionHandler({AlreadyExistsMemberIdException.class})
-	public ResponseEntity<?> handleConflictException(Exception ex) {
+	public ResponseEntity<GlobalErrorResponse> handleConflictException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(),
 			LocalDateTime.now());
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
