@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductStockUpdateDTO {
+public class RequestProductSalePriceUpdateDTO {
 	/**
-	 * 도서의 가격을 변경하기 위한 정보
+	 * 도서의 할인가를 변경하기 위한 정보
 	 */
 	private long productId;
-	private int productStock;
+	private int productSalePrice;
 }

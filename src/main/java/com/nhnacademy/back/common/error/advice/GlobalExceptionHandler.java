@@ -18,9 +18,12 @@ import com.nhnacademy.back.common.error.dto.GlobalErrorResponse;
 import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
+import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
+import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
+import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,7 +32,8 @@ public class GlobalExceptionHandler {
 	 * 이미 존재하는 경우의 에러 핸들러
 	 */
 	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
-		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,})
+		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
+		ProductAlreadyExistsException.class, TagAlreadyExistsException.class,})
 	public ResponseEntity<?> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -41,7 +45,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class,
 		CartItemNotFoundException.class, CartNotFoundException.class,
-		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,})
+		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class, TagNotFoundException.class})
 	public ResponseEntity<?> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());

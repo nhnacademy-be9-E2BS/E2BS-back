@@ -108,7 +108,31 @@ public class Product {
 		this.productSalePrice = productSalePrice;
 		this.productPackageable = productPackageable;
 		this.productStock = productStock;
-
+		this.productPublishedAt = LocalDate.now();
 	}
+
+	//updateProdut를 위해 set대신 쓴 생성자
+	public void setProduct(long productId, ProductState productState, Publisher publisher, String productTitle,
+		String productContent, String productDescription, long productRegularPrice, long productSalePrice,
+		boolean productPackageable, int productStock) {
+		this.productId = productId;
+		this.productState = productState;
+		this.publisher = publisher;
+		this.productTitle = productTitle;
+		this.productContent = productContent;
+		this.productDescription = productDescription;
+		this.productRegularPrice = productRegularPrice;
+		this.productSalePrice = productSalePrice;
+		this.productPackageable = productPackageable;
+		this.productStock = productStock;
+	}
+
+	public void setProduct(int productStock) {
+		this.productStock = productStock;
+	}
+
+
+
+
 
 }

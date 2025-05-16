@@ -29,4 +29,9 @@ public class ProductImage {
 	@Column(nullable = false)
 	private String productImagePath;
 
+	public ProductImage(Product product, String productImagePath) {
+		this.product = product;
+		this.productImagePath = productImagePath;
+	}
+
 }
