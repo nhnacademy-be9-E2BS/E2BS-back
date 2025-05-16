@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -22,7 +20,7 @@ public class TagJpaRepositoryTest {
 
 	@Test
 	@DisplayName("existsByTagName 메서드 작동 테스트")
-	public void existsByTagNameTest() {
+	void existsByTagNameTest() {
 		//given
 		tagJpaRepository.save(new Tag("new Tag"));
 

@@ -17,17 +17,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
-import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
-import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
-import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
-import com.nhnacademy.back.product.tag.service.TagService;
 import com.nhnacademy.back.product.tag.service.impl.TagServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
