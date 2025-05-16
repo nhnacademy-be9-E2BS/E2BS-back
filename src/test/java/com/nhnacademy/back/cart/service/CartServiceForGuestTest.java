@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -77,12 +78,15 @@ class CartServiceForGuestTest {
 		// given
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, sessionId, 1L, 2);
 
-		CartDTO cart = new CartDTO();
+		CartDTO cart = Mockito.mock(CartDTO.class);
 
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 		when(productCategoryRepository.findByProduct_ProductId(1L)).thenReturn(List.of());
-		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(Object.class);
-		when(objectMapper.convertValue(Object.class, CartDTO.class)).thenReturn(cart);
+		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
+		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cart);
+
+		CartItemDTO cartItem = Mockito.mock(CartItemDTO.class);
+		when(cart.getCartItems()).thenReturn(new ArrayList<>(List.of(cartItem)));;
 
 		// when
 		cartService.createCartItemForGuest(request);
