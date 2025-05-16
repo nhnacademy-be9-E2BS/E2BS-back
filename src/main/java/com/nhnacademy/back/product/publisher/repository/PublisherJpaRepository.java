@@ -7,7 +7,5 @@ import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 public interface PublisherJpaRepository extends JpaRepository<Publisher, Long> {
 	boolean existsByPublisherName(String publisherName);
 
-	String findByPublisherName(String publisherName);
-
-	Publisher findByPublisherId(long publisherId);
+	Publisher findByPublisherName(String publisherName);
 }

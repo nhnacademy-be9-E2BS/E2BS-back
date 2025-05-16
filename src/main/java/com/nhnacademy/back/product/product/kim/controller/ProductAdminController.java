@@ -12,4 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin/books")
 public class ProductAdminController {
 	private final ProductService productService;
+
+	// @Admin
+	// @PostMapping
+	// public ResponseEntity<Void> createProduct(@RequestBody Product product) {}
 }

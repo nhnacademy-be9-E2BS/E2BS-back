@@ -49,34 +49,16 @@ public class ProductServiceImpl implements ProductService {
 	public void createProduct(RequestProductCreateDTO request) {
 		// (현규) front에서 출판사 리스트를 선택하게 해서 없으면 생성하게 만들게 할 것
 		// 인스턴스 빼서 변수 선언
-		Publisher publisher = publisherJpaRepository.findByPublisherId(request.getPublisherId());
-		String productTitle = request.getProductTitle();
-		String productContent = request.getProductContent();
-		String productDescription = request.getProductDescription();
-		String productIsbn = request.getProductIsbn();
-		long productRegularPrice = request.getProductRegularPrice();
-		long productSalePrice = request.getProductSalePrice();
-		boolean productPackageable = request.isProductPackageable();
-		int productStock = request.getProductStock();
+		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
 		List<String> imagePaths = request.getProductImage();
 
 		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
-		if (productJpaRepository.existsByProductIsbn(productIsbn)) {
+		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
 			throw new ProductAlreadyExistsException("Product already exists");
 		}
 
 		//이미지 없이 product 객체 생성
-		Product product = new Product(
-			publisher,
-			productTitle,
-			productContent,
-			productDescription,
-			productIsbn,
-			productRegularPrice,
-			productSalePrice,
-			productPackageable,
-			productStock
-		);
+		Product product = Product.createProductEntity(request, publisher);
 
 		//DB에 Product저장
 		productJpaRepository.save(product);
@@ -173,18 +155,7 @@ public class ProductServiceImpl implements ProductService {
 			.orElseThrow(() -> new IllegalArgumentException("도서 상태를 찾을 수 없습니다."));
 
 
-		product.setProduct(
-			request.getProductId(),
-			productState,
-			publisher,
-			request.getProductTitle(),
-			request.getProductContent(),
-			request.getProductDescription(),
-			request.getProductRegularPrice(),
-			request.getProductSalePrice(),
-			request.isProductPackageable(),
-			request.getProductStock()
-		);
+		product.updateProduct(request, publisher, productState);
 
 
 		List<String> imagePaths = request.getProductImagePaths();
@@ -232,7 +203,7 @@ public class ProductServiceImpl implements ProductService {
 			new ResponseProductCouponDTO(
 				product.getProductId(),
 				product.getProductTitle(),
-				publisherJpaRepository.findByPublisherName(product.getPublisher().getPublisherName())
+				product.getPublisher().getPublisherName()
 		));
 	}
 

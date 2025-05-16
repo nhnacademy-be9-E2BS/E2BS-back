@@ -1,9 +1,6 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
-import java.time.LocalDate;
 import java.util.List;
-
-import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,7 +17,9 @@ public class RequestProductCreateDTO {
 	 * 도서를 생성할 때 필요한 정보
 	 */
 
-	private long publisherId;
+	//출판사
+	private String publisherName;
+
 	//제목, 목차, 설명
 	@NotNull
 	private String productTitle;
