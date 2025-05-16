@@ -95,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
 	public ResponseProductReadDTO getProduct(RequestProductGetDTO request) {
 		// RequestProductGetDTO가 productId를 포함하도록 업데이트될 것이라 가정
 		Product product = productJpaRepository.findById(request.getProductId())
-			.orElseThrow(()-> new ProductNotFoundException("Product Not Found, id: %d".formatted(request.getProductId())));
+			.orElseThrow(ProductNotFoundException::new);
 
 
 		return new ResponseProductReadDTO(
