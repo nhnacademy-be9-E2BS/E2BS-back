@@ -5,10 +5,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public class JwtMemberIdParser {
+	private JwtMemberIdParser() {
+	}
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
