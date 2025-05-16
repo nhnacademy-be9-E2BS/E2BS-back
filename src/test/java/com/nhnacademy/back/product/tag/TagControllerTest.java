@@ -27,6 +27,7 @@ import com.nhnacademy.back.product.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 
 @WebMvcTest(controllers = TagController.class)
+
 public class TagControllerTest {
 
 	@Autowired

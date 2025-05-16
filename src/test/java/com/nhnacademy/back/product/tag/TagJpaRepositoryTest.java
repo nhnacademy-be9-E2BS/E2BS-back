@@ -22,7 +22,7 @@ public class TagJpaRepositoryTest {
 
 	@Test
 	@DisplayName("existsByTagName 메서드 작동 테스트")
-	public void existsByTagNameTest() {
+	void existsByTagNameTest() {
 		//given
 		tagJpaRepository.save(new Tag("new Tag"));
 

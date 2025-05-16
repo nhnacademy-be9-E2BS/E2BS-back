@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductRe
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
+import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
 import com.nhnacademy.back.product.product.kim.service.ProductService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -187,8 +189,7 @@ public class ProductServiceImpl implements ProductService {
 
 
 		List<String> imagePaths = request.getProductImagePaths();
-		//05.15: 만약 같은 이미지가 들어온다면 알아서 구분을 하는가? 5장 중에 한장만 삭제했다면 miniO에서 어떻게 처리해야 하는가?
-		// 전부 삭제하고 다시 저장, 뷰에서 가진 이미지 전부 보여주고 삭제 여부 넣기
+		// todo 사진 수정 시 전부 삭제하고 다시 저장, 뷰에서 가진 이미지 전부 보여주고 삭제 여부 넣기
 		for (String imagePath : imagePaths) {
 			productImageJpaRepository.save(new ProductImage(product, imagePath));
 		}
@@ -199,12 +200,13 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서 재고 수정
 	 */
 	@Override
-	public void updateProductStock(RequestProductStockUpdateDTO request) {
+	public ResponseEntity<Void> updateProductStock(RequestProductStockUpdateDTO request) {
 		Product product = productJpaRepository.findById(request.getProductId())
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
+		//내부 메서드 사용
+		decrementProductStock(request.getProductStock(), product);
+		return ResponseEntity.status(HttpStatus.OK).build();
 
-		product.setProduct(request.getProductStock());
-		productJpaRepository.save(product);
 	}
 
 	/**
@@ -215,7 +217,7 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productJpaRepository.findById(request.getProductId())
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 
-		product.setProductSalePrice(request.getProductSalePrice());
+		product.setProduct(request.getProductSalePrice());
 		productJpaRepository.save(product);
 	}
 
@@ -224,7 +226,13 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	public Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable) {
-		return productJpaRepository.findByProductStockGreaterThanAndProductState_ProductStateName(
+		List<Product> saleProducts = productJpaRepository.findAllByProductStateName(ProductStateName.SALE);
+
+
+
+
+
+		productJpaRepository.findByProductStockGreaterThanAndProductState_ProductStateName(
 			0, ProductStateName.SALE, pageable
 		).map(product -> new ResponseProductCouponDTO(
 			product.getProductId(),
@@ -232,10 +240,14 @@ public class ProductServiceImpl implements ProductService {
 			product.getPublisher().getPublisherName(),
 			null // Contributor 정보는 제공된 코드에서 명확하지 않아 null로 설정
 		));
+
+		return null;
 	}
 
+
+
 	/**
-	 * productId로 이미지들을 찾아 List로 반환하는 메서드
+	 * productId로 이미지들을 찾아 List로 반환하는 내부 메서드
 	 */
 	private List<String> findProductImagePaths(Product product) {
 		List<ProductImage> productImages = productImageJpaRepository.findByProduct_ProductId(product.getProductId());
@@ -246,5 +258,21 @@ public class ProductServiceImpl implements ProductService {
 			productImagePaths.add(productImage.getProductImagePath());
 		}
 		return productImagePaths;
+	}
+
+	/**
+	 * 상품 차감 수량을 입력받아 DB에 저장하는 내부 메서드
+	 */
+	private void decrementProductStock(int decrementStock, Product product) {
+		int productStock = product.getProductStock();
+		int decrementedStock = productStock - decrementStock;
+
+		if (decrementedStock < 0) {
+			throw new ProductStockDecrementException("재고 수량 부족으로 차감 실패");
+		} else {
+			System.out.println("수량 차감 성공");
+			product.setProduct(decrementedStock);
+		}
+		productJpaRepository.save(product);
 	}
 }

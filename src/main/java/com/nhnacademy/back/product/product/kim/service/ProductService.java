@@ -25,7 +25,7 @@ public interface ProductService {
 
 	void updateProduct(RequestProductUpdateDTO request);
 
-	void updateProductStock(RequestProductStockUpdateDTO request);
+	ResponseEntity<Void> updateProductStock(RequestProductStockUpdateDTO request);
 
 	void updateProductSalePrice(RequestProductSalePriceUpdateDTO request);
 

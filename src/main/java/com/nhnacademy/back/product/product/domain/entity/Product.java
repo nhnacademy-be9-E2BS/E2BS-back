@@ -131,6 +131,10 @@ public class Product {
 		this.productStock = productStock;
 	}
 
+	public void setProduct(long productSalePrice) {
+		this.productSalePrice = productSalePrice;
+	}
+
 
 
 
