@@ -3,6 +3,7 @@ package com.nhnacademy.back.coupon.membercoupon.domain.entity;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 
 import jakarta.persistence.Column;
@@ -26,8 +27,8 @@ public class MemberCoupon {
 	private long memberCouponId;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+	@JoinColumn(name = "member_id")
+	private Member member;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "coupon_id")
@@ -39,4 +40,12 @@ public class MemberCoupon {
 
 	@Column(nullable = false)
 	private boolean memberCouponUsed = false;
+
+	public MemberCoupon(Member member, Coupon coupon, LocalDateTime memberCouponCreatedAt,
+		LocalDateTime memberCouponPeriod) {
+		this.member = member;
+		this.coupon = coupon;
+		this.memberCouponCreatedAt = memberCouponCreatedAt;
+		this.memberCouponPeriod = memberCouponPeriod;
+	}
 }

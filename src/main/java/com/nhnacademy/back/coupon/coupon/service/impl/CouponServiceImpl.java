@@ -165,4 +165,44 @@ public class CouponServiceImpl implements CouponService {
 		coupon.setCouponIsActive(!coupon.isCouponIsActive());
 		couponJpaRepository.save(coupon);
 	}
+
+	@Override
+	public Page<ResponseCouponDTO> getCouponsIsActive(Pageable pageable) {
+		Page<Coupon> coupons = couponJpaRepository.findAllByCouponIsActiveTrue(pageable);
+
+		return coupons.map(coupon -> {
+			CategoryCoupon categoryCoupon = categoryCouponJpaRepository.findById(coupon.getCouponId())
+				.orElse(null);
+
+			ProductCoupon productCoupon = productCouponJpaRepository.findById(coupon.getCouponId())
+				.orElse(null);
+
+			Long categoryId = null;
+			String categoryName = null;
+			if (categoryCoupon != null && categoryCoupon.getCategory() != null) {
+				categoryId = categoryCoupon.getCategory().getCategoryId();
+				categoryName = categoryCoupon.getCategory().getCategoryName();
+			}
+
+			Long productId = null;
+			String productTitle = null;
+			if (productCoupon != null && productCoupon.getProduct() != null) {
+				productId = productCoupon.getProduct().getProductId();
+				productTitle = productCoupon.getProduct().getProductTitle();
+			}
+
+			return new ResponseCouponDTO(
+				coupon.getCouponId(),
+				coupon.getCouponPolicy().getCouponPolicyId(),
+				coupon.getCouponPolicy().getCouponPolicyName(),
+				coupon.getCouponName(),
+				categoryId,
+				categoryName,
+				productId,
+				productTitle,
+				coupon.isCouponIsActive()
+			);
+		});
+	}
+
 }

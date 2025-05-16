@@ -67,4 +67,13 @@ public class CouponController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	/**
+	 * 관리자 쿠폰 발급시 활성화된 쿠폰만 조회
+	 */
+	@GetMapping("/isActive")
+	public ResponseEntity<Page<ResponseCouponDTO>> getCouponsIsActive(Pageable pageable) {
+		Page<ResponseCouponDTO> coupons = couponService.getCouponsIsActive(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(coupons);
+	}
+
 }

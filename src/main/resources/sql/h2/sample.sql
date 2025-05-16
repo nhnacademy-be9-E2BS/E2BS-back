@@ -33,9 +33,19 @@ INSERT INTO customer (
     customer_password,
     customer_name
 ) VALUES
-    ('testuser@example.com', 'password123', '홍길동');
+      ('user1@example.com', 'password123', '홍길동1'),
+      ('user2@example.com', 'password123', '홍길동2'),
+      ('user3@example.com', 'password123', '홍길동3'),
+      ('user4@example.com', 'password123', '홍길동4'),
+      ('user5@example.com', 'password123', '홍길동5'),
+      ('user6@example.com', 'password123', '홍길동6'),
+      ('user7@example.com', 'password123', '홍길동7'),
+      ('user8@example.com', 'password123', '홍길동8'),
+      ('user9@example.com', 'password123', '홍길동9'),
+      ('user10@example.com', 'password123', '홍길동10');
 
 -- Member (MapsId 관계라 customer_id = member PK)
+-- Member 10명 추가 (customer_id = member의 PK)
 INSERT INTO member (
     customer_id,
     member_id,
@@ -47,18 +57,18 @@ INSERT INTO member (
     member_state_id,
     member_role_id,
     social_auth_id
-) VALUES (
-             1,
-             'member01',
-             DATE '1990-01-01',
-             '01012345678',
-             DATE '2024-01-01',
-             DATE '2024-05-01',
-             1, -- NORMAL
-             1, -- ACTIVE
-             1, -- ADMIN
-             1  -- PAYCO
-         );
+) VALUES
+      (1,  'member01', DATE '1990-01-01', '01011110001', DATE '2024-01-01', DATE '2024-05-01', 1, 1, 1, 1),
+      (2,  'member02', DATE '1991-01-01', '01011110002', DATE '2024-01-02', DATE '2024-05-02', 1, 1, 1, 1),
+      (3,  'member03', DATE '1992-01-01', '01011110003', DATE '2024-01-03', DATE '2024-05-03', 1, 1, 1, 1),
+      (4,  'member04', DATE '1993-01-01', '01011110004', DATE '2024-01-04', DATE '2024-05-04', 1, 1, 1, 1),
+      (5,  'member05', DATE '1994-01-01', '01011110005', DATE '2024-01-05', DATE '2024-05-05', 1, 1, 1, 1),
+      (6,  'member06', DATE '1995-01-01', '01011110006', DATE '2024-01-06', DATE '2024-05-06', 1, 1, 1, 1),
+      (7,  'member07', DATE '1996-01-01', '01011110007', DATE '2024-01-07', DATE '2024-05-07', 1, 1, 1, 1),
+      (8,  'member08', DATE '1997-01-01', '01011110008', DATE '2024-01-08', DATE '2024-05-08', 1, 1, 1, 1),
+      (9,  'member09', DATE '1998-01-01', '01011110009', DATE '2024-01-09', DATE '2024-05-09', 1, 1, 1, 1),
+      (10, 'member10', DATE '1999-01-01', '01011110010', DATE '2024-01-10', DATE '2024-05-10', 1, 1, 1, 1);
+
 
 -- Address
 INSERT INTO address (
@@ -208,7 +218,7 @@ VALUES (1,'1,000원 쿠폰', 1, true),
        (2,'10% 쿠폰',2, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
 VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1);
 
