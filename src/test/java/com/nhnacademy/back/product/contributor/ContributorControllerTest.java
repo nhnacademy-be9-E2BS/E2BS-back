@@ -1,6 +1,5 @@
 package com.nhnacademy.back.product.contributor;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,14 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.contributor.controller.ContributorController;
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
-import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.Position;
 import com.nhnacademy.back.product.contributor.repository.ContributorJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.service.ContributorService;
 
 @WebMvcTest(ContributorController.class)
-public class ContributorControllerTest {
+class ContributorControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -54,8 +52,8 @@ public class ContributorControllerTest {
 		RequestContributorDTO requestContributorDTO = new RequestContributorDTO("기여자이름", position.getPositionId());
 
 		mockMvc.perform(post("/api/admin/contributors")
-			.content(objectMapper.writeValueAsString(requestContributorDTO))
-			.contentType(MediaType.APPLICATION_JSON))
+				.content(objectMapper.writeValueAsString(requestContributorDTO))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
 	}
 
@@ -77,8 +75,8 @@ public class ContributorControllerTest {
 		when(contributorService.getContributors(pageable)).thenReturn(mockPage);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/contributors")
-			.param("page", "0")
-			.param("size", "10"))
+				.param("page", "0")
+				.param("size", "10"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.content.length()").value(3))
@@ -91,7 +89,8 @@ public class ContributorControllerTest {
 	void getContributorById() throws Exception {
 		Position position1 = new Position("작가");
 
-		ResponseContributorDTO responseContributorDTO = new ResponseContributorDTO(1L, "이름1", 1L, position1.getPositionName());
+		ResponseContributorDTO responseContributorDTO = new ResponseContributorDTO(1L, "이름1", 1L,
+			position1.getPositionName());
 		when(contributorService.getContributor(1L)).thenReturn(responseContributorDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/admin/contributors/1"))

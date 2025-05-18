@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
@@ -97,6 +97,7 @@ class CartServiceForCustomerTest {
 	@Test
 	@DisplayName("비회원/회원 장바구니 항목 추가 테스트 - 실패(아이템 항목 이미 존재한 경우)")
 	void createCartItemForCustomer_AlreadyExists() {
+		// given
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, "", productId, 2);
 
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
@@ -105,6 +106,7 @@ class CartServiceForCustomerTest {
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(cart);
 		when(cartItemsRepository.existsByCartAndProduct(cart, product)).thenReturn(true);
 
+		// when & then
 		assertThrows(CartItemAlreadyExistsException.class, () -> cartService.createCartItemForCustomer(request));
 	}
 
@@ -142,8 +144,6 @@ class CartServiceForCustomerTest {
 	@DisplayName("비회원/회원 장바구니 항목 전체 삭제 테스트")
 	void deleteCartForCustomer() {
 		// given
-		long customerId = 1L;
-		Cart cart = new Cart();
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(cart);
 
 		// when
@@ -157,7 +157,6 @@ class CartServiceForCustomerTest {
 	@DisplayName("비회원/회원 장바구니 항목 전체 삭제 테스트 - 실패(찾을 수 없을 때의 예외)")
 	void deleteCartForCustomer_CartNotFound() {
 		// given
-		long customerId = 1L;
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(null);
 
 		// when & then

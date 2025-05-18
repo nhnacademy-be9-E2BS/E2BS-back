@@ -54,13 +54,13 @@ public class CouponServiceImpl implements CouponService {
 
 		if(request.getCategoryId() != null) {
 			Category category = categoryJpaRepository.findById(request.getCategoryId())
-				.orElseThrow(); // todo CategoryNotFoundException 추가 예정
+				.orElseThrow(); // 상준; CategoryNotFoundException 추가 예정
 			CategoryCoupon categoryCoupon = new CategoryCoupon(coupon, category);
 			categoryCouponJpaRepository.save(categoryCoupon);
 		}
 		else if(request.getProductId() != null) {
 			Product product = productJpaRepository.findById(request.getProductId())
-				.orElseThrow(); // todo ProductNotFoundException 추가 예정
+				.orElseThrow(); // 상준; ProductNotFoundException 추가 예정
 			ProductCoupon productCoupon = new ProductCoupon(coupon, product);
 			productCouponJpaRepository.save(productCoupon);
 		}

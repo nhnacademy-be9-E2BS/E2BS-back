@@ -1,6 +1,5 @@
 package com.nhnacademy.back.account.member.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,12 +14,14 @@ import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMe
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/register")
 public class MemberRegisterController {
 
-	@Autowired
-	private MemberService memberService;
+	private final MemberService memberService;
 
 	/**
 	 * 회원가입 시 입력한 아이디와 같은 값이 존재하는지 확인하고 없으면 데이터베이스에 저장
