@@ -2,7 +2,6 @@ package com.nhnacademy.back.coupon.membercoupon.domain.entity;
 
 import java.time.LocalDateTime;
 
-import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 
