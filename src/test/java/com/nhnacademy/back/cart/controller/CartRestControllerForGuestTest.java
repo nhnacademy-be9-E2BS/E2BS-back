@@ -102,7 +102,7 @@ class CartRestControllerForGuestTest {
 			new ResponseCartItemsForGuestDTO(1L, List.of(), "Product 1", 1000, "/image1.jpg", 2, 2000)
 		);
 
-		when(cartService.getCartItemsByGuest(eq(sessionId))).thenReturn(cartItems);
+		when(cartService.getCartItemsByGuest(sessionId)).thenReturn(cartItems);
 
 		// when & then
 		mockMvc.perform(get("/api/guests/{sessionId}/carts", sessionId))
@@ -110,7 +110,7 @@ class CartRestControllerForGuestTest {
 			.andExpect(jsonPath("$.[0].productId").value(1L))
 			.andExpect(jsonPath("$.[0].productTitle").value("Product 1"));
 
-		verify(cartService).getCartItemsByGuest(eq(sessionId));
+		verify(cartService).getCartItemsByGuest(sessionId);
 	}
 
 }

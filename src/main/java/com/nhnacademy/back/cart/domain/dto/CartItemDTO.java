@@ -1,5 +1,6 @@
 package com.nhnacademy.back.cart.domain.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItemDTO {
+public class CartItemDTO implements Serializable {
 	private long productId;
 	private List<ProductCategoryDTO> categoryIds;
 	private String productTitle;

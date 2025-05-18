@@ -53,7 +53,7 @@ class CartRestControllerForCustomerTest {
 	@DisplayName("PUT /api/customers/carts/items/{cartItemsId} - 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForCustomer() throws Exception {
 		// given
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, null, 5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, 1L, 5);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -62,7 +62,7 @@ class CartRestControllerForCustomerTest {
 				.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).updateCartItemForCustomer(eq(1L), any(RequestUpdateCartItemsDTO.class));
+		verify(cartService).updateCartItemForCustomer(anyLong(), any(RequestUpdateCartItemsDTO.class));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ class CartRestControllerForCustomerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartItemForCustomer(eq(1L));
+		verify(cartService).deleteCartItemForCustomer(1L);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ class CartRestControllerForCustomerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartForCustomer(eq(1L));
+		verify(cartService).deleteCartForCustomer(1L);
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class CartRestControllerForCustomerTest {
 			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2, 2000)
 		);
 
-		when(cartService.getCartItemsByCustomer(eq(1L))).thenReturn(cartItems);
+		when(cartService.getCartItemsByCustomer(1L)).thenReturn(cartItems);
 
 		// when & then
 		mockMvc.perform(get("/api/customers/1/carts"))

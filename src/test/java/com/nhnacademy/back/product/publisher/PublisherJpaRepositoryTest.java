@@ -19,7 +19,7 @@ class PublisherJpaRepositoryTest {
 
 	@Test
 	@DisplayName("existsByPublisherName 메소드 테스트")
-	public void exists_by_publisher_name_test() {
+	void exists_by_publisher_name_test() {
 		// given
 		publisherJpaRepository.save(new Publisher("new Publisher A"));
 

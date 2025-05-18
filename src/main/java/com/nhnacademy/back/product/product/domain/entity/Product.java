@@ -7,7 +7,6 @@ import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -75,23 +74,5 @@ public class Product {
 
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
-
-	public Product(ProductState productState, Publisher publisher,
-		           String productTitle, String productContent, String productDescription, LocalDate productPublishedAt, String productIsbn,
-				   long productRegularPrice, long productSalePrice, boolean productPackageable, int productStock, long productHits, long productSearches) {
-		this.productState = productState;
-		this.publisher = publisher;
-		this.productTitle = productTitle;
-		this.productContent = productContent;
-		this.productDescription = productDescription;
-		this.productPublishedAt = productPublishedAt;
-		this.productIsbn = productIsbn;
-		this.productRegularPrice = productRegularPrice;
-		this.productSalePrice = productSalePrice;
-		this.productPackageable = productPackageable;
-		this.productStock = productStock;
-		this.productHits = productHits;
-		this.productSearches = productSearches;
-	}
 
 }
