@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
@@ -117,6 +119,21 @@ public class MemberServiceImpl implements MemberService {
 		return new ResponseRegisterMemberDTO(
 			member.getMemberId(), member.getCustomer().getCustomerName(), member.getCustomer().getCustomerPassword(),
 			member.getCustomer().getCustomerEmail(), member.getMemberBirth(), member.getMemberPhone()
+		);
+	}
+
+	@Override
+	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
+		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		return new ResponseMemberInfoDTO(
+			member.getCustomer(), member.getMemberId(), member.getMemberBirth(),
+			member.getMemberPhone(), member.getMemberCreatedAt(), member.getMemberLoginLatest(),
+			member.getMemberRank(), member.getMemberState(), member.getMemberRole(),
+			member.getSocialAuth()
 		);
 	}
 
