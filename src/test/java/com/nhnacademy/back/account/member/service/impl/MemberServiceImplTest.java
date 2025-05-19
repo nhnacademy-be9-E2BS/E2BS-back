@@ -47,7 +47,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("ID에 해당하는 회원이 존재하는지 확인")
-	void existsMemberByMemberIdTest() throws Exception {
+	void existsMemberByMemberIdTest() {
 
 		// Given
 		String memberId = "nhn1";
@@ -62,7 +62,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("ID에 해당하는 회원 정보 가져오는 테스트")
-	void getMemberByMemberIdTest() throws Exception {
+	void getMemberByMemberIdTest() {
 
 		// Given
 		String memberId = "nhn1";
@@ -81,7 +81,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("RequestLoginMemberDTO 요청을 받지 못했을 경우 예외 처리")
-	void requestLoginMemberDTOBadRequestExceptionTest() throws Exception {
+	void requestLoginMemberDTOBadRequestExceptionTest() {
 
 		// Given
 
@@ -96,7 +96,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("아이디에 해당하는 회원이 존재하지 않는 경우")
-	void loginMemberNotExistsMemberByMemberIdTest() throws Exception {
+	void loginMemberNotExistsMemberByMemberIdTest() {
 
 		// Given
 		String memberId = "nhn1";
@@ -115,7 +115,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("아이디에 해당하는 회원 반환")
-	void loginMemberReturnMemberTest() throws Exception {
+	void loginMemberReturnMemberTest() {
 
 		// Given
 		String memberId = "nhn1";
@@ -134,7 +134,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원가입 시 RequestRegisterMemberDTO 요청을 받지 못했을 경우 예외 처리")
-	void registerMemberRequestRegisterMemberDTOBadRequestException() throws Exception {
+	void registerMemberRequestRegisterMemberDTOBadRequestException() {
 
 		// Given
 		RequestRegisterMemberDTO requestRegisterMemberDTO = null;
@@ -150,7 +150,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원가입 시 아이디가 중복된 경우 예외 처리")
-	void registerMemberExistsMemberByMemberIdTest() throws Exception {
+	void registerMemberExistsMemberByMemberIdTest() {
 
 		// Given
 		String memberId = "nhn1";
@@ -178,7 +178,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원가입 성공 시 memberJpaRepository에 정보 저장")
-	void successRegisterMemberTest() throws Exception {
+	void successRegisterMemberTest() {
 
 		// Given
 		String memberId = "nhn1";

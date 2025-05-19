@@ -62,7 +62,7 @@ class CartRestControllerForCustomerTest {
 				.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).updateCartItemForCustomer(eq(1L), any(RequestUpdateCartItemsDTO.class));
+		verify(cartService).updateCartItemForCustomer(anyLong(), any(RequestUpdateCartItemsDTO.class));
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class CartRestControllerForCustomerTest {
 			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2, 2000)
 		);
 
-		when(cartService.getCartItemsByCustomer(eq(1L))).thenReturn(cartItems);
+		when(cartService.getCartItemsByCustomer(1L)).thenReturn(cartItems);
 
 		// when & then
 		mockMvc.perform(get("/api/customers/1/carts"))

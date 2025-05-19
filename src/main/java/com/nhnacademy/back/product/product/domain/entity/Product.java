@@ -75,24 +75,4 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-	public Product(ProductState productState, Publisher publisher,
-		String productTitle, String productContent, String productDescription, LocalDate productPublishedAt,
-		String productIsbn,
-		long productRegularPrice, long productSalePrice, boolean productPackageable, int productStock, long productHits,
-		long productSearches) {
-		this.productState = productState;
-		this.publisher = publisher;
-		this.productTitle = productTitle;
-		this.productContent = productContent;
-		this.productDescription = productDescription;
-		this.productPublishedAt = productPublishedAt;
-		this.productIsbn = productIsbn;
-		this.productRegularPrice = productRegularPrice;
-		this.productSalePrice = productSalePrice;
-		this.productPackageable = productPackageable;
-		this.productStock = productStock;
-		this.productHits = productHits;
-		this.productSearches = productSearches;
-	}
-
 }
