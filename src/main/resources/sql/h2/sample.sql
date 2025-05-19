@@ -241,12 +241,13 @@ VALUES (1, 1, 1, 5),
        (3, 1, 3, 6),
        (4, 1, 4, 1);
 
--- 테스트를 위한 임의 어드민 유저 생성
+-- 테스트를 위한 임의 유저, 관리자 생성
 -- Customer password 12345
 INSERT INTO customer (customer_email,
                       customer_password,
                       customer_name)
-VALUES ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자');
+VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
+       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자');
 
 -- Member
 INSERT INTO member (customer_id,
@@ -260,6 +261,17 @@ INSERT INTO member (customer_id,
                     member_role_id,
                     social_auth_id)
 VALUES (2,
+        'user',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (3,
         'admin',
         DATE '1990-01-01',
         '01012345678',
@@ -267,6 +279,6 @@ VALUES (2,
         DATE '2024-05-01',
         1, -- NORMAL
         1, -- ACTIVE
-        1, -- ADMIN
+        1, -- Admin
         1 -- PAYCO
        );

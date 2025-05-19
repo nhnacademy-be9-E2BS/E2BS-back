@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
@@ -30,6 +31,7 @@ public class OrderController {
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
+	@Member
 	@PostMapping("/api/order/create/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -42,6 +44,7 @@ public class OrderController {
 	/**
 	 * 포인트 주문에 대한 처리
 	 */
+	@Member
 	@PostMapping("/api/order/create/point")
 	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(
 		@Validated @RequestBody RequestOrderWrapperDTO request,
@@ -58,6 +61,7 @@ public class OrderController {
 	 * 이는 이후 다른 부분 구현 완료 시 진행할 예정
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
+	@Member
 	@PostMapping("/api/order/confirm")
 	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
 		@RequestParam long amount) {
@@ -75,6 +79,7 @@ public class OrderController {
 	/**
 	 * 특정 주문서를 삭제하는 기능, 안에서 재고 복구도 진행함
 	 */
+	@Member
 	@PostMapping("/api/order/cancel")
 	public ResponseEntity<Void> cancelOrder(@RequestParam String orderId) {
 		return orderService.cancelOrder(orderId);
