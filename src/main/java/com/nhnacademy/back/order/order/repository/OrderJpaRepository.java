@@ -8,4 +8,6 @@ import com.nhnacademy.back.order.order.domain.entity.Order;
 
 public interface OrderJpaRepository extends JpaRepository<Order, String> {
 	Page<Order> findAllByOrderByOrderCreatedAtDesc(Pageable pageable);
+
+	Page<Order> findAllByOrderState_OrderStateIdOrderByOrderCreatedAtDesc(Pageable pageable, Long stateId);
 }

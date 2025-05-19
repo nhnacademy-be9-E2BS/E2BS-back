@@ -16,7 +16,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseOrderDTO {
 	private long customerId;
+	private String memberId;
+	private boolean isMember;
 	private long deliveryFeeId;
+	private long deliveryFeeAmount;
+	private long deliveryFeeFreeAmount;
 	private Long memberCouponId;
 	private String orderCode;
 	private String receiverName;
@@ -27,20 +31,25 @@ public class ResponseOrderDTO {
 	private String addressDetail;
 	private String addressExtra;
 	private long pointAmount;
-	private long totalAmount;
 	private long paymentAmount;
 	private String memo;
 	private boolean isPaid;
 	private LocalDate receiveDate;
 	private LocalDate shipmentDate;
 	private LocalDateTime createdAt;
+	private String state;
+	private String paymentMethod;
 
 	// 엔티티를 DTO로 바꾸는 메서드
 	public static ResponseOrderDTO fromEntity(Order order) {
 		return new ResponseOrderDTO(
 			order.getCustomer().getCustomerId(),
+			null,
+			false,
 			order.getDeliveryFee().getDeliveryFeeId(),
-			order.getMemberCoupon().getMemberCouponId(),
+			order.getDeliveryFee().getDeliveryFeeAmount(),
+			order.getDeliveryFee().getDeliveryFeeFreeAmount(),
+			order.getMemberCoupon() != null ? order.getMemberCoupon().getMemberCouponId() : null,
 			order.getOrderCode(),
 			order.getOrderReceiverName(),
 			order.getOrderReceiverPhone(),
@@ -50,13 +59,14 @@ public class ResponseOrderDTO {
 			order.getOrderAddressDetail(),
 			order.getOrderAddressExtra(),
 			order.getOrderPointAmount(),
-			order.getOrderTotalAmount(),
 			order.getOrderPaymentAmount(),
 			order.getOrderMemo(),
 			order.isOrderPaymentStatus(),
 			order.getOrderReceiveDate(),
 			order.getOrderShipmentDate(),
-			order.getOrderCreatedAt()
+			order.getOrderCreatedAt(),
+			order.getOrderState().getOrderStateName().name(),
+			null
 		);
 	}
 }

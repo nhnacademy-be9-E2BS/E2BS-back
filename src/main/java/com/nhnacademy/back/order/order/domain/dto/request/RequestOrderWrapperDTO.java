@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestOrderWrapperDTO {
+	// 주문서를 저장할 때 사용하는 요청 DTO
 	@Valid
 	private RequestOrderDTO order;
 
