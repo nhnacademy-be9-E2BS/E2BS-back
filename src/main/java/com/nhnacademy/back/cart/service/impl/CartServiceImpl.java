@@ -57,7 +57,7 @@ public class CartServiceImpl implements CartService {
 	public void createCartItemForCustomer(RequestAddCartItemsDTO request) {
 		// 비회원/회원, 상품 존재 검증
 		Customer findCustomer = customerRepository.findById(request.getCustomerId())
-			.orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
