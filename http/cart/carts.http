@@ -1,4 +1,4 @@
-### 장바구니 항목 추가 (비회원/회원)
+### 장바구니 항목 추가 (회원)
 POST http://localhost:10236/api/customers/carts/items
 Content-Type: application/json
 
@@ -8,16 +8,16 @@ Content-Type: application/json
   "quantity": 2
 }
 
-### 장바구니 항목 수량 수정 (비회원/회원)
-PUT http://localhost:8080/api/customers/carts/items/1
+### 장바구니 항목 수량 수정 (회원)
+PUT http://localhost:10236/api/customers/carts/items/1
 Content-Type: application/json
 
 {
   "quantity": 5
 }
 
-### 장바구니 항목 삭제 (비회원/회원)
-DELETE http://localhost:8080/api/customers/carts/items/1
+### 장바구니 항목 삭제 (회원)
+DELETE http://localhost:10236/api/customers/carts/items/1
 Content-Type: application/json
 
 ### 고객 장바구니 항목 조회 (페이징 처리)

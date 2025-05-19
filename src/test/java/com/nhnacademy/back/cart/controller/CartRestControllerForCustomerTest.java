@@ -30,7 +30,8 @@ class CartRestControllerForCustomerTest {
 	@MockitoBean
 	private CartService cartService;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	@Autowired
+	private ObjectMapper objectMapper;
 
 
 	@Test
@@ -57,7 +58,7 @@ class CartRestControllerForCustomerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/customers/carts/items/1")
+		mockMvc.perform(put("/api/customers/carts/items/{cartItemsId}", 1L)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isNoContent());
@@ -69,7 +70,7 @@ class CartRestControllerForCustomerTest {
 	@DisplayName("DELETE /api/customers/carts/items/{cartItemsId} - 장바구니 항목 삭제 테스트")
 	void deleteCartItemForCustomer() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/customers/carts/items/1")
+		mockMvc.perform(delete("/api/customers/carts/items/{cartItemsId}", 1L)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
@@ -80,7 +81,7 @@ class CartRestControllerForCustomerTest {
 	@DisplayName("DELETE /api/customers/{customerId}/carts - 장바구니 항목 전체 삭제 테스트")
 	void deleteCartForCustomer() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/customers/1/carts")
+		mockMvc.perform(delete("/api/customers/{customerId}/carts", 1L)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
@@ -98,7 +99,7 @@ class CartRestControllerForCustomerTest {
 		when(cartService.getCartItemsByCustomer(1L)).thenReturn(cartItems);
 
 		// when & then
-		mockMvc.perform(get("/api/customers/1/carts"))
+		mockMvc.perform(get("/api/customers/{customerId}/carts", 1L))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.[0].productId").value(100L))
 			.andExpect(jsonPath("$.[0].productTitle").value("Product A"))
