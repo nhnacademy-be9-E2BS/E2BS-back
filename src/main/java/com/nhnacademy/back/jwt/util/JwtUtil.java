@@ -29,7 +29,7 @@ public class JwtUtil {
 	 */
 	public String getMemberId(String token, Key secretKey) {
 		try {
-			Claims claims = Jwts.parserBuilder()
+			Claims claims = Jwts.parser()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
@@ -47,7 +47,7 @@ public class JwtUtil {
 	 */
 	public List<String> getMemberRole(String token, Key secretKey) {
 		try {
-			Claims claims = Jwts.parserBuilder()
+			Claims claims = Jwts.parser()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
@@ -65,7 +65,7 @@ public class JwtUtil {
 	 */
 	public Claims getClaimsIfExpired(String token, Key secretKey) {
 		try {
-			return Jwts.parserBuilder()
+			return Jwts.parser()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
@@ -104,7 +104,7 @@ public class JwtUtil {
 				return TokenStatus.INVALID;
 			}
 
-			Jwts.parserBuilder()
+			Jwts.parser()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token); // 여기에서 파싱이 되면 유효한 토큰이다
