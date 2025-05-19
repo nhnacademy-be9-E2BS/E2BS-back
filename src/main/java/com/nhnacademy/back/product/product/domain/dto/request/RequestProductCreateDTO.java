@@ -40,6 +40,6 @@ public class RequestProductCreateDTO {
 	//재고
 	private int productStock;
 	// 이미지
-	private List<String> productImage;
+	private List<String> productImagePaths;
 
 }

@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
 		// (현규) front에서 출판사 리스트를 선택하게 해서 없으면 생성하게 만들게 할 것
 		// 인스턴스 빼서 변수 선언
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
-		List<String> imagePaths = request.getProductImage();
+		List<String> imagePaths = request.getProductImagePaths();
 
 		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
 		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
