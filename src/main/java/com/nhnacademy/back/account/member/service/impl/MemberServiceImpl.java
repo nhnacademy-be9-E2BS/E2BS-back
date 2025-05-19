@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
@@ -24,7 +25,6 @@ import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
 import com.nhnacademy.back.account.memberstate.repository.MemberStateJpaRepository;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
-import com.nhnacademy.back.common.exception.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,12 +57,9 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * ID에 해당하는 회원이 존재하는지 확인하고 회원 정보 반환
 	 */
+	@Transactional
 	@Override
 	public MemberDTO loginMember(RequestLoginMemberDTO requestLoginMemberDTO) {
-		if (Objects.isNull(requestLoginMemberDTO) || Objects.isNull(requestLoginMemberDTO.getMemberId())) {
-			throw new BadRequestException("로그인 요청 DTO를 받지 못했습니다.");
-		}
-
 		if (!existsMemberByMemberId(requestLoginMemberDTO.getMemberId())) {
 			throw new LoginMemberIsNotExistsException("아이디에 해당하는 회원이 존재하지 않습니다.");
 		}
@@ -72,8 +69,11 @@ public class MemberServiceImpl implements MemberService {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
+		LocalDate loginLatest = LocalDate.now();
+		memberJpaRepository.updateMemberLoginLatestByMemberId(loginLatest, member.getMemberId());
+
 		return new MemberDTO(member.getCustomer(), member.getMemberId(), member.getMemberBirth(),
-			member.getMemberPhone(), member.getMemberCreatedAt(), member.getMemberLoginLatest(),
+			member.getMemberPhone(), member.getMemberCreatedAt(), loginLatest,
 			member.getMemberRank(), member.getMemberState(), member.getMemberRole(), member.getSocialAuth());
 	}
 
@@ -83,9 +83,6 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Override
 	public ResponseRegisterMemberDTO registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO) {
-		if (Objects.isNull(requestRegisterMemberDTO)) {
-			throw new BadRequestException("회원가입 요청 DTO를 받지 못했습니다.");
-		}
 
 		if (existsMemberByMemberId(requestRegisterMemberDTO.getMemberId())) {
 			throw new AlreadyExistsMemberIdException("중복된 아이디입니다.");

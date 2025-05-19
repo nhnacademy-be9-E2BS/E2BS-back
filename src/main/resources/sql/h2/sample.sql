@@ -13,8 +13,8 @@ VALUES ('ACTIVE'),
 
 -- SocialAuth ENUM 기반
 INSERT INTO social_auth (social_auth_name)
-VALUES ('PAYCO'),
-       ('WEB');
+VALUES ('WEB'),
+       ('PAYCO');
 
 -- MemberRank
 INSERT INTO member_rank (member_rank_name,
@@ -51,7 +51,7 @@ VALUES (1,
         1, -- NORMAL
         1, -- ACTIVE
         1, -- ADMIN
-        1 -- PAYCO
+        1 -- WEB
        );
 
 -- Address

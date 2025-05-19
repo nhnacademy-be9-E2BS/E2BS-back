@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
+import com.nhnacademy.back.account.member.exception.MemberRoleException;
+import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
@@ -30,7 +32,8 @@ public class GlobalExceptionHandler {
 	 * 이미 존재하는 경우의 에러 핸들러
 	 */
 	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
-		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,})
+		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
+		MemberStateWithdrawException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -42,7 +45,8 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class,
 		CartItemNotFoundException.class, CartNotFoundException.class,
-		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class, ReviewNotFoundException.class})
+		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
+		ReviewNotFoundException.class, MemberRoleException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());
