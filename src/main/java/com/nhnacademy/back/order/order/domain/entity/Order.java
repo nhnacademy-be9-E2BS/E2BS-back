@@ -8,6 +8,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
+import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,7 +53,7 @@ public class Order {
 	private long orderPointAmount = 0L;
 
 	@Column(nullable = false)
-	private long orderTotalAmount = 0L;
+	private long orderPaymentAmount;
 
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
@@ -68,8 +69,6 @@ public class Order {
 	@Column(nullable = false)
 	private LocalDateTime orderCreatedAt;
 
-	private long orderPaymentAmount;
-
 	@OneToOne
 	@JoinColumn(name = "member_coupon_id")
 	private MemberCoupon memberCoupon;
@@ -83,12 +82,20 @@ public class Order {
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "order_state_id")
+	private OrderState orderState;
+
 	public void updatePaymentStatus(boolean status) {
 		this.orderPaymentStatus = status;
 	}
 
+	public void updateOrderState(OrderState orderState) {
+		this.orderState = orderState;
+	}
+
 	public Order(RequestOrderDTO requestOrderDTO, MemberCoupon memberCoupon, DeliveryFee deliveryFee,
-		Customer customer) {
+		Customer customer, OrderState orderState) {
 		this.orderCode = generateSecureOrderId();
 		this.orderReceiverName = requestOrderDTO.getOrderReceiverName();
 		this.orderReceiverPhone = requestOrderDTO.getOrderReceiverPhone();
@@ -107,7 +114,7 @@ public class Order {
 		this.memberCoupon = memberCoupon;
 		this.customer = customer;
 		this.deliveryFee = deliveryFee;
-
+		this.orderState = orderState;
 	}
 
 	/**
