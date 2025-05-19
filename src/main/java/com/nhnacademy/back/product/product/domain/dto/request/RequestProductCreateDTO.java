@@ -1,7 +1,5 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
-import java.time.LocalDate;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
