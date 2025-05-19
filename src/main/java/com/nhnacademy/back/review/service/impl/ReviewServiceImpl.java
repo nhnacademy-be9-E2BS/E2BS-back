@@ -57,17 +57,6 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	/**
-	 * 리뷰 삭제 메소드
-	 */
-	@Override
-	public void deleteReview(long reviewId) {
-		Review findReview = reviewRepository.findById(reviewId)
-			.orElseThrow(ReviewNotFoundException::new);
-
-		reviewRepository.delete(findReview);
-	}
-
-	/**
 	 * 고객 리뷰 페이징 목록 조회 메소드
 	 */
 	@Override
