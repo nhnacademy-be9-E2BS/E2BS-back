@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class JwtUtil {
 
 			return claims.get("Role", List.class);
 		} catch (JwtException e) {
-			return null;
+			return Collections.emptyList();
 		}
 
 	}
@@ -64,17 +65,15 @@ public class JwtUtil {
 	 */
 	public Claims getClaimsIfExpired(String token, Key secretKey) {
 		try {
-			Claims claims = Jwts.parserBuilder()
+			return Jwts.parserBuilder()
 				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
-
-			return claims;
 		} catch (ExpiredJwtException e) {
 			return e.getClaims();
 		} catch (JwtException e) {
-			return null;
+			throw new JwtException("Expired or invalid JWT token");
 		}
 	}
 
@@ -151,6 +150,8 @@ public class JwtUtil {
 		Cookie cookie = new Cookie(tokenPrefix.getValue(), null);
 		cookie.setMaxAge(0);
 		cookie.setPath("/");
+		cookie.setSecure(true);
+		cookie.setHttpOnly(true);
 
 		return cookie;
 	}

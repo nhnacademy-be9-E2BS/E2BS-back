@@ -1,6 +1,6 @@
 package com.nhnacademy.back.order.orderreturn.domain.entity;
 
-import com.nhnacademy.back.order.orderdetail.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

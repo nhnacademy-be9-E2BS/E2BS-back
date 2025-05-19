@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.CartService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
@@ -55,7 +55,7 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/api/customers/carts/items/{cartItemId}")
-	public ResponseEntity<Void> deleteCartItemForCustomer(@PathVariable Long cartItemId) {
+	public ResponseEntity<Void> deleteCartItemForCustomer(@PathVariable long cartItemId) {
 		cartService.deleteCartItemForCustomer(cartItemId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

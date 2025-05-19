@@ -24,6 +24,7 @@ import com.nhnacademy.back.product.contributor.service.ContributorService;
 @RequestMapping("/api/admin/contributors")
 public class ContributorController {
 	private final ContributorService contributorService;
+
 	public ContributorController(ContributorService contributorService) {
 		this.contributorService = contributorService;
 	}
@@ -52,7 +53,8 @@ public class ContributorController {
 	 */
 
 	@PostMapping()
-	public ResponseEntity<?> createContributor(@Validated @RequestBody RequestContributorDTO request, BindingResult bindingResult) {
+	public ResponseEntity<Void> createContributor(@Validated @RequestBody RequestContributorDTO request,
+		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -65,13 +67,14 @@ public class ContributorController {
 	 */
 
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<?> updateContributor(@Validated @RequestBody RequestContributorDTO request, @PathVariable Long contributorId, BindingResult bindingResult) {
+	public ResponseEntity<ResponseContributorDTO> updateContributor(
+		@Validated @RequestBody RequestContributorDTO request, @PathVariable Long contributorId,
+		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 		ResponseContributorDTO response = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
-
 
 }

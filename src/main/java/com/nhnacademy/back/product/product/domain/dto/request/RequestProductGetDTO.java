@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +10,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductStockUpdateDTO {
+public class RequestProductGetDTO {
 	/**
-	 * 도서의 재고를 변경하기 위한 정보
+	 * 도서 단건 조회를 위해 필요한 정보
 	 */
-	private long productId;
-	private int productDecrementStock;
+	long productId;
+	@NotNull
+	String productIsbn;
+
+
 }

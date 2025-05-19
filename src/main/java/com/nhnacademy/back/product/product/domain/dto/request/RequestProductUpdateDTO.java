@@ -1,5 +1,7 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,5 +29,6 @@ public class RequestProductUpdateDTO {
 	private long productSalePrice;
 	private boolean productPackageable;
 	private int productStock;
+	private List<String> productImagePaths;
 
 }

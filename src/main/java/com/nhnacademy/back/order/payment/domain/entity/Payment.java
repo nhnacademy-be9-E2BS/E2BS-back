@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,11 +37,21 @@ public class Payment {
 
 	private LocalDateTime paymentApprovedAt;
 
-	@OneToOne(optional = false)
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "payment_method_id")
 	private PaymentMethod paymentMethod;
 
 	@OneToOne(optional = false)
 	@JoinColumn(name = "order_code")
 	private Order order;
+
+	public Payment(Order order, PaymentMethod paymentMethod, String paymentKey, long totalPaymentAmount, LocalDateTime paymentRequestedAt, LocalDateTime paymentApprovedAt) {
+		this.order = order;
+		this.paymentMethod = paymentMethod;
+		this.paymentKey = paymentKey;
+		this.totalPaymentAmount = totalPaymentAmount;
+		this.paymentRequestedAt = paymentRequestedAt;
+		this.paymentApprovedAt = paymentApprovedAt;
+	}
+
 }

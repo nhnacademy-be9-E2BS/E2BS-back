@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -27,18 +27,14 @@ import com.nhnacademy.back.coupon.couponpolicy.exception.CouponPolicyNotFoundExc
 import com.nhnacademy.back.coupon.couponpolicy.repository.CouponPolicyJpaRepository;
 import com.nhnacademy.back.coupon.couponpolicy.service.impl.CouponPolicyServiceImpl;
 
-public class CouponPolicyServiceTest {
+@ExtendWith(MockitoExtension.class)
+class CouponPolicyServiceTest {
 
 	@Mock
 	private CouponPolicyJpaRepository couponPolicyJpaRepository;
 
 	@InjectMocks
 	private CouponPolicyServiceImpl couponPolicyService;
-
-	@BeforeEach
-	void setUp() {
-		MockitoAnnotations.initMocks(this);
-	}
 
 	@Test
 	@DisplayName("관리자 쿠폰 정책 추가 성공")

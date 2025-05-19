@@ -14,3 +14,8 @@ eureka:
       defaultZone: http://admin:1234@s1.java21.net:10230/eureka # 로컬 Eureka 서버의 주소
   instance:
     prefer-ip-address: true # 서비스 등록 시 도메인 대신 IP 주소로 등록
+
+order:
+  url:
+    toss: https://api.tosspayments.com/v1/payments/confirm
+  sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
