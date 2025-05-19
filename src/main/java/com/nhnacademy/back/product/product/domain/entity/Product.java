@@ -101,7 +101,6 @@ public class Product {
 
 	//updateProdut를 위해 set대신 쓴 생성자
 	public void updateProduct(RequestProductUpdateDTO request, Publisher publisher, ProductState productState) {
-		this.productId = request.getProductId();
 		this.productState = productState;
 		this.publisher = publisher;
 		this.productTitle = request.getProductTitle();

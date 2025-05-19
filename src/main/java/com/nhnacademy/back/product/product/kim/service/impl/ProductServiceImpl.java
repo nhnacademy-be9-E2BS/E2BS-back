@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
@@ -123,8 +121,8 @@ public class ProductServiceImpl implements ProductService {
 	 * 특정 도서 ID 목록으로 도서 조회
 	 */
 	@Override
-	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(List<Long> products) {
-		List<ResponseProductReadDTO> list = productJpaRepository.findAllById(products).stream().map(product -> new ResponseProductReadDTO(
+	public List<ResponseProductReadDTO> getProducts(List<Long> products) {
+		return productJpaRepository.findAllById(products).stream().map(product -> new ResponseProductReadDTO(
 			product.getProductId(),
 			product.getProductState().getProductStateId(),
 			product.getPublisher().getPublisherId(),
@@ -139,15 +137,14 @@ public class ProductServiceImpl implements ProductService {
 			//내부 메서드 사용
 			findProductImagePaths(product)
 		)).collect(Collectors.toList());
-		return ResponseEntity.ok(list);
 	}
 
 	/**
 	 * 도서 정보 수정
 	 */
 	@Override
-	public void updateProduct(RequestProductUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	public void updateProduct(long productId, RequestProductUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new IllegalArgumentException("출판사를 찾을 수 없습니다."));
@@ -170,21 +167,19 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서 재고 수정
 	 */
 	@Override
-	public ResponseEntity<Void> updateProductStock(RequestProductStockUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	public void updateProductStock(long productId, RequestProductStockUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 		//내부 메서드 사용
 		decrementProductStock(request.getProductDecrementStock(), product);
-		return ResponseEntity.status(HttpStatus.OK).build();
-
 	}
 
 	/**
 	 * 도서 판매가 수정
 	 */
 	@Override
-	public void updateProductSalePrice(RequestProductSalePriceUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	public void updateProductSalePrice(long productId, RequestProductSalePriceUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 
 		product.setProduct(request.getProductSalePrice());

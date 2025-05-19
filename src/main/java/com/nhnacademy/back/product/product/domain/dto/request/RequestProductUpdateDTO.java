@@ -16,7 +16,6 @@ public class RequestProductUpdateDTO {
 	/**
 	 * 도서를 수정할 때 필요한 정보
 	 */
-	private long productId;
 	private long productStateId;
 	private long publisherId;
 	@NotNull

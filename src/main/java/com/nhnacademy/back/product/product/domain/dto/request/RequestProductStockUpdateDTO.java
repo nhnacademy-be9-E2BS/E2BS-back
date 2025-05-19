@@ -13,6 +13,5 @@ public class RequestProductStockUpdateDTO {
 	/**
 	 * 도서의 재고를 변경하기 위한 정보
 	 */
-	private long productId;
 	private int productDecrementStock;
 }
