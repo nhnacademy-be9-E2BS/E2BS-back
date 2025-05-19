@@ -1,6 +1,7 @@
 package com.nhnacademy.back.order.order.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
@@ -18,7 +21,10 @@ import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.domain.entity.Order;
 import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
@@ -26,7 +32,10 @@ import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
+import com.nhnacademy.back.order.orderstate.domain.entity.OrderStateName;
 import com.nhnacademy.back.order.orderstate.repository.OrderStateJpaRepository;
+import com.nhnacademy.back.order.payment.domain.entity.Payment;
+import com.nhnacademy.back.order.payment.repository.PaymentJpaRepository;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
@@ -39,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+	private final MemberJpaRepository memberJpaRepository;
 	@Value("${order.sc}")
 	private String secretKey;
 
@@ -47,6 +57,8 @@ public class OrderServiceImpl implements OrderService {
 	private final MemberCouponJpaRepository memberCouponJpaRepository;
 	private final DeliveryFeeJpaRepository deliveryFeeJpaRepository;
 	private final CustomerJpaRepository customerJpaRepository;
+
+	private final PaymentJpaRepository paymentJpaRepository;
 
 	private final ProductJpaRepository productJpaRepository;
 	private final OrderStateJpaRepository orderStateJpaRepository;
@@ -96,8 +108,9 @@ public class OrderServiceImpl implements OrderService {
 			memberCoupon = memberCouponJpaRepository.findById(requestOrderDTO.getMemberCouponId()).orElseThrow();
 		}
 		DeliveryFee deliveryFee = deliveryFeeJpaRepository.findById(requestOrderDTO.getDeliveryFeeId()).orElseThrow();
+		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT).orElseThrow();
 
-		Order order = new Order(requestOrderDTO, memberCoupon, deliveryFee, customer);
+		Order order = new Order(requestOrderDTO, memberCoupon, deliveryFee, customer, orderState);
 		orderJpaRepository.save(order);
 
 		// 주문 상세 저장
@@ -109,12 +122,10 @@ public class OrderServiceImpl implements OrderService {
 
 		for (RequestOrderDetailDTO requestOrderDetailDTO : requestOrderDetailDTOs) {
 			Product product = productJpaRepository.findById(requestOrderDetailDTO.getProductId()).orElseThrow();
-			OrderState orderState = orderStateJpaRepository.findById(requestOrderDetailDTO.getOrderStateId())
-				.orElseThrow();
 			Wrapper wrapper = wrapperJpaRepository.findById(requestOrderDetailDTO.getWrapperId())
 				.orElseThrow(() -> new WrapperNotFoundException(
 					"wrapper not found id: " + requestOrderDetailDTO.getWrapperId()));
-			OrderDetail orderDetail = new OrderDetail(requestOrderDetailDTO, product, orderState, order, wrapper);
+			OrderDetail orderDetail = new OrderDetail(requestOrderDetailDTO, product, order, wrapper);
 
 			orderDetailJpaRepository.save(orderDetail);
 		}
@@ -151,4 +162,28 @@ public class OrderServiceImpl implements OrderService {
 		return ResponseEntity.ok().build();
 	}
 
+	/**
+	 * 특정 주문 코드의 주문 상세 정보를 반환하는 메서드
+	 */
+	@Override
+	public ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode) {
+		ResponseOrderDTO order = orderJpaRepository.findById(orderCode).map(ResponseOrderDTO::fromEntity).orElse(null);
+		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
+		if (payment != null) {
+			order.setPaymentMethod(payment.getPaymentMethod().getPaymentMethodName().name());
+		}
+		Member member = memberJpaRepository.findById(order.getCustomerId()).orElse(null);
+		if (member != null) {
+			order.setMemberId(member.getMemberId());
+			order.setMember(true);
+		} else {
+			Customer customer = customerJpaRepository.findById(order.getCustomerId()).orElseThrow();
+			order.setMemberId(customer.getCustomerEmail());
+			order.setMember(false);
+		}
+
+		List<ResponseOrderDetailDTO> orderDetails = orderDetailJpaRepository.findByOrderOrderCode(orderCode)
+			.stream().map(ResponseOrderDetailDTO::fromEntity).collect(Collectors.toList());
+		return new ResponseOrderWrapperDTO(order, orderDetails);
+	}
 }
