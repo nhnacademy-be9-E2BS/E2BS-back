@@ -72,6 +72,7 @@ class ReviewRestControllerTest {
 	@Test
 	@DisplayName("GET /api/customers/{customerId}/reviews - 고객 리뷰 페이징 목록 조회 테스트")
 	void getReviewsByCustomer() throws Exception {
+		// given
 		Page<ResponseReviewPageDTO> page = new PageImpl<>(List.of(
 			new ResponseReviewPageDTO(1L, 1L, 1L, "좋네요", 5, "default.jpg", LocalDateTime.now()),
 			new ResponseReviewPageDTO(2L, 2L, 1L, "별로네요", 1, "default.jpg", LocalDateTime.now())
@@ -79,6 +80,7 @@ class ReviewRestControllerTest {
 
 		when(reviewService.getReviewsByCustomer(eq(1L), any(Pageable.class))).thenReturn(page);
 
+		// when & then
 		mockMvc.perform(get("/api/customers/{customerId}/reviews", 1L)
 				.param("page", "0")
 				.param("size", "10"))
@@ -90,14 +92,15 @@ class ReviewRestControllerTest {
 	@Test
 	@DisplayName("GET /api/products/{productId}/reviews - 상품 리뷰 페이징 목록 조회 테스트")
 	void getReviewsByProduct() throws Exception {
+		// given
 		Page<ResponseReviewPageDTO> page = new PageImpl<>(List.of(
 			new ResponseReviewPageDTO(1L, 1L, 1L, "좋네요", 5, "default.jpg", LocalDateTime.now()),
 			new ResponseReviewPageDTO(2L, 1L, 2L, "별로네요", 1, "default.jpg", LocalDateTime.now())
 		));
 
-		when(reviewService.getReviewsByProduct(eq(1L), any(Pageable.class)))
-			.thenReturn(page);
+		when(reviewService.getReviewsByProduct(eq(1L), any(Pageable.class))).thenReturn(page);
 
+		// when & then
 		mockMvc.perform(get("/api/products/{productId}/reviews", 1L)
 				.param("page", "0")
 				.param("size", "10"))

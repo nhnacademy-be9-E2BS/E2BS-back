@@ -180,4 +180,5 @@ class ReviewServiceImplTest {
 		assertEquals(1, result.getTotalElements());
 		assertEquals("좋네요", result.getContent().getFirst().getReviewContent());
 	}
+
 }
