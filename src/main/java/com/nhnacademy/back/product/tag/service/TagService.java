@@ -13,4 +13,6 @@ public interface TagService {
 	Page<ResponseTagDTO> getTags(Pageable pageable);
 
 	void updateTag(long tagId, RequestTagDTO request);
+
+	void deleteTag(String tagName);
 }
