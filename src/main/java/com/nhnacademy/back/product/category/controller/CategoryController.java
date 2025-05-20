@@ -28,7 +28,6 @@ public class CategoryController {
 	/**
 	 * html 헤더에 표시할 카테고리 리스트
 	 */
-	// @Member
 	@GetMapping("/api/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesToDepth3() {
 		List<ResponseCategoryDTO> response = categoryService.getCategoriesToDepth3();
@@ -38,7 +37,6 @@ public class CategoryController {
 	/**
 	 * 도서 리스트 조회 시 사이드 바에 표시할 카테고리 리스트
 	 */
-	// @Member
 	@GetMapping("/api/categories/{categoryId}")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
 		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
@@ -99,6 +97,17 @@ public class CategoryController {
 	@DeleteMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
 		categoryService.deleteCategory(categoryId);
+
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
+	/**
+	 * 헤더 카테고리 캐싱 삭제 (카테고리 DB 수정이 일어난 경우)
+	 */
+	// @Admin
+	@DeleteMapping("/api/admin/categories/headerCaching")
+	public ResponseEntity<Void> headerCachingClear() {
+		categoryService.clearHeaderCategoriesCache();
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}

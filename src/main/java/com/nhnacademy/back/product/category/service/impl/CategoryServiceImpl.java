@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
@@ -19,7 +21,9 @@ import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -104,7 +108,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 	/**
 	 * html 헤더에서 보여줄 카테고리 리스트를 조회하는 로직 (depth 3단계 까지만)
+	 * 캐시가 없는 경우 DB에서 캐싱하여 데이터를 저장
 	 */
+	@Cacheable("headerCategories")
 	@Override
 	public List<ResponseCategoryDTO> getCategoriesToDepth3() {
 		List<Category> rootCategories = categoryJpaRepository.findAllByParentIsNull();
@@ -113,6 +119,16 @@ public class CategoryServiceImpl implements CategoryService {
 			.map(root -> buildTreeUpToDepth(root, 1))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * headerCategories 캐시를 지우기 위한 메소드
+	 */
+	@CacheEvict(value = "headerCategories", allEntries = true)
+	@Override
+	public void clearHeaderCategoriesCache() {
+		// 필요한 경우 여기에 로그를 찍거나 추가 작업도 가능
+		log.info("header categories delete");
 	}
 
 	/**
