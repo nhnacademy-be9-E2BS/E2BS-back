@@ -15,7 +15,7 @@ import com.nhnacademy.back.coupon.couponpolicy.repository.CouponPolicyJpaReposit
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class CouponPolicyJpaRepositoryTest {
+class CouponPolicyJpaRepositoryTest {
 
 	@Autowired
 	private CouponPolicyJpaRepository couponPolicyJpaRepository;

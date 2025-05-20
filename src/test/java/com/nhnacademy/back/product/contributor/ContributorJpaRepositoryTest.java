@@ -14,7 +14,7 @@ import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class ContributorJpaRepositoryTest {
+class ContributorJpaRepositoryTest {
 
 	@Autowired
 	private ContributorJpaRepository contributorJpaRepository;
@@ -30,13 +30,13 @@ public class ContributorJpaRepositoryTest {
 		Contributor existingContributor = contributorJpaRepository.save(contributor);
 
 		assertEquals(contributor, existingContributor);
-		assertEquals("이름",existingContributor.getContributorName());
+		assertEquals("이름", existingContributor.getContributorName());
 		assertEquals(position, existingContributor.getPosition());
 		assertEquals("작가", existingContributor.getPosition().getPositionName());
 	}
 
 	@Test
-	public void testFindContributorByName() {
+	void testFindContributorByName() {
 		Position position = new Position("작가");
 		positionJpaRepository.save(position);
 		Contributor contributor = new Contributor("이름", position);

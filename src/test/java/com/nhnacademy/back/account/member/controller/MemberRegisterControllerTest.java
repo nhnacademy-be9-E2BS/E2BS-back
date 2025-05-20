@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.service.impl.MemberServiceImpl;
 
 @SpringBootTest
@@ -75,18 +75,17 @@ class MemberRegisterControllerTest {
 		String memberId = "nhn1";
 		String customerName = "NHN";
 		String customerPassword = "1234";
-		String customerPasswordCheck = "1234";
 		String customerEmail = "nhn@gmail.com";
 		LocalDate memberBirth = LocalDate.now();
 		String memberPhone = "01012345678";
 
-		RequestRegisterMemberDTO requestRegisterMemberDTO = new RequestRegisterMemberDTO(
-			memberId, customerName, customerPassword, customerPasswordCheck,
+		ResponseRegisterMemberDTO responseRegisterMemberDTO = new ResponseRegisterMemberDTO(
+			memberId, customerName, customerPassword,
 			customerEmail, memberBirth, memberPhone
 		);
 
 		// When
-		doNothing().when(memberService).registerMember(any());
+		when(memberService.registerMember(any())).thenReturn(responseRegisterMemberDTO);
 
 		// Then
 		mockMvc.perform(post("/api/register")

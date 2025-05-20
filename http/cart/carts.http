@@ -1,0 +1,86 @@
+### 장바구니 항목 추가 (회원)
+POST http://localhost:10236/api/members/carts/items
+Content-Type: application/json
+
+{
+  "memberId": "id123",
+  "productId": 1,
+  "quantity": 2
+}
+
+### 장바구니 항목 수량 수정 (회원)
+PUT http://localhost:10236/api/members/carts/items/1
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+### 장바구니 항목 삭제 (회원)
+DELETE http://localhost:10236/api/members/carts/items/1
+Content-Type: application/json
+
+### 고객 장바구니 항목 조회 (페이징 처리)
+GET http://localhost:10236/api/members/id123/carts?page=0&size=5
+Accept: application/json
+
+
+### 장바구니 항목 추가 (게스트)
+POST http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "sessionId": "guest-session-abc123",
+  "productId": 1,
+  "quantity": 1
+}
+###
+POST http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "sessionId": "guest-session-abc123",
+  "productId": 2,
+  "quantity": 2
+}
+###
+POST http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "sessionId": "guest-session-abc123",
+  "productId": 3,
+  "quantity": 3
+}
+###
+POST http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "sessionId": "guest-session-abc123",
+  "productId": 4,
+  "quantity": 4
+}
+
+### 장바구니 항목 수량 수정 (게스트)
+PUT http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "sessionId": "guest-session-abc123",
+  "productId": 1,
+  "quantity": 3
+}
+
+### 장바구니 항목 삭제 (게스트)
+DELETE http://localhost:10236/api/guests/carts/items
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "sessionId": "guest-session-abc123"
+}
+
+### 게스트 장바구니 목록 조회
+GET http://localhost:10236/api/guests/guest-session-abc123/carts
+Accept: application/json

@@ -17,9 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
@@ -41,6 +43,9 @@ class CartServiceForCustomerTest {
 	private CustomerJpaRepository customerRepository;
 
 	@Mock
+	private MemberJpaRepository memberRepository;
+
+	@Mock
 	private ProductJpaRepository productRepository;
 
 	@Mock
@@ -57,16 +62,20 @@ class CartServiceForCustomerTest {
 
 
 	private final long customerId = 1L;
+	private final String memberId = "id123";
 	private final long productId = 1L;
 	private final long cartItemId = 1L;
 
 	private Customer customer;
+	private Member member;
 	private Product product;
 	private Cart cart;
 
 	@BeforeEach
 	void setup() {
-		customer = new Customer("abc@gmail.com", "pwd12345", "name1");
+		customer = new Customer(customerId, "abc@gmail.com", "pwd12345", "name1");
+		member = mock(Member.class);
+
 		cart = new Cart(customer);
 
 		product = new Product(productId, new ProductState(ProductStateName.SALE), new Publisher("a"),
@@ -76,11 +85,13 @@ class CartServiceForCustomerTest {
 
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 추가 테스트")
+	@DisplayName("회원 장바구니 항목 추가 테스트")
 	void createCartItemForCustomer() {
 		// given
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, "", productId, 2);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(memberId, "", productId, 2);
 
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 		when(cartRepository.existsByCustomer_CustomerId(customerId)).thenReturn(false);
@@ -88,28 +99,32 @@ class CartServiceForCustomerTest {
 		when(cartItemsRepository.existsByCartAndProduct(cart, product)).thenReturn(false);
 
 		// when
-		cartService.createCartItemForCustomer(request);
+		cartService.createCartItemForMember(request);
 
 		// then
 		verify(cartItemsRepository).save(any(CartItems.class));
 	}
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 추가 테스트 - 실패(아이템 항목 이미 존재한 경우)")
+	@DisplayName("회원 장바구니 항목 추가 테스트 - 실패(아이템 항목 이미 존재한 경우)")
 	void createCartItemForCustomer_AlreadyExists() {
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(customerId, "", productId, 2);
+		// given
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(memberId, "", productId, 2);
 
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 		when(cartRepository.existsByCustomer_CustomerId(customerId)).thenReturn(true);
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(cart);
 		when(cartItemsRepository.existsByCartAndProduct(cart, product)).thenReturn(true);
 
-		assertThrows(CartItemAlreadyExistsException.class, () -> cartService.createCartItemForCustomer(request));
+		// when & then
+		assertThrows(CartItemAlreadyExistsException.class, () -> cartService.createCartItemForMember(request));
 	}
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 수량 변경 테스트")
+	@DisplayName("회원 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForCustomer() {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 1);
@@ -118,67 +133,70 @@ class CartServiceForCustomerTest {
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, null, 5);
 
 		// when
-		cartService.updateCartItemForCustomer(cartItemId, request);
+		cartService.updateCartItemForMember(cartItemId, request);
 
 		// then
 		assertEquals(5, cartItem.getCartItemsQuantity());
 	}
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 삭제 테스트")
+	@DisplayName("회원 장바구니 항목 삭제 테스트")
 	void deleteCartItemForCustomer() {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 1);
 		when(cartItemsRepository.findById(cartItemId)).thenReturn(Optional.of(cartItem));
 
 		// when
-		cartService.deleteCartItemForCustomer(cartItemId);
+		cartService.deleteCartItemForMember(cartItemId);
 
 		// then
 		verify(cartItemsRepository).delete(cartItem);
 	}
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 전체 삭제 테스트")
+	@DisplayName("회원 장바구니 항목 전체 삭제 테스트")
 	void deleteCartForCustomer() {
 		// given
-		long customerId = 1L;
-		Cart cart = new Cart();
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(cart);
 
 		// when
-		cartService.deleteCartForCustomer(customerId);
+		cartService.deleteCartForMember(memberId);
 
 		// then
 		verify(cartRepository, times(1)).delete(cart);
 	}
 
 	@Test
-	@DisplayName("비회원/회원 장바구니 항목 전체 삭제 테스트 - 실패(찾을 수 없을 때의 예외)")
+	@DisplayName("회원 장바구니 항목 전체 삭제 테스트 - 실패(찾을 수 없을 때의 예외)")
 	void deleteCartForCustomer_CartNotFound() {
 		// given
-		long customerId = 1L;
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(null);
 
 		// when & then
 		assertThrows(CartNotFoundException.class, () ->
-			cartService.deleteCartForCustomer(customerId)
+			cartService.deleteCartForMember(memberId)
 		);
 	}
 	
 
 	@Test
-	@DisplayName("비회원/회원의 장바구니 목록 조회 테스트")
+	@DisplayName("회원의 장바구니 목록 조회 테스트")
 	void getCartItemsByCustomer() {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 2);
 		List<CartItems> cartItems = List.of(cartItem);
 
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId)).thenReturn(cartItems);
 		when(productCategoryRepository.findByProduct_ProductId(customerId)).thenReturn(List.of());
 
 		// when
-		List<ResponseCartItemsForCustomerDTO> result = cartService.getCartItemsByCustomer(customerId);
+		List<ResponseCartItemsForMemberDTO> result = cartService.getCartItemsByMember(memberId);
 
 		// then
 		assertEquals(1, result.size());

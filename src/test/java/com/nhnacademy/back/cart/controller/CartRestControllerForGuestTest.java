@@ -15,10 +15,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.back.cart.domain.dto.RequestAddCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestDeleteCartItemsForGuestDTO;
-import com.nhnacademy.back.cart.domain.dto.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.CartService;
 
 @WebMvcTest(controllers = CartRestController.class)
@@ -99,10 +99,10 @@ class CartRestControllerForGuestTest {
 		// given
 		String sessionId = "session123";
 		List<ResponseCartItemsForGuestDTO> cartItems = List.of(
-			new ResponseCartItemsForGuestDTO(1L, List.of(), "Product 1", 1000, "/image1.jpg", 2)
+			new ResponseCartItemsForGuestDTO(1L, List.of(), "Product 1", 1000, "/image1.jpg", 2, 2000)
 		);
 
-		when(cartService.getCartItemsByGuest(eq(sessionId))).thenReturn(cartItems);
+		when(cartService.getCartItemsByGuest(sessionId)).thenReturn(cartItems);
 
 		// when & then
 		mockMvc.perform(get("/api/guests/{sessionId}/carts", sessionId))
@@ -110,7 +110,7 @@ class CartRestControllerForGuestTest {
 			.andExpect(jsonPath("$.[0].productId").value(1L))
 			.andExpect(jsonPath("$.[0].productTitle").value("Product 1"));
 
-		verify(cartService).getCartItemsByGuest(eq(sessionId));
+		verify(cartService).getCartItemsByGuest(sessionId);
 	}
 
 }

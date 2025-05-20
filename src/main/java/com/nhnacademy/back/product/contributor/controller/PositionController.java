@@ -18,15 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestPositionDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
-
 import com.nhnacademy.back.product.contributor.service.PositionService;
-
-import io.micrometer.core.instrument.config.validate.ValidationException;
 
 @RestController
 @RequestMapping("/api/admin/positions")
 public class PositionController {
 	private final PositionService positionService;
+
 	public PositionController(PositionService positionService) {
 		this.positionService = positionService;
 	}
@@ -53,18 +51,21 @@ public class PositionController {
 	 * position 생성
 	 */
 	@PostMapping()
-	public ResponseEntity<ResponsePositionDTO> createPosition(@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
+	public ResponseEntity<ResponsePositionDTO> createPosition(@Validated @RequestBody RequestPositionDTO request,
+		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 		ResponsePositionDTO response = positionService.createPosition(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
+
 	/**
 	 * position 수정
 	 */
 	@PutMapping("/{positionId}")
-	public ResponseEntity<?> updatePosition(@PathVariable Long positionId, @Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
+	public ResponseEntity<ResponsePositionDTO> updatePosition(@PathVariable Long positionId,
+		@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}

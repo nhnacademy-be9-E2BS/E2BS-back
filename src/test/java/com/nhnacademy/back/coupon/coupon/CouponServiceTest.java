@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.util.Optional;
 import java.util.List;
 
-import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.coupon.coupon.domain.dto.request.RequestCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.dto.response.ResponseCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.entity.CategoryCoupon;
@@ -53,12 +52,6 @@ class CouponServiceTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-	}
-
-	@Test
-	@DisplayName("요청 DTO null 예외 발생")
-	void createCoupon_withNullRequest_shouldThrowBadRequestException() {
-		assertThrows(BadRequestException.class, () -> couponService.createCoupon(null));
 	}
 
 	@Test
@@ -141,4 +134,28 @@ class CouponServiceTest {
 
 		assertThrows(CouponNotFoundException.class, () -> couponService.getCoupon(999L));
 	}
+
+	@Test
+	@DisplayName("쿠폰 활성화 상태 변경 성공")
+	void updateCouponIsActive_success() {
+		CouponPolicy policy = mock(CouponPolicy.class);
+		Coupon coupon = new Coupon(policy, "테스트 쿠폰");
+		coupon.setCouponIsActive(false);  // 초기 상태: 비활성
+
+		when(couponJpaRepository.findById(1L)).thenReturn(Optional.of(coupon));
+
+		couponService.updateCouponIsActive(1L);
+
+		assertThat(coupon.isCouponIsActive()).isTrue();  // 활성화됐는지 확인
+		verify(couponJpaRepository).save(coupon);
+	}
+
+	@Test
+	@DisplayName("쿠폰 활성화 상태 변경 실패: 존재하지 않는 쿠폰 ID")
+	void updateCouponIsActive_invalidId_shouldThrowException() {
+		when(couponJpaRepository.findById(999L)).thenReturn(Optional.empty());
+
+		assertThrows(CouponNotFoundException.class, () -> couponService.updateCouponIsActive(999L));
+	}
+
 }

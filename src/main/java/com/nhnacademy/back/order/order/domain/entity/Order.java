@@ -1,10 +1,14 @@
 package com.nhnacademy.back.order.order.domain.entity;
 
+import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
+import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
+import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,22 +53,18 @@ public class Order {
 	private long orderPointAmount = 0L;
 
 	@Column(nullable = false)
-	private long orderTotalAmount = 0L;
+	private long orderPaymentAmount;
 
 	@Column(columnDefinition = "TEXT")
 	private String orderMemo;
 
-	// 원래는 이랬음. 확인했으면 지워도됨
-	// 동일한 수정 : Product.productPackageable, MemberCoupon.memberCouponUsed
-	// @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-	// private boolean orderPaymentStatus = false;
-
 	@Column(nullable = false)
 	private boolean orderPaymentStatus = false;
 
-	private LocalDateTime orderReceiveDate;
+	// 희망 수령일, 출고일은 Date 타입으로 변경
+	private LocalDate orderReceiveDate;
 
-	private LocalDateTime orderShipmentDate;
+	private LocalDate orderShipmentDate;
 
 	@Column(nullable = false)
 	private LocalDateTime orderCreatedAt;
@@ -73,7 +73,8 @@ public class Order {
 	@JoinColumn(name = "member_coupon_id")
 	private MemberCoupon memberCoupon;
 
-	@OneToOne(optional = false)
+	// 일대일일 경우 한 정책을 한번밖에 사용 못 함 -> 다대일로 수정
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "delivery_fee_id")
 	private DeliveryFee deliveryFee;
 
@@ -81,4 +82,58 @@ public class Order {
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "order_state_id")
+	private OrderState orderState;
+
+	public void updatePaymentStatus(boolean status) {
+		this.orderPaymentStatus = status;
+	}
+
+	public void updateOrderState(OrderState orderState) {
+		this.orderState = orderState;
+	}
+
+	public void updateOrderShipmentDate(LocalDate orderShipmentDate) {
+		this.orderShipmentDate = orderShipmentDate;
+	}
+
+	public Order(RequestOrderDTO requestOrderDTO, MemberCoupon memberCoupon, DeliveryFee deliveryFee,
+		Customer customer, OrderState orderState) {
+		this.orderCode = generateSecureOrderId();
+		this.orderReceiverName = requestOrderDTO.getOrderReceiverName();
+		this.orderReceiverPhone = requestOrderDTO.getOrderReceiverPhone();
+		this.orderReceiverTel = requestOrderDTO.getOrderReceiverTel();
+		this.orderAddressCode = requestOrderDTO.getOrderAddressCode();
+		this.orderAddressInfo = requestOrderDTO.getOrderAddressInfo();
+		this.orderAddressDetail = requestOrderDTO.getOrderAddressDetail();
+		this.orderAddressExtra = requestOrderDTO.getOrderAddressExtra();
+		this.orderPointAmount = requestOrderDTO.getOrderPointAmount();
+		this.orderMemo = requestOrderDTO.getOrderMemo();
+		this.orderPaymentStatus = false;
+		this.orderReceiveDate = requestOrderDTO.getOrderReceivedDate();
+		this.orderShipmentDate = requestOrderDTO.getOrderShipmentDate();
+		this.orderCreatedAt = LocalDateTime.now();
+		this.orderPaymentAmount = requestOrderDTO.getOrderPaymentAmount();
+		this.memberCoupon = memberCoupon;
+		this.customer = customer;
+		this.deliveryFee = deliveryFee;
+		this.orderState = orderState;
+	}
+
+	/**
+	 * 주문 ID 난수를 생성하는 메서드
+	 * 임의로 32글자로 생성
+	 */
+	private String generateSecureOrderId() {
+		// 영문 대소문자, 숫자, -, _ 포함된 32자리 문자열 생성 로직
+		String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+		StringBuilder sb = new StringBuilder();
+		SecureRandom random = new SecureRandom();
+		for (int i = 0; i < 32; i++) {
+			int idx = random.nextInt(base.length());
+			sb.append(base.charAt(idx));
+		}
+		return sb.toString();
+	}
 }
