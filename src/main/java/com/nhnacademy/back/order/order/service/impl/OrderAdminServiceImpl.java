@@ -1,5 +1,7 @@
 package com.nhnacademy.back.order.order.service.impl;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,7 @@ public class OrderAdminServiceImpl implements OrderAdminService {
 		Order order = orderJpaRepository.findById(orderCode).get();
 		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).get();
 		order.updateOrderState(orderState);
+		order.updateOrderShipmentDate(LocalDate.now());
 		orderJpaRepository.save(order);
 		return ResponseEntity.ok().build();
 	}
