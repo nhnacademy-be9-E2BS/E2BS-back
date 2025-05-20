@@ -1,7 +1,5 @@
 package com.nhnacademy.back.common.config;
 
-import java.time.Duration;
-
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,9 +42,7 @@ public class RedisConfig {
 		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
 			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
 			.serializeValuesWith(
-				RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
-			.entryTtl(Duration.ofMinutes(1L));
-		// 추후에 TTL 지우기
+				RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
 		return RedisCacheManager
 			.RedisCacheManagerBuilder

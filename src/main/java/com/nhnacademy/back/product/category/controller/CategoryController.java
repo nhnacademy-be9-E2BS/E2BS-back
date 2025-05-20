@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
@@ -48,7 +49,7 @@ public class CategoryController {
 	/**
 	 * 관리자 페이지에서 전체 카테고리 리스트 조회
 	 */
-	// @Admin
+	@Admin
 	@GetMapping("/api/admin/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategories() {
 		List<ResponseCategoryDTO> response = categoryService.getCategories();
@@ -58,7 +59,7 @@ public class CategoryController {
 	/**
 	 * 최상위 + 하위 카테고리 저장
 	 */
-	// @Admin
+	@Admin
 	@PostMapping("/api/admin/categories")
 	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
 		categoryService.createCategoryTree(request);
@@ -69,7 +70,7 @@ public class CategoryController {
 	/**
 	 * 이미 존재하는 카테고리에 자식 카테고리 저장
 	 */
-	// @Admin
+	@Admin
 	@PostMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
@@ -81,7 +82,7 @@ public class CategoryController {
 	/**
 	 * 카테고리 수정
 	 */
-	// @Admin
+	@Admin
 	@PutMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
@@ -93,7 +94,7 @@ public class CategoryController {
 	/**
 	 * 카테고리 삭제
 	 */
-	// @Admin
+	@Admin
 	@DeleteMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
 		categoryService.deleteCategory(categoryId);
@@ -101,14 +102,4 @@ public class CategoryController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
-	/**
-	 * 헤더 카테고리 캐싱 삭제 (카테고리 DB 수정이 일어난 경우)
-	 */
-	// @Admin
-	// @DeleteMapping("/api/admin/categories/headerCaching")
-	// public ResponseEntity<Void> headerCachingClear() {
-	// 	categoryService.clearCategoriesCache();
-	//
-	// 	return ResponseEntity.status(HttpStatus.OK).build();
-	// }
 }
