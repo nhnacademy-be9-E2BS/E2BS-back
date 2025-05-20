@@ -13,8 +13,8 @@ VALUES ('ACTIVE'),
 
 -- SocialAuth ENUM 기반
 INSERT INTO social_auth (social_auth_name)
-VALUES ('PAYCO'),
-       ('WEB');
+VALUES ('WEB'),
+       ('PAYCO');
 
 -- MemberRank
 INSERT INTO member_rank (member_rank_name,
@@ -51,7 +51,7 @@ VALUES (1,
         1, -- NORMAL
         1, -- ACTIVE
         1, -- ADMIN
-        1 -- PAYCO
+        1 -- WEB
        );
 
 -- Address
@@ -205,17 +205,33 @@ VALUES (1, DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,
 INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
 VALUES (1, '1,000원 쿠폰', 1, true),
        (2, '10% 쿠폰', 2, true),
-       (3, '3000원 쿠폰', 3, true);
+       (3, '3000원 쿠폰', 3, true),
+       (4, '봄맞이 할인 쿠폰', 4, true),
+       (5, '과학의 달 쿠폰', 5, true),
+       (6, '5월 생일 쿠폰', 2, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
-VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
+VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
 VALUES (1, 'TOSS');
+
+
+-- Order
+INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, order_receiver_tel, order_address_code,
+                     order_address_info, order_address_detail, order_address_extra, order_point_amount,
+                     order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
+                     order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id)
+VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5);
+
+-- OrderDetail
+INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
+VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000);
 
 -- Cart (비회원/회원용 장바구니)
 INSERT INTO cart (cart_id, customer_id)
@@ -227,3 +243,54 @@ VALUES (1, 1, 1, 5),
        (2, 1, 2, 2),
        (3, 1, 3, 6),
        (4, 1, 4, 1);
+
+-- 테스트를 위한 임의 유저, 관리자 생성
+-- Customer password 12345
+INSERT INTO customer (customer_email,
+                      customer_password,
+                      customer_name)
+VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
+       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자');
+
+-- Member
+INSERT INTO member (customer_id,
+                    member_id,
+                    member_birth,
+                    member_phone,
+                    member_created_at,
+                    member_login_latest,
+                    member_rank_id,
+                    member_state_id,
+                    member_role_id,
+                    social_auth_id)
+VALUES (2,
+        'user',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (3,
+        'admin',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        1, -- Admin
+        1 -- PAYCO
+       );
+
+-- 카테고리 쿠폰
+INSERT INTO category_coupon (coupon_id, category_id)
+VALUES (1, 1),
+       (3, 2);
+
+-- 상품 쿠폰
+INSERT INTO product_coupon (coupon_id, product_id)
+VALUES (2, 1);

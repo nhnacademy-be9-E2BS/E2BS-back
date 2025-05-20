@@ -1,10 +1,9 @@
 package com.nhnacademy.back.coupon.couponpolicy.service.impl;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.RequestCouponPolicyDTO;
 import com.nhnacademy.back.coupon.couponpolicy.domain.dto.ResponseCouponPolicyDTO;
@@ -18,11 +17,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponPolicyServiceImpl implements CouponPolicyService {
 
 	private final CouponPolicyJpaRepository couponPolicyJpaRepository;
 
 	@Override
+	@Transactional
 	public void createCouponPolicy(RequestCouponPolicyDTO requestDTO) {
 		if(couponPolicyJpaRepository.existsByCouponPolicyName(requestDTO.getCouponPolicyName())) {
 			throw new CouponPolicyAlreadyExistException("Coupon Policy Already Exist: " + requestDTO.getCouponPolicyName());
