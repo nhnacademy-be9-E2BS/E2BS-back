@@ -11,7 +11,6 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,7 @@ import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
@@ -66,7 +66,6 @@ class OrderControllerTest {
 	private RequestOrderDetailDTO getTestOrderDetailDTO() {
 		RequestOrderDetailDTO orderDetailDTO = new RequestOrderDetailDTO();
 		orderDetailDTO.setProductId(10L);
-		orderDetailDTO.setOrderStateId(1L);
 		orderDetailDTO.setOrderCode("TEST-ORDER-CODE");
 		orderDetailDTO.setWrapperId(123L);
 		orderDetailDTO.setOrderQuantity(3);
@@ -157,10 +156,10 @@ class OrderControllerTest {
 		ResponseEntity<ResponseTossPaymentConfirmDTO> failedResponse =
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-		Mockito.when(orderService.confirmOrder(orderId, paymentKey, amount))
+		when(orderService.confirmOrder(orderId, paymentKey, amount))
 			.thenReturn(failedResponse);
 
-		Mockito.when(orderService.cancelOrder(orderId))
+		when(orderService.cancelOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/order/confirm")
@@ -169,13 +168,13 @@ class OrderControllerTest {
 				.param("amount", String.valueOf(amount)))
 			.andExpect(status().isBadRequest());
 
-		Mockito.verify(orderService).cancelOrder(orderId);
+		verify(orderService).cancelOrder(orderId);
 	}
 
 	@Test
 	@DisplayName("주문 취소 테스트")
 	void testCancelOrder() throws Exception {
-		String orderId = "orderToCancel";
+		String orderId = "TEST-ORDER-CODE";
 
 		when(orderService.cancelOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
@@ -184,4 +183,17 @@ class OrderControllerTest {
 				.param("orderId", orderId))
 			.andExpect(status().isOk());
 	}
+
+	@Test
+	@DisplayName("주문 상세 정보 조회 테스트")
+	void testGetOrder() throws Exception {
+		String orderId = "TEST-ORDER-CODE";
+		ResponseOrderWrapperDTO response = new ResponseOrderWrapperDTO();
+
+		when(orderService.getOrderByOrderCode(orderId)).thenReturn(response);
+
+		mockMvc.perform(get("/api/order/" + orderId))
+			.andExpect(status().isOk());
+	}
+
 }

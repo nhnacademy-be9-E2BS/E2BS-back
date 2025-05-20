@@ -14,8 +14,6 @@ public class RequestOrderDetailDTO {
 	@NotNull
 	private long productId;
 	@NotNull
-	private long orderStateId;
-	@NotNull
 	private String orderCode;
 	@NotNull
 	private long wrapperId;
