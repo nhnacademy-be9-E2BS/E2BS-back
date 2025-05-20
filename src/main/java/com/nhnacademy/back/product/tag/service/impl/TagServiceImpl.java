@@ -76,4 +76,14 @@ public class TagServiceImpl implements TagService {
 		tag.get().setTag(request.getTagName());
 		tagJpaRepository.save(tag.get());
 	}
+
+	/**
+	 * 태그 삭제
+	 */
+	@Override
+	@Transactional
+	public void deleteTag(long tagId, RequestTagDTO request) {
+		tagJpaRepository.deleteTagByTagId(tagId);
+	}
+
 }
