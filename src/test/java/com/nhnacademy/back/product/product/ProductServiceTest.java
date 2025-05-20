@@ -63,7 +63,7 @@ class ProductServiceTest {
 		// given
 		RequestProductCreateDTO request = new RequestProductCreateDTO(
 			"Test Publisher", "Test Book", "Content", "Description", "1234567890123",
-			10000L, 9000L, true, 50, List.of("image1.jpg")
+			10000L, 9000L, true, 50, List.of("image1.jpg"), List.of("tag1")
 		);
 		Publisher publisher = new Publisher("Test Publisher");
 		when(publisherJpaRepository.findByPublisherName("Test Publisher")).thenReturn(publisher);
@@ -83,7 +83,7 @@ class ProductServiceTest {
 		// given
 		RequestProductCreateDTO request = new RequestProductCreateDTO(
 			"Test Publisher", "Test Book", "Content", "Description", "1234567890123",
-			10000L, 9000L, true, 50, List.of("image1.jpg")
+			10000L, 9000L, true, 50, List.of("image1.jpg"), List.of("tag1")
 		);
 		when(productJpaRepository.existsByProductIsbn("1234567890123")).thenReturn(true);
 
@@ -96,7 +96,7 @@ class ProductServiceTest {
 	@DisplayName("도서 단건 조회 - 성공")
 	void getProductSuccess() {
 		// given
-		RequestProductGetDTO request = new RequestProductGetDTO(1L, "1234567890123");
+		RequestProductGetDTO request = new RequestProductGetDTO("1234567890123");
 		Publisher publisher = new Publisher("Test Publisher");
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Product product = Product.builder()
@@ -117,7 +117,7 @@ class ProductServiceTest {
 		when(productImageJpaRepository.findByProduct_ProductId(1L)).thenReturn(List.of(new ProductImage(product, "image1.jpg")));
 
 		// when
-		ResponseProductReadDTO result = productService.getProduct(request);
+		ResponseProductReadDTO result = productService.getProduct(1L, request);
 
 		// then
 		assertThat(result.getProductTitle()).isEqualTo("Test Book");
@@ -128,11 +128,11 @@ class ProductServiceTest {
 	@DisplayName("도서 단건 조회 - 실패 (없음)")
 	void getProductFailNotFound() {
 		// given
-		RequestProductGetDTO request = new RequestProductGetDTO(1L, "1234567890123");
+		RequestProductGetDTO request = new RequestProductGetDTO("1234567890123");
 		when(productJpaRepository.findById(1L)).thenReturn(Optional.empty());
 
 		// when & then
-		assertThatThrownBy(() -> productService.getProduct(request))
+		assertThatThrownBy(() -> productService.getProduct(1L, request))
 			.isInstanceOf(ProductNotFoundException.class);
 	}
 
@@ -174,8 +174,8 @@ class ProductServiceTest {
 		void updateProductSuccess() {
 			// given
 			RequestProductUpdateDTO request = new RequestProductUpdateDTO(
-				1L, 1L, "Updated Book", "Updated Content", "Updated Description",
-				12000L, 11000L, true, 60, List.of("image2.jpg")
+				"Sale", "Test Publisher", "Updated Book", "Updated Content", "Updated Description",
+				12000L, 11000L, true, 60, List.of("image2.jpg"), List.of("tag1")
 			);
 			Publisher publisher = new Publisher("Test Publisher");
 			ProductState productState = new ProductState(ProductStateName.SALE);

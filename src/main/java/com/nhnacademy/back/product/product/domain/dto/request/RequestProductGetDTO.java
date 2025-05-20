@@ -14,7 +14,6 @@ public class RequestProductGetDTO {
 	/**
 	 * 도서 단건 조회를 위해 필요한 정보
 	 */
-	long productId;
 	@NotNull
 	String productIsbn;
 

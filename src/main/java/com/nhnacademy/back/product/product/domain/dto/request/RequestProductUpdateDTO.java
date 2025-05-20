@@ -16,8 +16,8 @@ public class RequestProductUpdateDTO {
 	/**
 	 * 도서를 수정할 때 필요한 정보
 	 */
-	private long productStateId;
-	private long publisherId;
+	private String productStateName;
+	private String publisherName;
 	@NotNull
 	private String productTitle;
 	@NotNull
@@ -29,5 +29,6 @@ public class RequestProductUpdateDTO {
 	private boolean productPackageable;
 	private int productStock;
 	private List<String> productImagePaths;
+	private List<String> productTags;
 
 }

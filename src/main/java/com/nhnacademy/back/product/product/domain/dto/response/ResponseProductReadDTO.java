@@ -17,8 +17,8 @@ public class ResponseProductReadDTO {
 	 * 도서의 상세 정보를 조회할 때 보내줘야 할 정보
 	 */
 	private long productId;
-	private long productStateId;
-	private long publisherId;
+	private String productStateName;
+	private String publisherName;
 	private String productTitle;
 	private String productContent;
 	private String productDescription;

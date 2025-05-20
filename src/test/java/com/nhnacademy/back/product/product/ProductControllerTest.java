@@ -47,7 +47,7 @@ class ProductControllerTest {
 		// given
 		RequestProductCreateDTO request = new RequestProductCreateDTO(
 			"Test Publisher", "Test Book", "Content", "Description", "1234567890123",
-			10000L, 9000L, true, 50, List.of("image1.jpg")
+			10000L, 9000L, true, 50, List.of("image1.jpg"), List.of("tag1")
 		);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
@@ -64,11 +64,11 @@ class ProductControllerTest {
 	void getProductsForOrderSuccess() throws Exception {
 		// given
 		ResponseProductReadDTO responseA = new ResponseProductReadDTO(
-			1L, 1L, 1L, "Test Book A", "Content", "Description", LocalDate.now(),
+			1L, "SALE", "Test Publisher", "Test Book A", "Content", "Description", LocalDate.now(),
 			"1234567890123", 10000L, true, 50, List.of("image1.jpg")
 		);
 		ResponseProductReadDTO responseB = new ResponseProductReadDTO(
-			2L, 2L, 2L, "Test Book B", "Content", "Description", LocalDate.now(),
+			2L, "SALE", "Test Publisher", "Test Book B", "Content", "Description", LocalDate.now(),
 			"1234567893352", 100000L, true, 50, List.of("image2.jpg")
 		);
 		List<ResponseProductReadDTO> products = List.of(responseA, responseB);
@@ -89,8 +89,8 @@ class ProductControllerTest {
 	void updateProductSuccess() throws Exception {
 		// given
 		RequestProductUpdateDTO request = new RequestProductUpdateDTO(
-			1L, 1L, "Updated Book", "Updated Content", "Updated Description",
-			12000L, 11000L, true, 60, List.of("image2.jpg")
+			"SALE", "Test Publisher", "Updated Book", "Updated Content", "Updated Description",
+			12000L, 11000L, true, 60, List.of("image2.jpg"), List.of("tag")
 		);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
