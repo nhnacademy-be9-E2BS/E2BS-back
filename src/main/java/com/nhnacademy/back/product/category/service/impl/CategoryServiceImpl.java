@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 	private final CategoryJpaRepository categoryJpaRepository;
 
@@ -117,6 +119,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 관리자가 이미 존재하는 Category 하위에 다른 Category를 저장하는 로직
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
+	@Transactional
 	@Override
 	public void createChildCategory(long parentId, RequestCategoryDTO request) {
 		String categoryName = request.getCategoryName();
@@ -139,6 +142,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 관리자가 최상위 카테고리와 그 카테고리의 하위 카테고리를 저장하는 로직
 	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
+	@Transactional
 	@Override
 	public void createCategoryTree(List<RequestCategoryDTO> request) {
 		if (request.size() != 2) {
@@ -168,6 +172,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * category_name : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 * category_id2 : 자식 카테고리가 없는 최하위 카테고리인 경우에만 이동 가능하며, 해당 카테고리에 속한 도서들도 같이 이동, 최상위 카테고리로 이동은 불가능
 	 */
+	@Transactional
 	@Override
 	public void updateCategory(long categoryId, RequestCategoryDTO request) {
 		Category originCategory = categoryJpaRepository.findById(categoryId)
@@ -192,6 +197,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 1. 자식 카테고리가 없는 최하위 카테고리
 	 * 2. 2단계 카테고리라면 동일한 단계(level) + 동일한 상위 카테고리를 가지는 다른 카테고리가 존재 해야 함 (최소 2단계 요구 사항)
 	 */
+	@Transactional
 	@Override
 	public void deleteCategory(long categoryId) {
 		Category category = categoryJpaRepository.findById(categoryId)

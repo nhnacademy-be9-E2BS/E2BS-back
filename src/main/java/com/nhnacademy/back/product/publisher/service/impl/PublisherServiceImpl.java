@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PublisherServiceImpl implements PublisherService {
 	private final PublisherJpaRepository publisherJpaRepository;
 
@@ -26,6 +28,7 @@ public class PublisherServiceImpl implements PublisherService {
 	 * Publisher을 DB에 저장하는 로직
 	 * publisher_name이 이미 존재하는 경우 Exception 발생
 	 */
+	@Transactional
 	@Override
 	public void createPublisher(RequestPublisherDTO request) {
 		String publisherName = request.getPublisherName();
@@ -54,6 +57,7 @@ public class PublisherServiceImpl implements PublisherService {
 	 * 수정 가능한 값 : publisher_name
 	 * publisher_id가 없는 경우에는 Exception 발생
 	 */
+	@Transactional
 	@Override
 	public void updatePublisher(long publisherId, RequestPublisherDTO request) {
 		if (Objects.isNull(request)) {

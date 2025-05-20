@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.category.domain.dto.ProductCategoryFlatDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryIdsDTO;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 	private final ProductCategoryJpaRepository productCategoryJpaRepository;
 	private final ProductJpaRepository productJpaRepository;
@@ -38,6 +40,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 	 * (선택한 카테고리의 상위 카테고리들도 전부 저장)
 	 * (productIds는 선택한 카테고리)
 	 */
+	@Transactional
 	@Override
 	public void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate) {
 		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
