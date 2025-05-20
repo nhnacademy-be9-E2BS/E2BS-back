@@ -225,11 +225,14 @@ VALUES (1, DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,
 INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
 VALUES (1, '1,000원 쿠폰', 1, true),
        (2, '10% 쿠폰', 2, true),
-       (3, '3000원 쿠폰', 3, true);
+       (3, '3000원 쿠폰', 3, true),
+       (4, '봄맞이 할인 쿠폰', 4, true),
+       (5, '과학의 달 쿠폰', 5, true),
+       (6, '5월 생일 쿠폰', 2, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
-VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
+VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
 
@@ -247,3 +250,12 @@ VALUES (1, 1, 1, 5),
        (2, 1, 2, 2),
        (3, 1, 3, 6),
        (4, 1, 4, 1);
+
+-- 카테고리 쿠폰
+INSERT INTO category_coupon (coupon_id, category_id)
+VALUES (1, 1),
+       (3, 2);
+
+-- 상품 쿠폰
+INSERT INTO product_coupon (coupon_id, product_id)
+VALUES (2, 1);

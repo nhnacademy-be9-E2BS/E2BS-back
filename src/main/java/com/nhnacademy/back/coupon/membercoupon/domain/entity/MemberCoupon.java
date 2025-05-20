@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -37,6 +38,7 @@ public class MemberCoupon {
 
 	private LocalDateTime memberCouponPeriod;
 
+	@Setter
 	@Column(nullable = false)
 	private boolean memberCouponUsed = false;
 
@@ -47,4 +49,5 @@ public class MemberCoupon {
 		this.memberCouponCreatedAt = memberCouponCreatedAt;
 		this.memberCouponPeriod = memberCouponPeriod;
 	}
+
 }
