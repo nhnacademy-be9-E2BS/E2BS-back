@@ -2,7 +2,9 @@ package com.nhnacademy.back.account.member.service;
 
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 
@@ -15,5 +17,7 @@ public interface MemberService {
 	MemberDTO loginMember(RequestLoginMemberDTO requestLoginMemberDTO);
 
 	ResponseRegisterMemberDTO registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO);
+
+	ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO);
 
 }

@@ -13,8 +13,8 @@ VALUES ('ACTIVE'),
 
 -- SocialAuth ENUM 기반
 INSERT INTO social_auth (social_auth_name)
-VALUES ('PAYCO'),
-       ('WEB');
+VALUES ('WEB'),
+       ('PAYCO');
 
 -- MemberRank
 INSERT INTO member_rank (member_rank_name,
@@ -26,79 +26,59 @@ VALUES ('NORMAL', 0, 0),
        ('PLATINUM', 20, 900000);
 
 -- Customer (@OneToOne 관계 전 customer 먼저 삽입)
-INSERT INTO customer (
-    customer_email,
-    customer_password,
-    customer_name
-) VALUES
-      ('user1@example.com', 'password123', '홍길동1'),
-      ('user2@example.com', 'password123', '홍길동2'),
-      ('user3@example.com', 'password123', '홍길동3'),
-      ('user4@example.com', 'password123', '홍길동4'),
-      ('user5@example.com', 'password123', '홍길동5'),
-      ('user6@example.com', 'password123', '홍길동6'),
-      ('user7@example.com', 'password123', '홍길동7'),
-      ('user8@example.com', 'password123', '홍길동8'),
-      ('user9@example.com', 'password123', '홍길동9'),
-      ('user10@example.com', 'password123', '홍길동10');
+INSERT INTO customer (customer_email,
+                      customer_password,
+                      customer_name)
+VALUES ('testuser@example.com', 'password123', '홍길동');
 
 -- Member (MapsId 관계라 customer_id = member PK)
--- Member 10명 추가 (customer_id = member의 PK)
-INSERT INTO member (
-    customer_id,
-    member_id,
-    member_birth,
-    member_phone,
-    member_created_at,
-    member_login_latest,
-    member_rank_id,
-    member_state_id,
-    member_role_id,
-    social_auth_id
-) VALUES
-      (1,  'member01', DATE '1990-01-01', '01011110001', DATE '2024-01-01', DATE '2024-05-01', 1, 1, 1, 1),
-      (2,  'member02', DATE '1991-01-01', '01011110002', DATE '2024-01-02', DATE '2024-05-02', 1, 2, 1, 1),
-      (3,  'member03', DATE '1992-01-01', '01011110003', DATE '2024-01-03', DATE '2024-05-03', 1, 2, 1, 1),
-      (4,  'member04', DATE '1993-01-01', '01011110004', DATE '2024-01-04', DATE '2024-05-04', 1, 1, 1, 1),
-      (5,  'member05', DATE '1994-01-01', '01011110005', DATE '2024-01-05', DATE '2024-05-05', 1, 2, 1, 1),
-      (6,  'member06', DATE '1995-01-01', '01011110006', DATE '2024-01-06', DATE '2024-05-06', 1, 1, 1, 1),
-      (7,  'member07', DATE '1996-01-01', '01011110007', DATE '2024-01-07', DATE '2024-05-07', 1, 1, 1, 1),
-      (8,  'member08', DATE '1997-01-01', '01011110008', DATE '2024-01-08', DATE '2024-05-08', 1, 1, 1, 1),
-      (9,  'member09', DATE '1998-01-01', '01011110009', DATE '2024-01-09', DATE '2024-05-09', 1, 3, 1, 1),
-      (10, 'member10', DATE '1999-01-01', '01011110010', DATE '2024-01-10', DATE '2024-05-10', 1, 1, 1, 1);
-
+INSERT INTO member (customer_id,
+                    member_id,
+                    member_birth,
+                    member_phone,
+                    member_created_at,
+                    member_login_latest,
+                    member_rank_id,
+                    member_state_id,
+                    member_role_id,
+                    social_auth_id)
+VALUES (1,
+        'member01',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        1, -- ADMIN
+        1 -- WEB
+       );
 
 -- Address
-INSERT INTO address (
-    address_name,
-    address_code,
-    address_info,
-    address_extra,
-    address_alias,
-    address_default,
-    address_created_at,
-    customer_id
-) VALUES
-      (
-          '서울특별시 강남구 테헤란로',
-          '06130',
-          '삼성동 123-45',
-          '위워크 10층',
-          '회사',
-          TRUE,
-          CURRENT_TIMESTAMP,
-          1
-      ),
-      (
-          '경기도 성남시 분당구 정자동',
-          '13560',
-          '정자역 5번 출구',
-          'OO오피스텔 101호',
-          '집',
-          FALSE,
-          CURRENT_TIMESTAMP,
-          1
-      );
+INSERT INTO address (address_name,
+                     address_code,
+                     address_info,
+                     address_extra,
+                     address_alias,
+                     address_default,
+                     address_created_at,
+                     customer_id)
+VALUES ('서울특별시 강남구 테헤란로',
+        '06130',
+        '삼성동 123-45',
+        '위워크 10층',
+        '회사',
+        TRUE,
+        CURRENT_TIMESTAMP,
+        1),
+       ('경기도 성남시 분당구 정자동',
+        '13560',
+        '정자역 5번 출구',
+        'OO오피스텔 101호',
+        '집',
+        FALSE,
+        CURRENT_TIMESTAMP,
+        1);
 
 -- Point History
 INSERT INTO point_history (point_amount,
@@ -240,6 +220,19 @@ VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.0
 INSERT INTO payment_method (payment_method_id, payment_method_name)
 VALUES (1, 'TOSS');
 
+
+-- Order
+INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, order_receiver_tel, order_address_code,
+                     order_address_info, order_address_detail, order_address_extra, order_point_amount,
+                     order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
+                     order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id)
+VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5);
+
+-- OrderDetail
+INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
+VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000);
+
 -- Cart (비회원/회원용 장바구니)
 INSERT INTO cart (cart_id, customer_id)
 VALUES (1, 1);
@@ -250,6 +243,48 @@ VALUES (1, 1, 1, 5),
        (2, 1, 2, 2),
        (3, 1, 3, 6),
        (4, 1, 4, 1);
+
+-- 테스트를 위한 임의 유저, 관리자 생성
+-- Customer password 12345
+INSERT INTO customer (customer_email,
+                      customer_password,
+                      customer_name)
+VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
+       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자');
+
+-- Member
+INSERT INTO member (customer_id,
+                    member_id,
+                    member_birth,
+                    member_phone,
+                    member_created_at,
+                    member_login_latest,
+                    member_rank_id,
+                    member_state_id,
+                    member_role_id,
+                    social_auth_id)
+VALUES (2,
+        'user',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (3,
+        'admin',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        1, -- Admin
+        1 -- PAYCO
+       );
 
 -- 카테고리 쿠폰
 INSERT INTO category_coupon (coupon_id, category_id)

@@ -1,7 +1,6 @@
 package com.nhnacademy.back.order.order.domain.entity;
 
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
-import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.review.domain.entity.Review;
@@ -41,10 +40,6 @@ public class OrderDetail {
 	@JoinColumn(name = "order_code")
 	private Order order;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "order_state_id")
-	private OrderState orderState;
-
 	@ManyToOne
 	@JoinColumn(name = "wrapper_id")
 	private Wrapper wrapper;
@@ -53,11 +48,10 @@ public class OrderDetail {
 	@JoinColumn(name = "review_id")
 	private Review review;
 
-	public OrderDetail(RequestOrderDetailDTO requestOrderDetailDTO, Product product, OrderState orderState, Order order, Wrapper wrapper) {
+	public OrderDetail(RequestOrderDetailDTO requestOrderDetailDTO, Product product, Order order, Wrapper wrapper) {
 		this.orderQuantity = requestOrderDetailDTO.getOrderQuantity();
 		this.orderDetailPerPrice = requestOrderDetailDTO.getOrderDetailPerPrice();
 		this.wrapper = wrapper;
-		this.orderState = orderState;
 		this.product = product;
 		this.order = order;
 		this.review = null;
