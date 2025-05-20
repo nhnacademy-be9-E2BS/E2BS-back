@@ -27,4 +27,9 @@ public interface CouponService {
 	 * 쿠폰 상태 변경 (활성 <-> 비활성)
 	 */
 	void updateCouponIsActive(Long couponId);
+
+	/**
+	 * 활성화 상태인 쿠폰만 조회
+	 */
+	Page<ResponseCouponDTO> getCouponsIsActive(Pageable pageable);
 }
