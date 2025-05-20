@@ -18,17 +18,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.category.controller.CategoryController;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
-import com.nhnacademy.back.product.category.service.AdminCategoryService;
-import com.nhnacademy.back.product.category.service.UserCategoryService;
+import com.nhnacademy.back.product.category.service.CategoryService;
 
 @WebMvcTest(controllers = CategoryController.class)
 public class CategoryControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean
-	private AdminCategoryService adminCategoryService;
-	@MockitoBean
-	private UserCategoryService userCategoryService;
+	private CategoryService categoryService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -43,7 +40,7 @@ public class CategoryControllerTest {
 			))
 		);
 
-		when(userCategoryService.getCategoriesToDepth3()).thenReturn(dummyResponse);
+		when(categoryService.getCategoriesToDepth3()).thenReturn(dummyResponse);
 
 		// when & then
 		mockMvc.perform(get("/api/categories"))
@@ -53,7 +50,7 @@ public class CategoryControllerTest {
 			.andExpect(jsonPath("$[0].categoryName").value("Root"))
 			.andExpect(jsonPath("$[0].children[0].categoryName").value("Child"));
 
-		verify(userCategoryService, times(1)).getCategoriesToDepth3();
+		verify(categoryService, times(1)).getCategoriesToDepth3();
 	}
 
 	@Test
@@ -66,7 +63,7 @@ public class CategoryControllerTest {
 			new ResponseCategoryDTO(3L, "Child B", List.of())
 		);
 
-		when(userCategoryService.getCategoriesById(categoryId)).thenReturn(dummyResponse);
+		when(categoryService.getCategoriesById(categoryId)).thenReturn(dummyResponse);
 
 		// when & then
 		mockMvc.perform(get("/api/categories/{categoryId}", categoryId))
@@ -76,7 +73,7 @@ public class CategoryControllerTest {
 			.andExpect(jsonPath("$[0].categoryName").value("Child A"))
 			.andExpect(jsonPath("$[1].categoryName").value("Child B"));
 
-		verify(userCategoryService, times(1)).getCategoriesById(categoryId);
+		verify(categoryService, times(1)).getCategoriesById(categoryId);
 	}
 
 	@Test
@@ -87,7 +84,7 @@ public class CategoryControllerTest {
 			new ResponseCategoryDTO(1L, "Admin Root", List.of())
 		);
 
-		when(adminCategoryService.getCategories()).thenReturn(dummyResponse);
+		when(categoryService.getCategories()).thenReturn(dummyResponse);
 
 		// when & then
 		mockMvc.perform(get("/api/admin/categories"))
@@ -95,7 +92,7 @@ public class CategoryControllerTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$[0].categoryName").value("Admin Root"));
 
-		verify(adminCategoryService, times(1)).getCategories();
+		verify(categoryService, times(1)).getCategories();
 	}
 
 	@Test

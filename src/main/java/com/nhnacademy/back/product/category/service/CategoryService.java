@@ -5,15 +5,19 @@ import java.util.List;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 
-public interface AdminCategoryService {
+public interface CategoryService {
+
+	List<ResponseCategoryDTO> getCategories();
+
+	List<ResponseCategoryDTO> getCategoriesToDepth3();
+
+	List<ResponseCategoryDTO> getCategoriesById(long categoryId);
+
+	void clearCategoriesCache();
 
 	void createChildCategory(long parentId, RequestCategoryDTO request);
 
 	void createCategoryTree(List<RequestCategoryDTO> requests);
-
-	List<ResponseCategoryDTO> getCategories();
-
-	void clearHeaderCategoriesCache();
 
 	void updateCategory(long categoryId, RequestCategoryDTO request);
 

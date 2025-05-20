@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
@@ -16,59 +19,22 @@ import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsExcep
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
-import com.nhnacademy.back.product.category.service.AdminCategoryService;
+import com.nhnacademy.back.product.category.service.CategoryService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class AdminCategoryServiceImpl implements AdminCategoryService {
+public class CategoryServiceImpl implements CategoryService {
 	private final CategoryJpaRepository categoryJpaRepository;
 
-	/**
-	 * 관리자가 이미 존재하는 Category 하위에 다른 Category를 저장하는 로직
-	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
-	 */
-	@Override
-	public void createChildCategory(long parentId, RequestCategoryDTO request) {
-		String categoryName = request.getCategoryName();
+	// 프록시 지연 주입
+	@Lazy
+	private final CategoryService self;
 
-		Category parent = categoryJpaRepository.findById(parentId)
-			.orElseThrow(CategoryNotFoundException::new);
-
-		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(parentId, categoryName)) {
-			throw new CategoryAlreadyExistsException();
-		}
-
-		Category category = new Category(categoryName, parent);
-		parent.getChildren().add(category); // 부모 카테고리에 자식 카테고리 추가
-		categoryJpaRepository.save(category);
-	}
-
-	/**
-	 * 관리자가 최상위 카테고리와 그 카테고리의 하위 카테고리를 저장하는 로직
-	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
-	 */
-	@Override
-	public void createCategoryTree(List<RequestCategoryDTO> request) {
-		if (request.size() != 2) {
-			throw new IllegalArgumentException();
-		}
-
-		// 최상위 카테고리 이름 중복 검사
-		if (categoryJpaRepository.existsByParentIsNullAndCategoryName(request.get(0).getCategoryName())) {
-			throw new CategoryAlreadyExistsException();
-		}
-
-		// 최상위 카테고리 저장
-		Category parentCategory = categoryJpaRepository.save(
-			new Category(request.get(0).getCategoryName(), null));
-
-		// 하위 카테고리 저장
-		Category childCategory = new Category(request.get(1).getCategoryName(), parentCategory);
-		categoryJpaRepository.save(childCategory);
+	public CategoryServiceImpl(CategoryJpaRepository categoryJpaRepository, @Lazy CategoryService self) {
+		this.categoryJpaRepository = categoryJpaRepository;
+		this.self = self;
 	}
 
 	/**
@@ -106,13 +72,93 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 	}
 
 	/**
+	 * html 헤더에서 보여줄 카테고리 리스트를 조회하는 로직 (depth 3단계 까지만)
+	 * 캐시가 없는 경우 DB에서 캐싱하여 데이터를 저장
+	 */
+	@Cacheable(value = "Categories", key = "'header'")
+	@Override
+	public List<ResponseCategoryDTO> getCategoriesToDepth3() {
+		List<Category> rootCategories = categoryJpaRepository.findAllByParentIsNull();
+
+		return rootCategories.stream()
+			.map(root -> buildTreeUpToDepth(root, 1))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 사용자가 카테고리 선택 시 그에 해당하는 하위 카테고리들을 side bar에서 보여주기 위해
+	 * categoryId의 하위 카테고리들을 조회하여 return 하는 로직
+	 * ex) A-B-C-D-E에서 C를 누른 경우 side bar에서 D-E를 보여줌
+	 */
+	@Override
+	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
+		List<ResponseCategoryDTO> allCategories = self.getCategories();
+
+		ResponseCategoryDTO targetCategory = findCategoryById(allCategories, categoryId);
+		if (Objects.isNull(targetCategory)) {
+			throw new CategoryNotFoundException();
+		}
+
+		return targetCategory.getChildren();
+	}
+
+	/**
 	 * Categories라는 캐시 이름 안의 모든 키를 지우는 메소드
 	 */
 	@CacheEvict(value = "Categories", allEntries = true)
 	@Override
-	public void clearHeaderCategoriesCache() {
+	public void clearCategoriesCache() {
 		// 필요한 경우 여기에 로그를 찍거나 추가 작업도 가능
-		log.info("header categories delete");
+		log.info("categories delete");
+	}
+
+	/**
+	 * 관리자가 이미 존재하는 Category 하위에 다른 Category를 저장하는 로직
+	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
+	 */
+	@Override
+	public void createChildCategory(long parentId, RequestCategoryDTO request) {
+		String categoryName = request.getCategoryName();
+
+		Category parent = categoryJpaRepository.findById(parentId)
+			.orElseThrow(CategoryNotFoundException::new);
+
+		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(parentId, categoryName)) {
+			throw new CategoryAlreadyExistsException();
+		}
+
+		Category category = new Category(categoryName, parent);
+		parent.getChildren().add(category); // 부모 카테고리에 자식 카테고리 추가
+		categoryJpaRepository.save(category);
+
+		self.clearCategoriesCache();
+	}
+
+	/**
+	 * 관리자가 최상위 카테고리와 그 카테고리의 하위 카테고리를 저장하는 로직
+	 * 이름 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
+	 */
+	@Override
+	public void createCategoryTree(List<RequestCategoryDTO> request) {
+		if (request.size() != 2) {
+			throw new IllegalArgumentException();
+		}
+
+		// 최상위 카테고리 이름 중복 검사
+		if (categoryJpaRepository.existsByParentIsNullAndCategoryName(request.get(0).getCategoryName())) {
+			throw new CategoryAlreadyExistsException();
+		}
+
+		// 최상위 카테고리 저장
+		Category parentCategory = categoryJpaRepository.save(
+			new Category(request.get(0).getCategoryName(), null));
+
+		// 하위 카테고리 저장
+		Category childCategory = new Category(request.get(1).getCategoryName(), parentCategory);
+		categoryJpaRepository.save(childCategory);
+
+		self.clearCategoriesCache();
 	}
 
 	/**
@@ -136,6 +182,8 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
 		originCategory.setCategory(newName);
 		categoryJpaRepository.save(originCategory);
+
+		self.clearCategoriesCache();
 	}
 
 	/**
@@ -168,6 +216,47 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 		parent.getChildren().remove(category);    // 먼저 부모 카테고리의 자식 카테고리 리스트에서 현재 카테고리 제거
 		categoryJpaRepository.save(parent);
 		categoryJpaRepository.deleteById(categoryId);
+
+		self.clearCategoriesCache();
+	}
+
+	/**
+	 * getCategoriesToDepth3() 메소드에서 카테고리를 트리 구조로 만들기 위한 메소드
+	 */
+	private ResponseCategoryDTO buildTreeUpToDepth(Category category, int currentDepth) {
+		if (currentDepth > 3) {
+			return null;
+		}
+
+		List<ResponseCategoryDTO> childDtos = category.getChildren() == null ?
+			new ArrayList<>() :
+			category.getChildren().stream()
+				.map(child -> buildTreeUpToDepth(child, currentDepth + 1))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+
+		return new ResponseCategoryDTO(
+			category.getCategoryId(),
+			category.getCategoryName(),
+			childDtos
+		);
+	}
+
+	/**
+	 * getCategoriesById(long categoryId) 메소드에서 해당 categoryId 노드를 찾기 위한 메소드
+	 */
+	private ResponseCategoryDTO findCategoryById(List<ResponseCategoryDTO> categories, long categoryId) {
+		for (ResponseCategoryDTO category : categories) {
+			if (category.getCategoryId() == categoryId) {
+				return category;
+			}
+
+			ResponseCategoryDTO found = findCategoryById(category.getChildren(), categoryId);
+			if (found != null) {
+				return found;
+			}
+		}
+		return null;
 	}
 
 }

@@ -14,16 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
-import com.nhnacademy.back.product.category.service.AdminCategoryService;
-import com.nhnacademy.back.product.category.service.UserCategoryService;
+import com.nhnacademy.back.product.category.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class CategoryController {
-	private final AdminCategoryService adminCategoryService;
-	private final UserCategoryService userCategoryService;
+	private final CategoryService categoryService;
 
 	// 유저 페이지
 
@@ -32,7 +30,7 @@ public class CategoryController {
 	 */
 	@GetMapping("/api/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesToDepth3() {
-		List<ResponseCategoryDTO> response = userCategoryService.getCategoriesToDepth3();
+		List<ResponseCategoryDTO> response = categoryService.getCategoriesToDepth3();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -41,7 +39,7 @@ public class CategoryController {
 	 */
 	@GetMapping("/api/categories/{categoryId}")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
-		List<ResponseCategoryDTO> response = userCategoryService.getCategoriesById(categoryId);
+		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -53,7 +51,7 @@ public class CategoryController {
 	// @Admin
 	@GetMapping("/api/admin/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategories() {
-		List<ResponseCategoryDTO> response = adminCategoryService.getCategories();
+		List<ResponseCategoryDTO> response = categoryService.getCategories();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -63,7 +61,7 @@ public class CategoryController {
 	// @Admin
 	@PostMapping("/api/admin/categories")
 	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
-		adminCategoryService.createCategoryTree(request);
+		categoryService.createCategoryTree(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -75,7 +73,7 @@ public class CategoryController {
 	@PostMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
-		adminCategoryService.createChildCategory(categoryId, request);
+		categoryService.createChildCategory(categoryId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -87,7 +85,7 @@ public class CategoryController {
 	@PutMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
-		adminCategoryService.updateCategory(categoryId, request);
+		categoryService.updateCategory(categoryId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -98,7 +96,7 @@ public class CategoryController {
 	// @Admin
 	@DeleteMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
-		adminCategoryService.deleteCategory(categoryId);
+		categoryService.deleteCategory(categoryId);
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
@@ -107,10 +105,10 @@ public class CategoryController {
 	 * 헤더 카테고리 캐싱 삭제 (카테고리 DB 수정이 일어난 경우)
 	 */
 	// @Admin
-	@DeleteMapping("/api/admin/categories/headerCaching")
-	public ResponseEntity<Void> headerCachingClear() {
-		adminCategoryService.clearHeaderCategoriesCache();
-
-		return ResponseEntity.status(HttpStatus.OK).build();
-	}
+	// @DeleteMapping("/api/admin/categories/headerCaching")
+	// public ResponseEntity<Void> headerCachingClear() {
+	// 	categoryService.clearCategoriesCache();
+	//
+	// 	return ResponseEntity.status(HttpStatus.OK).build();
+	// }
 }

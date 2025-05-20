@@ -122,11 +122,17 @@ VALUES ('A tag'),
        ('C tag');
 
 -- Category
-INSERT INTO category (category_id, category_name)
-VALUES (1, 'Science'),
-       (2, 'Computer Science'),
-       (3, 'Math'),
-       (4, 'Statistics');
+INSERT INTO category (category_id, category_name, category_id2)
+VALUES (1, '국내도서', null),
+       (2, '소설', 1),
+       (3, '대학교재', 1),
+       (4, '과학', 3),
+       (5, '수학', 3),
+       (6, '국외도서', null),
+       (7, '건강', 6),
+       (8, '전자책', null),
+       (9, '만화', 8),
+       (10, '물리학', 4);
 
 -- Product
 INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
