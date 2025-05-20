@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseCartItemsForCustomerDTO {
+public class ResponseCartItemsForMemberDTO {
 
 	private long cartItemsId;
 

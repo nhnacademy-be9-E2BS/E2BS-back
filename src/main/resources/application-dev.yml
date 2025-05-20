@@ -22,6 +22,7 @@ spring:
     init:
       mode: always
       data-locations: classpath:sql/h2/sample.sql
+      schema-locations: classpath:sql/h2/schema.sql
 
 eureka:
   client:

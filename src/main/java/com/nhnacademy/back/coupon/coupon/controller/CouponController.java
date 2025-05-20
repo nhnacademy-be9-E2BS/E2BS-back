@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.coupon.coupon.domain.dto.request.RequestCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.dto.response.ResponseCouponDTO;
@@ -31,6 +32,7 @@ public class CouponController {
 	/**
 	 * 관리자 쿠폰 생성
 	 */
+	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createCoupon(@Validated @RequestBody RequestCouponDTO request, BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
@@ -43,6 +45,7 @@ public class CouponController {
 	/**
 	 * 관리자 쿠폰 전체 조회
 	 */
+	@Admin
 	@GetMapping
 	public ResponseEntity<Page<ResponseCouponDTO>> getCoupons(Pageable pageable) {
 		Page<ResponseCouponDTO> coupons = couponService.getCoupons(pageable);
@@ -52,6 +55,7 @@ public class CouponController {
 	/**
 	 * 관리자 쿠폰 ID로 단건 조회
 	 */
+	@Admin
 	@GetMapping("/{couponId}")
 	public ResponseEntity<ResponseCouponDTO> getCoupon(@PathVariable Long couponId) {
 		ResponseCouponDTO response = couponService.getCoupon(couponId);
@@ -61,10 +65,21 @@ public class CouponController {
 	/**
 	 * 관리자 쿠폰 활성 여부 변경
 	 */
+	@Admin
 	@PutMapping("/{couponId}")
 	public ResponseEntity<Void> updateCoupon(@PathVariable Long couponId) {
 		couponService.updateCouponIsActive(couponId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	/**
+	 * 관리자 쿠폰 발급시 활성화된 쿠폰만 조회
+	 */
+	@Admin
+	@GetMapping("/isActive")
+	public ResponseEntity<Page<ResponseCouponDTO>> getCouponsIsActive(Pageable pageable) {
+		Page<ResponseCouponDTO> coupons = couponService.getCouponsIsActive(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(coupons);
 	}
 
 }
