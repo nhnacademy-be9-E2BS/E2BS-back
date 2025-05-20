@@ -1,12 +1,11 @@
 package com.nhnacademy.back.product.tag.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,5 +55,17 @@ public class TagController {
 		tagService.updateTag(tagId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
+
+	/**
+	 * tagName을 받아 DB에서 태그 삭제
+	 * 200 상태코드 반환
+	 */
+	@DeleteMapping("/{tagId}")
+	public ResponseEntity<Void> deleteTag(@PathVariable Long tagId, @RequestBody RequestTagDTO request) {
+		tagService.deleteTag(tagId, request);
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
+
 
 }
