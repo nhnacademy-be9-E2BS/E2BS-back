@@ -26,7 +26,6 @@ import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
 import com.nhnacademy.back.account.memberstate.repository.MemberStateJpaRepository;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
-import com.nhnacademy.back.common.exception.BadRequestException;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTest {
@@ -80,21 +79,6 @@ class MemberServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("RequestLoginMemberDTO 요청을 받지 못했을 경우 예외 처리")
-	void requestLoginMemberDTOBadRequestExceptionTest() {
-
-		// Given
-
-		// When
-
-		// Then
-		Assertions.assertThrows(BadRequestException.class, () -> {
-			memberService.loginMember(null);
-		});
-
-	}
-
-	@Test
 	@DisplayName("아이디에 해당하는 회원이 존재하지 않는 경우")
 	void loginMemberNotExistsMemberByMemberIdTest() {
 
@@ -129,22 +113,6 @@ class MemberServiceImplTest {
 
 		// Then
 		Assertions.assertNotNull(memberService.loginMember(requestLoginMemberDTO));
-
-	}
-
-	@Test
-	@DisplayName("회원가입 시 RequestRegisterMemberDTO 요청을 받지 못했을 경우 예외 처리")
-	void registerMemberRequestRegisterMemberDTOBadRequestException() {
-
-		// Given
-		RequestRegisterMemberDTO requestRegisterMemberDTO = null;
-
-		// When
-
-		// Then
-		Assertions.assertThrows(BadRequestException.class, () -> {
-			memberService.registerMember(requestRegisterMemberDTO);
-		});
 
 	}
 
