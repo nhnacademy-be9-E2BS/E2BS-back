@@ -94,6 +94,10 @@ public class Order {
 		this.orderState = orderState;
 	}
 
+	public void updateOrderShipmentDate(LocalDate orderShipmentDate) {
+		this.orderShipmentDate = orderShipmentDate;
+	}
+
 	public Order(RequestOrderDTO requestOrderDTO, MemberCoupon memberCoupon, DeliveryFee deliveryFee,
 		Customer customer, OrderState orderState) {
 		this.orderCode = generateSecureOrderId();
