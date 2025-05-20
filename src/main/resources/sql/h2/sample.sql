@@ -122,11 +122,17 @@ VALUES ('A tag'),
        ('C tag');
 
 -- Category
-INSERT INTO category (category_id, category_name)
-VALUES (1, 'Science'),
-       (2, 'Computer Science'),
-       (3, 'Math'),
-       (4, 'Statistics');
+INSERT INTO category (category_id, category_name, category_id2)
+VALUES (1, '국내도서', null),
+       (2, '소설', 1),
+       (3, '대학교재', 1),
+       (4, '과학', 3),
+       (5, '수학', 3),
+       (6, '국외도서', null),
+       (7, '건강', 6),
+       (8, '전자책', null),
+       (9, '만화', 8),
+       (10, '물리학', 4);
 
 -- Product
 INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
@@ -205,11 +211,14 @@ VALUES (1, DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,
 INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
 VALUES (1, '1,000원 쿠폰', 1, true),
        (2, '10% 쿠폰', 2, true),
-       (3, '3000원 쿠폰', 3, true);
+       (3, '3000원 쿠폰', 3, true),
+       (4, '봄맞이 할인 쿠폰', 4, true),
+       (5, '과학의 달 쿠폰', 5, true),
+       (6, '5월 생일 쿠폰', 2, true);
 
 -- MemberCoupon
-INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, customer_id)
-VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
+VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
 
@@ -282,3 +291,12 @@ VALUES (2,
         1, -- Admin
         1 -- PAYCO
        );
+
+-- 카테고리 쿠폰
+INSERT INTO category_coupon (coupon_id, category_id)
+VALUES (1, 1),
+       (3, 2);
+
+-- 상품 쿠폰
+INSERT INTO product_coupon (coupon_id, product_id)
+VALUES (2, 1);

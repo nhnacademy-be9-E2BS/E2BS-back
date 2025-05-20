@@ -1,13 +1,10 @@
 package com.nhnacademy.back.coupon.coupon.service.impl;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.coupon.coupon.domain.dto.request.RequestCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.dto.response.ResponseCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.entity.CategoryCoupon;
@@ -30,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponServiceImpl implements CouponService {
 
 	private final CouponPolicyJpaRepository couponPolicyJpaRepository;
@@ -45,6 +43,7 @@ public class CouponServiceImpl implements CouponService {
 	 * 상품 쿠폰일 경우 productCoupon 테이블에도 추가
 	 */
 	@Override
+	@Transactional
 	public void createCoupon(RequestCouponDTO request) {
 		CouponPolicy couponPolicy = couponPolicyJpaRepository.findById(request.getCouponPolicyId())
 			.orElseThrow(()-> new CouponPolicyNotFoundException("존재하지 않는 쿠폰 정책입니다"));
@@ -158,6 +157,7 @@ public class CouponServiceImpl implements CouponService {
 	 * 활성, 비활성 2가지 상태만 있기 때문에 현재 상태를 다른 상태로 변경
 	 */
 	@Override
+	@Transactional
 	public void updateCouponIsActive(Long couponId) {
 		Coupon coupon = couponJpaRepository.findById(couponId)
 			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
@@ -165,4 +165,44 @@ public class CouponServiceImpl implements CouponService {
 		coupon.setCouponIsActive(!coupon.isCouponIsActive());
 		couponJpaRepository.save(coupon);
 	}
+
+	@Override
+	public Page<ResponseCouponDTO> getCouponsIsActive(Pageable pageable) {
+		Page<Coupon> coupons = couponJpaRepository.findAllByCouponIsActiveTrue(pageable);
+
+		return coupons.map(coupon -> {
+			CategoryCoupon categoryCoupon = categoryCouponJpaRepository.findById(coupon.getCouponId())
+				.orElse(null);
+
+			ProductCoupon productCoupon = productCouponJpaRepository.findById(coupon.getCouponId())
+				.orElse(null);
+
+			Long categoryId = null;
+			String categoryName = null;
+			if (categoryCoupon != null && categoryCoupon.getCategory() != null) {
+				categoryId = categoryCoupon.getCategory().getCategoryId();
+				categoryName = categoryCoupon.getCategory().getCategoryName();
+			}
+
+			Long productId = null;
+			String productTitle = null;
+			if (productCoupon != null && productCoupon.getProduct() != null) {
+				productId = productCoupon.getProduct().getProductId();
+				productTitle = productCoupon.getProduct().getProductTitle();
+			}
+
+			return new ResponseCouponDTO(
+				coupon.getCouponId(),
+				coupon.getCouponPolicy().getCouponPolicyId(),
+				coupon.getCouponPolicy().getCouponPolicyName(),
+				coupon.getCouponName(),
+				categoryId,
+				categoryName,
+				productId,
+				productTitle,
+				coupon.isCouponIsActive()
+			);
+		});
+	}
+
 }

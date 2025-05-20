@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
@@ -19,12 +20,14 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WrapperServiceImpl implements WrapperService {
 	private final WrapperJpaRepository wrapperJpaRepository;
 
 	/**
 	 * Wrapper를 DB에 저장하는 로직
 	 */
+	@Transactional
 	@Override
 	public void createWrapper(RequestRegisterWrapperDTO registerRequest) {
 		Wrapper wrapper = new Wrapper(registerRequest.getWrapperPrice(), registerRequest.getWrapperName(),
@@ -68,6 +71,7 @@ public class WrapperServiceImpl implements WrapperService {
 	 * DB에 저장 되어 있는 Wrapper의 값을 수정하는 로직
 	 * 수정 가능한 값 : wrapper_price, wrapper_name, wrapper_image, wrapper_saleable
 	 */
+	@Transactional
 	@Override
 	public void updateWrapper(long wrapperId, RequestModifyWrapperDTO modifyRequest) {
 		if (Objects.isNull(modifyRequest)) {
