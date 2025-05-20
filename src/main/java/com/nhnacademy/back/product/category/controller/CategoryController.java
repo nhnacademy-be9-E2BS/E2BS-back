@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
-import com.nhnacademy.back.product.category.service.CategoryService;
+import com.nhnacademy.back.product.category.service.AdminCategoryService;
+import com.nhnacademy.back.product.category.service.UserCategoryService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class CategoryController {
-	private final CategoryService categoryService;
+	private final AdminCategoryService adminCategoryService;
+	private final UserCategoryService userCategoryService;
 
 	// 유저 페이지
 
@@ -30,7 +32,7 @@ public class CategoryController {
 	 */
 	@GetMapping("/api/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesToDepth3() {
-		List<ResponseCategoryDTO> response = categoryService.getCategoriesToDepth3();
+		List<ResponseCategoryDTO> response = userCategoryService.getCategoriesToDepth3();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -39,7 +41,7 @@ public class CategoryController {
 	 */
 	@GetMapping("/api/categories/{categoryId}")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
-		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
+		List<ResponseCategoryDTO> response = userCategoryService.getCategoriesById(categoryId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -51,7 +53,7 @@ public class CategoryController {
 	// @Admin
 	@GetMapping("/api/admin/categories")
 	public ResponseEntity<List<ResponseCategoryDTO>> getCategories() {
-		List<ResponseCategoryDTO> response = categoryService.getCategories();
+		List<ResponseCategoryDTO> response = adminCategoryService.getCategories();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -61,7 +63,7 @@ public class CategoryController {
 	// @Admin
 	@PostMapping("/api/admin/categories")
 	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
-		categoryService.createCategoryTree(request);
+		adminCategoryService.createCategoryTree(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -73,7 +75,7 @@ public class CategoryController {
 	@PostMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
-		categoryService.createChildCategory(categoryId, request);
+		adminCategoryService.createChildCategory(categoryId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -85,7 +87,7 @@ public class CategoryController {
 	@PutMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
-		categoryService.updateCategory(categoryId, request);
+		adminCategoryService.updateCategory(categoryId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -96,7 +98,7 @@ public class CategoryController {
 	// @Admin
 	@DeleteMapping("/api/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
-		categoryService.deleteCategory(categoryId);
+		adminCategoryService.deleteCategory(categoryId);
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
@@ -107,7 +109,7 @@ public class CategoryController {
 	// @Admin
 	@DeleteMapping("/api/admin/categories/headerCaching")
 	public ResponseEntity<Void> headerCachingClear() {
-		categoryService.clearHeaderCategoriesCache();
+		adminCategoryService.clearHeaderCategoriesCache();
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}

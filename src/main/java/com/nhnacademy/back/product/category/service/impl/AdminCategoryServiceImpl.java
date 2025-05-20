@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,7 +16,7 @@ import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsExcep
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
-import com.nhnacademy.back.product.category.service.CategoryService;
+import com.nhnacademy.back.product.category.service.AdminCategoryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CategoryService {
+public class AdminCategoryServiceImpl implements AdminCategoryService {
 	private final CategoryJpaRepository categoryJpaRepository;
 
 	/**
@@ -77,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 관리자 페이지 카테고리 탭 & 상품 등록 & 상품 수정 창에서 모든 Category를 볼 수 있도록 조회하는 로직
 	 * 폴더 구조로 구현할 예정이기 때문에 페이징 처리 X
 	 */
+	@Cacheable(value = "Categories", key = "'all'")
 	@Override
 	public List<ResponseCategoryDTO> getCategories() {
 		List<Category> allCategories = categoryJpaRepository.findAll();
@@ -107,43 +106,13 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	/**
-	 * html 헤더에서 보여줄 카테고리 리스트를 조회하는 로직 (depth 3단계 까지만)
-	 * 캐시가 없는 경우 DB에서 캐싱하여 데이터를 저장
+	 * Categories라는 캐시 이름 안의 모든 키를 지우는 메소드
 	 */
-	@Cacheable("headerCategories")
-	@Override
-	public List<ResponseCategoryDTO> getCategoriesToDepth3() {
-		List<Category> rootCategories = categoryJpaRepository.findAllByParentIsNull();
-
-		return rootCategories.stream()
-			.map(root -> buildTreeUpToDepth(root, 1))
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
-	}
-
-	/**
-	 * headerCategories 캐시를 지우기 위한 메소드
-	 */
-	@CacheEvict(value = "headerCategories", allEntries = true)
+	@CacheEvict(value = "Categories", allEntries = true)
 	@Override
 	public void clearHeaderCategoriesCache() {
 		// 필요한 경우 여기에 로그를 찍거나 추가 작업도 가능
 		log.info("header categories delete");
-	}
-
-	/**
-	 * 사용자가 카테고리 선택 시 그에 해당하는 하위 카테고리들을 side bar에서 보여주기 위해
-	 * categoryId의 하위 카테고리들을 조회하여 return 하는 로직
-	 * ex) A-B-C-D-E에서 C를 누른 경우 side bar에서 D-E를 보여줌
-	 */
-	@Override
-	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
-		Category parent = categoryJpaRepository.findById(categoryId)
-			.orElseThrow(CategoryNotFoundException::new);
-
-		return parent.getChildren().stream()
-			.map(this::buildTree)
-			.collect(Collectors.toList());
 	}
 
 	/**
@@ -201,36 +170,4 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryJpaRepository.deleteById(categoryId);
 	}
 
-	/**
-	 * getCategoriesToDepth3() 메소드에서 카테고리를 트리 구조로 만들기 위한 메소드
-	 */
-	private ResponseCategoryDTO buildTreeUpToDepth(Category category, int currentDepth) {
-		if (currentDepth > 3) {
-			return null;
-		}
-
-		List<ResponseCategoryDTO> childDtos = category.getChildren() == null ?
-			new ArrayList<>() :
-			category.getChildren().stream()
-				.map(child -> buildTreeUpToDepth(child, currentDepth + 1))
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList());
-
-		return new ResponseCategoryDTO(
-			category.getCategoryId(),
-			category.getCategoryName(),
-			childDtos
-		);
-	}
-
-	/**
-	 * getCategoriesById(long categoryId) 메소드에서 카테고리를 트리 구조로 만들기 위한 메소드
-	 */
-	private ResponseCategoryDTO buildTree(Category category) {
-		List<ResponseCategoryDTO> children = category.getChildren().stream()
-			.map(this::buildTree)
-			.collect(Collectors.toList());
-
-		return new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), children);
-	}
 }
