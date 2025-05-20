@@ -1,6 +1,5 @@
 package com.nhnacademy.back.cart.controller;
 
-
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -18,11 +17,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.service.CartService;
 
 @WebMvcTest(controllers = CartRestController.class)
-class CartRestControllerForCustomerTest {
+class CartRestControllerForMemberTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -35,71 +34,71 @@ class CartRestControllerForCustomerTest {
 
 
 	@Test
-	@DisplayName("POST /api/customers/carts/items - 비회원/회원 장바구니 항목 추가 테스트")
-	void createCartItemForCustomer() throws Exception {
+	@DisplayName("POST /api/members/carts/items - 회원 장바구니 항목 추가 테스트")
+	void createCartItemForMember() throws Exception {
 		// given
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(1L, "", 1L, 3);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO("id123", "", 1L, 3);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(post("/api/customers/carts/items")
+		mockMvc.perform(post("/api/members/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isCreated());
 
-		verify(cartService).createCartItemForCustomer(any(RequestAddCartItemsDTO.class));
+		verify(cartService).createCartItemForMember(any(RequestAddCartItemsDTO.class));
 	}
 
 	@Test
-	@DisplayName("PUT /api/customers/carts/items/{cartItemsId} - 장바구니 항목 수량 변경 테스트")
-	void updateCartItemForCustomer() throws Exception {
+	@DisplayName("PUT /api/members/carts/items/{cartItemsId} - 회원 장바구니 항목 수량 변경 테스트")
+	void updateCartItemForMember() throws Exception {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, 1L, 5);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/customers/carts/items/{cartItemsId}", 1L)
+		mockMvc.perform(put("/api/members/carts/items/{cartItemsId}", 1L)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).updateCartItemForCustomer(anyLong(), any(RequestUpdateCartItemsDTO.class));
+		verify(cartService).updateCartItemForMember(anyLong(), any(RequestUpdateCartItemsDTO.class));
 	}
 
 	@Test
-	@DisplayName("DELETE /api/customers/carts/items/{cartItemsId} - 장바구니 항목 삭제 테스트")
-	void deleteCartItemForCustomer() throws Exception {
+	@DisplayName("DELETE /api/members/carts/items/{cartItemsId} - 회원 장바구니 항목 삭제 테스트")
+	void deleteCartItemForMember() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/customers/carts/items/{cartItemsId}", 1L)
+		mockMvc.perform(delete("/api/members/carts/items/{cartItemsId}", 1L)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartItemForCustomer(1L);
+		verify(cartService).deleteCartItemForMember(1L);
 	}
 
 	@Test
-	@DisplayName("DELETE /api/customers/{customerId}/carts - 장바구니 항목 전체 삭제 테스트")
-	void deleteCartForCustomer() throws Exception {
+	@DisplayName("DELETE /api/members/{memberId}/carts - 회원 장바구니 항목 전체 삭제 테스트")
+	void deleteCartForMember() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/customers/{customerId}/carts", 1L)
+		mockMvc.perform(delete("/api/members/{memberId}/carts", "id123")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartForCustomer(1L);
+		verify(cartService).deleteCartForMember("id123");
 	}
 
 	@Test
-	@DisplayName("GET /api/customers/{customerId}/carts - 고객 장바구니 목록 조회 테스트")
-	void getCartItemsByCustomer() throws Exception {
+	@DisplayName("GET /api/members/{memberId}/carts - 회원 장바구니 목록 조회 테스트")
+	void getCartItemsByMember() throws Exception {
 		// given
-		List<ResponseCartItemsForCustomerDTO> cartItems = List.of(
-			new ResponseCartItemsForCustomerDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2, 2000)
+		List<ResponseCartItemsForMemberDTO> cartItems = List.of(
+			new ResponseCartItemsForMemberDTO(1L, 100L, List.of(), "Product A", 1000, "path/image.jpg", 2, 2000)
 		);
 
-		when(cartService.getCartItemsByCustomer(1L)).thenReturn(cartItems);
+		when(cartService.getCartItemsByMember("id123")).thenReturn(cartItems);
 
 		// when & then
-		mockMvc.perform(get("/api/customers/{customerId}/carts", 1L))
+		mockMvc.perform(get("/api/members/{memberId}/carts", "id123"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.[0].productId").value(100L))
 			.andExpect(jsonPath("$.[0].productTitle").value("Product A"))

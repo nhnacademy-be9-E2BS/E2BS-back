@@ -6,19 +6,22 @@ import java.util.Objects;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
-import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForCustomerDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
@@ -33,15 +36,15 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-@Transactional
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
 	private final CustomerJpaRepository customerRepository;
+	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
 	private final ProductCategoryJpaRepository productCategoryRepository;
 	private final CartJpaRepository cartRepository;
@@ -51,22 +54,24 @@ public class CartServiceImpl implements CartService {
 
 
 	/**
-	 * 비회원/회원일 때 장바구니 항목 생성 메소드
+	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
+	@Transactional
 	@Override
-	public void createCartItemForCustomer(RequestAddCartItemsDTO request) {
+	public void createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 비회원/회원, 상품 존재 검증
-		Customer findCustomer = customerRepository.findById(request.getCustomerId())
+		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
 			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
 		Cart cart;
 		// 장바구니가 없으면 장바구니 생성
-		if (!cartRepository.existsByCustomer_CustomerId(request.getCustomerId())) {
+		if (!cartRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
 			cart = cartRepository.save(new Cart(findCustomer));
 		} else {
-			cart = cartRepository.findByCustomer_CustomerId(request.getCustomerId());
+			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId());
 		}
 
 		// 현재 고객이 장바구니 아이템을 가지고 있을 수 있으므로 중복 검증
@@ -79,10 +84,11 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 비회원/회원일 때 장바구니 항목 수량 수정 메소드
+	 * 회원일 때 장바구니 항목 수량 수정 메소드
 	 */
+	@Transactional
 	@Override
-	public void updateCartItemForCustomer(long cartItemId, RequestUpdateCartItemsDTO request) {
+	public void updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request) {
 		// 장바구니 항목 존재 검증
 		CartItems findCartItem = cartItemsRepository.findById(cartItemId)
 			.orElseThrow(CartItemNotFoundException::new);
@@ -96,10 +102,11 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 비회원/회원일 때 장바구니 항목 삭제 메소드
+	 * 회원일 때 장바구니 항목 삭제 메소드
 	 */
+	@Transactional
 	@Override
-	public void deleteCartItemForCustomer(long cartItemId) {
+	public void deleteCartItemForMember(long cartItemId) {
 		// 장바구니 항목 존재 검증
 		CartItems findCartItem = cartItemsRepository.findById(cartItemId)
 			.orElseThrow(CartItemNotFoundException::new);
@@ -109,11 +116,14 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 비회원/회원일 때 장바구니 전체 삭제 메소드
+	 * 회원일 때 장바구니 전체 삭제 메소드
 	 */
+	@Transactional
 	@Override
-	public void deleteCartForCustomer(long customerId) {
-		Cart findCart = cartRepository.findByCustomer_CustomerId(customerId);
+	public void deleteCartForMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
 		if (Objects.isNull(findCart)) {
 			throw new CartNotFoundException();
 		}
@@ -122,12 +132,13 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 비회원/회원인 고객의 장바구니 목록 조회 메소드
+	 * 회원인 고객의 장바구니 목록 조회 메소드
 	 */
 	@Override
-	public List<ResponseCartItemsForCustomerDTO> getCartItemsByCustomer(long customerId) {
+	public List<ResponseCartItemsForMemberDTO> getCartItemsByMember(String memberId) {
 		// 고객이 담은 장바구니들을 리스트로 담음
-		List<CartItems> cartItems = cartItemsRepository.findByCart_Customer_CustomerId(customerId);
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		List<CartItems> cartItems = cartItemsRepository.findByCart_Customer_CustomerId(findMember.getCustomerId());
 
 		// 필요한 api 스펙에 맞춰 response 재가공해서 반환
 		return cartItems.stream()
@@ -160,7 +171,7 @@ public class CartServiceImpl implements CartService {
 				//  DTO 가공
 				long productTotalPrice = product.getProductSalePrice() * cartItem.getCartItemsQuantity();
 
-				return new ResponseCartItemsForCustomerDTO(
+				return new ResponseCartItemsForMemberDTO(
 					cartItem.getCartItemsId(),
 					product.getProductId(),
 					findProductCategoriesDto,
