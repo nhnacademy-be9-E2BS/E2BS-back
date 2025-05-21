@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiGetDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiGetDTO;
 import com.nhnacademy.back.product.product.kim.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin/books")
 public class ProductAdminController {
 	private final ProductService productService;
+	private final com.nhnacademy.back.product.product.park.service.ProductService productApiService;
 
 	/**
 	 * 도서 받아와서 DB에 저장
@@ -97,5 +101,11 @@ public class ProductAdminController {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
+
+	@GetMapping("/search")
+	public List<ResponseProductsApiGetDTO> searchBooks(@ModelAttribute RequestProductApiGetDTO request) {
+		return productApiService.getProducts(request);
+	}
+
 
 }

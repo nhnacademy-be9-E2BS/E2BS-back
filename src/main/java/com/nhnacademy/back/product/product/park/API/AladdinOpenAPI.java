@@ -48,7 +48,7 @@ public class AladdinOpenAPI {
 		if (api.Items.isEmpty()) {
 			return null;
 		} else {
-			List<Item> items = new ArrayList<Item>(api.Items);
+			List<Item> items = new ArrayList<>(api.Items);
 			return items;
 		}
 	}
