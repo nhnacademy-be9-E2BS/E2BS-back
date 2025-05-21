@@ -1,4 +1,4 @@
-package com.nhnacademy.back.coupon.membercoupon.controller;
+package com.nhnacademy.back.coupon.membercoupon.contoller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

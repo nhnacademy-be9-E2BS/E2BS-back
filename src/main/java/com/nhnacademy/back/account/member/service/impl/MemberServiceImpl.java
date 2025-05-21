@@ -44,7 +44,6 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * 아이디에 해당하는 Member가 존재하는지 확인하는 메서드
 	 */
-	@Transactional
 	@Override
 	public boolean existsMemberByMemberId(String memberId) {
 		return memberJpaRepository.existsMemberByMemberId(memberId);
@@ -53,7 +52,6 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * 해당 아이디를 사용하는 회원 정보 가져오는 메서드
 	 */
-	@Transactional
 	@Override
 	public Member getMemberByMemberId(String memberId) {
 		return memberJpaRepository.getMemberByMemberId(memberId);
