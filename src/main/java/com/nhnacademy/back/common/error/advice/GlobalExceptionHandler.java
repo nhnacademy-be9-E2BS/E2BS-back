@@ -20,6 +20,10 @@ import com.nhnacademy.back.common.error.dto.GlobalErrorResponse;
 import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
+import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
+import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
+import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
@@ -39,7 +43,8 @@ public class GlobalExceptionHandler {
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
 		ProductAlreadyExistsException.class, TagAlreadyExistsException.class, ProductStockDecrementException.class,
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
-		MemberStateWithdrawException.class})
+		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
+		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -53,7 +58,7 @@ public class GlobalExceptionHandler {
 		CartItemNotFoundException.class, CartNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class, ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
-		ReviewNotFoundException.class, MemberRoleException.class})
+		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());

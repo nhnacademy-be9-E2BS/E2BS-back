@@ -31,6 +31,7 @@ import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
@@ -123,6 +124,7 @@ public class MemberServiceImpl implements MemberService {
 		);
 	}
 
+	@Transactional
 	@Override
 	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());

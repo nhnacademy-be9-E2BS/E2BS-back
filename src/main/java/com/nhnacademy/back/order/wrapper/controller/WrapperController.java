@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
@@ -27,6 +29,7 @@ public class WrapperController {
 	/**
 	 * Wrapper 리스트 조회 (판매 중)
 	 */
+	@Member
 	@GetMapping("/api/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappersBySaleable(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -38,6 +41,7 @@ public class WrapperController {
 	/**
 	 * Wrapper 리스트 조회 (모두)
 	 */
+	@Admin
 	@GetMapping("/api/admin/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -49,6 +53,7 @@ public class WrapperController {
 	/**
 	 * Wrapper 저장
 	 */
+	@Admin
 	@PostMapping("/api/admin/wrappers")
 	public ResponseEntity<Void> createWrapper(@RequestBody RequestRegisterWrapperDTO request) {
 		wrapperService.createWrapper(request);
@@ -59,6 +64,7 @@ public class WrapperController {
 	/**
 	 * Wrapper 수정
 	 */
+	@Admin
 	@PutMapping("/api/admin/wrappers/{wrapperId}")
 	public ResponseEntity<Void> updateWrapper(@PathVariable Long wrapperId,
 		@RequestBody RequestModifyWrapperDTO request) {
