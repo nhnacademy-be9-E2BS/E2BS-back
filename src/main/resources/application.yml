@@ -21,8 +21,8 @@ spring:
   rabbitmq:
     host: s4.java21.net
     port: 5672
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
+    username: admin
+    password: nhnacademy123!
 
   data:
     redis:
