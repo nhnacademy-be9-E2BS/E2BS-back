@@ -23,6 +23,12 @@ spring:
       mode: always
       data-locations: classpath:sql/h2/sample.sql
       schema-locations: classpath:sql/h2/schema.sql
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 293
 
 eureka:
   client:
