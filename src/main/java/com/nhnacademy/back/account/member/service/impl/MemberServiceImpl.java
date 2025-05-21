@@ -83,6 +83,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 회원가입 시 입력한 아이디 값이 이미 존재하는지 확인
 	 * 없다면 member 테이블에 회원 저장
 	 */
+	@Transactional
 	@Override
 	public ResponseRegisterMemberDTO registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO) {
 

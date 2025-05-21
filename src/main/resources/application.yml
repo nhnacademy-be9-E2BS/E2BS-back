@@ -14,12 +14,20 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate 가 사용할 SQL 문법(방언)을 지정
     open-in-view: false          # 영속성 컨텍스트를 뷰까지 열지 않음
 
+  # RabbitMQ 연결 설정
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
   data:
     redis:
       host: s4.java21.net
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
       database: 294
+
 
 logging:
   level:
@@ -39,3 +47,4 @@ order:
   url:
     toss: https://api.tosspayments.com/v1/payments/confirm
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
+
