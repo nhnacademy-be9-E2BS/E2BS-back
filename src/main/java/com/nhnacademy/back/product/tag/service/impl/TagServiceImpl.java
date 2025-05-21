@@ -1,15 +1,13 @@
 package com.nhnacademy.back.product.tag.service.impl;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
@@ -17,10 +15,12 @@ import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 import com.nhnacademy.back.product.tag.service.TagService;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TagServiceImpl implements TagService {
 	private final TagJpaRepository tagJpaRepository;
 
@@ -29,6 +29,7 @@ public class TagServiceImpl implements TagService {
 	 *  Tag가 이미 존재하면 Exception 발생
 	 */
 	@Override
+	@Transactional
 	public void createTag(RequestTagDTO request) {
 		String tagName = request.getTagName();
 		if (tagJpaRepository.existsByTagName(tagName)) {
@@ -57,6 +58,7 @@ public class TagServiceImpl implements TagService {
 	 */
 
 	@Override
+	@Transactional
 	public void updateTag(long tagId, RequestTagDTO request) {
 		if (Objects.isNull(request)) {
 			throw new IllegalArgumentException("Request cannot be null");
@@ -74,4 +76,14 @@ public class TagServiceImpl implements TagService {
 		tag.get().setTag(request.getTagName());
 		tagJpaRepository.save(tag.get());
 	}
+
+	/**
+	 * 태그 삭제
+	 */
+	@Override
+	@Transactional
+	public void deleteTag(long tagId, RequestTagDTO request) {
+		tagJpaRepository.deleteTagByTagId(tagId);
+	}
+
 }
