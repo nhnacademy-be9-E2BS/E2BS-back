@@ -1,12 +1,15 @@
 package com.nhnacademy.back.review.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
@@ -26,6 +29,9 @@ import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 import com.nhnacademy.back.review.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Transactional(readOnly = true)
 @Service
@@ -36,6 +42,9 @@ public class ReviewServiceImpl implements ReviewService {
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
 	private final ReviewJpaRepository reviewRepository;
+
+	private final S3Client s3Client;
+	private final String BUCKET_NAME = "e2bs-reviews-image";
 
 	
 	/**
@@ -60,8 +69,33 @@ public class ReviewServiceImpl implements ReviewService {
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
+		// 파일이 존재하면 업로드
+		if (Objects.nonNull(request.getReviewImage())) {
+			uploadFile(request.getReviewImage());
+		}
+
 		Review reviewEntity = Review.createReviewEntity(findProduct, findCustomer, request);
 		reviewRepository.save(reviewEntity);
+	}
+
+	/**
+	 * 파일 업로드 메소드
+	 */
+	private void uploadFile(MultipartFile reviewImageFile) {
+		String originalFilename = reviewImageFile.getOriginalFilename();
+
+		UUID uuid = UUID.randomUUID();
+		String objectFileName = uuid + "_" + originalFilename;
+
+		try {
+			s3Client.putObject(
+				req -> req.bucket(BUCKET_NAME).key(objectFileName), RequestBody.fromInputStream(reviewImageFile.getInputStream(), reviewImageFile.getSize())
+			);
+		} catch (IOException e) {
+			throw new RuntimeException("파일 스트림 열기 실패", e);
+		} catch (S3Exception e) {
+			throw new RuntimeException("MinIO 업로드 실패: " + e.awsErrorDetails().errorMessage(), e);
+		}
 	}
 
 	/**

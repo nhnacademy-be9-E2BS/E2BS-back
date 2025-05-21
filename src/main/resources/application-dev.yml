@@ -36,3 +36,10 @@ order:
   url:
     toss: https://api.tosspayments.com/v1/payments/confirm
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
+
+# minio 접근 설정
+minio:
+  endpoint: http://storage.java21.net
+  access-key: OCO4F9OO5naKnVCpAPBZ
+  secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
+  region: us-east-1

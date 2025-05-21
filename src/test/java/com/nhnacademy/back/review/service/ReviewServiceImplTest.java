@@ -70,7 +70,8 @@ class ReviewServiceImplTest {
 	@DisplayName("리뷰 생성 테스트")
 	void createReview() {
 		// given
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "", "좋네요", 5, "mockFile");
+		MockMultipartFile mockFile = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "", "좋네요", 5, mockFile);
 
 		when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));

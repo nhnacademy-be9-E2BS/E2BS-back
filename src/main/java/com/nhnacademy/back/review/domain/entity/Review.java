@@ -56,7 +56,7 @@ public class Review {
 			.customer(customer)
 			.reviewContent(request.getReviewContent())
 			.reviewGrade(request.getReviewGrade())
-			.reviewImage(request.getReviewImage())
+			.reviewImage(request.getReviewImage().getOriginalFilename())
 			.reviewCreatedAt(LocalDateTime.now())
 			.build();
 

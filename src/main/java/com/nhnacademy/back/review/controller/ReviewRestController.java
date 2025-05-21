@@ -1,5 +1,7 @@
 package com.nhnacademy.back.review.controller;
 
+import java.io.IOException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,7 @@ public class ReviewRestController {
 
 
 	@PostMapping("/api/reviews")
-	public ResponseEntity<Void> createReview(@Validated @RequestBody RequestCreateReviewDTO request, BindingResult bindingResult) {
+	public ResponseEntity<Void> createReview(@Validated @RequestBody RequestCreateReviewDTO request, BindingResult bindingResult) throws IOException {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
