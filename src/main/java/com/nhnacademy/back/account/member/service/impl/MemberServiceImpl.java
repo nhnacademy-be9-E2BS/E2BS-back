@@ -31,6 +31,7 @@ import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
@@ -83,6 +84,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 회원가입 시 입력한 아이디 값이 이미 존재하는지 확인
 	 * 없다면 member 테이블에 회원 저장
 	 */
+	@Transactional
 	@Override
 	public ResponseRegisterMemberDTO registerMember(RequestRegisterMemberDTO requestRegisterMemberDTO) {
 
@@ -122,6 +124,7 @@ public class MemberServiceImpl implements MemberService {
 		);
 	}
 
+	@Transactional
 	@Override
 	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());
