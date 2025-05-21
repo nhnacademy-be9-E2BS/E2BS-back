@@ -4,8 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMemberCouponDTO;
+import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMypageMemberCouponDTO;
 
 public interface MemberCouponService {
+
+	ResponseMypageMemberCouponDTO getMemberCouponCnt(String memberId);
 
 	/**
 	 * 회원 ID로 쿠폰 조회
