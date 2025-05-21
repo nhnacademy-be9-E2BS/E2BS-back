@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
@@ -17,7 +20,7 @@ import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsExcepti
 import com.nhnacademy.back.product.product.exception.SearchBookException;
 import com.nhnacademy.back.product.product.park.API.AladdinOpenAPI;
 import com.nhnacademy.back.product.product.park.API.Item;
-import com.nhnacademy.back.product.product.park.service.ProductService;
+import com.nhnacademy.back.product.product.park.service.ProductAPIService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -28,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class ProductAPIServiceImpl implements ProductAPIService {
 
 	private final ProductJpaRepository productJpaRepository;
 	private final PublisherJpaRepository publisherJpaRepository;
@@ -39,18 +42,17 @@ public class ProductServiceImpl implements ProductService {
 	/**
 	 * 검색결과에 맞는 책 목록들 가져오기
 	 */
-	@Override
-	public List<ResponseProductsApiGetDTO> getProducts(RequestProductApiGetDTO request) {
-		AladdinOpenAPI api = new AladdinOpenAPI(request.getQuery(), request.getQueryType()); //검색어, 검색대상 입력해서 해당하는 책들 가져오기
+	public Page<ResponseProductsApiGetDTO> searchProducts(RequestProductApiGetDTO request, Pageable pageable) {
+		AladdinOpenAPI api = new AladdinOpenAPI(request.getQuery(), request.getQueryType());
 		List<Item> items;
 
 		try {
-			items = api.searchBooks(); //알라딘 api는 결과를 item으로 넘겨줌
+			items = api.searchBooks();
 		} catch (Exception e) {
 			throw new SearchBookException("Search book failed");
 		}
 
-		List<Product> products = new ArrayList<>(); //items들을 product 리스트에 담음
+		List<Product> products = new ArrayList<>();
 		for (Item item : items) {
 			RequestProductCreateApiDTO createApiDTO = new RequestProductCreateApiDTO();
 			createApiDTO.setPublisherName(item.publisher);
@@ -59,15 +61,14 @@ public class ProductServiceImpl implements ProductService {
 			createApiDTO.setProductIsbn(item.isbn13);
 			createApiDTO.setProductRegularPrice(item.priceStandard);
 			createApiDTO.setProductSalePrice(item.priceSales);
-			createApiDTO.setProductImage(item.Link);
+			createApiDTO.setProductImage(item.cover);
 
 			Publisher publisher = publisherJpaRepository.findByPublisherName(createApiDTO.getPublisherName());
-
 			if (publisher == null) {
 				publisher = new Publisher(item.publisher);
 			}
-			Product product = Product.createProductApiEntity(createApiDTO, publisher);
 
+			Product product = Product.createProductApiEntity(createApiDTO, publisher);
 			products.add(product);
 		}
 
@@ -75,7 +76,16 @@ public class ProductServiceImpl implements ProductService {
 			.map(ResponseProductsApiGetDTO::from)
 			.collect(Collectors.toList());
 
-		return responseList;
+		int start = (int) pageable.getOffset();
+		int end = Math.min(start + pageable.getPageSize(), responseList.size());
+
+		if (start > end) {
+			start = end = 0;
+		}
+
+		List<ResponseProductsApiGetDTO> pagedList = responseList.subList(start, end);
+
+		return new PageImpl<>(pagedList, pageable, responseList.size());
 	}
 
 

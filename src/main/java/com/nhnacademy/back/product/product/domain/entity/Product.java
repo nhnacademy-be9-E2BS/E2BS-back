@@ -1,6 +1,7 @@
 package com.nhnacademy.back.product.product.domain.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
@@ -93,9 +94,11 @@ public class Product {
 			.productPublishedAt(LocalDate.now())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage()); //
+
 		product.getProductImage().add(image);
 
 		return product;

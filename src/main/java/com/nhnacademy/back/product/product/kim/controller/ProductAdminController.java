@@ -26,6 +26,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCo
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiGetDTO;
 import com.nhnacademy.back.product.product.kim.service.ProductService;
+import com.nhnacademy.back.product.product.park.service.ProductAPIService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin/books")
 public class ProductAdminController {
 	private final ProductService productService;
-	private final com.nhnacademy.back.product.product.park.service.ProductService productApiService;
+	private final ProductAPIService productApiService;
 
 	/**
 	 * 도서 받아와서 DB에 저장
@@ -103,8 +104,8 @@ public class ProductAdminController {
 	}
 
 	@GetMapping("/search")
-	public List<ResponseProductsApiGetDTO> searchBooks(@ModelAttribute RequestProductApiGetDTO request) {
-		return productApiService.getProducts(request);
+	public Page<ResponseProductsApiGetDTO> searchBooks(@ModelAttribute RequestProductApiGetDTO request, Pageable pageable) {
+		return productApiService.searchProducts(request, pageable);
 	}
 
 

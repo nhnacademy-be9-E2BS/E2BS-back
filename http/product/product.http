@@ -3,5 +3,5 @@ GET https://examples.http-client.intellij.net/get
     ?generated-in=IntelliJ IDEA
 
 ###
-GET http://localhost:10238/api/admin/books/search?query=자바&queryType=Title
+GET http://localhost:10236/api/admin/books/search?query=자바&queryType=Title
 Content-Type: application/json
