@@ -25,6 +25,7 @@ import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsExc
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
+import com.nhnacademy.back.review.exception.ReviewNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,7 +47,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class,
 		CartItemNotFoundException.class, CartNotFoundException.class,
-		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class, TagNotFoundException.class})
+		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class, ReviewNotFoundException.class, TagNotFoundException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());

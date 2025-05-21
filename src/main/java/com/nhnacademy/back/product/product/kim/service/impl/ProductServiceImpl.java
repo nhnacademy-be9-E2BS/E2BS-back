@@ -6,9 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
@@ -35,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 	private final ProductJpaRepository productJpaRepository;
 	private final ProductImageJpaRepository productImageJpaRepository;
@@ -46,11 +46,12 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서가 이미 존재하면 Exception 발생
 	 */
 	@Override
+	@Transactional
 	public void createProduct(RequestProductCreateDTO request) {
 		// (현규) front에서 출판사 리스트를 선택하게 해서 없으면 생성하게 만들게 할 것
 		// 인스턴스 빼서 변수 선언
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
-		List<String> imagePaths = request.getProductImage();
+		List<String> imagePaths = request.getProductImagePaths();
 
 		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
 		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
@@ -123,8 +124,8 @@ public class ProductServiceImpl implements ProductService {
 	 * 특정 도서 ID 목록으로 도서 조회
 	 */
 	@Override
-	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(List<Long> products) {
-		List<ResponseProductReadDTO> list = productJpaRepository.findAllById(products).stream().map(product -> new ResponseProductReadDTO(
+	public List<ResponseProductReadDTO> getProducts(List<Long> products) {
+		return productJpaRepository.findAllById(products).stream().map(product -> new ResponseProductReadDTO(
 			product.getProductId(),
 			product.getProductState().getProductStateId(),
 			product.getPublisher().getPublisherId(),
@@ -139,15 +140,15 @@ public class ProductServiceImpl implements ProductService {
 			//내부 메서드 사용
 			findProductImagePaths(product)
 		)).collect(Collectors.toList());
-		return ResponseEntity.ok(list);
 	}
 
 	/**
 	 * 도서 정보 수정
 	 */
 	@Override
-	public void updateProduct(RequestProductUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	@Transactional
+	public void updateProduct(long productId, RequestProductUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new IllegalArgumentException("출판사를 찾을 수 없습니다."));
@@ -170,21 +171,21 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서 재고 수정
 	 */
 	@Override
-	public ResponseEntity<Void> updateProductStock(RequestProductStockUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	@Transactional
+	public void updateProductStock(long productId, RequestProductStockUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 		//내부 메서드 사용
 		decrementProductStock(request.getProductDecrementStock(), product);
-		return ResponseEntity.status(HttpStatus.OK).build();
-
 	}
 
 	/**
 	 * 도서 판매가 수정
 	 */
 	@Override
-	public void updateProductSalePrice(RequestProductSalePriceUpdateDTO request) {
-		Product product = productJpaRepository.findById(request.getProductId())
+	@Transactional
+	public void updateProductSalePrice(long productId, RequestProductSalePriceUpdateDTO request) {
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
 
 		product.setProduct(request.getProductSalePrice());
@@ -196,6 +197,7 @@ public class ProductServiceImpl implements ProductService {
 	 * 쿠폰 적용 가능한 도서 목록 조회 (재고 있고 판매 상태인 도서)
 	 */
 	@Override
+	@Transactional
 	public Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable) {
 		Page<Product> saleProducts = productJpaRepository.findAllByProductStateName(ProductStateName.SALE, pageable);
 

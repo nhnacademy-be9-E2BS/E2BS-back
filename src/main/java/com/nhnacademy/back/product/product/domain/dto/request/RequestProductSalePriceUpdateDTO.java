@@ -13,6 +13,5 @@ public class RequestProductSalePriceUpdateDTO {
 	/**
 	 * 도서의 할인가를 변경하기 위한 정보
 	 */
-	private long productId;
-	private int productSalePrice;
+	private long productSalePrice;
 }
