@@ -52,7 +52,7 @@ class ProductControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/books/self")
+		mockMvc.perform(post("/api/admin/books")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());

@@ -8,5 +8,5 @@ import com.nhnacademy.back.product.tag.domain.entity.Tag;
 public interface TagJpaRepository extends JpaRepository<Tag, Long> {
 	boolean existsByTagName(String tagName);
 
-	void deleteByTagName(String tagName);
+	void deleteTagByTagId(long tagId);
 }
