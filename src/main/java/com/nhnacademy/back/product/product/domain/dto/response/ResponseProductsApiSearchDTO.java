@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseProductsApiGetDTO {
+public class ResponseProductsApiSearchDTO {
 	@NotBlank
 	private String publisherName;
 
@@ -37,8 +37,8 @@ public class ResponseProductsApiGetDTO {
 	private long productSalePrice;
 	// 이미지
 
-	public static ResponseProductsApiGetDTO from(Product product) {
-		return ResponseProductsApiGetDTO.builder()
+	public static ResponseProductsApiSearchDTO from(Product product) {
+		return ResponseProductsApiSearchDTO.builder()
 			.publisherName(product.getPublisher().getPublisherName())
 			.productTitle(product.getProductTitle())
 			.productIsbn(product.getProductIsbn())

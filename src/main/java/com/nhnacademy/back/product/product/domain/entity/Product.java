@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateApiDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -82,7 +82,7 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-	public static Product createProductApiEntity(RequestProductCreateApiDTO request, Publisher publisher) {
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher) {
 		Product product = Product.builder()
 			.productState(new ProductState(ProductStateName.SALE))
 			.publisher(publisher)

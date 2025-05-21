@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiGetDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiGetDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
 import com.nhnacademy.back.product.product.kim.service.ProductService;
 import com.nhnacademy.back.product.product.park.service.ProductAPIService;
 
@@ -103,10 +103,24 @@ public class ProductAdminController {
 		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
 
-	@GetMapping("/search")
-	public Page<ResponseProductsApiGetDTO> searchBooks(@ModelAttribute RequestProductApiGetDTO request, Pageable pageable) {
+	/**
+	 *
+	 * 검색어와 검색타입으로 책 검색
+	 */
+
+	@GetMapping("/aladdin/search")
+	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
 		return productApiService.searchProducts(request, pageable);
 	}
+
+	@Admin
+	@PostMapping("/aladdin/regiter")
+	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductCreateDTO request) {
+		productService.createProduct(request);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+
 
 
 }
