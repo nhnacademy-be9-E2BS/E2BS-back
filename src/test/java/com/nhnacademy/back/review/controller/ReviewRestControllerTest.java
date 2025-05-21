@@ -41,7 +41,7 @@ class ReviewRestControllerTest {
 	@DisplayName("POST /api/reviews - 리뷰 작성 테스트")
 	void createReview() throws Exception {
 		// given
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "상품 좋네요", 4, "default.jpg");
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "", "상품 좋네요", 4, null);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
@@ -74,8 +74,8 @@ class ReviewRestControllerTest {
 	void getReviewsByCustomer() throws Exception {
 		// given
 		Page<ResponseReviewPageDTO> page = new PageImpl<>(List.of(
-			new ResponseReviewPageDTO(1L, 1L, 1L, "좋네요", 5, "default.jpg", LocalDateTime.now()),
-			new ResponseReviewPageDTO(2L, 2L, 1L, "별로네요", 1, "default.jpg", LocalDateTime.now())
+			new ResponseReviewPageDTO(1L, 1L, 1L, "홍길동", "좋네요", 5, "default.jpg", LocalDateTime.now()),
+			new ResponseReviewPageDTO(2L, 2L, 1L, "홍길동", "별로네요", 1, "default.jpg", LocalDateTime.now())
 		));
 
 		when(reviewService.getReviewsByCustomer(eq(1L), any(Pageable.class))).thenReturn(page);
@@ -94,8 +94,8 @@ class ReviewRestControllerTest {
 	void getReviewsByProduct() throws Exception {
 		// given
 		Page<ResponseReviewPageDTO> page = new PageImpl<>(List.of(
-			new ResponseReviewPageDTO(1L, 1L, 1L, "좋네요", 5, "default.jpg", LocalDateTime.now()),
-			new ResponseReviewPageDTO(2L, 1L, 2L, "별로네요", 1, "default.jpg", LocalDateTime.now())
+			new ResponseReviewPageDTO(1L, 1L, 1L, "셀린", "좋네요", 5, "default.jpg", LocalDateTime.now()),
+			new ResponseReviewPageDTO(2L, 1L, 2L, "홍길동", "별로네요", 1, "default.jpg", LocalDateTime.now())
 		));
 
 		when(reviewService.getReviewsByProduct(eq(1L), any(Pageable.class))).thenReturn(page);

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
@@ -69,7 +70,7 @@ class ReviewServiceImplTest {
 	@DisplayName("리뷰 생성 테스트")
 	void createReview() {
 		// given
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "좋네요", 5, "default.jpg");
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "", "좋네요", 5, "mockFile");
 
 		when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -85,7 +86,7 @@ class ReviewServiceImplTest {
 	@DisplayName("리뷰 생성 테스트 - 실패(고객을 찾지 못한 경우)")
 	void createReview_Fail_CustomerNotFound() {
 		// given
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "좋네요", 5, "default.jpg");
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 1L, "", "좋네요", 5, null);
 
 		when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 

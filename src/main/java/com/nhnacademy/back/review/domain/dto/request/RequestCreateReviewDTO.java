@@ -13,8 +13,9 @@ public class RequestCreateReviewDTO {
 	@NotNull
 	private long productId;
 
-	@NotNull
-	private long customerId;
+	private Long customerId;
+
+	private String memberId;
 
 	private String reviewContent;
 

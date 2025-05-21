@@ -27,3 +27,7 @@ Content-Type: application/json
 ### 상품 리뷰 페이징 목록 조회
 GET http://localhost:10236/api/products/1/reviews?page=0&size=5
 Content-Type: application/json
+
+### 상품 리뷰의 전체 평점 및 각 등급의 리뷰 개수 구하기
+GET http://localhost:10236/api/products/1/reviews/info
+Content-Type: application/json

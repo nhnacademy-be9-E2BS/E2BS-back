@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 
 public interface ReviewService {
@@ -12,4 +13,5 @@ public interface ReviewService {
 	void updateReview(long reviewId, RequestUpdateReviewDTO request);
 	Page<ResponseReviewPageDTO> getReviewsByCustomer(long customerId, Pageable pageable);
 	Page<ResponseReviewPageDTO> getReviewsByProduct(long productId, Pageable pageable);
+	ResponseReviewInfoDTO getReviewInfo(long productId);
 }

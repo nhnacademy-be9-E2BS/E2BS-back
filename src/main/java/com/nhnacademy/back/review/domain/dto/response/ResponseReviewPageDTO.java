@@ -13,6 +13,7 @@ public class ResponseReviewPageDTO {
 	private long reviewId;
 	private long productId;
 	private long customerId;
+	private String customerName;
 	private String reviewContent;
 	private int reviewGrade;
 	private String reviewImage;

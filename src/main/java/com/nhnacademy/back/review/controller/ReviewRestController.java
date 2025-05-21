@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.service.ReviewService;
 
@@ -58,6 +59,12 @@ public class ReviewRestController {
 	@GetMapping("/api/products/{productId}/reviews")
 	public ResponseEntity<Page<ResponseReviewPageDTO>> getReviewsByProduct(@PathVariable long productId, Pageable pageable) {
 		Page<ResponseReviewPageDTO> body = reviewService.getReviewsByProduct(productId, pageable);
+		return ResponseEntity.ok(body);
+	}
+
+	@GetMapping("/api/products/{productId}/reviews/info")
+	public ResponseEntity<ResponseReviewInfoDTO> getReviewInfo(@PathVariable long productId) {
+		ResponseReviewInfoDTO body = reviewService.getReviewInfo(productId);
 		return ResponseEntity.ok(body);
 	}
 
