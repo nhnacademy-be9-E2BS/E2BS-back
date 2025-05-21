@@ -1,5 +1,8 @@
 package com.nhnacademy.back.product.category.domain.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.nhnacademy.back.product.product.domain.entity.Product;
 
 import jakarta.persistence.Entity;
@@ -27,6 +30,12 @@ public class ProductCategory {
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "category_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)    // Category가 삭제되면 이를 참조하고 있는 ProductCategory 자동 삭제
 	private Category category;
+
+	public ProductCategory(Product product, Category category) {
+		this.product = product;
+		this.category = category;
+	}
 
 }

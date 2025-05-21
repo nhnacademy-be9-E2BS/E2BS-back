@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
@@ -28,6 +29,7 @@ public class PublisherController {
 	/**
 	 * Publisher 리스트 조회
 	 */
+	@Admin
 	@GetMapping
 	public ResponseEntity<Page<ResponsePublisherDTO>> getPublishers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -38,6 +40,7 @@ public class PublisherController {
 	/**
 	 * Publisher 저장
 	 */
+	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createPublisher(@RequestBody RequestPublisherDTO request) {
 		publisherService.createPublisher(request);
@@ -48,6 +51,7 @@ public class PublisherController {
 	/**
 	 * Publisher 수정
 	 */
+	@Admin
 	@PutMapping("/{publisherId}")
 	public ResponseEntity<Void> updatePublisher(@PathVariable Long publisherId,
 		@RequestBody RequestPublisherDTO request) {

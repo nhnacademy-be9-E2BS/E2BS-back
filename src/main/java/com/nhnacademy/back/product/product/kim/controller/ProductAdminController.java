@@ -37,7 +37,7 @@ public class ProductAdminController {
 	 * 201 상태코드 반환
 	 */
 	@Admin
-	@PostMapping("/self")
+	@PostMapping
 	public ResponseEntity<Void> createProduct(@RequestBody RequestProductCreateDTO request) {
 		productService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -92,7 +92,7 @@ public class ProductAdminController {
 	 * 200 상태코드 반환
 	 */
 	@Admin
-	@GetMapping("/status/{sale}")
+	@GetMapping("/state-sale")
 	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(Pageable pageable) {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(products);

@@ -75,16 +75,16 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서 한 권을 DB에서 조회
 	 */
 	@Override
-	public ResponseProductReadDTO getProduct(RequestProductGetDTO request) {
+	public ResponseProductReadDTO getProduct(long productId, RequestProductGetDTO request) {
 		// RequestProductGetDTO가 productId를 포함하도록 업데이트될 것이라 가정
-		Product product = productJpaRepository.findById(request.getProductId())
+		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
 
 		return new ResponseProductReadDTO(
 			product.getProductId(),
-			product.getProductState().getProductStateId(),
-			product.getPublisher().getPublisherId(),
+			product.getProductState().getProductStateName().name(),
+			product.getPublisher().getPublisherName(),
 			product.getProductTitle(),
 			product.getProductContent(),
 			product.getProductDescription(),
@@ -105,8 +105,8 @@ public class ProductServiceImpl implements ProductService {
 	public Page<ResponseProductReadDTO> getProducts(Pageable pageable) {
 		return productJpaRepository.findAll(pageable).map(product -> new ResponseProductReadDTO(
 			product.getProductId(),
-			product.getProductState().getProductStateId(),
-			product.getPublisher().getPublisherId(),
+			product.getProductState().getProductStateName().name(),
+			product.getPublisher().getPublisherName(),
 			product.getProductTitle(),
 			product.getProductContent(),
 			product.getProductDescription(),
@@ -127,8 +127,8 @@ public class ProductServiceImpl implements ProductService {
 	public List<ResponseProductReadDTO> getProducts(List<Long> products) {
 		return productJpaRepository.findAllById(products).stream().map(product -> new ResponseProductReadDTO(
 			product.getProductId(),
-			product.getProductState().getProductStateId(),
-			product.getPublisher().getPublisherId(),
+			product.getProductState().getProductStateName().name(),
+			product.getPublisher().getPublisherName(),
 			product.getProductTitle(),
 			product.getProductContent(),
 			product.getProductDescription(),
@@ -150,10 +150,10 @@ public class ProductServiceImpl implements ProductService {
 	public void updateProduct(long productId, RequestProductUpdateDTO request) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
-		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
-			.orElseThrow(() -> new IllegalArgumentException("출판사를 찾을 수 없습니다."));
-		ProductState productState = productStateJpaRepository.findById(request.getProductStateId())
-			.orElseThrow(() -> new IllegalArgumentException("도서 상태를 찾을 수 없습니다."));
+		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
+		ProductStateName productStateName = ProductStateName.valueOf(request.getProductStateName());
+
+		ProductState productState = productStateJpaRepository.findByProductStateName(productStateName);
 
 
 		product.updateProduct(request, publisher, productState);

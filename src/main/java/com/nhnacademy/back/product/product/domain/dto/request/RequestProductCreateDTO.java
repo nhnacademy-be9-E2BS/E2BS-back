@@ -42,4 +42,6 @@ public class RequestProductCreateDTO {
 	// 이미지
 	private List<String> productImagePaths;
 
+	private List<String> tagNames;
+
 }
