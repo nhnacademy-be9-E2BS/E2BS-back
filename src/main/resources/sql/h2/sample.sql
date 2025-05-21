@@ -215,7 +215,9 @@ VALUES (1, '1,000원 쿠폰', 1, true),
        (3, '3000원 쿠폰', 3, true),
        (4, '봄맞이 할인 쿠폰', 4, true),
        (5, '과학의 달 쿠폰', 5, true),
-       (6, '5월 생일 쿠폰', 2, true);
+       (6, '5월 생일 쿠폰', 2, true),
+       (7, '웰컴 쿠폰', 5, true);
+
 
 -- MemberCoupon
 INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
@@ -264,7 +266,10 @@ INSERT INTO customer (customer_email,
                       customer_password,
                       customer_name)
 VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
-       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자');
+       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자'),
+       ('user1@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저1'),
+       ('user2@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저2');;
+
 
 -- Member
 INSERT INTO member (customer_id,
@@ -297,6 +302,28 @@ VALUES (2,
         1, -- NORMAL
         1, -- ACTIVE
         1, -- Admin
+        1 -- PAYCO
+       ),
+       (4,
+        'user1',
+        DATE '1990-05-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (5,
+        'user2',
+        DATE '1990-05-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
         1 -- PAYCO
        );
 
