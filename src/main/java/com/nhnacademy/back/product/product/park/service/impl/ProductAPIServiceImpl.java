@@ -1,0 +1,112 @@
+package com.nhnacademy.back.product.product.park.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
+import com.nhnacademy.back.product.product.exception.SearchBookException;
+import com.nhnacademy.back.product.product.park.API.AladdinOpenAPI;
+import com.nhnacademy.back.product.product.park.API.Item;
+import com.nhnacademy.back.product.product.park.service.ProductAPIService;
+import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
+import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
+import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
+import com.nhnacademy.back.product.publisher.service.PublisherService;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProductAPIServiceImpl implements ProductAPIService {
+
+	private final ProductJpaRepository productJpaRepository;
+	private final PublisherJpaRepository publisherJpaRepository;
+	private final ProductImageJpaRepository productImageJpaRepository;
+	private final PublisherService publisherService;
+
+
+	/**
+	 * 검색결과에 맞는 책 목록들 가져오기
+	 */
+	public Page<ResponseProductsApiSearchDTO> searchProducts(RequestProductApiSearchDTO request, Pageable pageable) {
+		AladdinOpenAPI api = new AladdinOpenAPI(request.getQuery(), request.getQueryType());
+		List<Item> items;
+
+		try {
+			items = api.searchBooks();
+		} catch (Exception e) {
+			throw new SearchBookException("Search book failed");
+		}
+
+		List<Product> products = new ArrayList<>();
+		for (Item item : items) {
+			RequestProductApiCreateDTO createApiDTO = new RequestProductApiCreateDTO();
+			createApiDTO.setPublisherName(item.publisher);
+			createApiDTO.setProductTitle(item.Title);
+			createApiDTO.setProductDescription(item.description);
+			createApiDTO.setProductIsbn(item.isbn13);
+			createApiDTO.setProductRegularPrice(item.priceStandard);
+			createApiDTO.setProductSalePrice(item.priceSales);
+			createApiDTO.setProductImage(item.cover);
+			createApiDTO.setContributorName(item.author);
+
+			Publisher publisher = publisherJpaRepository.findByPublisherName(createApiDTO.getPublisherName());
+			if (publisher == null) {
+				publisher = new Publisher(item.publisher);
+			}
+
+			Product product = Product.createProductApiEntity(createApiDTO, publisher);
+			products.add(product);
+		}
+
+		List<ResponseProductsApiSearchDTO> responseList = products.stream()
+			.map(ResponseProductsApiSearchDTO::from)
+			.collect(Collectors.toList());
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min(start + pageable.getPageSize(), responseList.size());
+
+		if (start > end) {
+			start = end = 0;
+		}
+
+		List<ResponseProductsApiSearchDTO> pagedList = responseList.subList(start, end);
+
+		return new PageImpl<>(pagedList, pageable, responseList.size());
+	}
+
+
+	//검색결과에 해당하는 책 목록들 중에서 선택후 등록버튼 누르면 RequestProdcutCreateDTO에 현재 리스트에 해당하는 product의 정보기져와서 등록하기
+	@Override
+	public void createProduct(RequestProductApiCreateDTO request) {
+		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
+
+
+		if (publisher == null) {
+			RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO(request.getPublisherName());
+			publisherService.createPublisher(requestPublisherDTO);
+			publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
+		} //출판사 없으면 생성
+
+		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
+			throw new ProductAlreadyExistsException("Product already exists: %s".formatted(request.getProductIsbn()));
+		}
+
+		Product product = Product.createProductApiEntity(request, publisher);
+
+		productJpaRepository.save(product);
+
+	}
+}
