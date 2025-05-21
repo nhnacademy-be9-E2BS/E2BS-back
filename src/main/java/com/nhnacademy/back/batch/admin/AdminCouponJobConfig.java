@@ -1,4 +1,4 @@
-package com.nhnacademy.back.coupon.membercoupon.batchconfig;
+package com.nhnacademy.back.batch.admin;
 
 import java.time.LocalDateTime;
 
@@ -29,9 +29,9 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@EnableBatchProcessing // Spring Batch를 활성화합니다.
+@EnableBatchProcessing // Batch 활성화
 @RequiredArgsConstructor
-public class MemberCouponBatchConfig {
+public class AdminCouponJobConfig {
 
 	private final EntityManagerFactory entityManagerFactory;
 	private final PlatformTransactionManager transactionManager;
@@ -43,9 +43,9 @@ public class MemberCouponBatchConfig {
 	 * 여기서는 단일 Step(issueStep)만 실행합니다.
 	 */
 	@Bean
-	public Job issueAllCouponsJob(JobRepository jobRepository) {
-		return new JobBuilder("issueAllCouponsJob", jobRepository) // Job 이름 지정
-			.start(issueStep(jobRepository)) // 시작 Step 지정
+	public Job adminCouponJob(JobRepository jobRepository) {
+		return new JobBuilder("adminCouponJob", jobRepository)
+			.start(issueStep(jobRepository))
 			.build();
 	}
 
@@ -59,18 +59,15 @@ public class MemberCouponBatchConfig {
 	@Bean
 	public Step issueStep(JobRepository jobRepository) {
 		return new StepBuilder("issueStep", jobRepository)
-			.<Member, MemberCoupon>chunk(500, transactionManager) // 500개씩 트랜잭션 단위 처리
+			.<Member, MemberCoupon>chunk(100, transactionManager)
 			.reader(memberReader()) // 데이터 읽기
 			.processor(member -> {
-				// 현재 실행 중인 Step의 Job 파라미터를 가져오기 위한 설정
 				StepExecution stepExecution = StepSynchronizationManager.getContext().getStepExecution();
 				JobParameters params = stepExecution.getJobParameters();
 
-				// Job 실행 시 전달된 쿠폰 ID와 만료 기간 파라미터 읽기
 				Long couponId = params.getLong("couponId");
 				LocalDateTime period = params.getLocalDateTime("memberCouponPeriod");
 
-				// 해당 ID의 쿠폰 엔티티 조회
 				Coupon coupon = couponRepo.findById(couponId)
 					.orElseThrow(() -> new CouponNotFoundException("쿠폰 없음"));
 
@@ -84,21 +81,21 @@ public class MemberCouponBatchConfig {
 
 	/**
 	 * Reader 설정
-	 * DB에서 Member 데이터를 페이징 방식으로 읽어옵니다.
+	 * 상태가 ACTIVE(1) 인 회원에게만 조회
 	 */
 	@Bean
 	public JpaPagingItemReader<Member> memberReader() {
 		return new JpaPagingItemReaderBuilder<Member>()
 			.name("memberReader")
 			.entityManagerFactory(entityManagerFactory)
-			.queryString("SELECT m FROM Member m WHERE m.memberState.id = 1") // 상태가 ACTIVE(1) 인 회원에게만 조회
-			.pageSize(500) // 한 번에 500명씩 처리
+			.queryString("SELECT m FROM Member m WHERE m.memberState.id = 1")
+			.pageSize(100)
 			.build();
 	}
 
 	/**
 	 * Writer 설정
-	 * Processor에서 생성한 MemberCoupon 객체를 DB에 저장합니다.
+	 * Processor 에서 생성한 MemberCoupon 객체를 DB에 저장
 	 */
 	@Bean
 	public JpaItemWriter<MemberCoupon> memberCouponWriter() {
