@@ -12,15 +12,15 @@ POST http://localhost:10236/api/admin/books/aladdin/register
 Content-Type: application/json
 
 {
-  "publisherName": "에프엔미디어",
-  "productTitle": "월가의 퀀트 투자 바이블",
-  "productIsbn": "9791188754540",
-  "productImage": "https://image.aladin.co.kr/product/28505/74/coversum/k502835739_1.jpg",
-  "productDescription": "PER, PSR, 배당수익률, 가격 모멘텀 등 널리 알려진 단일 요소부터 이들을 결합한 복합 요소까지 적용한 온갖 투자 전략의 성과를 약 90년간의 데이터로 검증해서 가장 강력한 전략을 찾는 방법을 알려주는 책이다.",
+  "publisherName": "인피니티북스",
+  "productTitle": "Power JAVA - 3판",
+  "productIsbn": "9791185578989",
+  "productImage": "https://image.aladin.co.kr/product/29009/25/coversum/k452836425_1.jpg",
+  "productDescription": "JAVA 입문자들이 쉽고 재미있게 학습할 수 있도록 게임, 인공지능, 그래픽 관련 흥미로운 LAB, Mini Project를 수록하였고 문답식 설명과 다양한 그림 자료를 활용하여 친절하게 설명했다. 최신 버전인 JDK 16 내용을 담았다.",
   "productRegularPrice": 35000,
-  "productSalePrice": 31500,
-  "contributors": "제임스 오쇼너시 (지은이), 이건, 서태준, 정호탁, 주민근, 모지환, 정창훈, 배금일, 최준석 (옮긴이), 신진오 (감수)",
-  "productContent": "이 책은 월가 역사상 가장 강력했던 퀀트 전략들을 집대성한 자료입니다.",
+  "productSalePrice": 35000,
+  "contributors": "천인국 (지은이)",
+  "productContent": "이 책은",
   "productPackageable": true,
   "productStock": 120
 }
