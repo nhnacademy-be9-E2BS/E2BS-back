@@ -198,8 +198,8 @@ public class CategoryServiceTest {
 	}
 
 	@Test
-	@DisplayName("get categories by id")
-	void get_categories_by_id_test() {
+	@DisplayName("get categories by id - success")
+	void get_categories_by_id_success_test() {
 		// given
 		ResponseCategoryDTO grandChild = new ResponseCategoryDTO(4L, "Grandchild", new ArrayList<>());
 		ResponseCategoryDTO child1 = new ResponseCategoryDTO(2L, "Child 1", List.of(grandChild));
@@ -228,6 +228,22 @@ public class CategoryServiceTest {
 		assertThat(child2Dto.getChildren()).isEmpty();
 
 		verify(categoryJpaRepository, never()).findById(any());
+	}
+
+	@Test
+	@DisplayName("get categories by id - fail")
+	void get_categories_by_id_fail_test() {
+		// given
+		ResponseCategoryDTO grandChild = new ResponseCategoryDTO(4L, "Grandchild", new ArrayList<>());
+		ResponseCategoryDTO child1 = new ResponseCategoryDTO(2L, "Child 1", List.of(grandChild));
+		ResponseCategoryDTO child2 = new ResponseCategoryDTO(3L, "Child 2", new ArrayList<>());
+		ResponseCategoryDTO root = new ResponseCategoryDTO(1L, "Root", List.of(child1, child2));
+
+		when(self.getCategories()).thenReturn(List.of(root, child1, child2, grandChild));
+
+		// when & then
+		assertThatThrownBy(() -> categoryService.getCategoriesById(5L))
+			.isInstanceOf(CategoryNotFoundException.class);
 	}
 
 	@Test
@@ -266,6 +282,21 @@ public class CategoryServiceTest {
 	void update_category_fail2_test() {
 		// given
 		RequestCategoryDTO request = new RequestCategoryDTO("new name category");
+
+		Category category = new Category("category", null);
+		when(categoryJpaRepository.findById(anyLong())).thenReturn(Optional.of(category));
+		when(categoryJpaRepository.existsByParentIsNullAndCategoryName(anyString())).thenReturn(true);
+
+		// when & then
+		assertThatThrownBy(() -> categoryService.updateCategory(2L, request))
+			.isInstanceOf(CategoryAlreadyExistsException.class);
+	}
+
+	@Test
+	@DisplayName("update category - fail3")
+	void update_category_fail3_test() {
+		// given
+		RequestCategoryDTO request = new RequestCategoryDTO("new name category");
 		Category parentCategory = mock(Category.class);
 		when(parentCategory.getCategoryId()).thenReturn(1L);
 
@@ -274,7 +305,7 @@ public class CategoryServiceTest {
 		when(categoryJpaRepository.existsByParentCategoryIdAndCategoryName(anyLong(), anyString())).thenReturn(true);
 
 		// when & then
-		assertThatThrownBy(() -> categoryService.updateCategory(2L, request))
+		assertThatThrownBy(() -> categoryService.updateCategory(3L, request))
 			.isInstanceOf(CategoryAlreadyExistsException.class);
 	}
 

@@ -1,4 +1,4 @@
-package com.nhnacademy.back.common.config;
+package com.nhnacademy.back.product.category.initializer;
 
 import java.util.Set;
 
