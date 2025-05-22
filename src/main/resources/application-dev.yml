@@ -30,7 +30,7 @@ spring:
       password: "*N2vya7H@muDTwdNMR!"
       database: 293
   rabbitmq:
-    virtual-host: "vh1_dev"
+    virtual-host: "e2bs_dev"
 
 eureka:
   client:
