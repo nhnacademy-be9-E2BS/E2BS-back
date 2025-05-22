@@ -30,5 +30,7 @@ public class RequestProductUpdateDTO {
 	private int productStock;
 	private List<String> productImagePaths;
 	private List<String> productTags;
+	private List<Long> categoryIds;
+	private List<String> contributorNames;
 
 }

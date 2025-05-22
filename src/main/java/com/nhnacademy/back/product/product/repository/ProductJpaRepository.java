@@ -11,7 +11,7 @@ import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 	boolean existsByProductIsbn(String isbn);
-
+	Product findByProductName(String productName);
 
 
 	@Query("SELECT p FROM Product p WHERE p.productState.productStateName = :stateName")
