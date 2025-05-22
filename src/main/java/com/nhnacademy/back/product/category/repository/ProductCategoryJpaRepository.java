@@ -23,4 +23,5 @@ public interface ProductCategoryJpaRepository extends JpaRepository<ProductCateg
 	@Query("DELETE FROM ProductCategory pc WHERE pc.product.productId = :productId")
 	void deleteAllByProductId(@Param("productId") Long productId);
 
+	void deleteByProduct_ProductId(long productId);
 }

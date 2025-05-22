@@ -25,7 +25,17 @@ public class ResponseProductReadDTO {
 	private LocalDate productPublishedAt;
 	private String productIsbn;
 	private long productRegularPrice;
+	private long productSalePrice;
 	private boolean productPackageable;
 	private int productStock;
+
+	//이미지
 	private List<String> productImagePaths;
+	// 태그
+	private List<String> tagNames;
+	// 카테고리 Id
+	private List<Long> categoryIds;
+	// 기여자 Id
+	private List<String> contributorNames;
+
 }
