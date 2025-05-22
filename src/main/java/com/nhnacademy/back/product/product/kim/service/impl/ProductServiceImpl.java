@@ -34,6 +34,7 @@ import com.nhnacademy.back.product.product.exception.ProductStockDecrementExcept
 import com.nhnacademy.back.product.product.kim.service.ProductService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
+import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
@@ -62,7 +63,6 @@ public class ProductServiceImpl implements ProductService {
 	private final TagJpaRepository tagJpaRepository;
 	private final ProductTagJpaRepository productTagJpaRepository;
 	private final PublisherService publisherService;
-	private final PositionJpaRepository positionJpaRepository;
 
 	/**
 	 * 도서를 DB에 저장
@@ -71,82 +71,81 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Transactional
 	public void createProduct(RequestProductCreateDTO request) {
-		// DB에서 없으면 생성하게 만드는게 아니라 입력받아 없으면 자동 생성하게 만듦
-		if (publisherJpaRepository.findByPublisherName(request.getPublisherName()) == null) {
-			RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO();
-			requestPublisherDTO.setPublisherName(request.getPublisherName());
-			publisherService.createPublisher(requestPublisherDTO);
-		}
-		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
+		// // DB에서 없으면 생성하게 만드는게 아니라 입력받아 없으면 자동 생성하게 만듦
+		// if (publisherJpaRepository.findByPublisherName(request.getPublisherName()) == null) {
+		// 	RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO();
+		// 	requestPublisherDTO.setPublisherName(request.getPublisherName());
+		// 	publisherService.createPublisher(requestPublisherDTO);
+		// }
+		// Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
+		//
+		// List<String> imagePaths = request.getProductImagePaths();
+		// List<String> tagNames = request.getTagNames();
+		// List<Long> categoryIds = request.getCategoryIds();
+		// List<String> contributorNames = request.getContributorNames();
+		// List<String> positionNames = request.getPositionNames();
+		//
+		// // 이미 존재하는지 unique인 isbn으로 DB에서 조회
+		// if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
+		// 	throw new ProductAlreadyExistsException("Product already exists");
+		// }
+		//
+		// //이미지 없이 product 객체 생성
+		// Product product = Product.createProductEntity(request, publisher);
+		// //DB에 Product저장
+		// productJpaRepository.save(product);
+		//
+		// // for문으로 ProductImage객체를 생성하여 저장을 반복
+		// for (String imagePath : imagePaths) {
+		// 	productImageJpaRepository.save(new ProductImage(product, imagePath));
+		// }
+		//
+		// // 태그 저장
+		// for (String tagName : tagNames) {
+		// 	Tag tag = tagJpaRepository.findByTagName(tagName)
+		// 		.orElseGet(() -> tagJpaRepository.save(new Tag(tagName)));
+		// 	productTagJpaRepository.save(new ProductTag(product, tag));
+		// }
+		//
+		// // 카테고리 저장
+		// for (Long categoryId : categoryIds) {
+		// 	Category category = categoryJpaRepository.findById(categoryId)
+		// 		.orElseThrow(() -> new IllegalArgumentException("Category not found: " + categoryId));
+		// 	productCategoryJpaRepository.save(new ProductCategory(product, category));
+		// }
+		//
+		// // 기여자 저장
+		// if (contributorNames != null && positionNames != null && contributorNames.size() == positionNames.size()) {
+		// 	for (int i = 0; i < contributorNames.size(); i++) {
+		// 		String contributorName = contributorNames.get(i);
+		// 		String positionName = positionNames.get(i);
+		//
+		// 		Contributor contributor = contributorJpaRepository.findByContributorName(contributorName)
+		// 			.orElseGet(() -> {
+		// 				Position position = positionJpaRepository.findByPositionName(positionName)
+		// 					.orElseGet(() -> positionJpaRepository.save(new Position(positionName)));
+		// 				return contributorJpaRepository.save(new Contributor(contributorName, position));
+		// 			});
+		// 		productContributorJpaRepository.save(new ProductContributor(product, contributor));
+		// 	}
+		// }
 
-		List<String> imagePaths = request.getProductImagePaths();
-		List<String> tagNames = request.getTagNames();
-		List<Long> categoryIds = request.getCategoryIds();
-		List<String> contributorNames = request.getContributorNames();
-		List<String> positionNames = request.getPositionNames();
 
-		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
-		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
-			throw new ProductAlreadyExistsException("Product already exists");
-		}
-
-		//이미지 없이 product 객체 생성
-		Product product = Product.createProductEntity(request, publisher);
-		//DB에 Product저장
-		productJpaRepository.save(product);
-
-		// for문으로 ProductImage객체를 생성하여 저장을 반복
-		for (String imagePath : imagePaths) {
-			productImageJpaRepository.save(new ProductImage(product, imagePath));
-		}
-
-		// 태그 저장
-		for (String tagName : tagNames) {
-			Tag tag = tagJpaRepository.findByTagName(tagName)
-				.orElseGet(() -> tagJpaRepository.save(new Tag(tagName)));
-			productTagJpaRepository.save(new ProductTag(product, tag));
-		}
-
-		// 카테고리 저장
-		for (Long categoryId : categoryIds) {
-			Category category = categoryJpaRepository.findById(categoryId)
-				.orElseThrow(() -> new IllegalArgumentException("Category not found: " + categoryId));
-			productCategoryJpaRepository.save(new ProductCategory(product, category));
-		}
-
-		// 기여자 저장
-		if (contributorNames != null && positionNames != null && contributorNames.size() == positionNames.size()) {
-			for (int i = 0; i < contributorNames.size(); i++) {
-				String contributorName = contributorNames.get(i);
-				String positionName = positionNames.get(i);
-
-				Contributor contributor = contributorJpaRepository.findByContributorName(contributorName)
-					.orElseGet(() -> {
-						Position position = positionJpaRepository.findByPositionName(positionName)
-							.orElseGet(() -> positionJpaRepository.save(new Position(positionName)));
-						return contributorJpaRepository.save(new Contributor(contributorName, position));
-					});
-				productContributorJpaRepository.save(new ProductContributor(product, contributor));
-			}
-		}
 	}
-
 
 
 	/**
 	 * 도서 한 권을 DB에서 조회
 	 */
 	@Override
-	public ResponseProductReadDTO getProduct(long productId, RequestProductGetDTO request) {
-		// RequestProductGetDTO가 productId를 포함하도록 업데이트될 것이라 가정
+	public ResponseProductReadDTO getProduct(long productId) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
-
 
 		return new ResponseProductReadDTO(
 			product.getProductId(),
 			product.getProductState().getProductStateName().name(),
-			product.getPublisher().getPublisherName(),
+			new ResponsePublisherDTO(product.getPublisher().getPublisherId(), product.getPublisher().getPublisherName()),
 			product.getProductTitle(),
 			product.getProductContent(),
 			product.getProductDescription(),
@@ -156,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
 			product.getProductSalePrice(),
 			product.isProductPackageable(),
 			product.getProductStock(),
-			findProductImagePaths(product),
+			productImageJpaRepository.findAllByProductId
 			findTagNames(product),
 			findCategoryIds(product),
 			findContributorNames(product)
@@ -274,9 +273,10 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	public void updateProductStock(long productId, RequestProductStockUpdateDTO request) {
 		Product product = productJpaRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
-		//내부 메서드 사용
-		decrementProductStock(request.getProductDecrementStock(), product);
+			.orElseThrow(ProductNotFoundException::new);
+
+		product.setProduct(request.getProductStock());
+		productJpaRepository.save(product);
 	}
 
 	/**
@@ -286,12 +286,11 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	public void updateProductSalePrice(long productId, RequestProductSalePriceUpdateDTO request) {
 		Product product = productJpaRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("도서를 찾을 수 없습니다."));
+			.orElseThrow(ProductNotFoundException::new);
 
 		product.setProduct(request.getProductSalePrice());
 		productJpaRepository.save(product);
 	}
-
 
 	/**
 	 * 쿠폰 적용 가능한 도서 목록 조회 (재고 있고 판매 상태인 도서)
@@ -311,56 +310,52 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-
-
-
-
-	/**
-	 * productId로 이미지들을 찾아 List로 반환하는 내부 메서드
-	 */
-	private List<String> findProductImagePaths(Product product) {
-		List<ProductImage> productImages = productImageJpaRepository.findByProduct_ProductId(product.getProductId());
-		return productImages.stream().map(ProductImage::getProductImagePath).collect(Collectors.toList());
-
-
-	}
-	/**
-	 * productId로 태그 이름을 찾아 List로 반환하는 내부 메서드
-	 */
-	private List<String> findTagNames(Product product) {
-		List<ProductTag> productTags = productTagJpaRepository.findByProduct_ProductId(product.getProductId());
-		return productTags.stream().map(pt -> pt.getTag().getTagName()).collect(Collectors.toList());
-	}
-
-	/**
-	 * productId로 카테고리 ID를 찾아 List로 반환하는 내부 메서드
-	 */
-	private List<Long> findCategoryIds(Product product) {
-		List<ProductCategory> productCategories = productCategoryJpaRepository.findByProduct_ProductId(product.getProductId());
-		return productCategories.stream().map(pc -> pc.getCategory().getCategoryId()).collect(Collectors.toList());
-	}
-
-	/**
-	 * productId로 기여자 이름을 찾아 List로 반환하는 내부 메서드
-	 */
-	private List<String> findContributorNames(Product product) {
-		List<ProductContributor> productContributors = productContributorJpaRepository.findByProduct_ProductId(product.getProductId());
-		return productContributors.stream().map(pc -> pc.getContributor().getContributorName()).collect(Collectors.toList());
-	}
-
-	/**
-	 * 상품 차감 수량을 입력받아 DB에 저장하는 내부 메서드
-	 */
-	private void decrementProductStock(int decrementStock, Product product) {
-		int productStock = product.getProductStock();
-		int decrementedStock = productStock - decrementStock;
-
-		if (decrementedStock < 0) {
-			throw new ProductStockDecrementException("재고 수량 부족으로 차감 실패");
-		} else {
-			System.out.println("수량 차감 성공");
-			product.setProduct(decrementedStock);
-		}
-		productJpaRepository.save(product);
-	}
+	// /**
+	//  * productId로 이미지들을 찾아 List로 반환하는 내부 메서드
+	//  */
+	// private List<String> findProductImagePaths(Product product) {
+	// 	List<ProductImage> productImages = productImageJpaRepository.findByProduct_ProductId(product.getProductId());
+	// 	return productImages.stream().map(ProductImage::getProductImagePath).collect(Collectors.toList());
+	//
+	//
+	// }
+	// /**
+	//  * productId로 태그 이름을 찾아 List로 반환하는 내부 메서드
+	//  */
+	// private List<String> findTagNames(Product product) {
+	// 	List<ProductTag> productTags = productTagJpaRepository.findByProduct_ProductId(product.getProductId());
+	// 	return productTags.stream().map(pt -> pt.getTag().getTagName()).collect(Collectors.toList());
+	// }
+	//
+	// /**
+	//  * productId로 카테고리 ID를 찾아 List로 반환하는 내부 메서드
+	//  */
+	// private List<Long> findCategoryIds(Product product) {
+	// 	List<ProductCategory> productCategories = productCategoryJpaRepository.findByProduct_ProductId(product.getProductId());
+	// 	return productCategories.stream().map(pc -> pc.getCategory().getCategoryId()).collect(Collectors.toList());
+	// }
+	//
+	// /**
+	//  * productId로 기여자 이름을 찾아 List로 반환하는 내부 메서드
+	//  */
+	// private List<String> findContributorNames(Product product) {
+	// 	List<ProductContributor> productContributors = productContributorJpaRepository.findByProduct_ProductId(product.getProductId());
+	// 	return productContributors.stream().map(pc -> pc.getContributor().getContributorName()).collect(Collectors.toList());
+	// }
+	//
+	// /**
+	//  * 상품 차감 수량을 입력받아 DB에 저장하는 내부 메서드
+	//  */
+	// private void decrementProductStock(int decrementStock, Product product) {
+	// 	int productStock = product.getProductStock();
+	// 	int decrementedStock = productStock - decrementStock;
+	//
+	// 	if (decrementedStock < 0) {
+	// 		throw new ProductStockDecrementException("재고 수량 부족으로 차감 실패");
+	// 	} else {
+	// 		System.out.println("수량 차감 성공");
+	// 		product.setProduct(decrementedStock);
+	// 	}
+	// 	productJpaRepository.save(product);
+	// }
 }

@@ -10,9 +10,7 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 public interface ProductJpaRepository extends JpaRepository<Product, Long> {
-	boolean existsByProductIsbn(String isbn);
-
-
 	@Query("SELECT p FROM Product p WHERE p.productState.productStateName = :stateName")
 	Page<Product> findAllByProductStateName(@Param("stateName") ProductStateName stateName, Pageable pageable);
+
 }
