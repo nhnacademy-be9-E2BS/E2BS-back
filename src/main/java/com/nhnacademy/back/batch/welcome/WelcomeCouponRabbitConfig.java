@@ -1,5 +1,8 @@
 package com.nhnacademy.back.batch.welcome;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -17,9 +20,34 @@ public class WelcomeCouponRabbitConfig {
 	public static final String WELCOME_QUEUE = "E2BS.welcome.coupon.queue";
 	public static final String WELCOME_ROUTING_KEY = "E2BS.welcome.coupon.key";
 
+	public static final String WELCOME_DLX = "E2BS.exchange.dlx";
+	public static final String WELCOME_DLQ = "E2BS.welcome.coupon.queue.dlq";
+	public static final String WELCOME_DLK = "E2BS.welcome.coupon.key.dlk";
+
+	@Bean
+	public Queue welcomeDLQ() {
+		return new Queue(WELCOME_DLQ, true);
+	}
+
+	@Bean
+	public DirectExchange welcomeDLX() {
+		return new DirectExchange(WELCOME_DLX);
+	}
+
+	@Bean
+	public Binding adminDLKBinding() {
+		return BindingBuilder
+			.bind(welcomeDLQ())
+			.to(welcomeDLX())
+			.with(WELCOME_DLK);
+	}
+
 	@Bean
 	public Queue welcomeQueue() {
-		return new Queue(WELCOME_QUEUE, true);
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("x-dead-letter-exchange", WELCOME_DLX);
+		arguments.put("x-dead-letter-routing-key", WELCOME_DLK);
+		return new Queue(WELCOME_QUEUE, true, false, false, arguments);
 	}
 
 	@Bean

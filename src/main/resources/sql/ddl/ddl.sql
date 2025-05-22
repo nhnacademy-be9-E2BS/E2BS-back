@@ -1,9 +1,9 @@
 CREATE TABLE address
 (
     address_id         BIGINT AUTO_INCREMENT NOT NULL,
-    address_name       VARCHAR(255)          NOT NULL,
     address_code       VARCHAR(5)            NOT NULL,
     address_info       VARCHAR(255)          NULL,
+    address_Detail       VARCHAR(255)          NOT NULL,
     address_extra      VARCHAR(255)          NOT NULL,
     address_alias      VARCHAR(20)           NULL,
     address_default    BIT(1)                NOT NULL,

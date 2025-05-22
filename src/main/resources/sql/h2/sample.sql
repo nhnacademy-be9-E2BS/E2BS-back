@@ -55,7 +55,7 @@ VALUES (1,
        );
 
 -- Address
-INSERT INTO address (address_name,
+INSERT INTO address (address_detail,
                      address_code,
                      address_info,
                      address_extra,

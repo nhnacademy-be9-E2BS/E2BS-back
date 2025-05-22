@@ -13,7 +13,7 @@ public interface MemberCouponService {
 	/**
 	 * 회원 ID로 쿠폰 조회
 	 */
-	Page<ResponseMemberCouponDTO> getMemberCouponsByMemberId(Long memberId, Pageable pageable);
+	Page<ResponseMemberCouponDTO> getMemberCouponsByMemberId(String memberId, Pageable pageable);
 
 	/**
 	 * 회원이 쿠폰 사용 시 사용여부 업데이트 (미사용 -> 사용완료)

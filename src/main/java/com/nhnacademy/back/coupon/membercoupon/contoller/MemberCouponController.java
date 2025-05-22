@@ -44,7 +44,7 @@ public class MemberCouponController {
 	 */
 	@Member
 	@GetMapping("/api/member-coupons")
-	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@RequestParam Long memberId, Pageable pageable) {
+	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@RequestParam String memberId, Pageable pageable) {
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getMemberCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
