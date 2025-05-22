@@ -29,4 +29,8 @@ public class ProductContributor {
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	public ProductContributor(Contributor contributor, Product product) {
+		this.contributor = contributor;
+		this.product = product;
+	}
 }

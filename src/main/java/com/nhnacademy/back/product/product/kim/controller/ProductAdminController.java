@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
@@ -108,15 +109,20 @@ public class ProductAdminController {
 	 * 검색어와 검색타입으로 책 검색
 	 */
 
+	@Admin
 	@GetMapping("/aladdin/search")
 	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
 		return productApiService.searchProducts(request, pageable);
 	}
 
+	/**
+	 * api 사용해서 등록
+	 */
+
 	@Admin
-	@PostMapping("/aladdin/regiter")
-	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductCreateDTO request) {
-		productService.createProduct(request);
+	@PostMapping("/aladdin/register")
+	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductApiCreateDTO request) {
+		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 

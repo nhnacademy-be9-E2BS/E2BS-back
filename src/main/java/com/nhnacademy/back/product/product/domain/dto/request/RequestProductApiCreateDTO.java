@@ -36,4 +36,16 @@ public class RequestProductApiCreateDTO {
 	@NotBlank
 	private String contributors;
 
+	/**
+	 * 아래부터는 관리자가 직접 입력하는 필드
+	 */
+	@NotBlank
+	private String productContent;
+
+	@NotNull
+	private boolean productPackageable;
+
+	@NotNull
+	private int productStock;
+
 }
