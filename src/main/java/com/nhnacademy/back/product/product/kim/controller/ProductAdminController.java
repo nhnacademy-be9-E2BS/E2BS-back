@@ -109,10 +109,11 @@ public class ProductAdminController {
 	 * 검색어와 검색타입으로 책 검색
 	 */
 
-	@Admin
+
 	@GetMapping("/aladdin/search")
-	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
-		return productApiService.searchProducts(request, pageable);
+	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
+		Page<ResponseProductsApiSearchDTO> products = productApiService.searchProducts(request, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
 
 	/**
