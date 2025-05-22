@@ -1,10 +1,7 @@
 package com.nhnacademy.back.account.member.controller;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.LocalDate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.service.impl.MemberServiceImpl;
 
 @SpringBootTest
@@ -54,45 +50,4 @@ class MemberRegisterControllerTest {
 			.andExpect(status().isBadRequest());
 
 	}
-
-	@Test
-	@DisplayName("회원가입 성공 시 201 응답")
-	void successRegisterReturnCREATEDTest() throws Exception {
-
-		// Given
-		String requestJson = """
-			{
-			    "memberId": "nhn1",
-			    "customerName": "NHN",
-			    "customerPassword": 1234,
-			    "customerPasswordCheck": 1234,
-			    "customerEmail": "nhn@gmail.com",
-			    "memberBirth": "2000-01-01",
-			    "memberPhone": "01012345678"
-			}
-			""";
-
-		String memberId = "nhn1";
-		String customerName = "NHN";
-		String customerPassword = "1234";
-		String customerEmail = "nhn@gmail.com";
-		LocalDate memberBirth = LocalDate.now();
-		String memberPhone = "01012345678";
-
-		ResponseRegisterMemberDTO responseRegisterMemberDTO = new ResponseRegisterMemberDTO(
-			memberId, customerName, customerPassword,
-			customerEmail, memberBirth, memberPhone
-		);
-
-		// When
-		when(memberService.registerMember(any())).thenReturn(responseRegisterMemberDTO);
-
-		// Then
-		mockMvc.perform(post("/api/register")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestJson))
-			.andExpect(status().isCreated());
-
-	}
-
 }

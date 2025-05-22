@@ -40,8 +40,11 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * 회원 ID로 쿠폰 조회 (쿠폰함)
 	 */
 	@Override
-	public Page<ResponseMemberCouponDTO> getMemberCouponsByMemberId(Long memberId, Pageable pageable) {
-		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberId, pageable);
+	public Page<ResponseMemberCouponDTO> getMemberCouponsByMemberId(String memberId, Pageable pageable) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		Long memberCustomerId = member.getCustomerId();
+
+		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId, pageable);
 
 		return memberCoupons.map(memberCoupon -> {
 			Coupon coupon = memberCoupon.getCoupon();
