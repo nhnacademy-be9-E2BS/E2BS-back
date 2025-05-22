@@ -146,14 +146,4 @@ public class Product {
 	public void setProduct(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
-
-	public void setProductContent(String productContent) {this.productContent = productContent;}
-
-	public void setProductPackageable(boolean productPackageable) {
-		this.productPackageable = productPackageable;
-	}
-
-	public void setProductStock(int productStock) {
-		this.productStock = productStock;
-	}
 }
