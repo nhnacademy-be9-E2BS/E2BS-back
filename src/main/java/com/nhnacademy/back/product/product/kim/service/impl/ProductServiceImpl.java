@@ -1,8 +1,9 @@
 package com.nhnacademy.back.product.product.kim.service.impl;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -141,20 +142,10 @@ public class ProductServiceImpl implements ProductService {
 			product.getProductSalePrice(),
 			product.isProductPackageable(),
 			product.getProductStock(),
-			productImageJpaRepository.findAllByProduct_ProductId(productId).stream()
-				.map(image -> new ResponseProductImageDTO(image.getProductImageId(), image.getProductImagePath()))
-				.collect(Collectors.toList()),
-			productTagJpaRepository.findTagsByProductId(productId).stream()
-				.map(tag -> new ResponseTagDTO(tag.getTagId(), tag.getTagName()))
-				.collect(Collectors.toList()),
-			productCategoryJpaRepository.findCategoriesByProductId(productId).stream()
-				.map(category -> new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), null))
-				.collect(Collectors.toList()),
-			productContributorJpaRepository.findContributorsByProductId(productId).stream()
-				.map(contributor -> new ResponseContributorDTO(contributor.getContributorId(),
-					contributor.getContributorName(),
-					contributor.getPosition().getPositionId(), contributor.getPosition().getPositionName()))
-				.collect(Collectors.toList())
+			productImageJpaRepository.findImageDTOsByProductId(productId),
+			productTagJpaRepository.findTagDTOsByProductId(productId),
+			productCategoryJpaRepository.findCategoryDTOsByProductId(productId),
+			productContributorJpaRepository.findContributorDTOsByProductId(productId)
 		);
 	}
 
@@ -177,23 +168,6 @@ public class ProductServiceImpl implements ProductService {
 			Long id = product.getProductId();
 			return new ResponseProductReadDTO(
 				id,
-				new ResponseProductStateDTO(...),
-				new ResponsePublisherDTO(...),
-        ...,
-			imageMap.getOrDefault(id, List.of()).stream()
-				.map(image -> new ResponseProductImageDTO(...)).toList(),
-				tagMap.getOrDefault(id, List.of()).stream()
-					.map(tag -> new ResponseTagDTO(...)).toList(),
-				categoryMap.getOrDefault(id, List.of()).stream()
-					.map(cat -> new ResponseCategoryDTO(...)).toList(),
-				contributorMap.getOrDefault(id, List.of()).stream()
-					.map(cont -> new ResponseContributorDTO(...)).toList()
-    );
-		});
-
-		return productJpaRepository.findAll(pageable)
-			.map(product -> new ResponseProductReadDTO(
-				product.getProductId(),
 				new ResponseProductStateDTO(product.getProductState().getProductStateId(),
 					product.getProductState().getProductStateName().name()),
 				new ResponsePublisherDTO(product.getPublisher().getPublisherId(),
@@ -207,22 +181,27 @@ public class ProductServiceImpl implements ProductService {
 				product.getProductSalePrice(),
 				product.isProductPackageable(),
 				product.getProductStock(),
-				productImageJpaRepository.findAllByProduct_ProductId(product.getProductId()).stream()
+				imageMap.getOrDefault(id, List.of())
+					.stream()
 					.map(image -> new ResponseProductImageDTO(image.getProductImageId(), image.getProductImagePath()))
-					.collect(Collectors.toList()),
-				productTagJpaRepository.findTagsByProductId(product.getProductId()).stream()
-					.map(tag -> new ResponseTagDTO(tag.getTagId(), tag.getTagName()))
-					.collect(Collectors.toList()),
-				productCategoryJpaRepository.findCategoriesByProductId(product.getProductId()).stream()
+					.toList(),
+				tagMap.getOrDefault(id, List.of()).stream()
+					.map(tag -> new ResponseTagDTO(tag.getTagId(), tag.getTagName())).toList(),
+				categoryMap.getOrDefault(id, List.of())
+					.stream()
 					.map(
 						category -> new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), null))
-					.collect(Collectors.toList()),
-				productContributorJpaRepository.findContributorsByProductId(product.getProductId()).stream()
+					.toList(),
+				contributorMap.getOrDefault(id, List.of())
+					.stream()
 					.map(contributor -> new ResponseContributorDTO(contributor.getContributorId(),
 						contributor.getContributorName(),
 						contributor.getPosition().getPositionId(), contributor.getPosition().getPositionName()))
-					.collect(Collectors.toList())
-			));
+					.toList()
+			);
+		});
+
+		return result;
 	}
 
 	/**
@@ -253,22 +232,11 @@ public class ProductServiceImpl implements ProductService {
 				product.getProductSalePrice(),
 				product.isProductPackageable(),
 				product.getProductStock(),
-				productImageJpaRepository.findAllByProduct_ProductId(product.getProductId()).stream()
-					.map(image -> new ResponseProductImageDTO(image.getProductImageId(), image.getProductImagePath()))
-					.collect(Collectors.toList()),
-				productTagJpaRepository.findTagsByProductId(product.getProductId()).stream()
-					.map(tag -> new ResponseTagDTO(tag.getTagId(), tag.getTagName()))
-					.collect(Collectors.toList()),
-				productCategoryJpaRepository.findCategoriesByProductId(product.getProductId()).stream()
-					.map(
-						category -> new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), null))
-					.collect(Collectors.toList()),
-				productContributorJpaRepository.findContributorsByProductId(product.getProductId()).stream()
-					.map(contributor -> new ResponseContributorDTO(contributor.getContributorId(),
-						contributor.getContributorName(),
-						contributor.getPosition().getPositionId(), contributor.getPosition().getPositionName()))
-					.collect(Collectors.toList())
-			)).collect(Collectors.toList());
+				productImageJpaRepository.findImageDTOsByProductId(product.getProductId()),
+				productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
+				productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
+				productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
+			)).collect(toList());
 	}
 
 	/**
@@ -360,52 +328,4 @@ public class ProductServiceImpl implements ProductService {
 			));
 	}
 
-	// /**
-	//  * productId로 이미지들을 찾아 List로 반환하는 내부 메서드
-	//  */
-	// private List<String> findProductImagePaths(Product product) {
-	// 	List<ProductImage> productImages = productImageJpaRepository.findByProduct_ProductId(product.getProductId());
-	// 	return productImages.stream().map(ProductImage::getProductImagePath).collect(Collectors.toList());
-	//
-	//
-	// }
-	// /**
-	//  * productId로 태그 이름을 찾아 List로 반환하는 내부 메서드
-	//  */
-	// private List<String> findTagNames(Product product) {
-	// 	List<ProductTag> productTags = productTagJpaRepository.findByProduct_ProductId(product.getProductId());
-	// 	return productTags.stream().map(pt -> pt.getTag().getTagName()).collect(Collectors.toList());
-	// }
-	//
-	// /**
-	//  * productId로 카테고리 ID를 찾아 List로 반환하는 내부 메서드
-	//  */
-	// private List<Long> findCategoryIds(Product product) {
-	// 	List<ProductCategory> productCategories = productCategoryJpaRepository.findByProduct_ProductId(product.getProductId());
-	// 	return productCategories.stream().map(pc -> pc.getCategory().getCategoryId()).collect(Collectors.toList());
-	// }
-	//
-	// /**
-	//  * productId로 기여자 이름을 찾아 List로 반환하는 내부 메서드
-	//  */
-	// private List<String> findContributorNames(Product product) {
-	// 	List<ProductContributor> productContributors = productContributorJpaRepository.findByProduct_ProductId(product.getProductId());
-	// 	return productContributors.stream().map(pc -> pc.getContributor().getContributorName()).collect(Collectors.toList());
-	// }
-	//
-	// /**
-	//  * 상품 차감 수량을 입력받아 DB에 저장하는 내부 메서드
-	//  */
-	// private void decrementProductStock(int decrementStock, Product product) {
-	// 	int productStock = product.getProductStock();
-	// 	int decrementedStock = productStock - decrementStock;
-	//
-	// 	if (decrementedStock < 0) {
-	// 		throw new ProductStockDecrementException("재고 수량 부족으로 차감 실패");
-	// 	} else {
-	// 		System.out.println("수량 차감 성공");
-	// 		product.setProduct(decrementedStock);
-	// 	}
-	// 	productJpaRepository.save(product);
-	// }
 }

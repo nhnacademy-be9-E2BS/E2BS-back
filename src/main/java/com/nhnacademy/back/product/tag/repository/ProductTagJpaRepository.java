@@ -8,12 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 
 public interface ProductTagJpaRepository extends JpaRepository<ProductTag, Long> {
-	@Query("SELECT pt.tag FROM ProductTag pt WHERE pt.product.productId = :productId")
-	List<Tag> findTagsByProductId(@Param("productId") Long productId);
+	@Query("select ResponseTagDTO(pt.tag.tagId, pt.tag.tagName) from ProductTag pt where pt.product.productId = :productId")
+	List<ResponseTagDTO> findTagDTOsByProductId(@Param("productId") Long productId);
 
 	void deleteByProduct_ProductId(long productId);
 
@@ -27,4 +28,6 @@ public interface ProductTagJpaRepository extends JpaRepository<ProductTag, Long>
 				Collectors.mapping(ProductTag::getTag, Collectors.toList())
 			));
 	}
+
+	boolean existsByTag_TagId(long tagTagId);
 }

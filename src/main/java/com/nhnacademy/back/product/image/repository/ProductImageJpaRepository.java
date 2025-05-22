@@ -12,16 +12,16 @@ import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImag
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 
 public interface ProductImageJpaRepository extends JpaRepository<ProductImage, Long> {
-	List<ProductImage> findAllByProduct_ProductId(Long productId);
+	@Query("select ResponseProductImageDTO(i.productImageId, i.productImagePath) from ProductImage i where i.product.productId = :productId")
+	List<ResponseProductImageDTO> findImageDTOsByProductId(@Param("productId") Long productId);
 
 	void deleteByProduct_ProductId(long productId);
 
-	@Query("SELECT ResponseProductImageDTO(pi.product.productId, pi.productImagePath) " +
-		"FROM ProductImage pi WHERE pi.product.productId IN :productIds")
-	List<ResponseProductImageDTO> findProductImageDTOsByProductIds(@Param("productIds") List<Long> productIds);
+	@Query("SELECT pi FROM ProductImage pi WHERE pi.product.productId IN :productIds")
+	List<ProductImage> findAllByProductIds(@Param("productIds") List<Long> productIds);
 
-	default Map<Long, List<ResponseProductImageDTO>> findGroupedDTOsByProductIds(List<Long> productIds) {
-		return findProductImageDTOsByProductIds(productIds).stream()
-			.collect(Collectors.groupingBy(ResponseProductImageDTO::getProductId));
+	default Map<Long, List<ProductImage>> findAllByProductIdsGrouped(List<Long> productIds) {
+		return findAllByProductIds(productIds).stream()
+			.collect(Collectors.groupingBy(pi -> pi.getProduct().getProductId()));
 	}
 }
