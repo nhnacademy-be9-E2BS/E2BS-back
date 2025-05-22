@@ -10,7 +10,7 @@ import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 public interface ContributorJpaRepository extends JpaRepository<Contributor, Long> {
 	boolean existsByContributorName(String contributorName);
 
-	List<Contributor> findAllByContributorName(List<String> contributorName);
+	List<Contributor> findAllByContributorNameIn(List<String> contributorName);
 
 	Optional<Contributor> findByContributorName(String contributorName);
 }
