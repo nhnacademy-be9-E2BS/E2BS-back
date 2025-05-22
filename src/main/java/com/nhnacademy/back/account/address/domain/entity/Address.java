@@ -12,25 +12,29 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Address {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long addressId;
 
-	@Column(nullable = false)
-	private String addressName;
-
 	@Column(nullable = false, length = 5)
 	private String addressCode;
 
 	private String addressInfo;
+
+	@Column(nullable = false)
+	private String addressDetail;
 
 	@Column(nullable = false)
 	private String addressExtra;
