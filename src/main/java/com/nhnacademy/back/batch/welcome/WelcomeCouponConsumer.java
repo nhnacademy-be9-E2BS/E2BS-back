@@ -25,8 +25,8 @@ public class WelcomeCouponConsumer {
 	private final MemberCouponJpaRepository memberCouponRepository;
 
 	@RabbitListener(queues = WelcomeCouponRabbitConfig.WELCOME_QUEUE)
-	public void issueCoupon(Long memberId) {
-		Member member = memberRepository.findById(memberId)
+	public void issueCoupon(Long customerId) {
+		Member member = memberRepository.findById(customerId)
 			.orElseThrow(() -> new CustomerNotFoundException());
 
 		String welcomeCouponName = "웰컴 쿠폰";

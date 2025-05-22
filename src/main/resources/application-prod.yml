@@ -5,6 +5,8 @@ spring:
     url: jdbc:mysql://s4.java21.net:13306/project_be9_team2_prod?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: project_be9_team2
     password: "*gzxziN[g9kwl]Ln"
+  rabbitmq:
+    virtual-host: "vh1_prod"
 
 eureka:
   client:
