@@ -20,9 +20,11 @@ import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class WrapperController {
 	private final WrapperService wrapperService;
 
@@ -45,8 +47,10 @@ public class WrapperController {
 	@GetMapping("/api/admin/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
+		log.info("포장지 전체 조회 요청 컨트롤러 start");
 		Page<ResponseWrapperDTO> wrappers = wrapperService.getWrappers(pageable);
-
+		log.info("포장지 컨트롤러 응답");
+		log.info(wrappers.toString());
 		return ResponseEntity.status(HttpStatus.OK).body(wrappers);
 	}
 
