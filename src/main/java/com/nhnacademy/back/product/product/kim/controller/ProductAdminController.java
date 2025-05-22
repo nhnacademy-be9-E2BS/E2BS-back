@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
@@ -44,7 +45,7 @@ public class ProductAdminController {
 	 * 201 상태코드 반환
 	 */
 	@Admin
-	@PostMapping
+	@PostMapping("/self")
 	public ResponseEntity<Void> createProduct(@RequestBody RequestProductCreateDTO request) {
 		long productId = productService.createProduct(request);
 		productCategoryService.createProductCategory(productId, request.getCategoryIds(), false);
@@ -103,7 +104,7 @@ public class ProductAdminController {
 	 * 200 상태코드 반환
 	 */
 	@Admin
-	@GetMapping("/state-sale")
+	@GetMapping("/status/{sale}")
 	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(Pageable pageable) {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(products);
@@ -114,17 +115,25 @@ public class ProductAdminController {
 	 * 검색어와 검색타입으로 책 검색
 	 */
 
+
 	@GetMapping("/aladdin/search")
-	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request,
-		Pageable pageable) {
-		return productApiService.searchProducts(request, pageable);
+	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
+		Page<ResponseProductsApiSearchDTO> products = productApiService.searchProducts(request, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
 
+	/**
+	 * api 사용해서 등록
+	 */
+
 	@Admin
-	@PostMapping("/aladdin/regiter")
-	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductCreateDTO request) {
-		productService.createProduct(request);
+	@PostMapping("/aladdin/register")
+	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductApiCreateDTO request) {
+		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+
+
+
 
 }

@@ -1,14 +1,21 @@
 package com.nhnacademy.back.product.product.park.service.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
+import com.nhnacademy.back.product.contributor.domain.entity.Position;
+import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
+import com.nhnacademy.back.product.contributor.repository.ContributorJpaRepository;
+import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
+import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
@@ -24,6 +31,9 @@ import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisher
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 import com.nhnacademy.back.product.publisher.service.PublisherService;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
+import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +44,11 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	private final ProductJpaRepository productJpaRepository;
 	private final PublisherJpaRepository publisherJpaRepository;
 	private final ProductImageJpaRepository productImageJpaRepository;
+	private final ContributorJpaRepository contributorJpaRepository;
+	private final PositionJpaRepository positionJpaRepository;
 	private final PublisherService publisherService;
-
+	private final ProductContributorJpaRepository productContributorJpaRepository;
+	private final ProductStateJpaRepository productStateJpaRepository;
 
 	/**
 	 * 검색결과에 맞는 책 목록들 가져오기
@@ -50,32 +63,23 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			throw new SearchBookException("Search book failed");
 		}
 
-		List<Product> products = new ArrayList<>();
+		List<ResponseProductsApiSearchDTO> responseList = new ArrayList<>();
+
 		for (Item item : items) {
-			RequestProductApiCreateDTO createApiDTO = new RequestProductApiCreateDTO();
-			createApiDTO.setPublisherName(item.publisher);
-			createApiDTO.setProductTitle(item.Title);
-			createApiDTO.setProductDescription(item.description);
-			createApiDTO.setProductIsbn(item.isbn13);
-			createApiDTO.setProductRegularPrice(item.priceStandard);
-			createApiDTO.setProductSalePrice(item.priceSales);
-			createApiDTO.setProductImage(item.cover);
-			createApiDTO.setContributorName(item.author);
+			ResponseProductsApiSearchDTO responseProductsApiSearchDTO = new ResponseProductsApiSearchDTO();
+			responseProductsApiSearchDTO.setPublisherName(item.publisher);
+			responseProductsApiSearchDTO.setProductTitle(item.Title);
+			responseProductsApiSearchDTO.setProductDescription(item.description);
+			responseProductsApiSearchDTO.setProductIsbn(item.isbn13);
+			responseProductsApiSearchDTO.setProductRegularPrice(item.priceStandard);
+			responseProductsApiSearchDTO.setProductSalePrice(item.priceSales);
+			responseProductsApiSearchDTO.setProductImage(item.cover);
+			responseProductsApiSearchDTO.setContributors(item.author);
 
-			Publisher publisher = publisherJpaRepository.findByPublisherName(createApiDTO.getPublisherName());
-			if (publisher == null) {
-				publisher = new Publisher(item.publisher);
-			}
-
-			Product product = Product.createProductApiEntity(createApiDTO, publisher);
-			products.add(product);
+			responseList.add(responseProductsApiSearchDTO);
 		}
 
-		List<ResponseProductsApiSearchDTO> responseList = products.stream()
-			.map(ResponseProductsApiSearchDTO::from)
-			.collect(Collectors.toList());
-
-		int start = (int) pageable.getOffset();
+		int start = (int)pageable.getOffset();
 		int end = Math.min(start + pageable.getPageSize(), responseList.size());
 
 		if (start > end) {
@@ -87,26 +91,71 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		return new PageImpl<>(pagedList, pageable, responseList.size());
 	}
 
-
-	//검색결과에 해당하는 책 목록들 중에서 선택후 등록버튼 누르면 RequestProdcutCreateDTO에 현재 리스트에 해당하는 product의 정보기져와서 등록하기
 	@Override
 	public void createProduct(RequestProductApiCreateDTO request) {
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
-
 
 		if (publisher == null) {
 			RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO(request.getPublisherName());
 			publisherService.createPublisher(requestPublisherDTO);
 			publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
-		} //출판사 없으면 생성
+		}
 
 		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
 			throw new ProductAlreadyExistsException("Product already exists: %s".formatted(request.getProductIsbn()));
 		}
 
-		Product product = Product.createProductApiEntity(request, publisher);
+		ProductState state = productStateJpaRepository.findByProductStateName(ProductStateName.SALE);
+
+		if (state == null) {
+			state = new ProductState(ProductStateName.SALE);
+			productStateJpaRepository.save(state);
+		}
+
+		Product product = Product.createProductApiEntity(request, publisher, state);
 
 		productJpaRepository.save(product);
 
+		Map<String, String> map = parse(request.getContributors());
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String contributorName = entry.getKey();
+			String positionName = entry.getValue();
+
+			if (!positionJpaRepository.existsByPositionName(positionName)) {
+				positionJpaRepository.save(new Position(positionName));
+			}
+
+			Position position = positionJpaRepository.findPositionByPositionName(positionName);
+			Contributor contributor = new Contributor(contributorName, position);
+			contributorJpaRepository.save(contributor);
+
+			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
+			ProductContributor productContributor = new ProductContributor(contributor, product);
+			productContributorJpaRepository.save(productContributor);
+
+		}
+
+
+	}
+
+	private Map<String, String> parse(String contributors) {
+		String[] contributorArr = contributors.split(",");
+		String contributorName = "";
+		String positionName = "";
+		Map<String, String> result = new LinkedHashMap<>();
+
+		for (String contributor : contributorArr) {
+			contributor = contributor.trim();
+			if (contributor.contains("(") && contributor.contains(")")) {
+				contributorName = contributor.substring(0, contributor.indexOf("("));
+				positionName = contributor.substring(contributor.indexOf("(") + 1, contributor.indexOf(")"));
+				result.put(contributorName, positionName);
+			} else {
+				contributorName = contributor;
+				positionName = "없음";
+				result.put(contributorName, positionName);
+			}
+		}
+		return result;
 	}
 }

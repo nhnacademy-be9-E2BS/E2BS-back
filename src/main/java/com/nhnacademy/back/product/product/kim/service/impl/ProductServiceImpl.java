@@ -68,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
 	private final TagJpaRepository tagJpaRepository;
 	private final ProductTagJpaRepository productTagJpaRepository;
 	private final PublisherService publisherService;
+	private final PositionJpaRepository positionJpaRepository;
 
 	/**
 	 * 도서를 DB에 저장

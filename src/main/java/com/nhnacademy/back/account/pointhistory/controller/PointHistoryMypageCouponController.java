@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/members")
+@RequestMapping("/api/mypage/{memberId}/points")
 public class PointHistoryMypageCouponController {
 
 	private final PointHistoryService pointHistoryService;
 
-	@GetMapping("/{memberId}/points")
-	public ResponseEntity<ResponseMemberPointDTO> getMemberCouponCnt(
+	@GetMapping
+	public ResponseEntity<ResponseMemberPointDTO> getPoints(
 		@PathVariable("memberId") String memberId) {
 		ResponseMemberPointDTO responseMemberPointDTO = pointHistoryService.getMemberPoints(memberId);
 

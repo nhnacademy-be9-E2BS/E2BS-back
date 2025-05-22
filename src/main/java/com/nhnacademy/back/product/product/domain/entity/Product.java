@@ -10,7 +10,6 @@ import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCrea
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
-import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +36,7 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
 
-	@OneToOne(optional = false)
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_state_id")
 	private ProductState productState;
 
@@ -82,23 +80,25 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher) {
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
 		Product product = Product.builder()
-			.productState(new ProductState(ProductStateName.SALE))
+			.productState(state)
 			.publisher(publisher)
 			.productTitle(request.getProductTitle())
 			.productDescription(request.getProductDescription())
+			.productContent(request.getProductContent())
 			.productIsbn(request.getProductIsbn())
 			.productRegularPrice(request.getProductRegularPrice())
 			.productSalePrice(request.getProductSalePrice())
+			.productPackageable(request.isProductPackageable())
+			.productStock(request.getProductStock())
 			.productPublishedAt(LocalDate.now())
 			.productHits(0)
 			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build();
 
-		ProductImage image = new ProductImage(product, request.getProductImage()); //
-
+		ProductImage image = new ProductImage(product, request.getProductImage());
 		product.getProductImage().add(image);
 
 		return product;

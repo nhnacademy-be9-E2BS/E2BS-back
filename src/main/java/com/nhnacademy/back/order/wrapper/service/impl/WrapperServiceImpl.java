@@ -17,10 +17,12 @@ import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
 import com.nhnacademy.back.order.wrapper.service.WrapperService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class WrapperServiceImpl implements WrapperService {
 	private final WrapperJpaRepository wrapperJpaRepository;
 
@@ -41,6 +43,7 @@ public class WrapperServiceImpl implements WrapperService {
 	 */
 	@Override
 	public Page<ResponseWrapperDTO> getWrappers(Pageable pageable) {
+		log.info("포장지 전체 조회 서비스 시작");
 		return wrapperJpaRepository.findAll(pageable)
 			.map(wrapper -> new ResponseWrapperDTO(
 				wrapper.getWrapperId(),

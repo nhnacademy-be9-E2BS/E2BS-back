@@ -14,14 +14,14 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/members")
+@RequestMapping("/api/mypage/{memberId}/coupons")
 public class MemberCouponMypageController {
 
 	private final MemberCouponService memberCouponService;
 
-	@GetMapping("/{memberId}/coupons")
-	public ResponseEntity<ResponseMypageMemberCouponDTO> getMemberPoints(
-		@PathVariable("memberId") String memberId) {
+	@GetMapping
+	public ResponseEntity<ResponseMypageMemberCouponDTO> getCouponCnt(@PathVariable("memberId") String memberId) {
+
 		ResponseMypageMemberCouponDTO responseMemberCouponDTO = memberCouponService.getMemberCouponCnt(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberCouponDTO);

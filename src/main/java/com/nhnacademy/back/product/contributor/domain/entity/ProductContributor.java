@@ -34,4 +34,8 @@ public class ProductContributor {
 		this.contributor = contributor;
 	}
 
+	public ProductContributor(Contributor contributor, Product product) {
+		this.contributor = contributor;
+		this.product = product;
+	}
 }

@@ -10,4 +10,6 @@ public interface PositionJpaRepository extends JpaRepository<Position, Long> {
 	boolean existsByPositionName(String positionName);
 
 	Optional<Position> findByPositionName(String positionName);
+
+	Position findPositionByPositionName(String positionName);
 }

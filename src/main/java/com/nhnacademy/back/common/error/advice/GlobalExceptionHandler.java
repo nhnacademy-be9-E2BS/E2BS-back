@@ -7,7 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.nhnacademy.back.account.address.exception.SaveMemberAddressFailedException;
+import com.nhnacademy.back.account.address.exception.DeleteAddressFailedException;
+import com.nhnacademy.back.account.address.exception.NotFoundAddressException;
+import com.nhnacademy.back.account.address.exception.SaveAddressFailedException;
+import com.nhnacademy.back.account.address.exception.UpdateAddressFailedException;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
@@ -46,7 +49,7 @@ public class GlobalExceptionHandler {
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
 		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
-		SaveMemberAddressFailedException.class})
+		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -61,7 +64,8 @@ public class GlobalExceptionHandler {
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
 		ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
-		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class})
+		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
+		NotFoundAddressException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());

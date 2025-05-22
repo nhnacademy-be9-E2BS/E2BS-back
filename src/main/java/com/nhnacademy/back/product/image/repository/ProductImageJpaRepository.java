@@ -12,10 +12,12 @@ import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImag
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 
 public interface ProductImageJpaRepository extends JpaRepository<ProductImage, Long> {
-	@Query("select ResponseProductImageDTO(i.productImageId, i.productImagePath) from ProductImage i where i.product.productId = :productId")
-	List<ResponseProductImageDTO> findImageDTOsByProductId(@Param("productId") Long productId);
+	List<ProductImage> findByProduct_ProductId(long productProductId);
 
 	void deleteByProduct_ProductId(long productId);
+
+	@Query("select ResponseProductImageDTO(i.productImageId, i.productImagePath) from ProductImage i where i.product.productId = :productId")
+	List<ResponseProductImageDTO> findImageDTOsByProductId(@Param("productId") Long productId);
 
 	@Query("SELECT pi FROM ProductImage pi WHERE pi.product.productId IN :productIds")
 	List<ProductImage> findAllByProductIds(@Param("productIds") List<Long> productIds);
