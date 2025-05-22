@@ -23,6 +23,10 @@ spring:
     port: 5672
     username: admin
     password: nhnacademy123!
+    listener:
+      simple:
+        acknowledge-mode: auto
+        default-requeue-rejected: false
 
   data:
     redis:
