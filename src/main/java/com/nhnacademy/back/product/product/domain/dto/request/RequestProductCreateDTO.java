@@ -40,6 +40,15 @@ public class RequestProductCreateDTO {
 	//재고
 	private int productStock;
 	// 이미지
-	private List<String> productImage;
+	private List<String> productImagePaths;
+	// 태그
+	private List<String> tagNames;
+	// 카테고리 Id
+	private List<Long> categoryIds;
+	// 기여자 Id
+	private List<String> contributorNames;
+	// 기여자 역할
+	private List<String> positionNames; // 새로 추가
+
 
 }
