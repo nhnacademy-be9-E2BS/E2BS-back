@@ -2,9 +2,8 @@
 
 package com.nhnacademy.back.product.product.domain.dto.response;
 
-import com.nhnacademy.back.product.product.domain.entity.Product;
-
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,27 +28,18 @@ public class ResponseProductsApiSearchDTO {
 	@NotBlank
 	private String productImage;
 
-	// 아래는 안보여줌
+	@NotBlank
 	private String productDescription;
-	//정가
-	private long productRegularPrice;
-	//판매가
-	private long productSalePrice;
-	// 이미지
 
-	public static ResponseProductsApiSearchDTO from(Product product) {
-		return ResponseProductsApiSearchDTO.builder()
-			.publisherName(product.getPublisher().getPublisherName())
-			.productTitle(product.getProductTitle())
-			.productIsbn(product.getProductIsbn())
-			.productDescription(product.getProductDescription())
-			.productRegularPrice(product.getProductRegularPrice())
-			.productSalePrice(product.getProductSalePrice())
-			.productImage(
-				product.getProductImage().isEmpty() ? null : product.getProductImage().getFirst().getProductImagePath()
-			)
-			.build();
-	}
+	@NotNull
+	private long productRegularPrice;
+
+	@NotNull
+	private long productSalePrice;
+
+	@NotBlank
+	private String contributors;
+
 
 
 }

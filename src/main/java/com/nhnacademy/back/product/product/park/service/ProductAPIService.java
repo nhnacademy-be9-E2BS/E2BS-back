@@ -11,8 +11,4 @@ public interface ProductAPIService {
 	Page<ResponseProductsApiSearchDTO> searchProducts(RequestProductApiSearchDTO request, Pageable pageable); //api에서 책 리스트 가져오기
 	void createProduct(RequestProductApiCreateDTO request);
 
-
-
-
-
 }

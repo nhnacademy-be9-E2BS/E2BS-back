@@ -82,6 +82,7 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
+
 	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher) {
 		Product product = Product.builder()
 			.productState(new ProductState(ProductStateName.SALE))
@@ -143,6 +144,7 @@ public class Product {
 	public void setProduct(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
+
 
 
 
