@@ -19,6 +19,7 @@ import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
 import com.nhnacademy.back.product.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.back.product.contributor.repository.ContributorJpaRepository;
+import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImageDTO;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
