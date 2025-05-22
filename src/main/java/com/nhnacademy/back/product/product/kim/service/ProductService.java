@@ -17,7 +17,7 @@ public interface ProductService {
 	//관리자 - 도서 DB에 저장
 	void createProduct(RequestProductCreateDTO request);
 	//공통 - 도서 한권 상세 조회
-	ResponseProductReadDTO getProduct(RequestProductGetDTO request);
+	ResponseProductReadDTO getProduct(long productId, RequestProductGetDTO request);
 	//공통 - 도서 여러권 페이지로 조회
 	Page<ResponseProductReadDTO> getProducts(Pageable pageable);
 	//Order전용 - 도서 여러권 리스트로 조회

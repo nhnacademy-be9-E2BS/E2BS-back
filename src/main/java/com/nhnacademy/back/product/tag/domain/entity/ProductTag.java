@@ -1,5 +1,8 @@
 package com.nhnacademy.back.product.tag.domain.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.nhnacademy.back.product.product.domain.entity.Product;
 
 import jakarta.persistence.Entity;
@@ -27,5 +30,11 @@ public class ProductTag {
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "tag_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Tag tag;
+
+	public ProductTag(Product product, Tag tag) {
+		this.product = product;
+		this.tag = tag;
+	}
 }
