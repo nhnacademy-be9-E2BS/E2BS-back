@@ -1,21 +1,24 @@
 package com.nhnacademy.back.common.config;
 
-import java.net.URI;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.errors.MinioException;
 
 @Configuration
 public class MinioConfig {
 
-	@Value("${minio.endpoint}")
-	private String endpoint;
+	@Value("${minio.host}")
+	private String host;
 
 	@Value("${minio.access-key}")
 	private String accessKey;
@@ -36,13 +39,44 @@ public class MinioConfig {
 	 * 3.요청 본문에 대한 서명 포함
 	 * 4.AWS S3와 완벽히 호환되는 방식으로 MinIO에 요청
 	 */
+	// @Bean
+	// public S3Client s3Client() {
+	// 	return S3Client.builder()
+	// 		.endpointOverride(URI.create(host))
+	// 		.credentialsProvider(() -> AwsBasicCredentials.builder()
+	// 									.accessKeyId(accessKey)
+	// 									.secretAccessKey(secretKey)
+	// 									.build())
+	// 		.region(Region.of(region))
+	// 		.forcePathStyle(true)
+	// 		.build();
+	// }
+
 	@Bean
-	public S3Client s3Client() {
-		return S3Client.builder()
-			.endpointOverride(URI.create(endpoint))
-			.credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-			.region(Region.of(region))
-			.build();
+	public MinioClient minioClient() {
+		try {
+			MinioClient minioClient = MinioClient.builder()
+				.endpoint(host)
+				.credentials(accessKey, secretKey)
+				.build();
+
+			boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket("e2bs-reviews-image").build());
+			if (!found) {
+				minioClient.makeBucket(MakeBucketArgs.builder().bucket("e2bs-reviews-image").build());
+			} else {
+				System.out.println("Bucket 'e2bs-reviews-image' already exists.");
+			}
+
+			return minioClient;
+		} catch (MinioException e) {
+			System.out.println("Error occurred: " + e);
+			System.out.println("HTTP trace: " + e.httpTrace());
+			throw new RuntimeException(e);
+		} catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+			System.out.println("Error occurred: " + e);
+			System.out.println("HTTP trace: " + Arrays.toString(e.getStackTrace()));
+			throw new RuntimeException(e);
+		}
 	}
 
 }

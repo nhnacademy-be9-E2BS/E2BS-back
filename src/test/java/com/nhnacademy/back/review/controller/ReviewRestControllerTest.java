@@ -57,7 +57,7 @@ class ReviewRestControllerTest {
 	@DisplayName("POST /api/reviews/{reviewId} - 리뷰 수정 테스트")
 	void updateReview() throws Exception {
 		// given
-		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO("리뷰 수정", 5, "update.jpg");
+		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO("리뷰 수정", 5, null);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then

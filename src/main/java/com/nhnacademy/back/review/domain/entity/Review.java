@@ -50,21 +50,21 @@ public class Review {
 	@Column(nullable = false)
 	private LocalDateTime reviewCreatedAt;
 
-	public static Review createReviewEntity(Product product, Customer customer, RequestCreateReviewDTO request) {
+	public static Review createReviewEntity(Product product, Customer customer, RequestCreateReviewDTO request, String imagePath) {
 		return Review.builder()
 			.product(product)
 			.customer(customer)
 			.reviewContent(request.getReviewContent())
 			.reviewGrade(request.getReviewGrade())
-			.reviewImage(request.getReviewImage().getOriginalFilename())
+			.reviewImage(imagePath)
 			.reviewCreatedAt(LocalDateTime.now())
 			.build();
 
 	}
 
-	public void changeReview(RequestUpdateReviewDTO request) {
+	public void changeReview(RequestUpdateReviewDTO request, String updateImagePath) {
 		this.reviewContent = request.getReviewContent();
 		this.reviewGrade = request.getReviewGrade();
-		this.reviewImage = request.getReviewImage();
+		this.reviewImage = updateImagePath;
 	}
 }
