@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,8 +44,8 @@ public class MemberCouponController {
 	 * 쿠폰함 : 회원 ID로 회원쿠폰 테이블에서 쿠폰 조회
 	 */
 	@Member
-	@GetMapping("/api/member-coupons")
-	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@RequestParam String memberId, Pageable pageable) {
+	@GetMapping("/api/mypage/{memberId}/coupons")
+	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@PathVariable String memberId, Pageable pageable) {
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getMemberCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

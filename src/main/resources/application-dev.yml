@@ -22,7 +22,7 @@ spring:
     init:
       mode: always
       data-locations: classpath:sql/h2/sample.sql
-      schema-locations: classpath:sql/h2/schema.sql
+      schema-locations: classpath:sql/h2/schema-h2.sql
   data:
     redis:
       host: s4.java21.net
