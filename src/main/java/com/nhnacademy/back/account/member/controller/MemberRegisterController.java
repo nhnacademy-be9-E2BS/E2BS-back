@@ -44,7 +44,6 @@ public class MemberRegisterController {
 			WelcomeCouponRabbitConfig.WELCOME_ROUTING_KEY,
 			responseRegisterMemberDTO.getMemberId());
 
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseRegisterMemberDTO);
 	}
 
