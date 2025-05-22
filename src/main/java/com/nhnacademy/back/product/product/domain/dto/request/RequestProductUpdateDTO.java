@@ -23,7 +23,7 @@ public class RequestProductUpdateDTO {
 	private long productStateId;
 	//출판사
 	@NotNull
-	private String publisherId;
+	private long publisherId;
 
 	//제목, 목차, 설명
 	@NotNull
@@ -53,11 +53,14 @@ public class RequestProductUpdateDTO {
 	private int productStock;
 
 	// 이미지
+	@NotNull
 	private List<String> productImagePaths;
 	// 태그
 	private List<Long> tagIds;
 	// 카테고리 Id
+	@NotNull
 	private List<Long> categoryIds;
 	// 기여자 Id
+	@NotNull
 	private List<Long> contributorIds;
 }

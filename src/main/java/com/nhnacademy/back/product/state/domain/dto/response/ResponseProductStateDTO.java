@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.image.domain.dto.response;
+package com.nhnacademy.back.product.state.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseProductImageDTO {
-	private long productImageId;
-	private String productImagePath;
+public class ResponseProductStateDTO {
+	private long productStateId;
+	private String productStateName;
 }

@@ -7,6 +7,7 @@ import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategory
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImageDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
+import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class ResponseProductReadDTO {
 
 	private long productId;
 	// 상품상태, 출판사
-	private String productState;
+	private ResponseProductStateDTO productState;
 	private ResponsePublisherDTO publisher;
 	private String productTitle;
 	private String productContent;

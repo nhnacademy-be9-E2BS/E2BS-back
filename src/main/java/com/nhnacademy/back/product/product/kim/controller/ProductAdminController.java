@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
+import com.nhnacademy.back.product.category.service.ProductCategoryService;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductAdminController {
 	private final ProductService productService;
 	private final ProductAPIService productApiService;
+	private final ProductCategoryService productCategoryService;
 
 	/**
 	 * 도서 받아와서 DB에 저장
@@ -44,7 +46,8 @@ public class ProductAdminController {
 	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createProduct(@RequestBody RequestProductCreateDTO request) {
-		productService.createProduct(request);
+		long productId = productService.createProduct(request);
+		productCategoryService.createProductCategory(productId, request.getCategoryIds(), false);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -67,6 +70,7 @@ public class ProductAdminController {
 	@PutMapping("/{bookId}")
 	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestBody RequestProductUpdateDTO request) {
 		productService.updateProduct(bookId, request);
+		productCategoryService.createProductCategory(bookId, request.getCategoryIds(), true);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
@@ -76,7 +80,8 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@PutMapping("/{bookId}/stock")
-	public ResponseEntity<Void> updateProductStock(@PathVariable Long bookId, @RequestBody RequestProductStockUpdateDTO request) {
+	public ResponseEntity<Void> updateProductStock(@PathVariable Long bookId,
+		@RequestBody RequestProductStockUpdateDTO request) {
 		productService.updateProductStock(bookId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
@@ -87,7 +92,8 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@PutMapping("/{bookId}/sale-price")
-	public ResponseEntity<Void> updateProductSalePrice(@PathVariable Long bookId, @RequestBody RequestProductSalePriceUpdateDTO request) {
+	public ResponseEntity<Void> updateProductSalePrice(@PathVariable Long bookId,
+		@RequestBody RequestProductSalePriceUpdateDTO request) {
 		productService.updateProductSalePrice(bookId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
@@ -109,7 +115,8 @@ public class ProductAdminController {
 	 */
 
 	@GetMapping("/aladdin/search")
-	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
+	public Page<ResponseProductsApiSearchDTO> searchBooks(@ModelAttribute RequestProductApiSearchDTO request,
+		Pageable pageable) {
 		return productApiService.searchProducts(request, pageable);
 	}
 
@@ -119,8 +126,5 @@ public class ProductAdminController {
 		productService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
-
-
 
 }

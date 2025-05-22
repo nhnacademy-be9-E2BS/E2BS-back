@@ -14,7 +14,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductRe
 
 public interface ProductService {
 	//관리자 - 도서 DB에 저장
-	void createProduct(RequestProductCreateDTO request);
+	Long createProduct(RequestProductCreateDTO request);
 
 	//공통 - 도서 한권 상세 조회
 	ResponseProductReadDTO getProduct(long productId);

@@ -104,32 +104,33 @@ public class Product {
 		return product;
 	}
 
-
-	public static Product createProductEntity(RequestProductCreateDTO request, Publisher publisher) {
+	public static Product createProductEntity(RequestProductCreateDTO request, ProductState productState,
+		Publisher publisher) {
 		return Product.builder()
-			.productState(new ProductState(ProductStateName.SALE))
+			.productState(productState)
 			.publisher(publisher)
 			.productTitle(request.getProductTitle())
 			.productContent(request.getProductContent())
 			.productDescription(request.getProductDescription())
+			.productPublishedAt(request.getProductPublishedAt())
 			.productIsbn(request.getProductIsbn())
 			.productRegularPrice(request.getProductRegularPrice())
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productPublishedAt(LocalDate.now())
 			.productHits(0)
 			.productSearches(0)
 			.build();
 	}
 
 	//updateProdut를 위해 set대신 쓴 생성자
-	public void updateProduct(RequestProductUpdateDTO request, Publisher publisher, ProductState productState) {
+	public void updateProduct(RequestProductUpdateDTO request, ProductState productState, Publisher publisher) {
 		this.productState = productState;
 		this.publisher = publisher;
 		this.productTitle = request.getProductTitle();
 		this.productContent = request.getProductContent();
 		this.productDescription = request.getProductDescription();
+		this.productIsbn = request.getProductIsbn();
 		this.productRegularPrice = request.getProductRegularPrice();
 		this.productSalePrice = request.getProductSalePrice();
 		this.productPackageable = request.isProductPackageable();
@@ -143,9 +144,5 @@ public class Product {
 	public void setProduct(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
-
-
-
-
 
 }
