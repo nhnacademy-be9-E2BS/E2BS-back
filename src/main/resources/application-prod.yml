@@ -6,7 +6,7 @@ spring:
     username: project_be9_team2
     password: "*gzxziN[g9kwl]Ln"
   rabbitmq:
-    virtual-host: "vh1_prod"
+    virtual-host: "e2bs_prod"
 
 eureka:
   client:
