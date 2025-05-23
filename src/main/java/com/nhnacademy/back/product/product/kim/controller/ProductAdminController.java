@@ -121,8 +121,10 @@ public class ProductAdminController {
 	}
 
 	/**
+	 *
 	 * 검색어와 검색타입으로 책 검색
 	 */
+
 	@Admin
 	@GetMapping("/aladdin/search")
 	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(
@@ -134,11 +136,15 @@ public class ProductAdminController {
 	/**
 	 * api 사용해서 등록
 	 */
+
 	@Admin
 	@PostMapping("/aladdin/register")
 	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductApiCreateDTO request) {
 		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+
+
+
 
 }
