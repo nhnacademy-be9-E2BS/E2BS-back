@@ -1,7 +1,6 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
-import java.util.List;
-
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,22 +11,41 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductUpdateDTO {
-	/**
-	 * 도서를 수정할 때 필요한 정보
-	 */
-	private long productStateId;
-	private long publisherId;
-	@NotNull
+public class RequestProductApiCreateDTO {
+	@NotBlank
+	private String publisherName;
+
+	@NotBlank
 	private String productTitle;
-	@NotNull
-	private String productContent;
-	@NotNull
+
+	@NotBlank
+	private String productIsbn;
+
+	@NotBlank
+	private String productImage;
+
+	@NotBlank
 	private String productDescription;
+
+	@NotNull
 	private long productRegularPrice;
+
+	@NotNull
 	private long productSalePrice;
+
+	@NotBlank
+	private String contributors;
+
+	/**
+	 * 아래부터는 관리자가 직접 입력하는 필드
+	 */
+	@NotBlank
+	private String productContent;
+
+	@NotNull
 	private boolean productPackageable;
+
+	@NotNull
 	private int productStock;
-	private List<String> productImagePaths;
 
 }

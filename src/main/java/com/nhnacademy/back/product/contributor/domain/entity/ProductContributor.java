@@ -22,11 +22,20 @@ public class ProductContributor {
 	private long productContributorId;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "contributor_id")
-	private Contributor contributor;
-
-	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "contributor_id")
+	private Contributor contributor;
+
+	public ProductContributor(Product product, Contributor contributor) {
+		this.product = product;
+		this.contributor = contributor;
+	}
+
+	public ProductContributor(Contributor contributor, Product product) {
+		this.contributor = contributor;
+		this.product = product;
+	}
 }
