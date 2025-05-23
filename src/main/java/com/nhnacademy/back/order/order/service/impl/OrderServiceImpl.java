@@ -1,7 +1,6 @@
 package com.nhnacademy.back.order.order.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -92,7 +91,6 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
 		order.updatePaymentStatus(true);
-		// orderJpaRepository.save(order);
 		return response;
 	}
 
@@ -185,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		List<ResponseOrderDetailDTO> orderDetails = orderDetailJpaRepository.findByOrderOrderCode(orderCode)
-			.stream().map(ResponseOrderDetailDTO::fromEntity).collect(Collectors.toList());
+			.stream().map(ResponseOrderDetailDTO::fromEntity).toList();
 		return new ResponseOrderWrapperDTO(order, orderDetails);
 	}
 
