@@ -15,13 +15,13 @@ import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class CategoryJpaRepositoryTest {
+class CategoryJpaRepositoryTest {
 	@Autowired
 	private CategoryJpaRepository categoryJpaRepository;
 
 	@Test
 	@DisplayName("findAllByParentIsNull 메소드 테스트")
-	public void find_all_by_parent_is_null_test() {
+	void find_all_by_parent_is_null_test() {
 		// given
 		Category rootCategory = new Category("Root", null);
 		categoryJpaRepository.save(rootCategory);
@@ -37,7 +37,7 @@ public class CategoryJpaRepositoryTest {
 
 	@Test
 	@DisplayName("existsByParentIsNullAndCategoryName 메소드 테스트")
-	public void exists_by_parent_is_null_and_category_name_test() {
+	void exists_by_parent_is_null_and_category_name_test() {
 		// given
 		Category rootCategory = new Category("Root", null);
 		categoryJpaRepository.save(rootCategory);
@@ -53,7 +53,7 @@ public class CategoryJpaRepositoryTest {
 
 	@Test
 	@DisplayName("existsByParentCategoryIdAndCategoryName 메소드 테스트")
-	public void exists_by_parent_category_id_and_category_name_test() {
+	void exists_by_parent_category_id_and_category_name_test() {
 		// given
 		Category root = new Category("Root", null);
 		categoryJpaRepository.save(root);

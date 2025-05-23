@@ -1,7 +1,5 @@
 package com.nhnacademy.back.product.product.kim.service.impl;
 
-import static java.util.stream.Collectors.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -236,7 +234,7 @@ public class ProductServiceImpl implements ProductService {
 				productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
 				productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
 				productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
-			)).collect(toList());
+			)).toList();
 	}
 
 	/**
