@@ -1,5 +1,7 @@
 package com.nhnacademy.back.order.order.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
@@ -93,4 +96,11 @@ public class OrderController {
 	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(@PathVariable String orderCode) {
 		return ResponseEntity.ok(orderService.getOrderByOrderCode(orderCode));
 	}
+
+	@Member
+	@GetMapping("/api/order/orders")
+	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId) {
+		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));
+	}
+
 }
