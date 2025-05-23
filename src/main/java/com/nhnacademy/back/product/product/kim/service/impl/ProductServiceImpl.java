@@ -164,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
 		Map<Long, List<Contributor>> contributorMap = productContributorJpaRepository.findContributorsGroupedByProductIds(
 			productIds);
 
-		Page<ResponseProductReadDTO> result = productPage.map(product -> {
+		return productPage.map(product -> {
 			Long id = product.getProductId();
 			return new ResponseProductReadDTO(
 				id,
@@ -200,8 +200,6 @@ public class ProductServiceImpl implements ProductService {
 					.toList()
 			);
 		});
-
-		return result;
 	}
 
 	/**
