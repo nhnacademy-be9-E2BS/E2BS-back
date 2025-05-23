@@ -43,7 +43,7 @@ public class ProductAdminController {
 	 * 도서 받아와서 DB에 저장
 	 * 201 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createProduct(@RequestBody RequestProductDTO request) {
 		long productId = productService.createProduct(request);
@@ -54,7 +54,7 @@ public class ProductAdminController {
 	/**
 	 * 전체 도서 페이징 처리하여 조회
 	 */
-	// @Admin
+	@Admin
 	@GetMapping
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProducts(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -66,7 +66,7 @@ public class ProductAdminController {
 	 * order전용 productId들을 받아서 정보를 반환
 	 * 200 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@GetMapping("/order")
 	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(@RequestBody List<Long> products) {
 		List<ResponseProductReadDTO> productsDTO = productService.getProducts(products);
@@ -77,7 +77,7 @@ public class ProductAdminController {
 	 * productId와 바꿀 정보들을 받아와 DB에 정보 업데이트
 	 * 200 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@PutMapping("/{bookId}")
 	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestBody RequestProductDTO request) {
 		productService.updateProduct(bookId, request);
@@ -89,7 +89,7 @@ public class ProductAdminController {
 	 *  productId와 바꿀 재고를 받아와 업데이트
 	 *  200 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@PutMapping("/{bookId}/stock")
 	public ResponseEntity<Void> updateProductStock(@PathVariable Long bookId,
 		@RequestBody RequestProductStockUpdateDTO request) {
@@ -101,7 +101,7 @@ public class ProductAdminController {
 	 * productId와 바꿀 판매가를 받아와 업데이트
 	 * 200 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@PutMapping("/{bookId}/salePrice")
 	public ResponseEntity<Void> updateProductSalePrice(@PathVariable Long bookId,
 		@RequestBody RequestProductSalePriceUpdateDTO request) {
@@ -113,7 +113,7 @@ public class ProductAdminController {
 	 * sale 상태 도서 전체 조회
 	 * 200 상태코드 반환
 	 */
-	// @Admin
+	@Admin
 	@GetMapping("/status/sale")
 	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(Pageable pageable) {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
@@ -123,6 +123,7 @@ public class ProductAdminController {
 	/**
 	 * 검색어와 검색타입으로 책 검색
 	 */
+	@Admin
 	@GetMapping("/aladdin/search")
 	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(
 		@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
