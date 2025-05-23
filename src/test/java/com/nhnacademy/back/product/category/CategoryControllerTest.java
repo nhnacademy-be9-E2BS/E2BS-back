@@ -21,7 +21,7 @@ import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategory
 import com.nhnacademy.back.product.category.service.CategoryService;
 
 @WebMvcTest(controllers = CategoryController.class)
-public class CategoryControllerTest {
+class CategoryControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean
