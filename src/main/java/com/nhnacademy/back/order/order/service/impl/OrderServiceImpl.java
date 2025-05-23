@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
 		order.updatePaymentStatus(true);
-		orderJpaRepository.save(order);
+		// orderJpaRepository.save(order);
 		return response;
 	}
 
