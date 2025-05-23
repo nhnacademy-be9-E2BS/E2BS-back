@@ -48,8 +48,8 @@ public class OrderAdminServiceImpl implements OrderAdminService {
 	 */
 	@Override
 	public ResponseEntity<Void> startDelivery(String orderCode) {
-		Order order = orderJpaRepository.findById(orderCode).get();
-		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).get();
+		Order order = orderJpaRepository.findById(orderCode).orElseThrow();
+		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).orElse(null);
 		order.updateOrderState(orderState);
 		order.updateOrderShipmentDate(LocalDate.now());
 		orderJpaRepository.save(order);
