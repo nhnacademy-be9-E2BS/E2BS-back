@@ -16,5 +16,11 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
 	/**
 	 * 쿠폰함 : 회원 ID로 쿠폰 조회
 	 */
-	Page<MemberCoupon> findByMember_CustomerId(Long memberId, Pageable pageable);
+	Page<MemberCoupon> findByMember_CustomerId(Long customerId, Pageable pageable);
+
+	/**
+	 * 주문서 : 해당 회원의 보유 쿠폰 중 사용하지 않은 것들
+	 */
+	List<MemberCoupon> findByMember_CustomerIdAndMemberCouponUsedFalse(Long customerId);
+
 }

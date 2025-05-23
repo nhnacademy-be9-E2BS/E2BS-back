@@ -172,6 +172,7 @@ VALUES (1, 1),
 INSERT INTO product_category (category_id, product_id)
 VALUES (1, 1),
        (2, 4),
+       (1, 4),
        (4, 2),
        (3, 3);
 
@@ -209,9 +210,9 @@ VALUES (1, DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,
 
 -- Coupon
 INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
-VALUES (1, '1,000원 쿠폰', 1, true),
-       (2, '10% 쿠폰', 2, true),
-       (3, '3000원 쿠폰', 3, true),
+VALUES (1, '국내도서 쿠폰', 1, true),
+       (2, 'spring 입문 쿠폰', 2, true),
+       (3, '소설 쿠폰', 3, true),
        (4, '봄맞이 할인 쿠폰', 4, true),
        (5, '과학의 달 쿠폰', 5, true),
        (6, '5월 생일 쿠폰', 2, true),
@@ -222,7 +223,12 @@ VALUES (1, '1,000원 쿠폰', 1, true),
 INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
 VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
-       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 4, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 5, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 6, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 7, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
