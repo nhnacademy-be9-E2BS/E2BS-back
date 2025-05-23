@@ -27,7 +27,7 @@ public class WelcomeCouponConsumer {
 	@RabbitListener(queues = WelcomeCouponRabbitConfig.WELCOME_QUEUE)
 	public void issueCoupon(Long customerId) {
 		Member member = memberRepository.findById(customerId)
-			.orElseThrow(() -> new CustomerNotFoundException());
+			.orElseThrow(CustomerNotFoundException::new);
 
 		String welcomeCouponName = "웰컴 쿠폰";
 
