@@ -30,7 +30,7 @@ public class BirthdayCouponConsumer {
 	@RabbitListener(queues = BirthdayCouponRabbitConfig.BIRTHDAY_QUEUE)
 	public void issueCoupon(Long memberId) {
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new CustomerNotFoundException());
+			.orElseThrow(CustomerNotFoundException::new);
 
 		String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("M월"));
 		String birthCouponName = currentMonth + " 생일 쿠폰";

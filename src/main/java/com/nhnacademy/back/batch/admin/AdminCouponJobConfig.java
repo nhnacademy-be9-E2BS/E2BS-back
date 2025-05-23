@@ -72,8 +72,7 @@ public class AdminCouponJobConfig {
 					.orElseThrow(() -> new CouponNotFoundException("쿠폰 없음"));
 
 				// MemberCoupon 생성: (Member, Coupon, 발급일, 만료일)
-				MemberCoupon mc = new MemberCoupon(member, coupon, LocalDateTime.now(), period);
-				return mc;
+				return new MemberCoupon(member, coupon, LocalDateTime.now(), period);
 			})
 			.writer(memberCouponWriter()) // DB에 MemberCoupon 저장
 			.build();
