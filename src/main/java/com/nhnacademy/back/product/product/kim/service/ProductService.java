@@ -5,28 +5,27 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 
 public interface ProductService {
 	//관리자 - 도서 DB에 저장
-	Long createProduct(RequestProductCreateDTO request);
+	Long createProduct(RequestProductDTO request);
 
 	//공통 - 도서 한권 상세 조회
 	ResponseProductReadDTO getProduct(long productId);
 
 	//공통 - 도서 여러권 페이지로 조회
-	Page<ResponseProductReadDTO> getProducts(Pageable pageable);
+	Page<ResponseProductReadDTO> getProducts(Pageable pageable, long categoryId);
 
 	//Order전용 - 도서 여러권 리스트로 조회
-	List<ResponseProductReadDTO> getProducts(List<Long> products);
+	List<ResponseProductReadDTO> getProducts(List<Long> productIds);
 
 	//관리자 - 도서 수정
-	void updateProduct(long productId, RequestProductUpdateDTO request);
+	void updateProduct(long productId, RequestProductDTO request);
 
 	//관리자 - 재고 수동 수정
 	void updateProductStock(long productId, RequestProductStockUpdateDTO request);

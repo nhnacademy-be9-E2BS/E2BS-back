@@ -23,12 +23,12 @@ public class ProductController {
 	private final ProductService productService;
 
 	/**
-	 * 도서 여러권 페이징 처리하여 조회
+	 * 카테고리별 도서 여러권 페이징 처리하여 조회
 	 */
-	@GetMapping
+	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProducts(
-		@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		Page<ResponseProductReadDTO> response = productService.getProducts(pageable);
+		@PageableDefault(page = 0, size = 10) Pageable pageable, @PathVariable long categoryId) {
+		Page<ResponseProductReadDTO> response = productService.getProducts(pageable, categoryId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

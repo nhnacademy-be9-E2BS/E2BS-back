@@ -13,9 +13,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductUpdateDTO {
+public class RequestProductDTO {
 	/**
-	 * 도서를 수정할 때 필요한 정보
+	 * 도서를 생성할 때 필요한 정보
 	 */
 
 	//상품상태
@@ -63,4 +63,5 @@ public class RequestProductUpdateDTO {
 	// 기여자 Id
 	@NotNull
 	private List<Long> contributorIds;
+
 }

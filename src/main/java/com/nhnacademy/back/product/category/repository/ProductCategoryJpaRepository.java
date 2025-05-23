@@ -27,7 +27,7 @@ public interface ProductCategoryJpaRepository extends JpaRepository<ProductCateg
 	@Query("DELETE FROM ProductCategory pc WHERE pc.product.productId = :productId")
 	void deleteAllByProductId(@Param("productId") Long productId);
 
-	@Query("select ResponseCategoryDTO(pc.category.categoryId, pc.category.categoryName, null) from ProductCategory pc where pc.product.productId = :productId")
+	@Query("select new com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO(pc.category.categoryId, pc.category.categoryName, null) from ProductCategory pc where pc.product.productId = :productId")
 	List<ResponseCategoryDTO> findCategoryDTOsByProductId(@Param("productId") Long productId);
 
 	@Query("SELECT pc FROM ProductCategory pc JOIN FETCH pc.category WHERE pc.product.productId IN :productIds")

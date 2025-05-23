@@ -12,34 +12,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.domain.entity.Category;
-import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
 import com.nhnacademy.back.product.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.back.product.contributor.repository.ContributorJpaRepository;
-import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImageDTO;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
+import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
 import com.nhnacademy.back.product.product.kim.service.ProductService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
-import com.nhnacademy.back.product.publisher.service.PublisherService;
 import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
@@ -62,14 +59,11 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductImageJpaRepository productImageJpaRepository;
 	private final PublisherJpaRepository publisherJpaRepository;
 	private final ProductStateJpaRepository productStateJpaRepository;
-	private final CategoryJpaRepository categoryJpaRepository;
 	private final ProductCategoryJpaRepository productCategoryJpaRepository;
 	private final ContributorJpaRepository contributorJpaRepository;
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 	private final TagJpaRepository tagJpaRepository;
 	private final ProductTagJpaRepository productTagJpaRepository;
-	private final PublisherService publisherService;
-	private final PositionJpaRepository positionJpaRepository;
 
 	/**
 	 * 도서를 DB에 저장
@@ -77,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	@Transactional
-	public Long createProduct(RequestProductCreateDTO request) {
+	public Long createProduct(RequestProductDTO request) {
 		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
 		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
 			throw new ProductAlreadyExistsException("Product already exists");
@@ -152,11 +146,17 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	/**
-	 * 도서 전체 목록을 페이지 단위로 조회
+	 * 도서 목록을 페이지 단위로 조회
+	 * categoryId = 0이면 전체 조회, 0이 아니면 해당 카테고리에서 조회
 	 */
 	@Override
-	public Page<ResponseProductReadDTO> getProducts(Pageable pageable) {
-		Page<Product> productPage = productJpaRepository.findAll(pageable);
+	public Page<ResponseProductReadDTO> getProducts(Pageable pageable, long categoryId) {
+		Page<Product> productPage;
+		if (categoryId == 0) {
+			productPage = productJpaRepository.findAll(pageable);
+		} else {
+			productPage = productJpaRepository.findAllByCategoryId(categoryId, pageable);
+		}
 		List<Long> productIds = productPage.stream().map(Product::getProductId).toList();
 
 		Map<Long, List<ProductImage>> imageMap = productImageJpaRepository.findAllByProductIdsGrouped(productIds);
@@ -246,7 +246,7 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	@Transactional
-	public void updateProduct(long productId, RequestProductUpdateDTO request) {
+	public void updateProduct(long productId, RequestProductDTO request) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
@@ -255,6 +255,11 @@ public class ProductServiceImpl implements ProductService {
 
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
+
+		long stock = product.getProductStock() + request.getProductStock();
+		if (stock < 0) {
+			throw new ProductStockDecrementException("재고 수량 변경 불가");
+		}
 
 		// 상품 정보 업데이트 (수정)
 		product.updateProduct(request, productState, publisher);
@@ -297,7 +302,12 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
-		product.setProduct(request.getProductStock());
+		int stock = product.getProductStock() + request.getProductStock();
+		if (stock < 0) {
+			throw new ProductStockDecrementException("재고 수량 변경 불가");
+		}
+
+		product.setProductSale(stock);
 		productJpaRepository.save(product);
 	}
 

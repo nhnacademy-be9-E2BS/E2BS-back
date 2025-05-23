@@ -13,7 +13,7 @@ import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 
 public interface ProductTagJpaRepository extends JpaRepository<ProductTag, Long> {
-	@Query("select ResponseTagDTO(pt.tag.tagId, pt.tag.tagName) from ProductTag pt where pt.product.productId = :productId")
+	@Query("select new com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO(pt.tag.tagId, pt.tag.tagName) from ProductTag pt where pt.product.productId = :productId")
 	List<ResponseTagDTO> findTagDTOsByProductId(@Param("productId") Long productId);
 
 	void deleteByProduct_ProductId(long productId);

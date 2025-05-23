@@ -16,4 +16,7 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 	@Query("SELECT p FROM Product p WHERE p.productState.productStateName = :stateName")
 	Page<Product> findAllByProductStateName(@Param("stateName") ProductStateName stateName, Pageable pageable);
 
+	@Query("SELECT p FROM ProductCategory pc JOIN pc.product p WHERE pc.category.categoryId = :categoryId")
+	Page<Product> findAllByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
+
 }

@@ -16,9 +16,10 @@ public interface ProductContributorJpaRepository extends JpaRepository<ProductCo
 
 	void deleteByProduct_ProductId(long productId);
 
-	@Query("select ResponseContributorDTO(pc.contributor.contributorId, pc.contributor.contributorName,"
-		+ "pc.contributor.position.positionId, pc.contributor.position.positionName)"
-		+ "from ProductContributor pc where pc.product.productId = :productId")
+	@Query(
+		"select new com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO(pc.contributor.contributorId, pc.contributor.contributorName,"
+			+ "pc.contributor.position.positionId, pc.contributor.position.positionName)"
+			+ "from ProductContributor pc where pc.product.productId = :productId")
 	List<ResponseContributorDTO> findContributorDTOsByProductId(@Param("productId") Long productId);
 
 	@Query("SELECT pc FROM ProductContributor pc JOIN FETCH pc.contributor c JOIN FETCH c.position WHERE pc.product.productId IN :productIds")
