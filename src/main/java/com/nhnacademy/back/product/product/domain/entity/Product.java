@@ -6,11 +6,9 @@ import java.util.List;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
-import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -106,42 +104,45 @@ public class Product {
 		return product;
 	}
 
-	public static Product createProductEntity(RequestProductCreateDTO request, Publisher publisher) {
+	public static Product createProductEntity(RequestProductDTO request, ProductState productState,
+		Publisher publisher) {
 		return Product.builder()
-			.productState(new ProductState(ProductStateName.SALE))
+			.productState(productState)
 			.publisher(publisher)
 			.productTitle(request.getProductTitle())
 			.productContent(request.getProductContent())
 			.productDescription(request.getProductDescription())
+			.productPublishedAt(request.getProductPublishedAt())
 			.productIsbn(request.getProductIsbn())
 			.productRegularPrice(request.getProductRegularPrice())
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productPublishedAt(LocalDate.now())
 			.productHits(0)
 			.productSearches(0)
 			.build();
 	}
 
 	//updateProdut를 위해 set대신 쓴 생성자
-	public void updateProduct(RequestProductUpdateDTO request, Publisher publisher, ProductState productState) {
+	public void updateProduct(RequestProductDTO request, ProductState productState, Publisher publisher) {
 		this.productState = productState;
 		this.publisher = publisher;
 		this.productTitle = request.getProductTitle();
 		this.productContent = request.getProductContent();
 		this.productDescription = request.getProductDescription();
+		this.productIsbn = request.getProductIsbn();
 		this.productRegularPrice = request.getProductRegularPrice();
 		this.productSalePrice = request.getProductSalePrice();
 		this.productPackageable = request.isProductPackageable();
 		this.productStock = request.getProductStock();
 	}
 
-	public void setProduct(int productStock) {
+	public void setProductSale(int productStock) {
 		this.productStock = productStock;
 	}
 
 	public void setProduct(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
+
 }

@@ -12,6 +12,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RequestProductContributorCreateDTO {
-	private String productIsbn;
+	private String productId;
 	private List<String> contributorName;
 }

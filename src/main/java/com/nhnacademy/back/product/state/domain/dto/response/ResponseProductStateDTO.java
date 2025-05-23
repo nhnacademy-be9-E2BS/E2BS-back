@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.domain.dto.request;
+package com.nhnacademy.back.product.state.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductApiSearchDTO {
-	String query;
-	String queryType;
+public class ResponseProductStateDTO {
+	private long productStateId;
+	private String productStateName;
 }
