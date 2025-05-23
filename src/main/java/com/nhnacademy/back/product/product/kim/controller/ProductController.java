@@ -27,7 +27,7 @@ public class ProductController {
 	 */
 	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProducts(
-		@PageableDefault(page = 0, size = 10) Pageable pageable, @PathVariable long categoryId) {
+		@PageableDefault(page = 0, size = 9) Pageable pageable, @PathVariable long categoryId) {
 		Page<ResponseProductReadDTO> response = productService.getProducts(pageable, categoryId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
