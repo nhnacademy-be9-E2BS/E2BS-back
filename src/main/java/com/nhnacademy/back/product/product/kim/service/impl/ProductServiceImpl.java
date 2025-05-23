@@ -1,7 +1,5 @@
 package com.nhnacademy.back.product.product.kim.service.impl;
 
-import static java.util.stream.Collectors.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -166,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
 		Map<Long, List<Contributor>> contributorMap = productContributorJpaRepository.findContributorsGroupedByProductIds(
 			productIds);
 
-		Page<ResponseProductReadDTO> result = productPage.map(product -> {
+		return productPage.map(product -> {
 			Long id = product.getProductId();
 			return new ResponseProductReadDTO(
 				id,
@@ -202,8 +200,6 @@ public class ProductServiceImpl implements ProductService {
 					.toList()
 			);
 		});
-
-		return result;
 	}
 
 	/**
@@ -238,7 +234,7 @@ public class ProductServiceImpl implements ProductService {
 				productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
 				productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
 				productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
-			)).collect(toList());
+			)).toList();
 	}
 
 	/**

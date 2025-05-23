@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.account.address.domain.dto.UpdateAddressDTO;
 import com.nhnacademy.back.account.address.domain.dto.request.RequestMemberAddressSaveDTO;
 import com.nhnacademy.back.account.address.domain.dto.response.ResponseMemberAddressDTO;
 import com.nhnacademy.back.account.address.domain.entity.Address;
@@ -90,11 +91,18 @@ public class AddressServiceImpl implements AddressService {
 	public void updateAddress(RequestMemberAddressSaveDTO request, String memberId,
 		long addressId) {
 
-		int result = addressJpaRepository.updateAddress(
-			request.getAddressAlias(), request.getAddressCode(), request.getAddressInfo(),
-			request.getAddressDetail(), request.getAddressExtra(), request.isAddressDefault(),
-			LocalDateTime.now(), addressId
-		);
+		UpdateAddressDTO updateAddressDTO = UpdateAddressDTO.builder()
+			.addressAlias(request.getAddressAlias())
+			.addressCode(request.getAddressCode())
+			.addressInfo(request.getAddressInfo())
+			.addressDetail(request.getAddressDetail())
+			.addressExtra(request.getAddressExtra())
+			.addressDefault(request.isAddressDefault())
+			.addressCreatedAt(LocalDateTime.now())
+			.addressId(addressId)
+			.build();
+
+		int result = addressJpaRepository.updateAddress(updateAddressDTO);
 
 		if (result <= 0) {
 			throw new UpdateAddressFailedException("배송지 정보를 수정하지 못했습니다.");
