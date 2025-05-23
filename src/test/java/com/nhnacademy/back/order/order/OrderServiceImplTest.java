@@ -1,5 +1,6 @@
 package com.nhnacademy.back.order.order;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -12,8 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -189,8 +195,7 @@ class OrderServiceImplTest {
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
-		// saveOrder에서 한 번, 이후 결제 완료 상태 변경에서 한 번으로 2번 진행
-		verify(orderJpaRepository, times(2)).save(any(Order.class));
+		verify(orderJpaRepository, times(1)).save(any(Order.class));
 		verify(orderDetailJpaRepository).save(any(OrderDetail.class));
 		verify(order).updatePaymentStatus(true);
 
@@ -310,5 +315,31 @@ class OrderServiceImplTest {
 		assertNotNull(result);
 		assertEquals(responseOrderDTO, result.getOrder());
 		assertEquals(1, result.getOrderDetails().size());
+	}
+
+	@Test
+	@DisplayName("특정 회원 주문 내역 상세 조회")
+	void testGetOrdersByMemberId() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L)).thenReturn(
+			orderPage);
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString());
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
+		}
 	}
 }

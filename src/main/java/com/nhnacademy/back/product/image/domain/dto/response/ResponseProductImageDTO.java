@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.domain.dto.request;
+package com.nhnacademy.back.product.image.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductApiSearchDTO {
-	String query;
-	String queryType;
+public class ResponseProductImageDTO {
+	private long productImageId;
+	private String productImagePath;
 }

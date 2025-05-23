@@ -8,11 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +30,7 @@ import com.nhnacademy.back.order.order.controller.OrderController;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
@@ -194,6 +199,24 @@ class OrderControllerTest {
 
 		mockMvc.perform(get("/api/order/" + orderId))
 			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("회원의 주문 내역 조회 테스트")
+	void testGetOrders() throws Exception {
+		// given
+		List<ResponseOrderDTO> content = List.of(new ResponseOrderDTO());
+		Page<ResponseOrderDTO> page = new PageImpl<>(content);
+		when(orderService.getOrdersByMemberId(any(Pageable.class), anyString())).thenReturn(page);
+
+		// when & then
+		mockMvc.perform(get("/api/order/orders")
+				.param("page", "0")
+				.param("size", "10")
+				.param("memberId", "memberId"))
+			.andExpect(status().isOk());
+
+		verify(orderService).getOrdersByMemberId(any(Pageable.class), anyString());
 	}
 
 }

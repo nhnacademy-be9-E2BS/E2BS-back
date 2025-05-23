@@ -1,8 +1,11 @@
 package com.nhnacademy.back.order.order.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
@@ -17,4 +20,6 @@ public interface OrderService {
 	ResponseEntity<Void> cancelOrder(String orderId);
 
 	ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode);
+
+	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
 }

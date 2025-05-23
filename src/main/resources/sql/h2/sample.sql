@@ -25,14 +25,18 @@ VALUES ('NORMAL', 0, 0),
        ('GOLD', 10, 500000),
        ('PLATINUM', 20, 900000);
 
--- Customer (@OneToOne 관계 전 customer 먼저 삽입)
+
+-- 테스트를 위한 임의 유저, 관리자 생성
+-- Customer password 12345
 INSERT INTO customer (customer_email,
                       customer_password,
                       customer_name)
-VALUES ('testuser1@example.com', 'password123', '홍길동'),
-       ('testuser2@example.com', 'password123', '셀린');
+VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
+       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자'),
+       ('user1@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저1'),
+       ('user2@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저2');;
 
--- Member (MapsId 관계라 customer_id = member PK)
+-- Member
 INSERT INTO member (customer_id,
                     member_id,
                     member_birth,
@@ -44,15 +48,48 @@ INSERT INTO member (customer_id,
                     member_role_id,
                     social_auth_id)
 VALUES (1,
-        'id123',
+        'user',
         DATE '1990-01-01',
         '01012345678',
         DATE '2024-01-01',
         DATE '2024-05-01',
         1, -- NORMAL
         1, -- ACTIVE
-        1, -- ADMIN
-        1 -- WEB
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (2,
+        'admin',
+        DATE '1990-01-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        1, -- Admin
+        1 -- PAYCO
+       ),
+       (3,
+        'user1',
+        DATE '1990-05-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
+       ),
+       (4,
+        'user2',
+        DATE '1990-05-01',
+        '01012345678',
+        DATE '2024-01-01',
+        DATE '2024-05-01',
+        1, -- NORMAL
+        1, -- ACTIVE
+        2, -- Member
+        1 -- PAYCO
        );
 
 -- Address
@@ -242,7 +279,7 @@ VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, '
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
 VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000);
 
--- Cart (회원용 장바구니)
+-- Cart (비회원/회원용 장바구니)
 INSERT INTO cart (cart_id, customer_id)
 VALUES (1, 1);
 
@@ -260,72 +297,6 @@ VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 're
        (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
        (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 17:30:00', 'review3.jpg');
 
--- 테스트를 위한 임의 유저, 관리자 생성
--- Customer password 12345
-INSERT INTO customer (customer_email,
-                      customer_password,
-                      customer_name)
-VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
-       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자'),
-       ('user1@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저1'),
-       ('user2@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저2');;
-
-
--- Member
-INSERT INTO member (customer_id,
-                    member_id,
-                    member_birth,
-                    member_phone,
-                    member_created_at,
-                    member_login_latest,
-                    member_rank_id,
-                    member_state_id,
-                    member_role_id,
-                    social_auth_id)
-VALUES (2,
-        'user',
-        DATE '1990-01-01',
-        '01012345678',
-        DATE '2024-01-01',
-        DATE '2024-05-01',
-        1, -- NORMAL
-        1, -- ACTIVE
-        2, -- Member
-        1 -- PAYCO
-       ),
-       (3,
-        'admin',
-        DATE '1990-01-01',
-        '01012345678',
-        DATE '2024-01-01',
-        DATE '2024-05-01',
-        1, -- NORMAL
-        1, -- ACTIVE
-        1, -- Admin
-        1 -- PAYCO
-       ),
-       (4,
-        'user1',
-        DATE '1990-05-01',
-        '01012345678',
-        DATE '2024-01-01',
-        DATE '2024-05-01',
-        1, -- NORMAL
-        1, -- ACTIVE
-        2, -- Member
-        1 -- PAYCO
-       ),
-       (5,
-        'user2',
-        DATE '1990-05-01',
-        '01012345678',
-        DATE '2024-01-01',
-        DATE '2024-05-01',
-        1, -- NORMAL
-        1, -- ACTIVE
-        2, -- Member
-        1 -- PAYCO
-       );
 
 -- 카테고리 쿠폰
 INSERT INTO category_coupon (coupon_id, category_id)
