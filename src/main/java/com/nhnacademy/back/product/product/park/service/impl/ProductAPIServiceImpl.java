@@ -167,7 +167,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productCategoryJpaRepository.save(new ProductCategory(product, category));
 		}
 
-
 		//request에 담긴 tagID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 태그 아이디 넣기
 		List<Long> tagIds = request.getTagIds();
 		for (Long tagId : tagIds) {
