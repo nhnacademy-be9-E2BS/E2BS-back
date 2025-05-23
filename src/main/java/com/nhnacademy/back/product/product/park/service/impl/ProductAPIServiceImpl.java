@@ -1,9 +1,11 @@
 package com.nhnacademy.back.product.product.park.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -89,6 +91,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			responseProductsApiSearchDTO.setProductSalePrice(item.priceSales);
 			responseProductsApiSearchDTO.setProductImage(item.cover);
 			responseProductsApiSearchDTO.setContributors(item.author);
+			responseProductsApiSearchDTO.setProductPublishedAt(item.pubDate);
 
 			responseList.add(responseProductsApiSearchDTO);
 		}
@@ -151,10 +154,19 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
+		Set<Category> allCategoriesToSave = new HashSet<>();
+
 		for (Long categoryId : categoryIds) {
-			Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
-			productCategoryJpaRepository.save(new ProductCategory(product,category));
+			Category current = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+			while (current != null) {
+				allCategoriesToSave.add(current);
+				current = current.getParent(); // getParent()는 Category 엔티티에 있어야 함
+			}
 		}
+		for (Category category : allCategoriesToSave) {
+			productCategoryJpaRepository.save(new ProductCategory(product, category));
+		}
+
 
 		//request에 담긴 tagID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 태그 아이디 넣기
 		List<Long> tagIds = request.getTagIds();

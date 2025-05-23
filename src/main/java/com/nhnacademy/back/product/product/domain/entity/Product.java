@@ -94,7 +94,7 @@ public class Product {
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productPublishedAt(LocalDate.now())
+			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
 			.productImage(new ArrayList<>())
@@ -105,8 +105,6 @@ public class Product {
 
 		return product;
 	}
-
-
 
 	public static Product createProductEntity(RequestProductCreateDTO request, Publisher publisher) {
 		return Product.builder()
