@@ -85,7 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
 		return rootCategories.stream()
 			.map(root -> buildTreeUpToDepth(root, 1))
 			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
@@ -217,11 +217,9 @@ public class CategoryServiceImpl implements CategoryService {
 		Category parent = category.getParent();
 		boolean isSecondLevel = parent.getParent() == null;
 
-		if (isSecondLevel) {
+		if (isSecondLevel && parent.getChildren().size() < 2) {
 			// 본인이 2단계 → 부모의 자식이 2개 이상이어야 삭제 가능 (최상위 카테고리 하나만 있는 경우 방지)
-			if (parent.getChildren().size() < 2) {
-				throw new CategoryDeleteNotAllowedException("최소 2단계로 구성해야 하므로 삭제 불가");
-			}
+			throw new CategoryDeleteNotAllowedException("최소 2단계로 구성해야 하므로 삭제 불가");
 		}
 
 		// 3단계 이상 → 항상 삭제 가능

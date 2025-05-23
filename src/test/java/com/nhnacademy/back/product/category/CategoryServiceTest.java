@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ import com.nhnacademy.back.product.category.service.CategoryService;
 import com.nhnacademy.back.product.category.service.impl.CategoryServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryServiceTest {
+class CategoryServiceTest {
 	@InjectMocks
 	private CategoryServiceImpl categoryService;
 	@Mock
@@ -147,7 +146,7 @@ public class CategoryServiceTest {
 
 		List<String> childNames = parentDTO.getChildren().stream()
 			.map(ResponseCategoryDTO::getCategoryName)
-			.collect(Collectors.toList());
+			.toList();
 
 		assertThat(childNames).containsExactlyInAnyOrder("Child 1", "Child 2");
 
@@ -350,7 +349,6 @@ public class CategoryServiceTest {
 	@DisplayName("delete category - fail1")
 	void delete_category_fail1_test() {
 		// given
-		Category category = new Category("category", null);
 		when(categoryJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		// when & then

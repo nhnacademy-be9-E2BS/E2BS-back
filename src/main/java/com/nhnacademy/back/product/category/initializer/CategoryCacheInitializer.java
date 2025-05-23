@@ -21,7 +21,7 @@ public class CategoryCacheInitializer implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 		Set<String> keys = redisTemplate.keys("Categories::*");
-		if (!keys.isEmpty()) {
+		if (keys != null && !keys.isEmpty()) {
 			redisTemplate.delete(keys);
 		}
 	}
