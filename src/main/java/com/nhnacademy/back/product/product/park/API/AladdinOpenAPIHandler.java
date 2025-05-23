@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +52,11 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 			tempValue = "";
 		} else if (localName.equals("stockstatus")) {
 			tempValue = "";
-		}
+		}  else if (localName.equals("pubDate")) {
+			tempValue = "";
 	}
+
+}
 
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		tempValue = tempValue + new String(ch, start, length);
@@ -84,6 +88,8 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 				currentItem.cover = tempValue;
 			} else if (localName.equals("stockstatus")) {
 				currentItem.stockstatus = tempValue;
+			} else if (localName.equals("pubDate")) {
+				currentItem.pubDate = LocalDate.parse(tempValue);
 			}
 		}
 	}

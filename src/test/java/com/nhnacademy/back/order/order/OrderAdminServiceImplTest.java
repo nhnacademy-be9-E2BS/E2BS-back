@@ -19,11 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.entity.Order;
-import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.impl.OrderAdminServiceImpl;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
@@ -34,9 +34,6 @@ import com.nhnacademy.back.order.orderstate.repository.OrderStateJpaRepository;
 class OrderAdminServiceImplTest {
 	@Mock
 	private OrderJpaRepository orderJpaRepository;
-
-	@Mock
-	private OrderDetailJpaRepository orderDetailJpaRepository;
 
 	@Mock
 	private OrderStateJpaRepository orderStateJpaRepository;
@@ -109,7 +106,7 @@ class OrderAdminServiceImplTest {
 		ResponseEntity<Void> response = orderAdminService.startDelivery(orderCode);
 
 		// then
-		assertThat(response.getStatusCodeValue()).isEqualTo(200);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(mockOrder).updateOrderState(deliveryState);
 		verify(orderJpaRepository).save(mockOrder);
 	}

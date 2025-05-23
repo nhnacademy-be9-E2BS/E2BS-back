@@ -89,6 +89,6 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
 		return grouped.entrySet().stream()
 			.map(entry -> new ResponseCategoryIdsDTO(entry.getKey(), entry.getValue()))
-			.collect(Collectors.toList());
+			.toList();
 	}
 }
