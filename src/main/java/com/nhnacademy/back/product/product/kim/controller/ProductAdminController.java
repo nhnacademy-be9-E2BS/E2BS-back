@@ -109,7 +109,7 @@ public class ProductAdminController {
 	 * 검색어와 검색타입으로 책 검색
 	 */
 
-
+	@Admin
 	@GetMapping("/aladdin/search")
 	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
 		Page<ResponseProductsApiSearchDTO> products = productApiService.searchProducts(request, pageable);

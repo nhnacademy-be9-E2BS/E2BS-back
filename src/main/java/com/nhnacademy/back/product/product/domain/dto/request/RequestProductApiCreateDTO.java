@@ -1,5 +1,7 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -47,5 +49,11 @@ public class RequestProductApiCreateDTO {
 
 	@NotNull
 	private int productStock;
+
+	/**
+	 *
+	 */
+	List<Long> categoryIds;
+	List<Long> tagIds;
 
 }

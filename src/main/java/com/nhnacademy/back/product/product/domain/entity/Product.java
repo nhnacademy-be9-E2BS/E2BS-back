@@ -45,7 +45,7 @@ public class Product {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Column(length = 30, nullable = false)
+	@Column(length = 100, nullable = false)
 	private String productTitle;
 
 	@Column(nullable = false)

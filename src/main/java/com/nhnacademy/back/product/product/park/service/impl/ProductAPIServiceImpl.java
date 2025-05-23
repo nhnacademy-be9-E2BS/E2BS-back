@@ -10,6 +10,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.nhnacademy.back.product.category.domain.entity.Category;
+import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
+import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
+import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.Position;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
@@ -34,6 +39,11 @@ import com.nhnacademy.back.product.publisher.service.PublisherService;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
+import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
+import com.nhnacademy.back.product.tag.domain.entity.Tag;
+import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
+import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
+import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +59,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	private final PublisherService publisherService;
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 	private final ProductStateJpaRepository productStateJpaRepository;
+	private final ProductCategoryJpaRepository productCategoryJpaRepository;
+	private final ProductTagJpaRepository productTagJpaRepository;
+	private final CategoryJpaRepository categoryJpaRepository;
+	private final TagJpaRepository tagJpaRepository;
 
 	/**
 	 * 검색결과에 맞는 책 목록들 가져오기
@@ -135,7 +149,19 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		}
 
+		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
+		List<Long> categoryIds = request.getCategoryIds();
+		for (Long categoryId : categoryIds) {
+			Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+			productCategoryJpaRepository.save(new ProductCategory(product,category));
+		}
 
+		//request에 담긴 tagID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 태그 아이디 넣기
+		List<Long> tagIds = request.getTagIds();
+		for (Long tagId : tagIds) {
+			Tag tag = tagJpaRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
+			productTagJpaRepository.save(new ProductTag(product,tag));
+		}
 	}
 
 	private Map<String, String> parse(String contributors) {
