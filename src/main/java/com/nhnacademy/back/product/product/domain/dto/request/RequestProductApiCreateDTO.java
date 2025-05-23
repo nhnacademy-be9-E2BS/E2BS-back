@@ -53,6 +53,7 @@ public class RequestProductApiCreateDTO {
 	/**
 	 *
 	 */
+
 	List<Long> categoryIds;
 	List<Long> tagIds;
 

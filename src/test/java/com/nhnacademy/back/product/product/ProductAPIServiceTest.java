@@ -30,7 +30,7 @@
 // import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
 //
 // @ExtendWith(MockitoExtension.class)
-// class ProductAPIServiceImplTest {
+// class ProductAPIServiceTest {
 //
 // 	@InjectMocks
 // 	private ProductAPIServiceImpl productAPIService;
@@ -114,4 +114,11 @@
 // 		assertThatThrownBy(() -> productAPIService.createProduct(request))
 // 			.isInstanceOf(ProductAlreadyExistsException.class);
 // 	}
+//
+// 	@Test
+// 	@DisplayName("도서 API 검색")
+// 	void searchProduct_success() {}
+//
+//
+//
 // }
