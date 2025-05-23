@@ -64,7 +64,6 @@ public class Review {
 
 	public void changeReview(RequestUpdateReviewDTO request, String updateImagePath) {
 		this.reviewContent = request.getReviewContent();
-		this.reviewGrade = request.getReviewGrade();
 		this.reviewImage = updateImagePath;
 	}
 }

@@ -9,12 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -22,15 +24,13 @@ import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.entity.Review;
+import com.nhnacademy.back.review.exception.ReviewAlreadyExistsException;
 import com.nhnacademy.back.review.exception.ReviewNotFoundException;
 import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 import com.nhnacademy.back.review.service.ReviewService;
 
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 
 @Transactional(readOnly = true)
@@ -43,10 +43,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ProductJpaRepository productRepository;
 	private final ReviewJpaRepository reviewRepository;
 
-	// private final S3Client s3Client;
-	private final MinioClient minioClient;
+	private final MinioUtils minioUtils;
 	private final String BUCKET_NAME = "e2bs-reviews-image";
-
 
 
 	/**
@@ -68,6 +66,10 @@ public class ReviewServiceImpl implements ReviewService {
 				.orElseThrow(CustomerNotFoundException::new);
 		}
 
+		if (reviewRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
+			throw new ReviewAlreadyExistsException();
+		}
+
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
@@ -87,49 +89,10 @@ public class ReviewServiceImpl implements ReviewService {
 	 */
 	private String uploadFile(MultipartFile reviewImageFile) {
 		String originalFilename = reviewImageFile.getOriginalFilename();
-
 		UUID uuid = UUID.randomUUID();
 		String objectName = uuid + "_" + originalFilename;
-
-		try {
-
-			minioClient.putObject(
-				PutObjectArgs.builder()
-					.bucket(BUCKET_NAME)
-					.object(objectName)
-					.stream(reviewImageFile.getInputStream(), reviewImageFile.getSize(), -1)
-					.contentType(reviewImageFile.getContentType())
-					.build()
-			);
-
-			return minioClient.getPresignedObjectUrl(
-				GetPresignedObjectUrlArgs.builder()
-					.bucket(BUCKET_NAME)
-					.object(objectName)
-					.method(Method.GET)
-					.expiry(60 * 60)
-					.build()
-			);
-
-		} catch (Exception e) {
-			throw new RuntimeException("Minio 업로드 실패", e);
-		}
-
-		// try {
-		// 	PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-		// 		.bucket(BUCKET_NAME)
-		// 		.key(objectName)
-		// 		.contentType(reviewImageFile.getContentType())
-		// 		.build();
-		//
-		// 	s3Client.putObject(putObjectRequest, RequestBody.fromBytes(reviewImageFile.getBytes()));
-		//
-		// 	return s3Client.utilities().getUrl(GetUrlRequest.builder().bucket(BUCKET_NAME).key(objectName).build()).toString();
-		// } catch (IOException e) {
-		// 	throw new RuntimeException("파일 스트림 열기 실패", e);
-		// } catch (S3Exception e) {
-		// 	throw new RuntimeException("MinIO 업로드 실패: " + e.awsErrorDetails().errorMessage(), e);
-		// }
+		minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+		return objectName;
 	}
 
 	/**
@@ -137,36 +100,37 @@ public class ReviewServiceImpl implements ReviewService {
 	 */
 	@Transactional
 	@Override
-	public void updateReview(long reviewId, RequestUpdateReviewDTO request) {
+	public ResponseUpdateReviewDTO updateReview(long reviewId, RequestUpdateReviewDTO request) {
 		Review findReview = reviewRepository.findById(reviewId)
 			.orElseThrow(ReviewNotFoundException::new);
 
-		String updateImagePath = "";
+		String updateReviewContent = request.getReviewContent();
+
+		String updateImage = "";
 		MultipartFile reviewImageFile = request.getReviewImage();
 		if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
-			// updateImagePath = updateFile(reviewImageFile);
+			// 기존 파일 삭제
+			minioUtils.deleteObject(BUCKET_NAME, findReview.getReviewImage());
+
+			// 새로 업로드할 파일 등록
+			String originalFilename = reviewImageFile.getOriginalFilename();
+
+			UUID uuid = UUID.randomUUID();
+			String objectName = uuid + "_" + originalFilename;
+			minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+			
+			// 가공된 파일명 적용
+			updateImage = objectName;
 		}
 
-		findReview.changeReview(request, updateImagePath);
-	}
+		// 변경 감지로 DB의 값 변경
+		findReview.changeReview(request, updateImage);
 
-	// private String updateFile(MultipartFile reviewImageFile) {
-	// 	try {
-	// 		// 객체 삭제 요청
-	// 		DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-	// 			.bucket(BUCKET_NAME)
-	// 			.key(objectKey)
-	// 			.build();
-	//
-	// 		// 파일 삭제
-	// 		s3Client.deleteObject(deleteObjectRequest);
-	//
-	// 		System.out.println("파일 삭제 성공: " + objectKey);
-	//
-	// 	} catch (S3Exception e) {
-	// 		throw new RuntimeException("파일 삭제 실패: " + e.awsErrorDetails().errorMessage(), e);
-	// 	}
-	// }
+		// 변경 이미지에 대한 url 가공
+		String updateImageUrl = minioUtils.getPresignedUrl(BUCKET_NAME, updateImage);
+
+		return new ResponseUpdateReviewDTO(updateReviewContent, updateImageUrl);
+	}
 
 	/**
 	 * 고객 리뷰 페이징 목록 조회 메소드
@@ -174,17 +138,7 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public Page<ResponseReviewPageDTO> getReviewsByCustomer(long customerId, Pageable pageable) {
 		Page<Review> getReviewsByCustomerId = reviewRepository.findAllByCustomer_CustomerId(customerId, pageable);
-
-		return getReviewsByCustomerId.map(review -> new ResponseReviewPageDTO(
-			review.getReviewId(),
-			review.getProduct().getProductId(),
-			review.getCustomer().getCustomerId(),
-			review.getCustomer().getCustomerName(),
-			review.getReviewContent(),
-			review.getReviewGrade(),
-			review.getReviewImage(),
-			review.getReviewCreatedAt()
-		));
+		return getResponseReviewPageDTOS(getReviewsByCustomerId);
 	}
 
 	/**
@@ -193,17 +147,30 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public Page<ResponseReviewPageDTO> getReviewsByProduct(long productId, Pageable pageable) {
 		Page<Review> getReviewsByProductId = reviewRepository.findAllByProduct_ProductId(productId, pageable);
+		return getResponseReviewPageDTOS(getReviewsByProductId);
+	}
 
-		return getReviewsByProductId.map(review -> new ResponseReviewPageDTO(
-			review.getReviewId(),
-			review.getProduct().getProductId(),
-			review.getCustomer().getCustomerId(),
-			review.getCustomer().getCustomerName(),
-			review.getReviewContent(),
-			review.getReviewGrade(),
-			review.getReviewImage(),
-			review.getReviewCreatedAt()
-		));
+	/**
+	 * 페이징 목록 DTO 가공 메소드
+	 */
+	private Page<ResponseReviewPageDTO> getResponseReviewPageDTOS(Page<Review> getReviewsBy) {
+		return getReviewsBy.map(review -> {
+			String reviewImagePath = "";
+			if (!StringUtils.isEmpty(review.getReviewImage())) {
+				reviewImagePath = minioUtils.getPresignedUrl(BUCKET_NAME, review.getReviewImage());
+			}
+
+			return new ResponseReviewPageDTO(
+				review.getReviewId(),
+				review.getProduct().getProductId(),
+				review.getCustomer().getCustomerId(),
+				review.getCustomer().getCustomerName(),
+				review.getReviewContent(),
+				review.getReviewGrade(),
+				reviewImagePath,
+				review.getReviewCreatedAt()
+			);
+		});
 	}
 
 	/**

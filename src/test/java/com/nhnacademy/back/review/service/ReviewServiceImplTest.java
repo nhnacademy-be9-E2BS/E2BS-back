@@ -101,7 +101,7 @@ class ReviewServiceImplTest {
 	void updateReview() {
 		// given
 		long reviewId = 1L;
-		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO("내용 수정", 3, null);
+		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO("내용 수정", null);
 
 		Review review = mock(Review.class);
 		when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
@@ -110,7 +110,7 @@ class ReviewServiceImplTest {
 		reviewService.updateReview(reviewId, request);
 
 		// then
-		// verify(review).changeReview(request);
+		verify(review).changeReview(request, anyString());
 	}
 
 	@Test

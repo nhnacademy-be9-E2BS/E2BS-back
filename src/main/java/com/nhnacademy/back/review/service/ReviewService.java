@@ -9,10 +9,11 @@ import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
 
 public interface ReviewService {
 	void createReview(RequestCreateReviewDTO request) throws IOException;
-	void updateReview(long reviewId, RequestUpdateReviewDTO request);
+	ResponseUpdateReviewDTO updateReview(long reviewId, RequestUpdateReviewDTO request);
 	Page<ResponseReviewPageDTO> getReviewsByCustomer(long customerId, Pageable pageable);
 	Page<ResponseReviewPageDTO> getReviewsByProduct(long productId, Pageable pageable);
 	ResponseReviewInfoDTO getReviewInfo(long productId);

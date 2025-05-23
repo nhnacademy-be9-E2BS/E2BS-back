@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +23,7 @@ import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewMetaDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
 import com.nhnacademy.back.review.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -48,13 +48,14 @@ public class ReviewRestController {
 
 
 	@PutMapping("/api/reviews/{reviewId}")
-	public ResponseEntity<Void> updateReview(@PathVariable long reviewId, @Validated @RequestBody RequestUpdateReviewDTO request, BindingResult bindingResult) {
+	public ResponseEntity<ResponseUpdateReviewDTO> updateReview(@PathVariable long reviewId, @Validated @RequestPart("reviewContent") String reviewContent, BindingResult bindingResult, @RequestPart("reviewImage") MultipartFile reviewImage) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		reviewService.updateReview(reviewId, request);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO(reviewContent, reviewImage);
+		ResponseUpdateReviewDTO body = reviewService.updateReview(reviewId, request);
+		return ResponseEntity.ok(body);
 	}
 
 	@GetMapping("/api/customers/{customerId}/reviews")

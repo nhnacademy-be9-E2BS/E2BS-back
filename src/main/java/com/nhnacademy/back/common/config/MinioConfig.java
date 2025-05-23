@@ -1,18 +1,16 @@
 package com.nhnacademy.back.common.config;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.errors.MinioException;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 public class MinioConfig {
@@ -39,44 +37,34 @@ public class MinioConfig {
 	 * 3.요청 본문에 대한 서명 포함
 	 * 4.AWS S3와 완벽히 호환되는 방식으로 MinIO에 요청
 	 */
-	// @Bean
-	// public S3Client s3Client() {
-	// 	return S3Client.builder()
-	// 		.endpointOverride(URI.create(host))
-	// 		.credentialsProvider(() -> AwsBasicCredentials.builder()
-	// 									.accessKeyId(accessKey)
-	// 									.secretAccessKey(secretKey)
-	// 									.build())
-	// 		.region(Region.of(region))
-	// 		.forcePathStyle(true)
-	// 		.build();
-	// }
-
 	@Bean
-	public MinioClient minioClient() {
-		try {
-			MinioClient minioClient = MinioClient.builder()
-				.endpoint(host)
-				.credentials(accessKey, secretKey)
-				.build();
-
-			boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket("e2bs-reviews-image").build());
-			if (!found) {
-				minioClient.makeBucket(MakeBucketArgs.builder().bucket("e2bs-reviews-image").build());
-			} else {
-				System.out.println("Bucket 'e2bs-reviews-image' already exists.");
-			}
-
-			return minioClient;
-		} catch (MinioException e) {
-			System.out.println("Error occurred: " + e);
-			System.out.println("HTTP trace: " + e.httpTrace());
-			throw new RuntimeException(e);
-		} catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-			System.out.println("Error occurred: " + e);
-			System.out.println("HTTP trace: " + Arrays.toString(e.getStackTrace()));
-			throw new RuntimeException(e);
-		}
+	public S3Client s3Client() {
+		return S3Client.builder()
+			.endpointOverride(URI.create(host))
+			.credentialsProvider(() -> AwsBasicCredentials.builder()
+										.accessKeyId(accessKey)
+										.secretAccessKey(secretKey)
+										.build())
+			.region(Region.of(region))
+			.forcePathStyle(true)
+			.build();
 	}
 
+	/**
+	 * 파일 접근을 위한 url 변환 메소드를 사용하기 위한 S3Presigner 설정
+	 */
+	@Bean
+	public S3Presigner s3Presigner() {
+		return S3Presigner.builder()
+			.endpointOverride(URI.create(host))
+			.credentialsProvider(() -> AwsBasicCredentials.builder()
+										.accessKeyId(accessKey)
+										.secretAccessKey(secretKey)
+										.build())
+			.region(Region.of(region))
+			.serviceConfiguration(S3Configuration.builder()
+									.pathStyleAccessEnabled(true) // url 경로로 접근하기 위한 설정
+									.build())
+			.build();
+	}
 }

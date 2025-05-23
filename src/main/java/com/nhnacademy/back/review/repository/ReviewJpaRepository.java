@@ -34,4 +34,9 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 	 * 상품에 해당하는 리뷰 총 개수 조회 메소드
 	 */
 	Integer countAllByProduct_ProductId(long productProductId);
+
+	/**
+	 * 고객이 이미 작성한 리뷰가 있는지 여부 확인 메소드
+	 */
+	boolean existsByCustomer_CustomerId(long customerCustomerId);
 }
