@@ -3,7 +3,7 @@ CREATE TABLE address
     address_id         BIGINT AUTO_INCREMENT NOT NULL,
     address_code       VARCHAR(5)            NOT NULL,
     address_info       VARCHAR(255)          NULL,
-    address_Detail       VARCHAR(255)          NOT NULL,
+    address_Detail     VARCHAR(255)          NOT NULL,
     address_extra      VARCHAR(255)          NOT NULL,
     address_alias      VARCHAR(20)           NULL,
     address_default    BIT(1)                NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE delivery_fee
     delivery_fee_id          BIGINT AUTO_INCREMENT NOT NULL,
     delivery_fee_amount      BIGINT                NOT NULL,
     delivery_fee_free_amount BIGINT                NOT NULL,
-    delivery_fee_date        date                  NOT NULL,
+    delivery_fee_date        datetime              NOT NULL,
     CONSTRAINT pk_deliveryfee PRIMARY KEY (delivery_fee_id)
 );
 

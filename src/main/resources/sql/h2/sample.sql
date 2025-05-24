@@ -217,7 +217,7 @@ VALUES (1, 1),
 
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_date, delivery_fee_free_amount)
-VALUES (5000, DATE '2025-01-01', 30000);
+VALUES (5000, TIMESTAMP '2025-01-01 00:00:00.000000', 30000);
 
 -- Wrapper
 INSERT INTO wrapper (wrapper_image, wrapper_name, wrapper_price, wrapper_saleable)
