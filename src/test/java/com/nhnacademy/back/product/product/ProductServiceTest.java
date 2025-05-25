@@ -82,7 +82,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
@@ -111,7 +111,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(true);
 
@@ -126,7 +126,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -142,7 +142,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
@@ -160,7 +160,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
@@ -180,7 +180,7 @@ class ProductServiceTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
@@ -352,7 +352,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
@@ -389,7 +389,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.findById(productId)).thenReturn(Optional.empty());
 
@@ -405,7 +405,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
@@ -428,7 +428,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
@@ -452,7 +452,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
@@ -477,7 +477,7 @@ class ProductServiceTest {
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
@@ -551,7 +551,7 @@ class ProductServiceTest {
 	void update_productSalePrice_success_test() {
 		// given
 		long productId = 1L;
-		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(5000);
+		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(5000L);
 		Product product = new Product(
 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
@@ -569,7 +569,7 @@ class ProductServiceTest {
 	@DisplayName("update product sale price - fail")
 	void update_productSalePrice_fail_test() {
 		long productId = 1L;
-		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(5000);
+		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(5000L);
 		when(productJpaRepository.findById(productId)).thenReturn(Optional.empty());
 
 		// when & then

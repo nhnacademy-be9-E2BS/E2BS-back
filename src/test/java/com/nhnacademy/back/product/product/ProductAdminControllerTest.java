@@ -55,7 +55,7 @@ class ProductAdminControllerTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 100,
+			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
@@ -149,7 +149,7 @@ class ProductAdminControllerTest {
 		// given
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
-			"978-89-12345-01-1", 10000, 8000, true, 200,
+			"978-89-12345-01-1", 10000L, 8000L, true, 200,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
@@ -178,7 +178,7 @@ class ProductAdminControllerTest {
 	@DisplayName("도서 판매가 수정")
 	void update_productSalePrice_test() throws Exception {
 		// given
-		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(3000);
+		RequestProductSalePriceUpdateDTO request = new RequestProductSalePriceUpdateDTO(3000L);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
