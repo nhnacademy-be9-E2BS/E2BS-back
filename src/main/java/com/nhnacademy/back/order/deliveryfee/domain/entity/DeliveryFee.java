@@ -1,6 +1,8 @@
 package com.nhnacademy.back.order.deliveryfee.domain.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.nhnacademy.back.order.deliveryfee.domain.dto.request.RequestDeliveryFeeDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +29,11 @@ public class DeliveryFee {
 	private long deliveryFeeFreeAmount;
 
 	@Column(nullable = false)
-	private LocalDate deliveryFeeDate;
+	private LocalDateTime deliveryFeeDate;
 
+	public DeliveryFee(RequestDeliveryFeeDTO request) {
+		this.deliveryFeeAmount = request.getDeliveryFeeAmount();
+		this.deliveryFeeFreeAmount = request.getDeliveryFeeFreeAmount();
+		this.deliveryFeeDate = LocalDateTime.now();
+	}
 }
