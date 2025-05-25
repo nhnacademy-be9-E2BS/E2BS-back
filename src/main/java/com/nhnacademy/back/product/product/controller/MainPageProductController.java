@@ -1,15 +1,12 @@
 package com.nhnacademy.back.product.product.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.product.product.domain.dto.request.RequestMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.service.MainPageProductService;
 
@@ -22,10 +19,31 @@ public class MainPageProductController {
 		this.mainPageProductService = mainPageProductService;
 	}
 
-	@GetMapping()
-	public ResponseEntity<Page<ResponseMainPageProductDTO>> getProductsByCategory(
-		@ModelAttribute RequestMainPageProductDTO request, Pageable pageable) {
-		Page<ResponseMainPageProductDTO> products = mainPageProductService.showProducts(request, pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(products);
+
+	@GetMapping("/bestseller")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.showBestSellerProducts();
+		return ResponseEntity.ok(products);
 	}
+
+	@GetMapping("/blogbest")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getBlogBest() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.showBlogBestProducts();
+		return ResponseEntity.ok(products);
+	}
+
+	@GetMapping("/newitems")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewItems() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.showNewItemsProducts();
+		return ResponseEntity.ok(products);
+	}
+
+	@GetMapping("/newspecialitems")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSepcialItems() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.showItemNewSpecialProducts();
+		return ResponseEntity.ok(products);
+	}
+
+
+
 }
