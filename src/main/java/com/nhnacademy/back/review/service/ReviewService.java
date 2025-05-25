@@ -14,7 +14,6 @@ import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
 public interface ReviewService {
 	void createReview(RequestCreateReviewDTO request) throws IOException;
 	ResponseUpdateReviewDTO updateReview(long reviewId, RequestUpdateReviewDTO request);
-	Page<ResponseReviewPageDTO> getReviewsByCustomer(long customerId, Pageable pageable);
 	Page<ResponseReviewPageDTO> getReviewsByProduct(long productId, Pageable pageable);
 	ResponseReviewInfoDTO getReviewInfo(long productId);
 }

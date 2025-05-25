@@ -133,15 +133,6 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	/**
-	 * 고객 리뷰 페이징 목록 조회 메소드
-	 */
-	@Override
-	public Page<ResponseReviewPageDTO> getReviewsByCustomer(long customerId, Pageable pageable) {
-		Page<Review> getReviewsByCustomerId = reviewRepository.findAllByCustomer_CustomerId(customerId, pageable);
-		return getResponseReviewPageDTOS(getReviewsByCustomerId);
-	}
-
-	/**
 	 * 상품 리뷰 페이징 목록 조회 메소드
 	 */
 	@Override

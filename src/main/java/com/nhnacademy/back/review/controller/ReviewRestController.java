@@ -58,12 +58,6 @@ public class ReviewRestController {
 		return ResponseEntity.ok(body);
 	}
 
-	@GetMapping("/api/customers/{customerId}/reviews")
-	public ResponseEntity<Page<ResponseReviewPageDTO>> getReviewsByCustomer(@PathVariable long customerId, Pageable pageable) {
-		Page<ResponseReviewPageDTO> body = reviewService.getReviewsByCustomer(customerId, pageable);
-		return ResponseEntity.ok(body);
-	}
-
 	@GetMapping("/api/products/{productId}/reviews")
 	public ResponseEntity<Page<ResponseReviewPageDTO>> getReviewsByProduct(@PathVariable long productId, Pageable pageable) {
 		Page<ResponseReviewPageDTO> body = reviewService.getReviewsByProduct(productId, pageable);
