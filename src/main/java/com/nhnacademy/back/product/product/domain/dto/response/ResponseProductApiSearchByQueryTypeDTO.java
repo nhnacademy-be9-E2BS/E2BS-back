@@ -1,11 +1,11 @@
-package com.nhnacademy.back.product.product.domain.dto.request;
+package com.nhnacademy.back.product.product.domain.dto.response;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +14,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductApiCreateDTO {
-
+@Builder
+public class ResponseProductApiSearchByQueryTypeDTO {
 	@NotBlank
 	private String publisherName;
 
@@ -42,24 +42,4 @@ public class RequestProductApiCreateDTO {
 
 	@NotNull
 	private LocalDate productPublishedAt;
-
-	/**
-	 * 아래부터는 관리자가 직접 입력하는 필드
-	 */
-	@NotBlank
-	private String productContent;
-
-	@NotNull
-	private boolean productPackageable;
-
-	@NotNull
-	private int productStock;
-
-	/**
-	 *
-	 */
-
-	List<Long> categoryIds;
-	List<Long> tagIds;
-
 }

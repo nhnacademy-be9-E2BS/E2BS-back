@@ -10,8 +10,15 @@ import java.util.Map;
 public class AladdinOpenAPI {
 	String query;
 	String queryType;
+
+	static AladdinOpenAPIHandler api = new AladdinOpenAPIHandler();
+
 	public AladdinOpenAPI(String query, String queryType) {
 		this.query = query;
+		this.queryType = queryType;
+	}
+
+	public AladdinOpenAPI(String queryType) {
 		this.queryType = queryType;
 	}
 
@@ -41,15 +48,51 @@ public class AladdinOpenAPI {
 		return baseUrl + sb;
 	}
 
+	public String getListUrl(String queryType) throws Exception {
+		String baseUrl = "http://www.aladin.co.kr/ttb/api/ItemList.aspx?";
+
+		Map<String,String> hashMap = new LinkedHashMap<String,String>();
+		hashMap.put("ttbkey", "ttbsusan24901006001");
+		hashMap.put("QueryType", queryType); //검색어 종류 - ItemNewAll, ItemNewSpecial, ItemEditorChoice, Bestseller, BlogBest
+		hashMap.put("MaxResults", "100");
+		hashMap.put("start", "1");
+		hashMap.put("SearchTarget", "Book");
+		hashMap.put("output", "xml");
+		hashMap.put("Version", "20131101");
+
+		StringBuffer sb = new StringBuffer();
+		Iterator<String> iter = hashMap.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			String val  = hashMap.get(key);
+			sb.append(key).append("=").append(val);
+			if (iter.hasNext()) {
+				sb.append("&");
+			}
+		}
+		return baseUrl + sb;
+	}
+
 	public List<Item> searchBooks() throws Exception {
 		String searchUrl = getSerachUrl(this.query, this.queryType);
-		AladdinOpenAPIHandler api = new AladdinOpenAPIHandler();
 		api.parseXml(searchUrl);
-		if (api.Items.isEmpty()) {
+		if (api.getItems().isEmpty()) {
 			return null;
 		} else {
-			List<Item> items = new ArrayList<>(api.Items);
+			List<Item> items = new ArrayList<>(api.getItems());
 			return items;
 		}
+	}
+
+	public List<Item> getListBooks() throws Exception {
+		String listUrl = getListUrl(this.queryType);
+		api.parseXml(listUrl);
+		if (api.getItems().isEmpty()) {
+			return null;
+		} else {
+			List<Item> items = new ArrayList<>(api.getItems());
+			return items;
+		}
+
 	}
 }
