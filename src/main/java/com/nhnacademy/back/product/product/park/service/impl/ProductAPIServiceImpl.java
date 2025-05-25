@@ -23,6 +23,7 @@ import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
 import com.nhnacademy.back.product.contributor.repository.ContributorJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
@@ -176,6 +177,8 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		productJpaRepository.save(product);
 
+		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
+
 		Map<String, String> map = parse(request.getContributors());
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			String contributorName = entry.getKey();
@@ -243,7 +246,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		Product product = Product.createProductApiByQueryEntity(request, publisher, state);
 
 		productJpaRepository.save(product);
-
+		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
 		Map<String, String> map = parse(request.getContributors());
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			String contributorName = entry.getKey();

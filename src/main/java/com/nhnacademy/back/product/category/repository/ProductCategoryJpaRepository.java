@@ -40,4 +40,6 @@ public interface ProductCategoryJpaRepository extends JpaRepository<ProductCateg
 				Collectors.mapping(ProductCategory::getCategory, Collectors.toList())
 			));
 	}
+
+	List<ProductCategory> findProductIdByCategory(Category category);
 }

@@ -25,3 +25,5 @@ Content-Type: application/json
   "productStock": 120
 }
 
+###
+GET http://localhost:10236/?categoryName=전자책&page=0&size=10
