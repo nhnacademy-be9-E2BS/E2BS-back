@@ -1,4 +1,6 @@
-package com.nhnacademy.back.product.product.park.API;
+package com.nhnacademy.back.product.product.park.api;
+
+import java.time.LocalDate;
 
 import java.time.LocalDate;
 
