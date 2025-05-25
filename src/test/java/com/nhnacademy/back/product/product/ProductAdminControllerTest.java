@@ -36,7 +36,7 @@ import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStat
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 @WebMvcTest(controllers = ProductAdminController.class)
-public class ProductAdminControllerTest {
+class ProductAdminControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@MockitoBean
