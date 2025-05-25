@@ -252,11 +252,6 @@ public class ProductServiceImpl implements ProductService {
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
-		long stock = product.getProductStock() + request.getProductStock();
-		if (stock < 0) {
-			throw new ProductStockDecrementException("재고 수량 변경 불가");
-		}
-
 		// 상품 정보 업데이트 (수정)
 		product.updateProduct(request, productState, publisher);
 
