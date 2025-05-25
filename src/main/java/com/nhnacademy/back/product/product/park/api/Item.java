@@ -1,5 +1,7 @@
 package com.nhnacademy.back.product.product.park.api;
 
+import java.time.LocalDate;
+
 public class Item{
 	public String Title = ""; //제목
 
@@ -15,6 +17,8 @@ public class Item{
 	public int priceStandard = 0; // 정가
 
 	public int priceSales = 0; //판매가
+
+	public LocalDate pubDate;
 
 	public String cover = ""; //상품 이미지
 	public String Link = ""; // 상품링크

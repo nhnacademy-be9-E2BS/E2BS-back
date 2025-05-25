@@ -14,7 +14,7 @@ VALUES ('WAIT'),
 
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_free_amount, delivery_fee_date)
-VALUES (3000, 50000, CURDATE());
+VALUES (3000, 50000, NOW());
 
 -- Order
 INSERT INTO `order` (order_code,

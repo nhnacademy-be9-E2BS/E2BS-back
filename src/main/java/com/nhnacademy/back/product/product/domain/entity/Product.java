@@ -43,7 +43,7 @@ public class Product {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Column(length = 30, nullable = false)
+	@Column(length = 100, nullable = false)
 	private String productTitle;
 
 	@Column(nullable = false)
@@ -79,8 +79,8 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher,
-		ProductState state) {
+
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
@@ -92,7 +92,7 @@ public class Product {
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productPublishedAt(LocalDate.now())
+			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
 			.productImage(new ArrayList<>())

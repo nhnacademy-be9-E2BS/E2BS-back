@@ -1,5 +1,8 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -36,6 +39,9 @@ public class RequestProductApiCreateDTO {
 	@NotBlank
 	private String contributors;
 
+	@NotNull
+	private LocalDate productPublishedAt;
+
 	/**
 	 * 아래부터는 관리자가 직접 입력하는 필드
 	 */
@@ -47,5 +53,12 @@ public class RequestProductApiCreateDTO {
 
 	@NotNull
 	private int productStock;
+
+	/**
+	 *
+	 */
+
+	List<Long> categoryIds;
+	List<Long> tagIds;
 
 }
