@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.product.domain.dto.request.RequestMainPageProductDTO;
@@ -13,6 +14,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageP
 import com.nhnacademy.back.product.product.service.MainPageProductService;
 
 @RestController
+@RequestMapping("/api")
 public class MainPageProductController {
 	private final MainPageProductService mainPageProductService;
 
