@@ -17,6 +17,8 @@ import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsExcept
 import com.nhnacademy.back.account.member.exception.MemberRoleException;
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
@@ -49,7 +51,8 @@ public class GlobalExceptionHandler {
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
 		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
-		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class})
+		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
+		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
