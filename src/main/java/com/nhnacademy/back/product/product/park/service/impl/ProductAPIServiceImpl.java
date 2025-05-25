@@ -23,8 +23,8 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsA
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.SearchBookException;
-import com.nhnacademy.back.product.product.park.API.AladdinOpenAPI;
-import com.nhnacademy.back.product.product.park.API.Item;
+import com.nhnacademy.back.product.product.park.api.AladdinOpenAPI;
+import com.nhnacademy.back.product.product.park.api.Item;
 import com.nhnacademy.back.product.product.park.service.ProductAPIService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
@@ -75,7 +75,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			responseProductsApiSearchDTO.setProductSalePrice(item.priceSales);
 			responseProductsApiSearchDTO.setProductImage(item.cover);
 			responseProductsApiSearchDTO.setContributors(item.author);
-
 			responseList.add(responseProductsApiSearchDTO);
 		}
 
@@ -134,8 +133,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productContributorJpaRepository.save(productContributor);
 
 		}
-
-
 	}
 
 	private Map<String, String> parse(String contributors) {

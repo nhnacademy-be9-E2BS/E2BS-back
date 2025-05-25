@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.API;
+package com.nhnacademy.back.product.product.park.api;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -52,5 +52,4 @@ public class AladdinOpenAPI {
 			return items;
 		}
 	}
-
 }

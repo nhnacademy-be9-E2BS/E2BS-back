@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.API;
+package com.nhnacademy.back.product.product.park.api;
 
 public class Item{
 	public String Title = ""; //제목

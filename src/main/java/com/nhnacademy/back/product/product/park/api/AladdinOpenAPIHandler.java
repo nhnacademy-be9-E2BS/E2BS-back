@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.API;
+package com.nhnacademy.back.product.product.park.api;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
