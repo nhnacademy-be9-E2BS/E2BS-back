@@ -10,11 +10,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like {
 
@@ -29,4 +33,13 @@ public class Like {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
+
+
+	public static Like createLikeEntity(Product product, Customer customer) {
+		return Like.builder()
+			.product(product)
+			.customer(customer)
+			.build();
+	}
+
 }
