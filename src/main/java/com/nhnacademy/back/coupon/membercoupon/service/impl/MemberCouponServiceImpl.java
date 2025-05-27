@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -157,12 +158,12 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		QCategory ca = QCategory.category;
 		QProductCategory pcat = QProductCategory.productCategory;
 
-		// 공통 조건: 사용여부-false, 만료기한-현재시간보다 이후
+		// 공통 조건
 		BooleanExpression baseCondition = mc.member.customerId.eq(member.getCustomerId())
 			.and(mc.memberCouponUsed.eq(false))
 			.and(mc.memberCouponPeriod.after(LocalDateTime.now()));
 
-		// 일반 쿠폰 (상품/카테고리 쿠폰테이블에 없는 전체 할인 쿠폰)
+		// 1. 일반 쿠폰
 		List<ResponseOrderCouponDTO> generalCoupons = queryFactory
 			.select(new QResponseOrderCouponDTO(
 				mc.memberCouponId,
@@ -174,8 +175,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 				cp.couponPolicyName,
 				mc.memberCouponCreatedAt,
 				mc.memberCouponPeriod,
-				Expressions.nullExpression(),   // categoryName
-				Expressions.nullExpression()    // productTitle
+				Expressions.nullExpression(), // category_name
+				Expressions.nullExpression()  // product_title
 			))
 			.from(mc)
 			.join(c).on(mc.coupon.eq(c))
@@ -185,9 +186,10 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.where(baseCondition
 				.and(pc.coupon.isNull())
 				.and(cc.coupon.isNull()))
+			.distinct()
 			.fetch();
 
-		// 상품 쿠폰 (상품 쿠폰 테이블에 존재하는 쿠폰)
+		// 2. 상품 쿠폰
 		List<ResponseOrderCouponDTO> productCoupons = queryFactory
 			.select(new QResponseOrderCouponDTO(
 				mc.memberCouponId,
@@ -199,7 +201,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 				cp.couponPolicyName,
 				mc.memberCouponCreatedAt,
 				mc.memberCouponPeriod,
-				Expressions.nullExpression(), // categoryName
+				Expressions.nullExpression(), // category_name
 				p.productTitle
 			))
 			.from(mc)
@@ -209,9 +211,10 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.join(p).on(pc.product.eq(p))
 			.where(baseCondition
 				.and(pc.product.productId.in(productIds)))
+			.distinct()
 			.fetch();
 
-		// 카테고리 쿠폰 (카테고리 쿠폰 테이블에 존재하는 쿠폰)
+		// 3. 카테고리 쿠폰
 		List<ResponseOrderCouponDTO> categoryCoupons = queryFactory
 			.select(new QResponseOrderCouponDTO(
 				mc.memberCouponId,
@@ -224,7 +227,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 				mc.memberCouponCreatedAt,
 				mc.memberCouponPeriod,
 				ca.categoryName,
-				Expressions.nullExpression() // productTitle
+				Expressions.nullExpression() // product_title
 			))
 			.from(mc)
 			.join(c).on(mc.coupon.eq(c))
@@ -234,16 +237,21 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.join(pcat).on(ca.eq(pcat.category))
 			.where(baseCondition
 				.and(pcat.product.productId.in(productIds)))
+			.distinct()
 			.fetch();
 
-		// 합치기
+		// 4. 결과 합치기
 		List<ResponseOrderCouponDTO> result = new ArrayList<>();
 		result.addAll(generalCoupons);
 		result.addAll(productCoupons);
 		result.addAll(categoryCoupons);
 
-		return result;
+		// 필요시 중복 제거
+		return result.stream()
+			.distinct()
+			.collect(Collectors.toList());
 	}
+
 
 
 
