@@ -78,9 +78,10 @@ public class Product {
 	private long productSearches = 0;
 
 	@OneToMany(mappedBy = "product")
-	private List<ProductImage> productImage;
+	private List<ProductImage> productImage = new ArrayList<>();
 
-	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher,
+		ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
@@ -95,8 +96,8 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
-			.productImage(new ArrayList<>())
 			.build();
+
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
 		product.getProductImage().add(image);
@@ -104,7 +105,8 @@ public class Product {
 		return product;
 	}
 
-	public static Product createProductApiByQueryEntity(RequestProductApiCreateByQueryDTO request, Publisher publisher, ProductState state) {
+	public static Product createProductApiByQueryEntity(RequestProductApiCreateByQueryDTO request, Publisher publisher,
+		ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
@@ -119,7 +121,6 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
-			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage());

@@ -19,8 +19,10 @@ import com.nhnacademy.back.coupon.couponpolicy.domain.entity.CouponPolicy;
 import com.nhnacademy.back.coupon.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.back.coupon.couponpolicy.repository.CouponPolicyJpaRepository;
 import com.nhnacademy.back.product.category.domain.entity.Category;
+import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -53,13 +55,13 @@ public class CouponServiceImpl implements CouponService {
 
 		if(request.getCategoryId() != null) {
 			Category category = categoryJpaRepository.findById(request.getCategoryId())
-				.orElseThrow(); // 상준; CategoryNotFoundException 추가 예정
+				.orElseThrow(CategoryNotFoundException::new);
 			CategoryCoupon categoryCoupon = new CategoryCoupon(coupon, category);
 			categoryCouponJpaRepository.save(categoryCoupon);
 		}
 		else if(request.getProductId() != null) {
 			Product product = productJpaRepository.findById(request.getProductId())
-				.orElseThrow(); // 상준; ProductNotFoundException 추가 예정
+				.orElseThrow(ProductNotFoundException::new);
 			ProductCoupon productCoupon = new ProductCoupon(coupon, product);
 			productCouponJpaRepository.save(productCoupon);
 		}

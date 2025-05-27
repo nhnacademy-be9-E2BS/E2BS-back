@@ -2,6 +2,7 @@ package com.nhnacademy.back.account.admin.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.account.admin.domain.dto.request.RequestAdminSettingsMemberStateDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMembersDTO;
+import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
+import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminSettingsController {
 
 	private final AdminSettingsService adminSettingsService;
+	private final CustomerService customerService;
 	private final MemberService memberService;
 
 	/**
@@ -46,7 +50,8 @@ public class AdminSettingsController {
 	 * 관리자 회원 관리 페이지에서 회원 조회하는 컨트롤러
 	 */
 	@GetMapping("/members")
-	public ResponseEntity<Page<ResponseAdminSettingsMembersDTO>> getAdminSettingsMembers(Pageable pageable) {
+	public ResponseEntity<Page<ResponseAdminSettingsMembersDTO>> getAdminSettingsMembers(
+		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseAdminSettingsMembersDTO> response = adminSettingsService.getAdminSettingsMembers(pageable);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -85,6 +90,14 @@ public class AdminSettingsController {
 		memberService.withdrawMember(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@GetMapping("/non-members")
+	public ResponseEntity<Page<ResponseAdminSettingsNonMembersDTO>> getAdminSettingsNonMembers(
+		@PageableDefault(page = 0, size = 10) Pageable pageable) {
+		Page<ResponseAdminSettingsNonMembersDTO> response = customerService.getAdminSettingsNonMembers(pageable);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 }

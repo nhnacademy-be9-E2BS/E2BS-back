@@ -1,8 +1,10 @@
 package com.nhnacademy.back.coupon.membercoupon.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import com.nhnacademy.back.coupon.coupon.repository.CategoryCouponJpaRepository;
 import com.nhnacademy.back.coupon.coupon.repository.ProductCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMemberCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMypageMemberCouponDTO;
+import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseOrderCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.exception.MemberCouponUpdateProcessException;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
@@ -44,7 +47,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		Long memberCustomerId = member.getCustomerId();
 
-		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId, pageable);
+		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId,
+			pageable);
 
 		return memberCoupons.map(memberCoupon -> {
 			Coupon coupon = memberCoupon.getCoupon();
@@ -123,4 +127,22 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 
 		return new ResponseMypageMemberCouponDTO(memberId, couponCnt);
 	}
+
+	@Override
+	public List<ResponseOrderCouponDTO> getCouponsInOrderByMemberIdAndProductIds(String memberId,
+		List<Long> productIds) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (member == null) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		Long customerId = member.getCustomerId();
+		List<ResponseOrderCouponDTO> result = new ArrayList<>();
+		result.addAll(memberCouponJpaRepository.findGeneralCoupons(customerId));
+		result.addAll(memberCouponJpaRepository.findProductCoupons(customerId, productIds));
+		result.addAll(memberCouponJpaRepository.findCategoryCoupons(customerId, productIds));
+
+		return result.stream().distinct().collect(Collectors.toList());
+	}
+
 }
