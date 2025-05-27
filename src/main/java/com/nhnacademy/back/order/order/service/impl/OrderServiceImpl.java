@@ -51,6 +51,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
 	private final MemberJpaRepository memberJpaRepository;
@@ -140,6 +141,7 @@ public class OrderServiceImpl implements OrderService {
 	/**
 	 * 결제 완료 시 토스에 결제 승인 요청을 보내는 서비스
 	 */
+	@Transactional
 	@Override
 	public ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount) {
 		RequestTossConfirmDTO requestTossConfirmDTO = new RequestTossConfirmDTO(orderId, paymentKey, amount);
