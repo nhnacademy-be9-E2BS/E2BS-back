@@ -11,6 +11,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
@@ -21,6 +22,7 @@ import com.nhnacademy.back.product.like.service.LikeService;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,7 @@ public class LikeServiceImpl implements LikeService {
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
 	private final LikeJpaRepository likeRepository;
+	private final ReviewJpaRepository reviewRepository;
 
 
 	@Transactional
@@ -40,7 +43,7 @@ public class LikeServiceImpl implements LikeService {
 	public void createLike(long productId, String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new MemberNotFound
+			throw new NotFoundMemberException("Member not found");
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -60,28 +63,49 @@ public class LikeServiceImpl implements LikeService {
 
 	@Transactional
 	@Override
-	public void deleteLike(long productId, long customerId) {
+	public void deleteLike(long productId, String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("Member not found");
+		}
+
+		long customerId = findMember.getCustomerId();
 		if (!likeRepository.existsByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)) {
 			throw new LikeNotFoundException();
 		}
 
-		Like findLike = likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId).orElseThrow(LikeNotFoundException::new);
+		Like findLike = likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)
+			.orElseThrow(LikeNotFoundException::new);
+
 		likeRepository.delete(findLike);
 	}
 
 	@Override
-	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(long customerId, Pageable pageable) {
-		// Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
-		//
-		// return likedProductsByCustomerId.map(product -> {
-		//
-		// 	return new ResponseLikedProductDTO(
-		// 		product.getProductId(),
-		//
-		// 	);
-		// });
+	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(String memberId, Pageable pageable) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("Member not found");
+		}
 
-		return null;
+		long customerId = findMember.getCustomerId();
+
+		Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
+
+		return likedProductsByCustomerId.map(product -> {
+			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId()).orElseThrow(LikeNotFoundException::new);
+
+			return new ResponseLikedProductDTO(
+				product.getProductId(),
+				product.getProductTitle(),
+				product.getProductSalePrice(),
+				product.getPublisher().getPublisherName(),
+				product.getProductImage().getFirst().getProductImagePath(),
+				true,
+				getLikeCount(product.getProductId()),
+				reviewRepository.totalAvgReviewsByProductId(product.getProductId()),
+				findLike.getCreatedAt()
+			);
+		});
 	}
 
 	@Override

@@ -1,8 +1,11 @@
 package com.nhnacademy.back.product.like.domain.entity;
 
+import java.time.LocalDateTime;
+
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +36,9 @@ public class Like {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
+
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
 
 
 	public static Like createLikeEntity(Product product, Customer customer) {

@@ -1,5 +1,7 @@
 package com.nhnacademy.back.product.like.controller;
 
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -28,29 +30,40 @@ public class LikeRestController {
 
 
 	@PostMapping("/api/products/{productId}/likes")
-	public ResponseEntity<Void> createLike(@PathVariable long productId, @Validated @RequestBody RequestCreateLikeDTO likeDTO, BindingResult bindingResult) {
+	public ResponseEntity<Void> createLike(@PathVariable Long productId, @Validated @RequestBody RequestCreateLikeDTO requestDto, BindingResult bindingResult) {
+		if (Objects.isNull(productId)) {
+			throw new IllegalArgumentException();
+		}
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		likeService.createLike(productId, likeDTO.getCustomerId());
+		likeService.createLike(productId, requestDto.getMemberId());
 		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/api/products/{productId}/likes")
-	public ResponseEntity<Void> deleteLike(@PathVariable long productId, @RequestParam long customerId) {
-		likeService.deleteLike(productId, customerId);
+	public ResponseEntity<Void> deleteLike(@PathVariable Long productId, @RequestParam String memberId) {
+		if (Objects.isNull(productId)) {
+			throw new IllegalArgumentException();
+		}
+
+		likeService.deleteLike(productId, memberId);
 		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/api/products/likes")
-	public ResponseEntity<Page<ResponseLikedProductDTO>> getLikedProductsByCustomer(@RequestParam long customerId, Pageable pageable) {
-		Page<ResponseLikedProductDTO> body = likeService.getLikedProductsByCustomer(customerId, pageable);
+	public ResponseEntity<Page<ResponseLikedProductDTO>> getLikedProductsByCustomer(@RequestParam String memberId, Pageable pageable) {
+		Page<ResponseLikedProductDTO> body = likeService.getLikedProductsByCustomer(memberId, pageable);
 		return ResponseEntity.ok(body);
 	}
 
 	@GetMapping("/api/products/{productId}/likes/counts")
-	public ResponseEntity<Long> getLikeCounts(@PathVariable long productId) {
+	public ResponseEntity<Long> getLikeCounts(@PathVariable Long productId) {
+		if (Objects.isNull(productId)) {
+			throw new IllegalArgumentException();
+		}
+
 		long body = likeService.getLikeCount(productId);
 		return ResponseEntity.ok(body);
 	}

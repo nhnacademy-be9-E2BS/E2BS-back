@@ -8,6 +8,6 @@ import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProduct
 public interface LikeService {
 	void createLike(long productId, String memberId);
 	void deleteLike(long productId, String memberId);
-	Page<ResponseLikedProductDTO> getLikedProductsByCustomer(long customerId, Pageable pageable);
+	Page<ResponseLikedProductDTO> getLikedProductsByCustomer(String memberId, Pageable pageable);
 	long getLikeCount(long productId);
 }
