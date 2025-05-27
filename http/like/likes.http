@@ -3,7 +3,7 @@ POST http://localhost:10236/api/products/1/likes
 Content-Type: application/json
 
 {
-  "customerId": 1
+  "memberId": "user"
 }
 
 ### 상품 좋아요 취소

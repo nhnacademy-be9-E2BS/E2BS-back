@@ -1,8 +1,13 @@
 package com.nhnacademy.back.product.like.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
+
 public interface LikeService {
-	void createLike(long productId, long customerId);
-	void deleteLike(long productId, long customerId);
-	// Page<ResponseProductReadDTO> getLikeProducts(long customerId, Pageable pageable);
+	void createLike(long productId, String memberId);
+	void deleteLike(long productId, String memberId);
+	Page<ResponseLikedProductDTO> getLikedProductsByCustomer(long customerId, Pageable pageable);
 	long getLikeCount(long productId);
 }

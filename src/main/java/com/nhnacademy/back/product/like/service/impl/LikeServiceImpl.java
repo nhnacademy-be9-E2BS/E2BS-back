@@ -1,11 +1,18 @@
 package com.nhnacademy.back.product.like.service.impl;
 
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
 import com.nhnacademy.back.product.like.exception.LikeAlreadyExistsException;
 import com.nhnacademy.back.product.like.exception.LikeNotFoundException;
@@ -23,13 +30,20 @@ import lombok.RequiredArgsConstructor;
 public class LikeServiceImpl implements LikeService {
 
 	private final CustomerJpaRepository customerRepository;
+	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
 	private final LikeJpaRepository likeRepository;
 
 
 	@Transactional
 	@Override
-	public void createLike(long productId, long customerId) {
+	public void createLike(long productId, String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new MemberNotFound
+		}
+
+		long customerId = findMember.getCustomerId();
 		if (likeRepository.existsByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)) {
 			throw new LikeAlreadyExistsException();
 		}
@@ -55,18 +69,20 @@ public class LikeServiceImpl implements LikeService {
 		likeRepository.delete(findLike);
 	}
 
-	// @Override
-	// public Page<ResponseLikedProductDTO> getLikeProducts(long customerId, Pageable pageable) {
-	// 	Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
-	//
-	// 	return likedProductsByCustomerId.map(product -> {
-	//
-	// 		return new ResponseLikedProductDTO(
-	// 			product.getProductId(),
-	//
-	// 		);
-	// 	});
-	// }
+	@Override
+	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(long customerId, Pageable pageable) {
+		// Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
+		//
+		// return likedProductsByCustomerId.map(product -> {
+		//
+		// 	return new ResponseLikedProductDTO(
+		// 		product.getProductId(),
+		//
+		// 	);
+		// });
+
+		return null;
+	}
 
 	@Override
 	public long getLikeCount(long productId) {

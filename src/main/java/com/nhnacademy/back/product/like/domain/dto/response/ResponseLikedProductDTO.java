@@ -15,8 +15,12 @@ public class ResponseLikedProductDTO {
 
 	private long productSalePrice;
 
+	private String publisherName;
+
 	private String productThumbnail;
 
 	private long likeCount;
+
+	private double avgRating;
 
 }

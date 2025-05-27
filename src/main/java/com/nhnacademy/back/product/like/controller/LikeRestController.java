@@ -1,5 +1,7 @@
 package com.nhnacademy.back.product.like.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.like.domain.dto.request.RequestCreateLikeDTO;
+import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.service.LikeService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,11 +43,11 @@ public class LikeRestController {
 		return ResponseEntity.ok().build();
 	}
 
-	// @GetMapping("/api/products/likes")
-	// public ResponseEntity<Page<ResponseProductReadDTO>> getLikes(@RequestParam long customerId, Pageable pageable) {
-	// 	Page<ResponseProductReadDTO> body = likeService.getLikeProducts(customerId, pageable);
-	// 	return ResponseEntity.ok(body);
-	// }
+	@GetMapping("/api/products/likes")
+	public ResponseEntity<Page<ResponseLikedProductDTO>> getLikedProductsByCustomer(@RequestParam long customerId, Pageable pageable) {
+		Page<ResponseLikedProductDTO> body = likeService.getLikedProductsByCustomer(customerId, pageable);
+		return ResponseEntity.ok(body);
+	}
 
 	@GetMapping("/api/products/{productId}/likes/counts")
 	public ResponseEntity<Long> getLikeCounts(@PathVariable long productId) {
