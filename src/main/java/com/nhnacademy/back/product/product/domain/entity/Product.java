@@ -79,7 +79,7 @@ public class Product {
 	private long productSearches = 0;
 
 	@OneToMany(mappedBy = "product")
-	private List<ProductImage> productImage;
+	private List<ProductImage> productImage = new ArrayList<>();
 
 	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher,
 		ProductState state) {
@@ -147,6 +147,7 @@ public class Product {
 			.productStock(request.getProductStock())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 	}
 
