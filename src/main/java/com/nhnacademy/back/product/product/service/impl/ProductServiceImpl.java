@@ -29,8 +29,8 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
@@ -92,8 +92,11 @@ public class ProductServiceImpl implements ProductService {
 		productJpaRepository.save(product);
 
 		// 이미지 저장
+		// 자식 추가 (ProductImage)
 		for (String imagePath : imagePaths) {
-			productImageJpaRepository.save(new ProductImage(product, imagePath));
+			ProductImage productImage = new ProductImage(product, imagePath);
+			product.getProductImage().add(productImage);
+			productImageJpaRepository.save(productImage);
 		}
 
 		// 태그 저장
@@ -260,9 +263,12 @@ public class ProductServiceImpl implements ProductService {
 		List<Long> contributorIds = request.getContributorIds();
 
 		// 이미지 삭제 후 저장
+		// 자식 추가 (ProductImage)
 		productImageJpaRepository.deleteByProduct_ProductId(productId);
 		for (String imagePath : imagePaths) {
-			productImageJpaRepository.save(new ProductImage(product, imagePath));
+			ProductImage productImage = new ProductImage(product, imagePath);
+			product.getProductImage().add(productImage);
+			productImageJpaRepository.save(productImage);
 		}
 
 		// 태그 삭제 후 저장
