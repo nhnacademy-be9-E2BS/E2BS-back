@@ -75,6 +75,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	/**
 	 * 검색결과에 맞는 책 목록들 가져오기
 	 */
+	@Override
 	public Page<ResponseProductsApiSearchDTO> searchProducts(RequestProductApiSearchDTO request, Pageable pageable) {
 		AladdinOpenAPI api = new AladdinOpenAPI(request.getQuery(), request.getQueryType());
 		List<Item> items;
