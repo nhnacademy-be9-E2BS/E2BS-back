@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.kim.service;
+package com.nhnacademy.back.product.product.service;
 
 import java.util.List;
 

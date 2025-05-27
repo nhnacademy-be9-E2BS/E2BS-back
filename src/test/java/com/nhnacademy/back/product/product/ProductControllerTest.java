@@ -22,8 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.kim.controller.ProductController;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
+import com.nhnacademy.back.product.product.controller.ProductController;
+import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;

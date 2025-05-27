@@ -25,3 +25,5 @@ Content-Type: application/json
   "productStock": 120
 }
 
+###
+GET http://localhost:10236/api/newspecialitems

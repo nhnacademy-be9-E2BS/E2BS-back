@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestPositionDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
@@ -32,6 +33,7 @@ public class PositionController {
 	/**
 	 * position 전체 조회
 	 */
+	@Admin
 	@GetMapping()
 	public ResponseEntity<Page<ResponsePositionDTO>> getPositions(@PageableDefault() Pageable pageable) {
 		Page<ResponsePositionDTO> responsePositionDTOs = positionService.getPositions(pageable);
@@ -41,6 +43,7 @@ public class PositionController {
 	/**
 	 * position 단건 조회
 	 */
+	@Admin
 	@GetMapping("/{positionId}")
 	public ResponseEntity<ResponsePositionDTO> getPosition(@PathVariable Long positionId) {
 		ResponsePositionDTO responsePositionDTO = positionService.getPosition(positionId);
@@ -50,6 +53,7 @@ public class PositionController {
 	/**
 	 * position 생성
 	 */
+	@Admin
 	@PostMapping()
 	public ResponseEntity<ResponsePositionDTO> createPosition(@Validated @RequestBody RequestPositionDTO request,
 		BindingResult bindingResult) {
@@ -63,6 +67,7 @@ public class PositionController {
 	/**
 	 * position 수정
 	 */
+	@Admin
 	@PutMapping("/{positionId}")
 	public ResponseEntity<ResponsePositionDTO> updatePosition(@PathVariable Long positionId,
 		@Validated @RequestBody RequestPositionDTO request, BindingResult bindingResult) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -79,8 +80,31 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-
 	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
+		Product product = Product.builder()
+			.productState(state)
+			.publisher(publisher)
+			.productTitle(request.getProductTitle())
+			.productDescription(request.getProductDescription())
+			.productContent(request.getProductContent())
+			.productIsbn(request.getProductIsbn())
+			.productRegularPrice(request.getProductRegularPrice())
+			.productSalePrice(request.getProductSalePrice())
+			.productPackageable(request.isProductPackageable())
+			.productStock(request.getProductStock())
+			.productPublishedAt(request.getProductPublishedAt())
+			.productHits(0)
+			.productSearches(0)
+			.productImage(new ArrayList<>())
+			.build();
+
+		ProductImage image = new ProductImage(product, request.getProductImage());
+		product.getProductImage().add(image);
+
+		return product;
+	}
+
+	public static Product createProductApiByQueryEntity(RequestProductApiCreateByQueryDTO request, Publisher publisher, ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
