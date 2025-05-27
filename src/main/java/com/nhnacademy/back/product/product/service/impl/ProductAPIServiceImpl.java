@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.service.impl;
+package com.nhnacademy.back.product.product.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,9 +35,9 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductAp
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.SearchBookException;
-import com.nhnacademy.back.product.product.park.api.AladdinOpenAPI;
-import com.nhnacademy.back.product.product.park.api.Item;
-import com.nhnacademy.back.product.product.park.service.ProductAPIService;
+import com.nhnacademy.back.product.product.api.AladdinOpenAPI;
+import com.nhnacademy.back.product.product.api.Item;
+import com.nhnacademy.back.product.product.service.ProductAPIService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;

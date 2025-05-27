@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.kim.controller;
+package com.nhnacademy.back.product.product.controller;
 
 import java.util.List;
 
@@ -30,8 +30,8 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCo
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
-import com.nhnacademy.back.product.product.park.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
+import com.nhnacademy.back.product.product.service.ProductAPIService;
 
 import lombok.RequiredArgsConstructor;
 

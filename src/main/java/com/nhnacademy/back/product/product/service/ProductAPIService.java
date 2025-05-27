@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.service;
+package com.nhnacademy.back.product.product.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

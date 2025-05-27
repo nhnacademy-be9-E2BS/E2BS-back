@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.api;
+package com.nhnacademy.back.product.product.api;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
