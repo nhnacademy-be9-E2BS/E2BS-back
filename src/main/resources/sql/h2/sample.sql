@@ -132,13 +132,16 @@ VALUES (5000,
 -- Position
 INSERT INTO position (position_id, position_name)
 VALUES (1, 'writer'),
-       (2, 'translator');
+       (2, 'translator'),
+       (3, '지은이');
 
 -- Contributor
 INSERT INTO contributor (contributor_id, position_id, contributor_name)
 VALUES (1, 1, 'Kim'),
        (2, 1, 'Lee'),
-       (3, 2, 'Park');
+       (3, 2, 'Park'),
+       (4, 3, '김지은'),
+       (5, 3, '한강');
 
 -- ProductState
 INSERT INTO product_state (product_state_id, product_state_name)
@@ -151,7 +154,8 @@ VALUES (1, 'SALE'),
 INSERT INTO publisher (publisher_id, publisher_name)
 VALUES (1, 'A pub'),
        (2, 'B pub'),
-       (3, 'C pub');
+       (3, 'C pub'),
+       (4, '창비');
 
 -- Tag
 INSERT INTO tag (tag_name)
@@ -170,7 +174,13 @@ VALUES (1, '국내도서', null),
        (7, '건강', 6),
        (8, '전자책', null),
        (9, '만화', 8),
-       (10, '물리학', 4);
+       (10, '물리학', 4),
+       (11, 'Bestseller', null),
+       (12, 'BlogBest', null),
+       (13, 'ItemNewAll', null),
+       (14, 'ItemNewSpecial', null);
+
+
 
 -- Product
 INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
@@ -183,20 +193,29 @@ VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Sprin
        (1, '2022-06-10', 20, 3, 25000, 20000, 3, 1, '978-89-12345-03-3', 'Docker 실전', '컨테이너 기술',
         'Docker를 활용한 배포 환경 구성 실전서입니다.'),
        (0, '2025-03-01', 70, 4, 22000, 18000, 4, 2, '978-89-12345-04-4', 'CI/CD 이해하기', '지속적 통합과 배포',
-        'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.');
+        'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.'),
+    (0, '2025-05-23', 100, 5, 16800, 15120, 1, 4, '9788936448943', '어린이는 멀리 간다','문학이야기',
+     '오랜 시간 빛나는 지성과 따스한 진심으로 어린이와 문학을 이야기해 온 김지은 평론가가 첫 번째 에세이 『어린이는 멀리 간다』를 펴낸다. 이 책은 김지은 평론가가 2020년부터 2023년까지 4년간 경향신문에 연재한 칼럼을 비롯해 다양한 지면을 통해 발표한 산문을 엄선해 묶었다.,'),
+    (1, '2014-05-19', 100, 6, 15000, 13500, 1, 4, '9788936434120', '소년이 온다 - 2024 노벨문학상 수상작가', '상처의 구조에 대한 투시와 천착의 서사',
+     '섬세한 감수성과 치밀한 문장으로 인간 존재의 본질을 탐구해온 작가 한강의 여섯번째 장편소설. ''상처의 구조에 대한 투시와 천착의 서사''를 통해 한강만이 풀어낼 수 있는 방식으로 1980년 5월을 새롭게 조명한다.');
+
 
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
 VALUES (1, 'asdfageaafdbaefw.jpg'),
        (2, 'akdknjkbaierfdsna.png'),
        (3, 'skbkgeajifaseflknv.jpg'),
-       (4, 'afbdijfknvmaklf2.jpeg');
+       (4, 'afbdijfknvmaklf2.jpeg'),
+       (5, 'https://image.aladin.co.kr/product/36256/59/coversum/8936448943_1.jpg'),
+       (6, 'https://image.aladin.co.kr/product/4086/97/coversum/8936434128_2.jpg');
 
 -- ProductContributor
 INSERT INTO product_contributor (contributor_id, product_contributor_id, product_id)
 VALUES (1, 1, 1),
        (3, 2, 1),
-       (2, 3, 2);
+       (2, 3, 2),
+       (4, 4, 5),
+       (5, 5, 6);
 
 -- ProductTag
 INSERT INTO product_tag (product_id, tag_id)
@@ -204,14 +223,18 @@ VALUES (1, 1),
        (1, 2),
        (2, 1),
        (3, 3),
-       (4, 3);
+       (4, 3),
+       (5, 1),
+       (6, 1);
 
 -- ProductCategory
 INSERT INTO product_category (category_id, product_id)
 VALUES (1, 1),
        (2, 4),
        (4, 2),
-       (3, 3);
+       (3, 3),
+       (11, 5),
+       (11, 6);
 
 -- 주문 테스트를 위한 데이터
 
