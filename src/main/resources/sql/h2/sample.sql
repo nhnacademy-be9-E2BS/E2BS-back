@@ -290,6 +290,13 @@ VALUES (1, 1, 1, 5),
        (3, 1, 3, 6),
        (4, 1, 4, 1);
 
+-- Review
+INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
+VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 'review1.jpg'),
+       (1, 2, '노트북 별로네요', 2, TIMESTAMP '2025-05-05 16:30:00', 'review1.jpg'),
+       (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
+       (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 17:30:00', 'review3.jpg');
+
 -- 카테고리 쿠폰
 INSERT INTO category_coupon (coupon_id, category_id)
 VALUES (1, 1),
