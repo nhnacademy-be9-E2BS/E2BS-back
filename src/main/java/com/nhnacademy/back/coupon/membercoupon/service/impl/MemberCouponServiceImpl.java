@@ -26,7 +26,6 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.exception.MemberCouponUpdateProcessException;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,6 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	private final CategoryCouponJpaRepository categoryCouponJpaRepository;
 	private final ProductCouponJpaRepository productCouponJpaRepository;
 	private final MemberJpaRepository memberJpaRepository;
-	private final JPAQueryFactory queryFactory;
 
 	/**
 	 * 회원 ID로 쿠폰 조회 (쿠폰함)
@@ -49,7 +47,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		Long memberCustomerId = member.getCustomerId();
 
-		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId, pageable);
+		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId,
+			pageable);
 
 		return memberCoupons.map(memberCoupon -> {
 			Coupon coupon = memberCoupon.getCoupon();
@@ -130,7 +129,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	}
 
 	@Override
-	public List<ResponseOrderCouponDTO> getCouponsInOrderByMemberIdAndProductIds(String memberId, List<Long> productIds) {
+	public List<ResponseOrderCouponDTO> getCouponsInOrderByMemberIdAndProductIds(String memberId,
+		List<Long> productIds) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (member == null) {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
@@ -144,9 +144,5 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 
 		return result.stream().distinct().collect(Collectors.toList());
 	}
-
-
-
-
 
 }
