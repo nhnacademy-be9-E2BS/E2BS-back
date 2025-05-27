@@ -17,26 +17,15 @@ import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.coupon.coupon.domain.entity.CategoryCoupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.ProductCoupon;
-import com.nhnacademy.back.coupon.coupon.domain.entity.QCategoryCoupon;
-import com.nhnacademy.back.coupon.coupon.domain.entity.QCoupon;
-import com.nhnacademy.back.coupon.coupon.domain.entity.QProductCoupon;
 import com.nhnacademy.back.coupon.coupon.repository.CategoryCouponJpaRepository;
 import com.nhnacademy.back.coupon.coupon.repository.ProductCouponJpaRepository;
-import com.nhnacademy.back.coupon.couponpolicy.domain.entity.QCouponPolicy;
-import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.QResponseOrderCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMemberCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseMypageMemberCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseOrderCouponDTO;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
-import com.nhnacademy.back.coupon.membercoupon.domain.entity.QMemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.exception.MemberCouponUpdateProcessException;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
-import com.nhnacademy.back.product.category.domain.entity.QCategory;
-import com.nhnacademy.back.product.category.domain.entity.QProductCategory;
-import com.nhnacademy.back.product.product.domain.entity.QProduct;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -142,115 +131,20 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 
 	@Override
 	public List<ResponseOrderCouponDTO> getCouponsInOrderByMemberIdAndProductIds(String memberId, List<Long> productIds) {
-		// 1. 회원 조회
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
-		if (Objects.isNull(member)) {
+		if (member == null) {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		// Alias
-		QMemberCoupon mc = QMemberCoupon.memberCoupon;
-		QCoupon c = QCoupon.coupon;
-		QCouponPolicy cp = QCouponPolicy.couponPolicy;
-		QProductCoupon pc = QProductCoupon.productCoupon;
-		QCategoryCoupon cc = QCategoryCoupon.categoryCoupon;
-		QProduct p = QProduct.product;
-		QCategory ca = QCategory.category;
-		QProductCategory pcat = QProductCategory.productCategory;
-
-		// 공통 조건
-		BooleanExpression baseCondition = mc.member.customerId.eq(member.getCustomerId())
-			.and(mc.memberCouponUsed.eq(false))
-			.and(mc.memberCouponPeriod.after(LocalDateTime.now()));
-
-		// 1. 일반 쿠폰
-		List<ResponseOrderCouponDTO> generalCoupons = queryFactory
-			.select(new QResponseOrderCouponDTO(
-				mc.memberCouponId,
-				c.couponName,
-				cp.couponPolicyMinimum,
-				cp.couponPolicyMaximumAmount,
-				cp.couponPolicySalePrice,
-				cp.couponPolicyDiscountRate,
-				cp.couponPolicyName,
-				mc.memberCouponCreatedAt,
-				mc.memberCouponPeriod,
-				Expressions.nullExpression(), // category_name
-				Expressions.nullExpression()  // product_title
-			))
-			.from(mc)
-			.join(c).on(mc.coupon.eq(c))
-			.join(cp).on(c.couponPolicy.eq(cp))
-			.leftJoin(pc).on(c.eq(pc.coupon))
-			.leftJoin(cc).on(c.eq(cc.coupon))
-			.where(baseCondition
-				.and(pc.coupon.isNull())
-				.and(cc.coupon.isNull()))
-			.distinct()
-			.fetch();
-
-		// 2. 상품 쿠폰
-		List<ResponseOrderCouponDTO> productCoupons = queryFactory
-			.select(new QResponseOrderCouponDTO(
-				mc.memberCouponId,
-				c.couponName,
-				cp.couponPolicyMinimum,
-				cp.couponPolicyMaximumAmount,
-				cp.couponPolicySalePrice,
-				cp.couponPolicyDiscountRate,
-				cp.couponPolicyName,
-				mc.memberCouponCreatedAt,
-				mc.memberCouponPeriod,
-				Expressions.nullExpression(), // category_name
-				p.productTitle
-			))
-			.from(mc)
-			.join(c).on(mc.coupon.eq(c))
-			.join(cp).on(c.couponPolicy.eq(cp))
-			.join(pc).on(c.eq(pc.coupon))
-			.join(p).on(pc.product.eq(p))
-			.where(baseCondition
-				.and(pc.product.productId.in(productIds)))
-			.distinct()
-			.fetch();
-
-		// 3. 카테고리 쿠폰
-		List<ResponseOrderCouponDTO> categoryCoupons = queryFactory
-			.select(new QResponseOrderCouponDTO(
-				mc.memberCouponId,
-				c.couponName,
-				cp.couponPolicyMinimum,
-				cp.couponPolicyMaximumAmount,
-				cp.couponPolicySalePrice,
-				cp.couponPolicyDiscountRate,
-				cp.couponPolicyName,
-				mc.memberCouponCreatedAt,
-				mc.memberCouponPeriod,
-				ca.categoryName,
-				Expressions.nullExpression() // product_title
-			))
-			.from(mc)
-			.join(c).on(mc.coupon.eq(c))
-			.join(cp).on(c.couponPolicy.eq(cp))
-			.join(cc).on(c.eq(cc.coupon))
-			.join(ca).on(cc.category.eq(ca))
-			.join(pcat).on(ca.eq(pcat.category))
-			.where(baseCondition
-				.and(pcat.product.productId.in(productIds)))
-			.distinct()
-			.fetch();
-
-		// 4. 결과 합치기
+		Long customerId = member.getCustomerId();
 		List<ResponseOrderCouponDTO> result = new ArrayList<>();
-		result.addAll(generalCoupons);
-		result.addAll(productCoupons);
-		result.addAll(categoryCoupons);
+		result.addAll(memberCouponJpaRepository.findGeneralCoupons(customerId));
+		result.addAll(memberCouponJpaRepository.findProductCoupons(customerId, productIds));
+		result.addAll(memberCouponJpaRepository.findCategoryCoupons(customerId, productIds));
 
-		// 필요시 중복 제거
-		return result.stream()
-			.distinct()
-			.collect(Collectors.toList());
+		return result.stream().distinct().collect(Collectors.toList());
 	}
+
 
 
 
