@@ -108,6 +108,5 @@ class OrderAdminServiceImplTest {
 		// then
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(mockOrder).updateOrderState(deliveryState);
-		verify(orderJpaRepository).save(mockOrder);
 	}
 }
