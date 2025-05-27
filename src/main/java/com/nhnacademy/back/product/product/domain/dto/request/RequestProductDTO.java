@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.product.domain.dto.request;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
@@ -12,13 +13,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductCreateDTO {
+public class RequestProductDTO {
 	/**
 	 * 도서를 생성할 때 필요한 정보
 	 */
 
+	//상품상태
+	@NotNull
+	private Long productStateId;
 	//출판사
-	private String publisherName;
+	@NotNull
+	private Long publisherId;
 
 	//제목, 목차, 설명
 	@NotNull
@@ -28,18 +33,35 @@ public class RequestProductCreateDTO {
 	@NotNull
 	private String productDescription;
 
+	//출판일시
+	@NotNull
+	private LocalDate productPublishedAt;
 	//isbn
 	@NotNull
 	private String productIsbn;
 	//정가
-	private long productRegularPrice;
+	@NotNull
+	private Long productRegularPrice;
 	//판매가
-	private long productSalePrice;
+	@NotNull
+	private Long productSalePrice;
 	//포장가능여부
+	@NotNull
 	private boolean productPackageable;
-	//재고
-	private int productStock;
+	//상품재고
+	@NotNull
+	private Integer productStock;
+
 	// 이미지
-	private List<String> productImage;
+	@NotNull
+	private List<String> productImagePaths;
+	// 태그
+	private List<Long> tagIds;
+	// 카테고리 Id
+	@NotNull
+	private List<Long> categoryIds;
+	// 기여자 Id
+	@NotNull
+	private List<Long> contributorIds;
 
 }

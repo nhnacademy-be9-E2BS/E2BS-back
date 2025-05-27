@@ -1,9 +1,10 @@
 package com.nhnacademy.back.order.order.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +91,6 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
 		order.updatePaymentStatus(true);
-		orderJpaRepository.save(order);
 		return response;
 	}
 
@@ -183,7 +183,15 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		List<ResponseOrderDetailDTO> orderDetails = orderDetailJpaRepository.findByOrderOrderCode(orderCode)
-			.stream().map(ResponseOrderDetailDTO::fromEntity).collect(Collectors.toList());
+			.stream().map(ResponseOrderDetailDTO::fromEntity).toList();
 		return new ResponseOrderWrapperDTO(order, orderDetails);
+	}
+
+	@Override
+	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		long customerId = member.getCustomerId();
+		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
+			.map(ResponseOrderDTO::fromEntity);
 	}
 }

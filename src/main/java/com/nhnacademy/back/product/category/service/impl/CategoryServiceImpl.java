@@ -85,7 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
 		return rootCategories.stream()
 			.map(root -> buildTreeUpToDepth(root, 1))
 			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
@@ -97,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
 		List<ResponseCategoryDTO> allCategories = self.getCategories();
 
+		// targetCategory -> 선택한 카테고리
 		ResponseCategoryDTO targetCategory = findCategoryById(allCategories, categoryId);
 		if (Objects.isNull(targetCategory)) {
 			throw new CategoryNotFoundException();
@@ -167,10 +168,8 @@ public class CategoryServiceImpl implements CategoryService {
 
 	/**
 	 * 관리자가 DB에 저장 되어 있는 Category의 값을 수정하는 로직
-	 * 수정 가능한 값 : category_name, category_id2(parent)
-	 * 수정 조건
-	 * category_name : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
-	 * category_id2 : 자식 카테고리가 없는 최하위 카테고리인 경우에만 이동 가능하며, 해당 카테고리에 속한 도서들도 같이 이동, 최상위 카테고리로 이동은 불가능
+	 * 수정 가능한 값 : category_name
+	 * 수정 조건 : 동일한 단계(level) + 동일한 상위 카테고리 내에서 이름 중복 불가 -> 중복 되는 경우 Exception 발생
 	 */
 	@Transactional
 	@Override
@@ -180,9 +179,16 @@ public class CategoryServiceImpl implements CategoryService {
 
 		String newName = request.getCategoryName();
 
-		if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(originCategory.getParent().getCategoryId(),
-			newName)) {
-			throw new CategoryAlreadyExistsException();
+		if (originCategory.getParent() == null) {
+			if (categoryJpaRepository.existsByParentIsNullAndCategoryName(newName)) {
+				throw new CategoryAlreadyExistsException();
+			}
+		} else {
+			if (categoryJpaRepository.existsByParentCategoryIdAndCategoryName(
+				originCategory.getParent().getCategoryId(),
+				newName)) {
+				throw new CategoryAlreadyExistsException();
+			}
 		}
 
 		originCategory.setCategory(newName);
@@ -211,11 +217,9 @@ public class CategoryServiceImpl implements CategoryService {
 		Category parent = category.getParent();
 		boolean isSecondLevel = parent.getParent() == null;
 
-		if (isSecondLevel) {
+		if (isSecondLevel && parent.getChildren().size() < 2) {
 			// 본인이 2단계 → 부모의 자식이 2개 이상이어야 삭제 가능 (최상위 카테고리 하나만 있는 경우 방지)
-			if (parent.getChildren().size() < 2) {
-				throw new CategoryDeleteNotAllowedException("최소 2단계로 구성해야 하므로 삭제 불가");
-			}
+			throw new CategoryDeleteNotAllowedException("최소 2단계로 구성해야 하므로 삭제 불가");
 		}
 
 		// 3단계 이상 → 항상 삭제 가능

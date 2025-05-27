@@ -7,7 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.nhnacademy.back.account.address.exception.SaveMemberAddressFailedException;
+import com.nhnacademy.back.account.address.exception.DeleteAddressFailedException;
+import com.nhnacademy.back.account.address.exception.NotFoundAddressException;
+import com.nhnacademy.back.account.address.exception.SaveAddressFailedException;
+import com.nhnacademy.back.account.address.exception.UpdateAddressFailedException;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
@@ -19,6 +22,7 @@ import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.common.error.dto.GlobalErrorResponse;
 import com.nhnacademy.back.common.exception.BadRequestException;
+import com.nhnacademy.back.common.exception.InvalidImageFormatException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
@@ -32,13 +36,14 @@ import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsExc
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
+import com.nhnacademy.back.review.exception.ReviewAlreadyExistsException;
 import com.nhnacademy.back.review.exception.ReviewNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	/**
-	 * 이미 존재하는 경우의 에러 핸들러
+	 * HttpStatus.BAD_REQUEST 경우의 에러 핸들러
 	 */
 	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
@@ -46,7 +51,8 @@ public class GlobalExceptionHandler {
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
 		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
-		SaveMemberAddressFailedException.class})
+		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
+		ReviewAlreadyExistsException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -61,7 +67,8 @@ public class GlobalExceptionHandler {
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
 		ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
-		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class})
+		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
+		NotFoundAddressException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());
@@ -69,7 +76,7 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
-	 * 값의 충돌
+	 * 충돌인 경우 에러 핸들러
 	 */
 	@ExceptionHandler({AlreadyExistsMemberIdException.class})
 	public ResponseEntity<GlobalErrorResponse> handleConflictException(Exception ex) {
@@ -78,4 +85,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
 	}
 
+	/**
+	 * 지원하지 않는 미디어 타입인 경우 에러 핸들러
+	 */
+	@ExceptionHandler({InvalidImageFormatException.class})
+	public ResponseEntity<GlobalErrorResponse> handleUnsupportedMediaTypeException(Exception ex) {
+		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
+			LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(body);
+	}
 }

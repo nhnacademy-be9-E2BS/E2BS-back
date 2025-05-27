@@ -1,14 +1,14 @@
 package com.nhnacademy.back.product.product.domain.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
-import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +35,7 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
 
-	@OneToOne(optional = false)
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "product_state_id")
 	private ProductState productState;
 
@@ -44,7 +43,7 @@ public class Product {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Column(length = 30, nullable = false)
+	@Column(length = 100, nullable = false)
 	private String productTitle;
 
 	@Column(nullable = false)
@@ -81,47 +80,69 @@ public class Product {
 	private List<ProductImage> productImage;
 
 
-	public static Product createProductEntity(RequestProductCreateDTO request, Publisher publisher) {
-		return Product.builder()
-			.productState(new ProductState(ProductStateName.SALE))
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
+		Product product = Product.builder()
+			.productState(state)
 			.publisher(publisher)
 			.productTitle(request.getProductTitle())
-			.productContent(request.getProductContent())
 			.productDescription(request.getProductDescription())
+			.productContent(request.getProductContent())
 			.productIsbn(request.getProductIsbn())
 			.productRegularPrice(request.getProductRegularPrice())
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productPublishedAt(LocalDate.now())
+			.productPublishedAt(request.getProductPublishedAt())
+			.productHits(0)
+			.productSearches(0)
+			.productImage(new ArrayList<>())
+			.build();
+
+		ProductImage image = new ProductImage(product, request.getProductImage());
+		product.getProductImage().add(image);
+
+		return product;
+	}
+
+	public static Product createProductEntity(RequestProductDTO request, ProductState productState,
+		Publisher publisher) {
+		return Product.builder()
+			.productState(productState)
+			.publisher(publisher)
+			.productTitle(request.getProductTitle())
+			.productContent(request.getProductContent())
+			.productDescription(request.getProductDescription())
+			.productPublishedAt(request.getProductPublishedAt())
+			.productIsbn(request.getProductIsbn())
+			.productRegularPrice(request.getProductRegularPrice())
+			.productSalePrice(request.getProductSalePrice())
+			.productPackageable(request.isProductPackageable())
+			.productStock(request.getProductStock())
 			.productHits(0)
 			.productSearches(0)
 			.build();
 	}
 
 	//updateProdut를 위해 set대신 쓴 생성자
-	public void updateProduct(RequestProductUpdateDTO request, Publisher publisher, ProductState productState) {
+	public void updateProduct(RequestProductDTO request, ProductState productState, Publisher publisher) {
 		this.productState = productState;
 		this.publisher = publisher;
 		this.productTitle = request.getProductTitle();
 		this.productContent = request.getProductContent();
 		this.productDescription = request.getProductDescription();
+		this.productIsbn = request.getProductIsbn();
 		this.productRegularPrice = request.getProductRegularPrice();
 		this.productSalePrice = request.getProductSalePrice();
 		this.productPackageable = request.isProductPackageable();
 		this.productStock = request.getProductStock();
 	}
 
-	public void setProduct(int productStock) {
+	public void setProductSale(int productStock) {
 		this.productStock = productStock;
 	}
 
 	public void setProduct(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
-
-
-
-
 
 }
