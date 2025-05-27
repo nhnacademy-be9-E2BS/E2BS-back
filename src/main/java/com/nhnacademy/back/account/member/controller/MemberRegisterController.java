@@ -1,9 +1,14 @@
 package com.nhnacademy.back.account.member.controller;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +50,17 @@ public class MemberRegisterController {
 			responseRegisterMemberDTO.getMemberId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseRegisterMemberDTO);
+	}
+
+	/**
+	 * 회원 가입 아이디 중복체크 메서드
+	 */
+	@GetMapping("/members/{memberId}")
+	public ResponseEntity<Map<String, Boolean>> checkMemberIdDev(@PathVariable("memberId") String memberId) {
+		boolean idDuplicateCheck = memberService.existsMemberByMemberId(memberId);
+		Map<String, Boolean> response = Collections.singletonMap("available", !idDuplicateCheck);
+
+		return ResponseEntity.ok(response);
 	}
 
 }

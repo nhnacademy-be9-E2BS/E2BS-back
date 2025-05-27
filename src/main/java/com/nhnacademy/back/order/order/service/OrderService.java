@@ -22,4 +22,12 @@ public interface OrderService {
 	ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode);
 
 	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
+
+	long getAllOrders();
+
+	long getTotalSales();
+
+	long getTotalMonthlySales();
+
+	long getTotalDailySales();
 }

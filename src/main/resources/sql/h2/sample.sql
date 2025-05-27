@@ -187,7 +187,7 @@ VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Sprin
 
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
-VALUES (1, 'asdfageaafdbaefw.jpg'),
+VALUES (1, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
        (2, 'akdknjkbaierfdsna.png'),
        (3, 'skbkgeajifaseflknv.jpg'),
        (4, 'afbdijfknvmaklf2.jpeg');
@@ -210,6 +210,7 @@ VALUES (1, 1),
 INSERT INTO product_category (category_id, product_id)
 VALUES (1, 1),
        (2, 4),
+       (1, 4),
        (4, 2),
        (3, 3);
 
@@ -217,7 +218,7 @@ VALUES (1, 1),
 
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_date, delivery_fee_free_amount)
-VALUES (5000, TIMESTAMP '2025-01-01 00:00:00.000000', 30000);
+VALUES (5000, DATE '2025-01-01', 30000);
 
 -- Wrapper
 INSERT INTO wrapper (wrapper_image, wrapper_name, wrapper_price, wrapper_saleable)
@@ -247,9 +248,9 @@ VALUES (1, DATE '2025-01-01', null, null, 10000, '10,000원 이상 구매 시 1,
 
 -- Coupon
 INSERT INTO coupon (coupon_id, coupon_name, coupon_policy_id, coupon_is_active)
-VALUES (1, '1,000원 쿠폰', 1, true),
-       (2, '10% 쿠폰', 2, true),
-       (3, '3000원 쿠폰', 3, true),
+VALUES (1, '국내도서 쿠폰', 1, true),
+       (2, 'spring 입문 쿠폰', 2, true),
+       (3, '소설 쿠폰', 3, true),
        (4, '봄맞이 할인 쿠폰', 4, true),
        (5, '과학의 달 쿠폰', 5, true),
        (6, '5월 생일 쿠폰', 2, true),
@@ -260,7 +261,12 @@ VALUES (1, '1,000원 쿠폰', 1, true),
 INSERT INTO member_coupon (member_coupon_created_at, member_coupon_period, member_coupon_used, coupon_id, member_id)
 VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 1, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 2, 1),
-       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1);
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 3, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', true, 4, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 5, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 6, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 7, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
@@ -296,7 +302,6 @@ VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 're
        (1, 2, '노트북 별로네요', 2, TIMESTAMP '2025-05-05 16:30:00', 'review1.jpg'),
        (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
        (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 17:30:00', 'review3.jpg');
-
 
 -- 카테고리 쿠폰
 INSERT INTO category_coupon (coupon_id, category_id)

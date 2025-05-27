@@ -1,10 +1,9 @@
 package com.nhnacademy.back.product.contributor.service.impl;
 
-import java.util.Objects;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
@@ -20,12 +19,14 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ContributorServiceImpl implements ContributorService {
 
 	private final ContributorJpaRepository contributorJpaRepository;
 	private final PositionJpaRepository positionJpaRepository;
 
 	@Override
+	@Transactional
 	public void createContributor(RequestContributorDTO request) {
 		Position position = positionJpaRepository.findById(request.getPositionId())
 			.orElseThrow(() -> new PositionNotFoundException("position not found : %s".formatted(request.getPositionId())));
@@ -59,6 +60,7 @@ public class ContributorServiceImpl implements ContributorService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseContributorDTO updateContributor(long contributorId, RequestContributorDTO request) {
 		Contributor contributor = contributorJpaRepository.findById(contributorId)
 			.orElseThrow(() -> new ContributorNotFoundException("contributor id not found : %s".formatted(contributorId)));

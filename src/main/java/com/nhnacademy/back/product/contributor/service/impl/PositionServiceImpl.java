@@ -1,13 +1,9 @@
 package com.nhnacademy.back.product.contributor.service.impl;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestPositionDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
@@ -16,18 +12,18 @@ import com.nhnacademy.back.product.contributor.exception.PositionAlreadyExistsEx
 import com.nhnacademy.back.product.contributor.exception.PositionNotFoundException;
 import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.service.PositionService;
-import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
-import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PositionServiceImpl implements PositionService {
 
 	private final PositionJpaRepository positionJpaRepository;
 
 	@Override
+	@Transactional
 	public ResponsePositionDTO createPosition(RequestPositionDTO request) {
 		String positionName = request.getPositionName();
 		if (positionJpaRepository.existsByPositionName(request.getPositionName())) {
@@ -56,6 +52,7 @@ public class PositionServiceImpl implements PositionService {
 
 
 	@Override
+	@Transactional
 	public ResponsePositionDTO updatePosition(Long positionId, RequestPositionDTO request) {
 		Position position = positionJpaRepository.findById(positionId).orElseThrow(
 			() -> new PositionNotFoundException("Position Not Found : %s".formatted(positionId)));

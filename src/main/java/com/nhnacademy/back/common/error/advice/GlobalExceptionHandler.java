@@ -13,10 +13,14 @@ import com.nhnacademy.back.account.address.exception.SaveAddressFailedException;
 import com.nhnacademy.back.account.address.exception.UpdateAddressFailedException;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
+import com.nhnacademy.back.account.member.exception.DeleteMemberFailedException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
 import com.nhnacademy.back.account.member.exception.MemberRoleException;
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
@@ -52,6 +56,9 @@ public class GlobalExceptionHandler {
 		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
 		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
+		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class,
+		UpdateMemberRoleFailedException.class,
+		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
 		ReviewAlreadyExistsException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
@@ -76,7 +83,7 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
-	 * 충돌인 경우 에러 핸들러
+	 * 값의 충돌
 	 */
 	@ExceptionHandler({AlreadyExistsMemberIdException.class})
 	public ResponseEntity<GlobalErrorResponse> handleConflictException(Exception ex) {

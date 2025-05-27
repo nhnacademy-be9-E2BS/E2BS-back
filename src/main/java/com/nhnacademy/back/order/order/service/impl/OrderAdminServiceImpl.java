@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.entity.Order;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class OrderAdminServiceImpl implements OrderAdminService {
 	private final OrderJpaRepository orderJpaRepository;
 	private final OrderDetailJpaRepository orderDetailJpaRepository;
@@ -47,12 +49,12 @@ public class OrderAdminServiceImpl implements OrderAdminService {
 	 * 특정 주문 코드의 주문 상태를 배송 시작으로 바꾸는 메서드
 	 */
 	@Override
+	@Transactional
 	public ResponseEntity<Void> startDelivery(String orderCode) {
 		Order order = orderJpaRepository.findById(orderCode).orElseThrow();
 		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).orElse(null);
 		order.updateOrderState(orderState);
 		order.updateOrderShipmentDate(LocalDate.now());
-		orderJpaRepository.save(order);
 		return ResponseEntity.ok().build();
 	}
 

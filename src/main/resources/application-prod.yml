@@ -21,3 +21,11 @@ order:
   url:
     toss: https://api.tosspayments.com/v1/payments/confirm
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
+
+
+# minio 로컬에서 연동
+minio:
+  host: http://localhost:9000
+  access-key: vIu0hfiRAwTNHGwlKlb9
+  secret-key: 7ZXONJs8I5SVJitjXjPBMogeeEAjcL01pOuHvNXI
+  region: us-east-1

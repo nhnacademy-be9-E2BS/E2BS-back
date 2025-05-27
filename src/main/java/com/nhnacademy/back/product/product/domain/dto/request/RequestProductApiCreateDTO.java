@@ -15,6 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestProductApiCreateDTO {
+
 	@NotBlank
 	private String publisherName;
 

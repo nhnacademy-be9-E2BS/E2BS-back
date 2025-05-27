@@ -161,6 +161,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		// 하위 카테고리 저장
 		Category childCategory = new Category(request.get(1).getCategoryName(), parentCategory);
+		parentCategory.getChildren().add(childCategory);
 		categoryJpaRepository.save(childCategory);
 
 		self.clearCategoriesCache();

@@ -24,7 +24,6 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	private final PointHistoryJpaRepository pointHistoryJpaRepository;
 	private final MemberJpaRepository memberJpaRepository;
 
-	@Transactional
 	public ResponseMemberPointDTO getMemberPoints(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
