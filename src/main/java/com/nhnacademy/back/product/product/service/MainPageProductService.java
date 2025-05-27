@@ -9,16 +9,16 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageP
 
 public interface MainPageProductService {
 	//메인 페이지에서 책 보여주기
-	List<ResponseMainPageProductDTO> showProducts(RequestMainPageProductDTO request);
+	List<ResponseMainPageProductDTO> getProducts(RequestMainPageProductDTO request);
 
 	@Transactional(readOnly = true)
-	List<ResponseMainPageProductDTO> showProductsByCategory(String categoryName);
+	List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName);
 
-	List<ResponseMainPageProductDTO> showBestSellerProducts();
+	List<ResponseMainPageProductDTO> getBestSellerProducts();
 
-	List<ResponseMainPageProductDTO> showBlogBestProducts();
+	List<ResponseMainPageProductDTO> getBlogBestProducts();
 
-	List<ResponseMainPageProductDTO> showNewItemsProducts();
+	List<ResponseMainPageProductDTO> getNewItemsProducts();
 
-	List<ResponseMainPageProductDTO> showItemNewSpecialProducts();
+	List<ResponseMainPageProductDTO> getItemNewSpecialProducts();
 }

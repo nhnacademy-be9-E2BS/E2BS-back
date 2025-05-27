@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductJpaRepository productJpaRepository;
 	private final CategoryJpaRepository categoryJpaRepository;
@@ -29,13 +30,13 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 
 	@Override
-	public List<ResponseMainPageProductDTO> showProducts(RequestMainPageProductDTO request) {
+	public List<ResponseMainPageProductDTO> getProducts(RequestMainPageProductDTO request) {
 		return List.of();
 	}
 
-	@Transactional(readOnly = true)
+
 	@Override
-	public List<ResponseMainPageProductDTO> showProductsByCategory(String categoryName) {
+	public List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName) {
 		Category category = categoryJpaRepository.findCategoryByCategoryName(categoryName);
 		if (category == null) {
 			return List.of(); // 혹은 예외 던지기
@@ -76,23 +77,23 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	}
 
 	@Override
-	public List<ResponseMainPageProductDTO> showBestSellerProducts() {
-		return showProductsByCategory("Bestseller");
+	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
+		return getProductsByCategory("Bestseller");
 	}
 
 	@Override
-	public List<ResponseMainPageProductDTO> showBlogBestProducts() {
-		return showProductsByCategory("BlogBest");
+	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
+		return getProductsByCategory("BlogBest");
 	}
 
 	@Override
-	public List<ResponseMainPageProductDTO> showNewItemsProducts() {
-		return showProductsByCategory("ItemNewAll");
+	public List<ResponseMainPageProductDTO> getNewItemsProducts() {
+		return getProductsByCategory("ItemNewAll");
 	}
 
 	@Override
-	public List<ResponseMainPageProductDTO> showItemNewSpecialProducts() {
-		return showProductsByCategory("ItemNewSpecial");
+	public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
+		return getProductsByCategory("ItemNewSpecial");
 	}
 
 }

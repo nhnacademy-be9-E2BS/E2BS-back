@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
@@ -55,6 +56,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductAPIServiceImpl implements ProductAPIService {
 
 	private final ProductJpaRepository productJpaRepository;
@@ -153,6 +155,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	}
 
 	@Override
+	@Transactional
 	public void createProduct(RequestProductApiCreateDTO request) {
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
 
@@ -223,6 +226,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	}
 
 	@Override
+	@Transactional
 	public void createProductByQuery(RequestProductApiCreateByQueryDTO request) {
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
 

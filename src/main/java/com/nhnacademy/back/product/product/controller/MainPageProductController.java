@@ -22,25 +22,25 @@ public class MainPageProductController {
 
 	@GetMapping("/bestseller")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller() {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.showBestSellerProducts();
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getBestSellerProducts();
 		return ResponseEntity.ok(products);
 	}
 
 	@GetMapping("/blogbest")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getBlogBest() {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.showBlogBestProducts();
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getBlogBestProducts();
 		return ResponseEntity.ok(products);
 	}
 
 	@GetMapping("/newitems")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewItems() {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.showNewItemsProducts();
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getNewItemsProducts();
 		return ResponseEntity.ok(products);
 	}
 
 	@GetMapping("/newspecialitems")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSepcialItems() {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.showItemNewSpecialProducts();
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemNewSpecialProducts();
 		return ResponseEntity.ok(products);
 	}
 
