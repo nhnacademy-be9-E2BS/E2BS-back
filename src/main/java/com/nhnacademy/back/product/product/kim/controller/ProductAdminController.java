@@ -119,14 +119,17 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@GetMapping("/status/sale")
-	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(Pageable pageable) {
+	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(
+		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
 
 	/**
+	 *
 	 * 검색어와 검색타입으로 책 검색
 	 */
+
 	@Admin
 	@GetMapping("/aladdin/search")
 	public ResponseEntity<?> searchProducts(@ModelAttribute UnifiedProductApiSearchDTO request, Pageable pageable) {

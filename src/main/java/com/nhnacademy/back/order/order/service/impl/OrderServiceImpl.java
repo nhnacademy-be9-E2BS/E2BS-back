@@ -1,5 +1,9 @@
 package com.nhnacademy.back.order.order.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -193,5 +197,47 @@ public class OrderServiceImpl implements OrderService {
 		long customerId = member.getCustomerId();
 		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
 			.map(ResponseOrderDTO::fromEntity);
+	}
+
+	/**
+	 * 지금까지 총 주문 개수를 조회하는 메서드
+	 */
+	@Override
+	public long getAllOrders() {
+		return orderJpaRepository.countAllOrders();
+	}
+
+	/**
+	 * 총 매출액 조회하는 메서드
+	 */
+	@Override
+	public long getTotalSales() {
+		Long totalSales = orderDetailJpaRepository.getTotalSales();
+
+		return totalSales != null ? totalSales : 0L;
+	}
+
+	/**
+	 * 이번 달 총 매출액 조회하는 메서드
+	 */
+	@Override
+	public long getTotalMonthlySales() {
+		YearMonth thisMonth = YearMonth.now();
+		LocalDateTime start = thisMonth.atDay(1).atStartOfDay();
+		LocalDateTime end = thisMonth.atEndOfMonth().atTime(LocalTime.MAX);
+
+		Long totalMonthlySales = orderDetailJpaRepository.getTotalMonthlySales(start, end);
+
+		return totalMonthlySales != null ? totalMonthlySales : 0L;
+	}
+
+	@Override
+	public long getTotalDailySales() {
+		LocalDateTime start = LocalDate.now().atStartOfDay();
+		LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
+
+		Long totalDailySales = orderDetailJpaRepository.getTotalDailySales(start, end);
+
+		return totalDailySales != null ? totalDailySales : 0L;
 	}
 }

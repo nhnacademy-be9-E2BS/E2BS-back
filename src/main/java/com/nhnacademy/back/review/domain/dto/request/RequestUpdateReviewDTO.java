@@ -1,6 +1,7 @@
 package com.nhnacademy.back.review.domain.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestUpdateReviewDTO {
-
 	private String reviewContent;
-
-	@NotNull
-	private int reviewGrade;
-
-	private String reviewImage;
-
+	private MultipartFile reviewImage;
 }

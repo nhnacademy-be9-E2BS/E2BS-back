@@ -18,8 +18,10 @@ import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
 public interface ProductCategoryJpaRepository extends JpaRepository<ProductCategory, Long> {
 	List<ProductCategory> findByProduct_ProductId(long productProductId);
 
-	@Query("SELECT ProductCategoryFlatDTO(pc.product.productId, pc.category.categoryId) " +
-		"FROM ProductCategory pc WHERE pc.product.productId IN :productIds")
+	@Query(
+		"SELECT new com.nhnacademy.back.product.category.domain.dto.ProductCategoryFlatDTO(pc.product.productId, pc.category.categoryId) "
+			+
+			"FROM ProductCategory pc WHERE pc.product.productId IN :productIds")
 	List<ProductCategoryFlatDTO> findFlatCategoryData(@Param("productIds") List<Long> productIds);
 
 	@Modifying

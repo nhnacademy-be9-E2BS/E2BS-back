@@ -6,24 +6,33 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.account.admin.domain.dto.request.RequestAdminSettingsMemberStateDTO;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
+import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
+import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
 import com.nhnacademy.back.account.memberrank.repository.MemberRankJpaRepository;
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
 import com.nhnacademy.back.account.memberrole.repository.MemberRoleJpaRepository;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
+import com.nhnacademy.back.account.memberstate.domain.entity.MemberStateName;
 import com.nhnacademy.back.account.memberstate.repository.MemberStateJpaRepository;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
@@ -40,6 +49,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberStateJpaRepository memberStateJpaRepository;
 	private final MemberRoleJpaRepository memberRoleJpaRepository;
 	private final SocialAuthJpaRepository socialAuthJpaRepository;
+	private final CustomerJpaRepository customerJpaRepository;
 
 	/**
 	 * 아이디에 해당하는 Member가 존재하는지 확인하는 메서드
@@ -70,6 +80,10 @@ public class MemberServiceImpl implements MemberService {
 		Member member = getMemberByMemberId(requestLoginMemberDTO.getMemberId());
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		if (member.getMemberState().getMemberStateName() == MemberStateName.WITHDRAW) {
+			throw new MemberStateWithdrawException("탈퇴한 회원입니다.");
 		}
 
 		LocalDate loginLatest = LocalDate.now();
@@ -124,7 +138,9 @@ public class MemberServiceImpl implements MemberService {
 		);
 	}
 
-	@Transactional
+	/**
+	 * 회원 정보를 가져오는 메서드
+	 */
 	@Override
 	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());
@@ -138,6 +154,119 @@ public class MemberServiceImpl implements MemberService {
 			member.getMemberRank(), member.getMemberState(), member.getMemberRole(),
 			member.getSocialAuth()
 		);
+	}
+
+	/**
+	 * 회원 정보를 수정하는 메서드
+	 */
+	@Transactional
+	@Override
+	public void updateMemberInfo(RequestMemberInfoDTO requestMemberInfoDTO) {
+		Member member = memberJpaRepository.getMemberByMemberId(requestMemberInfoDTO.getMemberId());
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		int memberResult = memberJpaRepository.updateMemberInfo(
+			requestMemberInfoDTO.getMemberBirth(),
+			requestMemberInfoDTO.getMemberPhone(),
+			requestMemberInfoDTO.getMemberId()
+		);
+
+		if (memberResult <= 0) {
+			throw new UpdateMemberInfoFailedException("회원 정보를 수정하지 못했습니다.");
+		}
+
+		int customerResult = customerJpaRepository.updateCustomerNameAndCustomerEmail(
+			requestMemberInfoDTO.getCustomerName(),
+			requestMemberInfoDTO.getCustomerEmail(),
+			member.getCustomer().getCustomerId()
+		);
+
+		if (customerResult <= 0) {
+			throw new UpdateMemberInfoFailedException("회원 정보를 수정하지 못했습니다.");
+		}
+	}
+
+	/**
+	 * 마이페이지 회원 정보에서 회원 탈퇴하는 메서드
+	 */
+	@Transactional
+	public void withdrawMember(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		MemberState withdrawMemberState = memberStateJpaRepository.getMemberStateByMemberStateId(3);
+		int result = memberJpaRepository.updateMemberMemberState(withdrawMemberState, memberId);
+		if (result <= 0) {
+			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+		}
+	}
+
+	/**
+	 * 총 회원 수 가져오는 메서드
+	 */
+	@Override
+	public int getTotalMemberCnt() {
+		return memberJpaRepository.countAllMembers();
+	}
+
+	/**
+	 * 오늘 로그인한 회원 개수 조회하는 메서드
+	 */
+	@Override
+	public int getTotalTodayLoginMembersCnt() {
+		return memberJpaRepository.countTodayLoginMembers(LocalDate.now());
+	}
+
+	/**
+	 * 관리자 페이지에서 회원 상태를 변경하는 메서드
+	 */
+	@Override
+	@Transactional
+	public void updateMemberState(String memberId,
+		RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		MemberStateName memberStateName = MemberStateName.valueOf(
+			requestAdminSettingsMemberStateDTO.getMemberStateName()
+		);
+		MemberState memberState = memberStateJpaRepository.findMemberStateByMemberStateName(memberStateName);
+
+		int result = memberJpaRepository.updateMemberMemberState(memberState, memberId);
+		if (result <= 0) {
+			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+		}
+	}
+
+	/**
+	 * 관리자 페이지에서 회원 권한을 변경하는 메서드
+	 */
+	@Override
+	@Transactional
+	public void updateMemberRole(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		int result = 0;
+		if (member.getMemberRole().getMemberRoleName() == MemberRoleName.ADMIN) {
+			MemberRole memberRole = memberRoleJpaRepository.getMemberRoleByMemberRoleId(2);
+			result = memberJpaRepository.updateMemberRole(memberRole, memberId);
+		} else if (member.getMemberRole().getMemberRoleName() == MemberRoleName.MEMBER) {
+			MemberRole memberRole = memberRoleJpaRepository.getMemberRoleByMemberRoleId(1);
+			result = memberJpaRepository.updateMemberRole(memberRole, memberId);
+		}
+
+		if (result <= 0) {
+			throw new UpdateMemberRoleFailedException("회원 권한을 변경하지 못했습니다.");
+		}
 	}
 
 }
