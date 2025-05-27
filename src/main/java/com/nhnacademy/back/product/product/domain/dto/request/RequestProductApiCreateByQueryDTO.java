@@ -14,7 +14,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductApiCreateDTO {
+public class RequestProductApiCreateByQueryDTO {
+
+	@NotBlank
+	private String queryType;
 
 	@NotBlank
 	private String publisherName;
@@ -61,5 +64,4 @@ public class RequestProductApiCreateDTO {
 
 	List<Long> categoryIds;
 	List<Long> tagIds;
-
 }

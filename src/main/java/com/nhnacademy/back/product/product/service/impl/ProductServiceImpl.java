@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.kim.service.impl;
+package com.nhnacademy.back.product.product.service.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
+import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;

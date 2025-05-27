@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.kim.controller;
+package com.nhnacademy.back.product.product.controller;
 
 import java.util.List;
 
@@ -18,16 +18,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.UnifiedProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
-import com.nhnacademy.back.product.product.park.service.ProductAPIService;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.service.ProductService;
+import com.nhnacademy.back.product.product.service.ProductAPIService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -128,21 +132,49 @@ public class ProductAdminController {
 
 	@Admin
 	@GetMapping("/aladdin/search")
-	public ResponseEntity<Page<ResponseProductsApiSearchDTO>> searchProducts(
-		@ModelAttribute RequestProductApiSearchDTO request, Pageable pageable) {
-		Page<ResponseProductsApiSearchDTO> products = productApiService.searchProducts(request, pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(products);
+	public ResponseEntity<?> searchProducts(@ModelAttribute UnifiedProductApiSearchDTO request, Pageable pageable) {
+		boolean isQueryProvided = request.getQuery() != null && !request.getQuery().isBlank();
+
+		if (isQueryProvided) { //검색어 + 검색타입
+			RequestProductApiSearchDTO searchDTO = new RequestProductApiSearchDTO();
+			searchDTO.setQuery(request.getQuery());
+			searchDTO.setQueryType(request.getQueryType());
+
+			Page<ResponseProductsApiSearchDTO> products = productApiService.searchProducts(searchDTO, pageable);
+			return ResponseEntity.status(HttpStatus.OK).body(products);
+
+		} else { //베스트셀러, 신간등 리스트로 검색하기
+			RequestProductApiSearchByQueryTypeDTO showDTO = new RequestProductApiSearchByQueryTypeDTO();
+			showDTO.setQueryType(request.getQueryType());
+
+			Page<ResponseProductApiSearchByQueryTypeDTO> products = productApiService.searchProductsByQuery(showDTO, pageable);
+			return ResponseEntity.status(HttpStatus.OK).body(products);
+
+		}
 	}
 
 	/**
 	 * api 사용해서 등록
 	 */
-
 	@Admin
 	@PostMapping("/aladdin/register")
 	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductApiCreateDTO request) {
 		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+
+	@Admin
+	@PostMapping("/aladdin/register/list")
+	public ResponseEntity<Void> createProductQueryByApi(@RequestBody RequestProductApiCreateByQueryDTO request) {
+		productApiService.createProductByQuery(request);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+
+
+
+
+
+
 
 }

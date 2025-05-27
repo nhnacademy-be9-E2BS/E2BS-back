@@ -28,9 +28,9 @@ import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSale
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.kim.controller.ProductAdminController;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
-import com.nhnacademy.back.product.product.park.service.ProductAPIService;
+import com.nhnacademy.back.product.product.controller.ProductAdminController;
+import com.nhnacademy.back.product.product.service.ProductService;
+import com.nhnacademy.back.product.product.service.ProductAPIService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;

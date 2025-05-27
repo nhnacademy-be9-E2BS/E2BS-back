@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.park.API;
+package com.nhnacademy.back.product.product.api;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -19,14 +19,24 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.ParserAdapter;
 
 public class AladdinOpenAPIHandler extends DefaultHandler {
-	public List<Item> Items;
+	private List<Item> Items = new ArrayList<>();
 	private Item currentItem;
 	private boolean inItemElement = false;
 	private String tempValue;
 
-	public AladdinOpenAPIHandler() {
-		Items = new ArrayList<Item>();
+	public List<Item> getItems() {
+		return Items; // null 걱정 없음
 	}
+
+	public AladdinOpenAPIHandler() {
+	}
+
+
+	@Override
+	public void startDocument() throws SAXException {
+		Items = new ArrayList<>();
+	}
+
 
 	public void startElement(String namespace, String localName, String qName, Attributes atts) {
 		if (localName.equals("item")) {

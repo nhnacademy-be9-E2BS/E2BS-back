@@ -38,7 +38,7 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
-import com.nhnacademy.back.product.product.kim.service.impl.ProductServiceImpl;
+import com.nhnacademy.back.product.product.service.impl.ProductServiceImpl;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
