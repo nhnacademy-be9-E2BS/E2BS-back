@@ -83,7 +83,9 @@ class CategoryServiceTest {
 		RequestCategoryDTO requestParent = new RequestCategoryDTO("parent category");
 		RequestCategoryDTO requestChild = new RequestCategoryDTO("child category");
 		List<RequestCategoryDTO> requests = List.of(requestParent, requestChild);
+		Category category = new Category("parent category", null);
 		when(categoryJpaRepository.existsByParentIsNullAndCategoryName(anyString())).thenReturn(false);
+		when(categoryJpaRepository.save(any())).thenReturn(category);
 
 		// when
 		categoryService.createCategoryTree(requests);

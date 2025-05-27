@@ -96,6 +96,7 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
@@ -120,6 +121,7 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
@@ -144,6 +146,7 @@ public class Product {
 			.productStock(request.getProductStock())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 	}
 
