@@ -2,8 +2,6 @@ package com.nhnacademy.back.coupon.membercoupon.domain.dto.response;
 
 import java.time.LocalDateTime;
 
-import com.querydsl.core.annotations.QueryProjection;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +25,6 @@ public class ResponseOrderCouponDTO {
 	private String CategoryName;
 	private String productTitle;
 
-	@QueryProjection
 	public ResponseOrderCouponDTO(Long memberCouponId, String couponName, Long couponPolicyMinimum,
 		Long couponPolicyMaximumAmount, Long couponPolicySalePrice, Integer couponPolicyDiscountRate,
 		String couponPolicyName, LocalDateTime memberCouponCreatedAt, LocalDateTime memberCouponPeriod,

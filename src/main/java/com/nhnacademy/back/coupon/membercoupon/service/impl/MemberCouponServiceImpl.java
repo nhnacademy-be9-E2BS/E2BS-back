@@ -26,7 +26,6 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.exception.MemberCouponUpdateProcessException;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,6 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	private final CategoryCouponJpaRepository categoryCouponJpaRepository;
 	private final ProductCouponJpaRepository productCouponJpaRepository;
 	private final MemberJpaRepository memberJpaRepository;
-	private final JPAQueryFactory queryFactory;
 
 	/**
 	 * 회원 ID로 쿠폰 조회 (쿠폰함)
