@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.home.dto.response.ResponseHomeMemberNameDTO;
+import com.nhnacademy.back.home.model.dto.response.ResponseHomeMemberNameDTO;
 import com.nhnacademy.back.home.service.HomeService;
 
 import lombok.RequiredArgsConstructor;

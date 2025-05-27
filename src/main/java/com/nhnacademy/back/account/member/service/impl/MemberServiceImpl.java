@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.account.admin.domain.dto.request.RequestAdminSettingsMemberStateDTO;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
@@ -21,12 +22,14 @@ import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsExcept
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
 import com.nhnacademy.back.account.memberrank.repository.MemberRankJpaRepository;
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
 import com.nhnacademy.back.account.memberrole.repository.MemberRoleJpaRepository;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberStateName;
@@ -185,6 +188,9 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	/**
+	 * 마이페이지 회원 정보에서 회원 탈퇴하는 메서드
+	 */
 	@Transactional
 	public void withdrawMember(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
@@ -196,6 +202,70 @@ public class MemberServiceImpl implements MemberService {
 		int result = memberJpaRepository.updateMemberMemberState(withdrawMemberState, memberId);
 		if (result <= 0) {
 			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+		}
+	}
+
+	/**
+	 * 총 회원 수 가져오는 메서드
+	 */
+	@Override
+	public int getTotalMemberCnt() {
+		return memberJpaRepository.countAllMembers();
+	}
+
+	/**
+	 * 오늘 로그인한 회원 개수 조회하는 메서드
+	 */
+	@Override
+	public int getTotalTodayLoginMembersCnt() {
+		return memberJpaRepository.countTodayLoginMembers(LocalDate.now());
+	}
+
+	/**
+	 * 관리자 페이지에서 회원 상태를 변경하는 메서드
+	 */
+	@Override
+	@Transactional
+	public void updateMemberState(String memberId,
+		RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		MemberStateName memberStateName = MemberStateName.valueOf(
+			requestAdminSettingsMemberStateDTO.getMemberStateName()
+		);
+		MemberState memberState = memberStateJpaRepository.findMemberStateByMemberStateName(memberStateName);
+
+		int result = memberJpaRepository.updateMemberMemberState(memberState, memberId);
+		if (result <= 0) {
+			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+		}
+	}
+
+	/**
+	 * 관리자 페이지에서 회원 권한을 변경하는 메서드
+	 */
+	@Override
+	@Transactional
+	public void updateMemberRole(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		int result = 0;
+		if (member.getMemberRole().getMemberRoleName() == MemberRoleName.ADMIN) {
+			MemberRole memberRole = memberRoleJpaRepository.getMemberRoleByMemberRoleId(2);
+			result = memberJpaRepository.updateMemberRole(memberRole, memberId);
+		} else if (member.getMemberRole().getMemberRoleName() == MemberRoleName.MEMBER) {
+			MemberRole memberRole = memberRoleJpaRepository.getMemberRoleByMemberRoleId(1);
+			result = memberJpaRepository.updateMemberRole(memberRole, memberId);
+		}
+
+		if (result <= 0) {
+			throw new UpdateMemberRoleFailedException("회원 권한을 변경하지 못했습니다.");
 		}
 	}
 

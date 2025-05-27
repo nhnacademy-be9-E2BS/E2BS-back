@@ -1,5 +1,6 @@
 package com.nhnacademy.back.account.member.service;
 
+import com.nhnacademy.back.account.admin.domain.dto.request.RequestAdminSettingsMemberStateDTO;
 import com.nhnacademy.back.account.member.domain.dto.MemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
@@ -25,4 +26,11 @@ public interface MemberService {
 
 	void withdrawMember(String memberId);
 
+	int getTotalMemberCnt();
+
+	int getTotalTodayLoginMembersCnt();
+
+	void updateMemberState(String memberId, RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO);
+
+	void updateMemberRole(String memberId);
 }

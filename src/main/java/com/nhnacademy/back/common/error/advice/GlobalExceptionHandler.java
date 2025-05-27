@@ -13,11 +13,13 @@ import com.nhnacademy.back.account.address.exception.SaveAddressFailedException;
 import com.nhnacademy.back.account.address.exception.UpdateAddressFailedException;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
+import com.nhnacademy.back.account.member.exception.DeleteMemberFailedException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
 import com.nhnacademy.back.account.member.exception.MemberRoleException;
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
+import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
 import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
@@ -52,7 +54,9 @@ public class GlobalExceptionHandler {
 		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
 		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
 		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
-		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class})
+		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class,
+		UpdateMemberRoleFailedException.class,
+		DeleteMemberFailedException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());

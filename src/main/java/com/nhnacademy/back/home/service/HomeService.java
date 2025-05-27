@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
-import com.nhnacademy.back.home.dto.response.ResponseHomeMemberNameDTO;
+import com.nhnacademy.back.home.model.dto.response.ResponseHomeMemberNameDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ public class HomeService {
 		}
 
 		return new ResponseHomeMemberNameDTO(
-			memberId, member.getCustomer().getCustomerName()
+			memberId, member.getCustomer().getCustomerName(), member.getMemberRole()
 		);
 	}
 
