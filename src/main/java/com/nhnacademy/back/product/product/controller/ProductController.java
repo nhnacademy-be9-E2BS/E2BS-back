@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.product.kim.controller;
+package com.nhnacademy.back.product.product.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.kim.service.ProductService;
+import com.nhnacademy.back.product.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 

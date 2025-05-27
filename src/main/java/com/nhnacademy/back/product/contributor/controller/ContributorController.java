@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
@@ -32,6 +33,7 @@ public class ContributorController {
 	/**
 	 * 기여자 목록 전체 조회
 	 */
+	@Admin
 	@GetMapping()
 	public ResponseEntity<Page<ResponseContributorDTO>> getContributors(@PageableDefault() Pageable pageable) {
 		Page<ResponseContributorDTO> contributors = contributorService.getContributors(pageable);
@@ -41,7 +43,7 @@ public class ContributorController {
 	/**
 	 * 기여자 id로 기여자 조회
 	 */
-
+	@Admin
 	@GetMapping("/{contributorId}")
 	public ResponseEntity<ResponseContributorDTO> getContributor(@PathVariable Long contributorId) {
 		ResponseContributorDTO responseContributorDTO = contributorService.getContributor(contributorId);
@@ -51,7 +53,7 @@ public class ContributorController {
 	/**
 	 * 기여자 생성
 	 */
-
+	@Admin
 	@PostMapping()
 	public ResponseEntity<Void> createContributor(@Validated @RequestBody RequestContributorDTO request,
 		BindingResult bindingResult) {
@@ -65,7 +67,7 @@ public class ContributorController {
 	/**
 	 * 기여자 수정
 	 */
-
+	@Admin
 	@PutMapping("/{contributorId}")
 	public ResponseEntity<ResponseContributorDTO> updateContributor(
 		@Validated @RequestBody RequestContributorDTO request, @PathVariable Long contributorId,
