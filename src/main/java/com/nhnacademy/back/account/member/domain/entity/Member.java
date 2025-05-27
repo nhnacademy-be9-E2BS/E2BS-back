@@ -42,7 +42,7 @@ public class Member {
 	@Column(nullable = false)
 	private LocalDate memberBirth;
 
-	@Column(nullable = false, length = 11)
+	@Column(nullable = false, length = 13)
 	private String memberPhone;
 
 	@Column(nullable = false)
