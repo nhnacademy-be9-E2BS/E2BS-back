@@ -115,7 +115,8 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@GetMapping("/status/sale")
-	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(Pageable pageable) {
+	public ResponseEntity<Page<ResponseProductCouponDTO>> getProductsToCoupon(
+		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseProductCouponDTO> products = productService.getProductsToCoupon(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(products);
 	}
@@ -143,8 +144,5 @@ public class ProductAdminController {
 		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
-
-
 
 }

@@ -20,10 +20,10 @@ public class RequestProductDTO {
 
 	//상품상태
 	@NotNull
-	private long productStateId;
+	private Long productStateId;
 	//출판사
 	@NotNull
-	private long publisherId;
+	private Long publisherId;
 
 	//제목, 목차, 설명
 	@NotNull
@@ -41,16 +41,16 @@ public class RequestProductDTO {
 	private String productIsbn;
 	//정가
 	@NotNull
-	private long productRegularPrice;
+	private Long productRegularPrice;
 	//판매가
 	@NotNull
-	private long productSalePrice;
+	private Long productSalePrice;
 	//포장가능여부
 	@NotNull
 	private boolean productPackageable;
 	//상품재고
 	@NotNull
-	private int productStock;
+	private Integer productStock;
 
 	// 이미지
 	@NotNull
