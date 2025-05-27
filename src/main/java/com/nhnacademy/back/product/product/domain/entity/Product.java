@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
 
+	// product_id
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
@@ -80,7 +81,8 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage;
 
-	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher, ProductState state) {
+	public static Product createProductApiEntity(RequestProductApiCreateDTO request, Publisher publisher,
+		ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
@@ -104,7 +106,8 @@ public class Product {
 		return product;
 	}
 
-	public static Product createProductApiByQueryEntity(RequestProductApiCreateByQueryDTO request, Publisher publisher, ProductState state) {
+	public static Product createProductApiByQueryEntity(RequestProductApiCreateByQueryDTO request, Publisher publisher,
+		ProductState state) {
 		Product product = Product.builder()
 			.productState(state)
 			.publisher(publisher)
