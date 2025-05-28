@@ -54,30 +54,7 @@ class CategoryControllerTest {
 	}
 
 	@Test
-	@DisplayName("User - side bar category 리스트 조회")
-	void get_categories_by_id_test() throws Exception {
-		// given
-		long categoryId = 1L;
-		List<ResponseCategoryDTO> dummyResponse = List.of(
-			new ResponseCategoryDTO(2L, "Child A", List.of()),
-			new ResponseCategoryDTO(3L, "Child B", List.of())
-		);
-
-		when(categoryService.getCategoriesById(categoryId)).thenReturn(dummyResponse);
-
-		// when & then
-		mockMvc.perform(get("/api/categories/{categoryId}", categoryId))
-			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$[0].categoryId").value(2))
-			.andExpect(jsonPath("$[0].categoryName").value("Child A"))
-			.andExpect(jsonPath("$[1].categoryName").value("Child B"));
-
-		verify(categoryService, times(1)).getCategoriesById(categoryId);
-	}
-
-	@Test
-	@DisplayName("Admin - 모든 category 리스트 조회")
+	@DisplayName("모든 category 리스트 조회")
 	void get_categories_test() throws Exception {
 		// given
 		List<ResponseCategoryDTO> dummyResponse = List.of(
@@ -87,7 +64,7 @@ class CategoryControllerTest {
 		when(categoryService.getCategories()).thenReturn(dummyResponse);
 
 		// when & then
-		mockMvc.perform(get("/api/admin/categories"))
+		mockMvc.perform(get("/api/categories/all"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$[0].categoryName").value("Admin Root"));
