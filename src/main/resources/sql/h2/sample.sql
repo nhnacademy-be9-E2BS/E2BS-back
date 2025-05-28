@@ -188,7 +188,7 @@ VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Sprin
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
 VALUES (1, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (2, 'akdknjkbaierfdsna.png'),
+       (2, 'https://image.aladin.co.kr/product/36286/32/cover200/s372039570_1.jpg'),
        (3, 'skbkgeajifaseflknv.jpg'),
        (4, 'afbdijfknvmaklf2.jpeg');
 
