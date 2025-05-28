@@ -31,6 +31,7 @@ public class AladdinOpenAPI {
 		hashMap.put("QueryType", queryType); //검색어 종류 - Keyword(제목+저자), Title(제목), Author(저자), Publisher(출판사)
 		hashMap.put("MaxResults", "100");
 		hashMap.put("start", "1");
+		hashMap.put("cover", "Big");
 		hashMap.put("SearchTarget", "All"); //검색대상 - Book, Foreign
 		hashMap.put("output", "xml");
 		hashMap.put("cover", "Big");
@@ -58,6 +59,7 @@ public class AladdinOpenAPI {
 		hashMap.put("MaxResults", "100");
 		hashMap.put("start", "1");
 		hashMap.put("SearchTarget", "Book");
+		hashMap.put("cover", "Big");
 		hashMap.put("output", "xml");
 		hashMap.put("cover", "Big");
 		hashMap.put("Version", "20131101");
