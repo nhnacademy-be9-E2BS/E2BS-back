@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/settings")
+@RequestMapping("/api/auth/admin/settings")
 public class AdminSettingsController {
 
 	private final AdminSettingsService adminSettingsService;

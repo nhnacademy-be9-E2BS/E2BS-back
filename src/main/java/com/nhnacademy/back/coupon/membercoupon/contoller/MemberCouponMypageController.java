@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/{memberId}/coupons/counts")
+@RequestMapping("/api/auth/mypage/{memberId}/coupons/counts")
 public class MemberCouponMypageController {
 
 	private final MemberCouponService memberCouponService;

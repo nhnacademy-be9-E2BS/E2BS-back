@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/{memberId}/points")
+@RequestMapping("/api/auth/mypage/{memberId}/points")
 public class PointHistoryMypageCouponController {
 
 	private final PointHistoryService pointHistoryService;
