@@ -156,14 +156,14 @@ public class ProductAdminController {
 	/**
 	 * api 사용해서 등록
 	 */
-	@Admin
+	//@Admin
 	@PostMapping("/aladdin/register")
 	public ResponseEntity<Void> createProductByApi(@RequestBody RequestProductApiCreateDTO request) {
 		productApiService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@Admin
+	//@Admin
 	@PostMapping("/aladdin/register/list")
 	public ResponseEntity<Void> createProductQueryByApi(@RequestBody RequestProductApiCreateByQueryDTO request) {
 		productApiService.createProductByQuery(request);

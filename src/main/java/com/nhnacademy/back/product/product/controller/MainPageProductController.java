@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,7 +12,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageP
 import com.nhnacademy.back.product.product.service.MainPageProductService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/category")
 public class MainPageProductController {
 	private final MainPageProductService mainPageProductService;
 
@@ -19,12 +20,20 @@ public class MainPageProductController {
 		this.mainPageProductService = mainPageProductService;
 	}
 
+	@GetMapping("/{categoryId}")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getProducts(@PathVariable long categoryId) {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getProductsByCategoryId(categoryId);
+		return ResponseEntity.ok(products);
+	}
+
 
 	@GetMapping("/bestseller")
-	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller() {
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller()  {
+
 		List<ResponseMainPageProductDTO> products = mainPageProductService.getBestSellerProducts();
 		return ResponseEntity.ok(products);
 	}
+
 
 	@GetMapping("/blogbest")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getBlogBest() {
@@ -39,10 +48,18 @@ public class MainPageProductController {
 	}
 
 	@GetMapping("/newspecialitems")
-	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSepcialItems() {
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSpecialItems() {
 		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemNewSpecialProducts();
 		return ResponseEntity.ok(products);
 	}
+
+	@GetMapping("/itemeditorchoice")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getItemEditorChoiceItems() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemNewSpecialProducts();
+		return ResponseEntity.ok(products);
+	}
+
+
 
 
 

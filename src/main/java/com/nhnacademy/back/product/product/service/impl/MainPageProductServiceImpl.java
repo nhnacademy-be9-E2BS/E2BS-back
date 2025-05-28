@@ -11,7 +11,6 @@ import com.nhnacademy.back.product.category.repository.ProductCategoryJpaReposit
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -30,16 +29,10 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 
 	@Override
-	public List<ResponseMainPageProductDTO> getProducts(RequestMainPageProductDTO request) {
-		return List.of();
-	}
-
-
-	@Override
-	public List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName) {
-		Category category = categoryJpaRepository.findCategoryByCategoryName(categoryName);
+	public List<ResponseMainPageProductDTO> getProductsByCategoryId(long categoryId) {
+		Category category = categoryJpaRepository.findCategoryByCategoryId(categoryId);
 		if (category == null) {
-			return List.of(); // 혹은 예외 던지기
+			return List.of();
 		}
 
 		List<Long> productIds = productCategoryJpaRepository.findProductIdByCategory(category)
@@ -75,25 +68,35 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 			})
 			.toList();
 	}
-
+	//
 	@Override
 	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
-		return getProductsByCategory("Bestseller");
+		Category category = categoryJpaRepository.findCategoryByCategoryName("Bestseller");
+		return getProductsByCategoryId(category.getCategoryId());
 	}
 
+	 @Override
+	 public List<ResponseMainPageProductDTO> getBlogBestProducts() {
+		 Category category = categoryJpaRepository.findCategoryByCategoryName("BlogBest");
+		 return getProductsByCategoryId(category.getCategoryId());
+	 }
 	@Override
-	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
-		return getProductsByCategory("BlogBest");
+	 public List<ResponseMainPageProductDTO> getNewItemsProducts() {
+		Category category = categoryJpaRepository.findCategoryByCategoryName("ItemNewAll");
+		return getProductsByCategoryId(category.getCategoryId());
+
 	}
 
-	@Override
-	public List<ResponseMainPageProductDTO> getNewItemsProducts() {
-		return getProductsByCategory("ItemNewAll");
-	}
+	 @Override
+	 public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
+		 Category category = categoryJpaRepository.findCategoryByCategoryName("ItemNewSpecial");
+		 return getProductsByCategoryId(category.getCategoryId());
+	 }
 
 	@Override
-	public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
-		return getProductsByCategory("ItemNewSpecial");
+	public List<ResponseMainPageProductDTO> getItemItemEditorChoiceProducts() {
+		Category category = categoryJpaRepository.findCategoryByCategoryName("ItemEditorChoice");
+		return getProductsByCategoryId(category.getCategoryId());
 	}
 
 }
