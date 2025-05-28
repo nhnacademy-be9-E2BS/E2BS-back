@@ -11,8 +11,6 @@ public interface CategoryService {
 
 	List<ResponseCategoryDTO> getCategoriesToDepth3();
 
-	List<ResponseCategoryDTO> getCategoriesById(long categoryId);
-
 	void clearCategoriesCache();
 
 	void createChildCategory(long parentId, RequestCategoryDTO request);
