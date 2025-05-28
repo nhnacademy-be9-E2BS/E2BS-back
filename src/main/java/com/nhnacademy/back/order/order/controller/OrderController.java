@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,7 +75,7 @@ public class OrderController {
 			//결제 승인 완료 시 포인트 차감, 쿠폰 사용, 포인트 적립 호출, 결제 정보 저장
 			paymentService.createPayment(response.getBody());
 		} else { // 승인 실패 시 롤백
-			cancelOrder(orderId);
+			orderService.deleteOrder(orderId);
 		}
 		return ResponseEntity.status(response.getStatusCode()).build();
 	}
@@ -84,8 +85,8 @@ public class OrderController {
 	 */
 	@Member
 	@PostMapping("/api/order/cancel")
-	public ResponseEntity<Void> cancelOrder(@RequestParam String orderId) {
-		return orderService.cancelOrder(orderId);
+	public ResponseEntity<Void> deleteOrder(@RequestParam String orderId) {
+		return orderService.deleteOrder(orderId);
 	}
 
 	/**
@@ -103,4 +104,12 @@ public class OrderController {
 		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));
 	}
 
+	/**
+	 * 회원의 주문 취소 처리
+	 */
+	@Member
+	@DeleteMapping("/api/order/orders/{orderCode}")
+	public ResponseEntity<Void> cancelOrder(@PathVariable String orderCode) {
+		return orderService.cancelOrder(orderCode);
+	}
 }

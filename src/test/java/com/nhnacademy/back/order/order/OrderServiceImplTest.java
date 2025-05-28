@@ -30,7 +30,7 @@ import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
-import com.nhnacademy.back.order.order.adaptor.TossConfirmAdaptor;
+import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
@@ -82,7 +82,7 @@ class OrderServiceImplTest {
 	@Mock
 	private MemberJpaRepository memberJpaRepository;
 	@Mock
-	private TossConfirmAdaptor tossConfirmAdaptor;
+	private TossAdaptor tossAdaptor;
 
 	@BeforeEach
 	void setUp() {
@@ -213,7 +213,7 @@ class OrderServiceImplTest {
 		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
 		ResponseEntity<ResponseTossPaymentConfirmDTO> responseEntity = ResponseEntity.ok(confirmDTO);
 
-		when(tossConfirmAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
+		when(tossAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
 			.thenReturn(responseEntity);
 		when(orderJpaRepository.findById(orderId)).thenReturn(Optional.of(order));
 
@@ -238,7 +238,7 @@ class OrderServiceImplTest {
 		ResponseEntity<ResponseTossPaymentConfirmDTO> responseEntity =
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-		when(tossConfirmAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
+		when(tossAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
 			.thenReturn(responseEntity);
 
 		// when
@@ -252,12 +252,12 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("주문서 삭제 요청 성공")
-	void testCancelOrder_Success() {
+	void testDeleteOrder_Success() {
 		// given
 		String orderId = "TEST-ORDER-CODE";
 
 		// when
-		ResponseEntity<Void> response = orderService.cancelOrder(orderId);
+		ResponseEntity<Void> response = orderService.deleteOrder(orderId);
 
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());

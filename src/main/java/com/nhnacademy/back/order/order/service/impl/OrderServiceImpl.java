@@ -21,7 +21,7 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
-import com.nhnacademy.back.order.order.adaptor.TossConfirmAdaptor;
+import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderStateJpaRepository orderStateJpaRepository;
 	private final WrapperJpaRepository wrapperJpaRepository;
 
-	private final TossConfirmAdaptor tossConfirmAdaptor;
+	private final TossAdaptor tossAdaptor;
 
 	/**
 	 * 주문서를 저장하는 서비스
@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 	public ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount) {
 		RequestTossConfirmDTO requestTossConfirmDTO = new RequestTossConfirmDTO(orderId, paymentKey, amount);
 		// 결제 승인 결과를 받아 온 응답
-		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossConfirmAdaptor.confirmOrder(requestTossConfirmDTO,
+		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossAdaptor.confirmOrder(requestTossConfirmDTO,
 			secretKey);
 		// 만약 승인된 경우 결제 상태 업데이트
 		if (response.getStatusCode().is2xxSuccessful()) {
@@ -161,7 +161,7 @@ public class OrderServiceImpl implements OrderService {
 	// 재고 복구 추가해야 함
 	@Transactional
 	@Override
-	public ResponseEntity<Void> cancelOrder(String orderId) {
+	public ResponseEntity<Void> deleteOrder(String orderId) {
 		orderDetailJpaRepository.deleteByOrderOrderCode(orderId);
 		orderJpaRepository.deleteById(orderId);
 		// orderDetails를 가져와서 순회 돌면서 재고 복구 추가
@@ -199,6 +199,17 @@ public class OrderServiceImpl implements OrderService {
 		long customerId = member.getCustomerId();
 		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
 			.map(ResponseOrderDTO::fromEntity);
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<Void> cancelOrder(String orderCode) {
+		// 주문 코드로 주문서의 상태 취소로 변경
+		// 사용한 포인트, 쿠폰 복구
+		// 이후 결제 테이블에서 주문 코드로 검색하여 있다면 취소 요청
+		Order order = orderJpaRepository.findById(orderCode).orElseThrow();
+
+		return null;
 	}
 
 	/**
@@ -242,4 +253,5 @@ public class OrderServiceImpl implements OrderService {
 
 		return totalDailySales != null ? totalDailySales : 0L;
 	}
+
 }

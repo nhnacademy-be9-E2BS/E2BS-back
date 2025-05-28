@@ -152,7 +152,7 @@ class OrderControllerTest {
 	}
 
 	@Test
-	@DisplayName("결제 승인 실패 시 주문 취소 및 상태코드 반환 테스트")
+	@DisplayName("결제 승인 실패 시 주문서 삭제 및 상태코드 반환 테스트")
 	void testOrderConfirmFailure() throws Exception {
 		String orderId = "TEST-ORDER-CODE";
 		String paymentKey = "TEST-PAYMENT-KEY";
@@ -164,7 +164,7 @@ class OrderControllerTest {
 		when(orderService.confirmOrder(orderId, paymentKey, amount))
 			.thenReturn(failedResponse);
 
-		when(orderService.cancelOrder(orderId))
+		when(orderService.deleteOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/order/confirm")
@@ -173,15 +173,15 @@ class OrderControllerTest {
 				.param("amount", String.valueOf(amount)))
 			.andExpect(status().isBadRequest());
 
-		verify(orderService).cancelOrder(orderId);
+		verify(orderService).deleteOrder(orderId);
 	}
 
 	@Test
-	@DisplayName("주문 취소 테스트")
-	void testCancelOrder() throws Exception {
+	@DisplayName("주문 삭제 테스트")
+	void testDeleteOrder() throws Exception {
 		String orderId = "TEST-ORDER-CODE";
 
-		when(orderService.cancelOrder(orderId))
+		when(orderService.deleteOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/order/cancel")
