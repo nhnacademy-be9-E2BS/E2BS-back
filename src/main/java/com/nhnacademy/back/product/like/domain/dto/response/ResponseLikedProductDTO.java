@@ -25,6 +25,8 @@ public class ResponseLikedProductDTO {
 
 	private double avgRating;
 
+	private int reviewCount = 0;
+
 	private LocalDateTime likeCreatedAt;
 	
 }

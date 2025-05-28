@@ -94,6 +94,7 @@ public class LikeServiceImpl implements LikeService {
 		return likedProductsByCustomerId.map(product -> {
 			long likeCount = getLikeCount(product.getProductId());
 			double reviewAvg = reviewRepository.totalAvgReviewsByProductId(product.getProductId());
+			Integer reviewCount = reviewRepository.countAllByProduct_ProductId(product.getProductId());
 			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId())
 				.orElseThrow(LikeNotFoundException::new);
 
@@ -105,6 +106,7 @@ public class LikeServiceImpl implements LikeService {
 				product.getProductImage().getFirst().getProductImagePath(),
 				likeCount,
 				reviewAvg,
+				reviewCount,
 				findLike.getLikeCreatedAt()
 			);
 		});
