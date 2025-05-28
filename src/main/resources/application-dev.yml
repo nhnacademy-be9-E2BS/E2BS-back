@@ -47,17 +47,9 @@ order:
     toss: https://api.tosspayments.com/v1/payments/confirm
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
 
-# minio 접근 설정
-# 원격에서 연동
+# minio 원격 접근 설정
 minio:
   host: http://storage.java21.net:8000
   access-key: OCO4F9OO5naKnVCpAPBZ
   secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
   region: us-east-1
-
-# 로컬에서 연동
-#minio:
-#  host: http://localhost:9000
-#  access-key: vIu0hfiRAwTNHGwlKlb9
-#  secret-key: 7ZXONJs8I5SVJitjXjPBMogeeEAjcL01pOuHvNXI
-#  region: us-east-1

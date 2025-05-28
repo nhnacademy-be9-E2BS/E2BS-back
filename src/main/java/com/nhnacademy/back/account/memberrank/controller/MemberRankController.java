@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/{memberId}/rank")
+@RequestMapping("/api/auth/mypage/{memberId}/rank")
 public class MemberRankController {
 
 	private final MemberRankService memberRankService;
