@@ -12,12 +12,15 @@ spring:
         use_sql_comments: true   # 실행되는 쿼리에 주석 추가로 출력
         auto_quote_keyword: true # 컬럼명이 예약어일 경우 자동으로 감쌈
         dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate 가 사용할 SQL 문법(방언)을 지정
-    open-in-view: false          # 영속성 컨텍스트를 뷰까지 열지 않음
-
+    open-in-view: false          # 영속성 컨텍스트를 뷰까지 열지 않음 -> 환경 자체가 Controller 까지 영향을 미치지 않게 설정 (Service 까지)
+    # (= 트랜잭션의 영향 범위 설정)
   cache:
-    type: redis
+    type: redis # 카테고리 항상 가져올 수 없으니 redis caching 처리 (예) front/back 중 back 에 캐싱 처리하는 이유 설명 + 캐싱을 어디에 적용할 수 있을지)
+      # 스프링에서 사용할 수 있는 캐시 매니저의 종류 약 4가지:
+    # PSA: Portable Service Abstraction
 
-  # RabbitMQ 연결 설정
+  # RabbitMQ 사용한 이유 설명
+  # RabbitMQ 연결 설정 <-> Spring EventListener (비교적 가벼운 작업에 유리)
   rabbitmq:
     host: s4.java21.net
     port: 5672
@@ -35,19 +38,19 @@ spring:
       password: "*N2vya7H@muDTwdNMR!"
       database: 294
 
-
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 로그를 trace 레벨로 출력
     org.springframework.transaction.interceptor: trace # 트랜잭션 처리 로그를 trace 로 출력
 
+# 서버가 종료됐을 때 대기 시간 (kill -15, -9 차이점)
 server:
   shutdown: graceful
 
 management:
   endpoints:
     web:
-      exposure:
+      exposure: # Actuator 는 일부만 노출하는게 좋음
         include: "*" # Actuator 의 모든 엔드포인트를 웹에서 노출 (운영환경에선 최소화 필요)
 
 order:

@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
 
+	// product_id
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
@@ -44,7 +45,7 @@ public class Product {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 200, nullable = false)
 	private String productTitle;
 
 	@Column(nullable = false)
