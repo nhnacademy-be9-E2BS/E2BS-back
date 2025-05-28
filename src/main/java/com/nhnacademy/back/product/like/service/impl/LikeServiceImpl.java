@@ -37,13 +37,16 @@ public class LikeServiceImpl implements LikeService {
 	private final LikeJpaRepository likeRepository;
 	private final ReviewJpaRepository reviewRepository;
 
-
+	
+	/**
+	 * 좋아요 생성 메소드
+	 */
 	@Transactional
 	@Override
 	public void createLike(long productId, String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("Member not found");
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -61,12 +64,15 @@ public class LikeServiceImpl implements LikeService {
 		likeRepository.save(likeEntity);
 	}
 
+	/**
+	 * 좋아요 삭제 메소드
+	 */
 	@Transactional
 	@Override
 	public void deleteLike(long productId, String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("Member not found");
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -80,11 +86,14 @@ public class LikeServiceImpl implements LikeService {
 		likeRepository.delete(findLike);
 	}
 
+	/**
+	 * 회원이 좋아요한 상품 페이징 목록 조히 메소드
+	 */
 	@Override
 	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(String memberId, Pageable pageable) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("Member not found");
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -112,6 +121,9 @@ public class LikeServiceImpl implements LikeService {
 		});
 	}
 
+	/**
+	 * 상품 좋아요 개수 조회 메소드
+	 */
 	@Override
 	public long getLikeCount(long productId) {
 		return likeRepository.countAllByProduct_ProductId(productId);
