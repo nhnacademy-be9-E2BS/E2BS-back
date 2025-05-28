@@ -2,12 +2,15 @@ package com.nhnacademy.back.order.wrapper.service.impl;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
@@ -26,14 +29,23 @@ import lombok.extern.slf4j.Slf4j;
 public class WrapperServiceImpl implements WrapperService {
 	private final WrapperJpaRepository wrapperJpaRepository;
 
+	private final MinioUtils minioUtils;
+	private final String BUCKET_NAME = "e2bs-wrappers-image";
+
 	/**
 	 * Wrapper를 DB에 저장하는 로직
 	 */
 	@Transactional
 	@Override
 	public void createWrapper(RequestRegisterWrapperDTO registerRequest) {
+		String imagePath = "";
+		MultipartFile wrapperImageFile = registerRequest.getWrapperImage();
+		if (Objects.nonNull(wrapperImageFile) && !wrapperImageFile.isEmpty()) {
+			imagePath = uploadFile(wrapperImageFile);
+		}
+
 		Wrapper wrapper = new Wrapper(registerRequest.getWrapperPrice(), registerRequest.getWrapperName(),
-			registerRequest.getWrapperImage(), registerRequest.isWrapperSaleable());
+			imagePath, registerRequest.isWrapperSaleable());
 
 		wrapperJpaRepository.save(wrapper);
 	}
@@ -49,7 +61,8 @@ public class WrapperServiceImpl implements WrapperService {
 				wrapper.getWrapperId(),
 				wrapper.getWrapperPrice(),
 				wrapper.getWrapperName(),
-				wrapper.getWrapperImage(),
+				wrapper.getWrapperImage().isEmpty() ? "" :
+					minioUtils.getPresignedUrl(BUCKET_NAME, wrapper.getWrapperImage()),
 				wrapper.isWrapperSaleable()
 			));
 	}
@@ -65,7 +78,8 @@ public class WrapperServiceImpl implements WrapperService {
 				wrapper.getWrapperId(),
 				wrapper.getWrapperPrice(),
 				wrapper.getWrapperName(),
-				wrapper.getWrapperImage(),
+				wrapper.getWrapperImage().isEmpty() ? "" :
+					minioUtils.getPresignedUrl(BUCKET_NAME, wrapper.getWrapperImage()),
 				wrapper.isWrapperSaleable()
 			));
 	}
@@ -87,5 +101,16 @@ public class WrapperServiceImpl implements WrapperService {
 
 		wrapper.get().setWrapper(modifyRequest.isWrapperSaleable());
 		wrapperJpaRepository.save(wrapper.get());
+	}
+
+	/**
+	 * 파일 업로드 메소드
+	 */
+	private String uploadFile(MultipartFile reviewImageFile) {
+		String originalFilename = reviewImageFile.getOriginalFilename();
+		UUID uuid = UUID.randomUUID();
+		String objectName = uuid + "_" + originalFilename;
+		minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+		return objectName;
 	}
 }
