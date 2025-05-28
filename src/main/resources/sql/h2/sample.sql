@@ -24,6 +24,7 @@ VALUES ('NORMAL', 0, 0),
        ('GOLD', 10, 500000),
        ('PLATINUM', 20, 900000);
 
+
 -- 테스트를 위한 임의 유저, 관리자 생성
 -- Customer password 12345
 INSERT INTO customer (customer_email,

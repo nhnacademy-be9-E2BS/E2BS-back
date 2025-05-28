@@ -89,24 +89,6 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	/**
-	 * 사용자가 카테고리 선택 시 그에 해당하는 하위 카테고리들을 side bar에서 보여주기 위해
-	 * categoryId의 하위 카테고리들을 조회하여 return 하는 로직
-	 * ex) A-B-C-D-E에서 C를 누른 경우 side bar에서 D-E를 보여줌
-	 */
-	@Override
-	public List<ResponseCategoryDTO> getCategoriesById(long categoryId) {
-		List<ResponseCategoryDTO> allCategories = self.getCategories();
-
-		// targetCategory -> 선택한 카테고리
-		ResponseCategoryDTO targetCategory = findCategoryById(allCategories, categoryId);
-		if (Objects.isNull(targetCategory)) {
-			throw new CategoryNotFoundException();
-		}
-
-		return targetCategory.getChildren();
-	}
-
-	/**
 	 * Categories라는 캐시 이름 안의 모든 키를 지우는 메소드
 	 */
 	@CacheEvict(value = "Categories", allEntries = true)
