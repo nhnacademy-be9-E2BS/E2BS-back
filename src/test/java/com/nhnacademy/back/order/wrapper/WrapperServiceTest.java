@@ -16,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.response.ResponseWrapperDTO;
@@ -31,12 +33,20 @@ class WrapperServiceTest {
 	private WrapperServiceImpl wrapperService;
 	@Mock
 	private WrapperJpaRepository wrapperJpaRepository;
+	@Mock
+	private MinioUtils minioUtils;
 
 	@Test
 	@DisplayName("create wrapper")
 	void create_wrapper_test() {
 		// given
-		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(1000L, "Wrapper A", "a.jpg", true);
+		MockMultipartFile mockFile = new MockMultipartFile(
+			"wrapperImage",
+			"a.jpg",
+			"image/jpeg",
+			"image-content".getBytes()
+		);
+		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(1000L, "Wrapper A", mockFile, true);
 
 		// when
 		wrapperService.createWrapper(request);
@@ -66,7 +76,6 @@ class WrapperServiceTest {
 		ResponseWrapperDTO dto = result.getContent().get(0);
 		assertThat(dto.getWrapperPrice()).isEqualTo(700L);
 		assertThat(dto.getWrapperName()).isEqualTo("Wrapper A");
-		assertThat(dto.getWrapperImage()).isEqualTo("a.jpg");
 		assertThat(dto.isWrapperSaleable()).isTrue();
 	}
 
@@ -91,7 +100,6 @@ class WrapperServiceTest {
 		ResponseWrapperDTO dto = result.getContent().get(1);
 		assertThat(dto.getWrapperPrice()).isEqualTo(900L);
 		assertThat(dto.getWrapperName()).isEqualTo("Wrapper C");
-		assertThat(dto.getWrapperImage()).isEqualTo("c.jpg");
 		assertThat(dto.isWrapperSaleable()).isTrue();
 	}
 
