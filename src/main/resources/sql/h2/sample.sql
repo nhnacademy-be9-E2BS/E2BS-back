@@ -1,5 +1,4 @@
--- 회원과 상품 기반 샘플 데이터
-
+------------------------ 회원 관련 데이터 --------------------------------
 -- MemberRole
 INSERT INTO member_role (member_role_name)
 VALUES ('ADMIN'),
@@ -24,7 +23,6 @@ VALUES ('NORMAL', 0, 0),
        ('ROYAL', 5, 100000),
        ('GOLD', 10, 500000),
        ('PLATINUM', 20, 900000);
-
 
 -- 테스트를 위한 임의 유저, 관리자 생성
 -- Customer password 12345
@@ -128,7 +126,7 @@ VALUES (5000,
         '회원가입',
         1);
 
-
+------------------------ 도서 관련 데이터 --------------------------------
 -- Position
 INSERT INTO position (position_id, position_name)
 VALUES (1, 'writer'),
@@ -183,20 +181,40 @@ VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Sprin
        (1, '2022-06-10', 20, 3, 25000, 20000, 3, 1, '978-89-12345-03-3', 'Docker 실전', '컨테이너 기술',
         'Docker를 활용한 배포 환경 구성 실전서입니다.'),
        (0, '2025-03-01', 70, 4, 22000, 18000, 4, 2, '978-89-12345-04-4', 'CI/CD 이해하기', '지속적 통합과 배포',
-        'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.');
+        'CI/CD 파이프라인의 구성과 구현 방법을 설명합니다.'),
+       (1, '2023-05-20', 80, 5, 23000, 18000, 1, 3, '978-89-12345-05-5', 'React 완벽 가이드', 'React 기초부터 고급까지',
+        'React를 사용한 프론트엔드 개발에 대한 완벽 가이드입니다.'),
+       (0, '2023-09-10', 150, 6, 27000, 21000, 2, 1, '978-89-12345-06-6', 'Vue.js 실전', 'Vue.js로 웹 애플리케이션 만들기',
+        'Vue.js를 사용한 웹 애플리케이션 개발 실전서입니다.'),
+       (1, '2025-01-15', 30, 7, 24000, 20000, 3, 2, '978-89-12345-07-7', 'Machine Learning', '머신러닝 기초부터 실습까지',
+        '머신러닝을 활용한 데이터 분석 및 모델링 실습서를 제공합니다.'),
+       (0, '2024-08-25', 60, 8, 25000, 22000, 4, 3, '978-89-12345-08-8', 'Kubernetes 실전', 'Kubernetes 클러스터 구축',
+        'Kubernetes를 사용한 클러스터 구성 및 배포 전략에 대한 실전 가이드입니다.');
 
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
 VALUES (1, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (2, 'akdknjkbaierfdsna.png'),
-       (3, 'skbkgeajifaseflknv.jpg'),
-       (4, 'afbdijfknvmaklf2.jpeg');
+       (2, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (3, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (4, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (5, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (6, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (7, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
+       (8, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg');
 
 -- ProductContributor
 INSERT INTO product_contributor (contributor_id, product_contributor_id, product_id)
 VALUES (1, 1, 1),
        (3, 2, 1),
-       (2, 3, 2);
+       (2, 3, 2),
+       (1, 4, 5),
+       (2, 5, 5),
+       (3, 6, 6),
+       (1, 7, 6),
+       (2, 8, 7),
+       (3, 9, 7),
+       (1, 10, 8),
+       (2, 11, 8);
 
 -- ProductTag
 INSERT INTO product_tag (product_id, tag_id)
@@ -204,7 +222,15 @@ VALUES (1, 1),
        (1, 2),
        (2, 1),
        (3, 3),
-       (4, 3);
+       (4, 3),
+       (5, 2),
+       (5, 3),
+       (6, 1),
+       (6, 2),
+       (7, 3),
+       (7, 1),
+       (8, 2),
+       (8, 1);
 
 -- ProductCategory
 INSERT INTO product_category (category_id, product_id)
@@ -212,10 +238,42 @@ VALUES (1, 1),
        (2, 4),
        (1, 4),
        (4, 2),
-       (3, 3);
+       (3, 3),
+       (2, 5),
+       (1, 5),
+       (3, 6),
+       (4, 6),
+       (5, 7),
+       (6, 7),
+       (4, 8),
+       (7, 8);
 
--- 주문 테스트를 위한 데이터
+-- Like
+INSERT INTO `like` (like_id, product_id, customer_id, like_created_at)
+VALUES
+    (1, 1, 1, '2024-01-10T10:00:00'),
+    (2, 1, 2, '2024-01-12T11:30:00'),
+    (3, 1, 3, '2024-01-12T11:30:00'),
+    (4, 1, 4, '2024-01-12T11:30:00'),
+    (5, 2, 1, '2024-02-01T09:45:00'),
+    (6, 2, 2, '2024-02-05T15:20:00'),
+    (7, 2, 3, '2024-02-05T15:20:00'),
+    (8, 2, 4, '2024-02-05T15:20:00'),
+    (9, 3, 1, '2024-03-10T16:10:00'),
+    (10, 3, 2, '2024-03-12T17:00:00'),
+    (11, 4, 1, '2024-04-10T12:25:00'),
+    (12, 4, 2, '2024-04-15T13:30:00'),
+    (13, 5, 1, '2024-05-01T14:40:00'),
+    (14, 5, 2, '2024-05-03T10:50:00'),
+    (15, 6, 1, '2024-06-20T09:30:00'),
+    (16, 6, 2, '2024-06-21T14:00:00'),
+    (17, 7, 1, '2024-07-25T16:35:00'),
+    (18, 7, 2, '2024-07-27T17:10:00'),
+    (19, 8, 1, '2024-08-01T10:00:00'),
+    (20, 8, 2, '2024-08-02T11:45:00');
 
+
+----------------------- 주문 관련 데이터------------------------
 -- DeliveryFee
 INSERT INTO delivery_fee (delivery_fee_amount, delivery_fee_date, delivery_fee_free_amount)
 VALUES (5000, DATE '2025-01-01', 30000);

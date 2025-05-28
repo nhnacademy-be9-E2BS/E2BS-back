@@ -21,8 +21,6 @@ public class ResponseLikedProductDTO {
 
 	private String productThumbnail;
 
-	private boolean liked;
-
 	private long likeCount;
 
 	private double avgRating;

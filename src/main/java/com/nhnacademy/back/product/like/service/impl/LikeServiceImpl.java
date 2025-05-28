@@ -92,7 +92,10 @@ public class LikeServiceImpl implements LikeService {
 		Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
 
 		return likedProductsByCustomerId.map(product -> {
-			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId()).orElseThrow(LikeNotFoundException::new);
+			long likeCount = getLikeCount(product.getProductId());
+			double reviewAvg = reviewRepository.totalAvgReviewsByProductId(product.getProductId());
+			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId())
+				.orElseThrow(LikeNotFoundException::new);
 
 			return new ResponseLikedProductDTO(
 				product.getProductId(),
@@ -100,10 +103,9 @@ public class LikeServiceImpl implements LikeService {
 				product.getProductSalePrice(),
 				product.getPublisher().getPublisherName(),
 				product.getProductImage().getFirst().getProductImagePath(),
-				true,
-				getLikeCount(product.getProductId()),
-				reviewRepository.totalAvgReviewsByProductId(product.getProductId()),
-				findLike.getCreatedAt()
+				likeCount,
+				reviewAvg,
+				findLike.getLikeCreatedAt()
 			);
 		});
 	}

@@ -38,13 +38,14 @@ public class Like {
 	private Customer customer;
 
 	@Column(nullable = false)
-	private LocalDateTime createdAt;
+	private LocalDateTime likeCreatedAt;
 
 
 	public static Like createLikeEntity(Product product, Customer customer) {
 		return Like.builder()
 			.product(product)
 			.customer(customer)
+			.likeCreatedAt(LocalDateTime.now())
 			.build();
 	}
 

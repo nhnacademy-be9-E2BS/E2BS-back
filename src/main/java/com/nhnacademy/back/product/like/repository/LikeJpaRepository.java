@@ -21,5 +21,5 @@ public interface LikeJpaRepository extends JpaRepository<Like, Long> {
 
 	long countAllByProduct_ProductId(long productProductId);
 
-	Optional<Like> findByCustomer_CustomerIdAndProduct_ProductId(long customerCustomerId, long productProductId);
+	Optional<Like> findByCustomer_CustomerIdAndProduct_ProductId(long customerId, long productProductId);
 }
