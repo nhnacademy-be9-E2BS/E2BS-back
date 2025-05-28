@@ -24,7 +24,6 @@ public class OrderAdminController {
 	/**
 	 * 전체 주문 내역 목록을 주문 상태에 따라 반환하는 메서드
 	 */
-	@Admin
 	@GetMapping("/api/admin/orders")
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(@RequestParam(required = false) Long stateId,
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
