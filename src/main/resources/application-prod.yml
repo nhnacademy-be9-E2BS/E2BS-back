@@ -29,6 +29,3 @@ minio:
   access-key: ${MINIO_ACCESS_KEY}
   secret-key: ${MINIO_SECRET_KEY}
   region: us-east-1
-
-#  access-key: OCO4F9OO5naKnVCpAPBZ
-#  secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
