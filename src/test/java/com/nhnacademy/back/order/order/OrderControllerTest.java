@@ -87,7 +87,7 @@ class OrderControllerTest {
 		when(orderService.createOrder(any()))
 			.thenReturn(ResponseEntity.ok(responseDTO));
 
-		mockMvc.perform(post("/api/order/create/tossPay")
+		mockMvc.perform(post("/api/auth/orders/create/tossPay")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
@@ -98,7 +98,7 @@ class OrderControllerTest {
 	void testCreateOrderFail() throws Exception {
 		RequestOrderWrapperDTO request = new RequestOrderWrapperDTO();
 
-		mockMvc.perform(post("/api/order/create/tossPay")
+		mockMvc.perform(post("/api/auth/orders/create/tossPay")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest())
@@ -115,7 +115,7 @@ class OrderControllerTest {
 		when(orderService.createPointOrder(any()))
 			.thenReturn(ResponseEntity.ok(responseDTO));
 
-		mockMvc.perform(post("/api/order/create/point")
+		mockMvc.perform(post("/api/auth/orders/create/point")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
@@ -125,7 +125,7 @@ class OrderControllerTest {
 	@DisplayName("포인트 주문 생성 테스트 - 잘못된 요청")
 	void testCreatePointOrderFail() throws Exception {
 		RequestOrderWrapperDTO request = new RequestOrderWrapperDTO();
-		mockMvc.perform(post("/api/order/create/point")
+		mockMvc.perform(post("/api/auth/orders/create/point")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest())
@@ -144,7 +144,7 @@ class OrderControllerTest {
 		when(orderService.confirmOrder(orderId, paymentKey, amount))
 			.thenReturn(ResponseEntity.ok(confirmDTO));
 
-		mockMvc.perform(post("/api/order/confirm")
+		mockMvc.perform(post("/api/auth/orders/confirm")
 				.param("orderId", orderId)
 				.param("paymentKey", paymentKey)
 				.param("amount", String.valueOf(amount)))
@@ -167,7 +167,7 @@ class OrderControllerTest {
 		when(orderService.deleteOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
-		mockMvc.perform(post("/api/order/confirm")
+		mockMvc.perform(post("/api/auth/orders/confirm")
 				.param("orderId", orderId)
 				.param("paymentKey", paymentKey)
 				.param("amount", String.valueOf(amount)))
@@ -184,7 +184,7 @@ class OrderControllerTest {
 		when(orderService.deleteOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
-		mockMvc.perform(post("/api/order/cancel")
+		mockMvc.perform(post("/api/auth/orders/cancel")
 				.param("orderId", orderId))
 			.andExpect(status().isOk());
 	}
@@ -197,7 +197,7 @@ class OrderControllerTest {
 
 		when(orderService.getOrderByOrderCode(orderId)).thenReturn(response);
 
-		mockMvc.perform(get("/api/order/" + orderId))
+		mockMvc.perform(get("/api/auth/orders/" + orderId))
 			.andExpect(status().isOk());
 	}
 
@@ -210,13 +210,25 @@ class OrderControllerTest {
 		when(orderService.getOrdersByMemberId(any(Pageable.class), anyString())).thenReturn(page);
 
 		// when & then
-		mockMvc.perform(get("/api/order/orders")
+		mockMvc.perform(get("/api/auth/orders")
 				.param("page", "0")
 				.param("size", "10")
 				.param("memberId", "memberId"))
 			.andExpect(status().isOk());
 
 		verify(orderService).getOrdersByMemberId(any(Pageable.class), anyString());
+	}
+
+	@Test
+	@DisplayName("회원의 주문 취소 요청 테스트")
+	void testCancelOrder() throws Exception {
+		ResponseEntity<Void> response = ResponseEntity.ok().build();
+		String orderCode = "TEST-ORDER-CODE";
+
+		when(orderService.cancelOrder(orderCode)).thenReturn(response);
+
+		mockMvc.perform(delete("/api/auth/orders/" + orderCode))
+			.andExpect(status().isOk());
 	}
 
 }

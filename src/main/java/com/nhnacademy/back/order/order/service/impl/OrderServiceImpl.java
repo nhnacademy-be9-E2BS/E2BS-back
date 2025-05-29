@@ -25,6 +25,7 @@ import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.domain.dto.request.RequestTossCancelDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDetailDTO;
@@ -92,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO) {
 		ResponseEntity<ResponseOrderResultDTO> response = saveOrder(requestOrderWrapperDTO);
-		//포인트 차감,적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
+		//포인트 차감, 적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
 
 		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
 		order.updatePaymentStatus(true);
@@ -115,7 +116,9 @@ public class OrderServiceImpl implements OrderService {
 		DeliveryFee deliveryFee = deliveryFeeJpaRepository.findById(requestOrderDTO.getDeliveryFeeId()).orElseThrow();
 		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT).orElseThrow();
 
-		Order order = new Order(requestOrderDTO, memberCoupon, deliveryFee, customer, orderState);
+		//적립해야할 금액을 미리 계산해서 넣어야 함(기본 적립률 + 등급 적립률)
+
+		Order order = new Order(requestOrderDTO, memberCoupon, deliveryFee, customer, orderState, 0L);
 		orderJpaRepository.save(order);
 
 		// 주문 상세 저장
@@ -148,11 +151,10 @@ public class OrderServiceImpl implements OrderService {
 		// 결제 승인 결과를 받아 온 응답
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossAdaptor.confirmOrder(requestTossConfirmDTO,
 			secretKey);
-		// 만약 승인된 경우 결제 상태 업데이트
+		// 만약 승인된 경우 결제 상태 업데이트, 포인트 차감, 적립, 쿠폰 사용
 		if (response.getStatusCode().is2xxSuccessful()) {
 			Order order = orderJpaRepository.findById(orderId).orElseThrow();
 			order.updatePaymentStatus(true);
-			orderJpaRepository.save(order);
 		}
 		return response;
 	}
@@ -208,8 +210,46 @@ public class OrderServiceImpl implements OrderService {
 		// 사용한 포인트, 쿠폰 복구
 		// 이후 결제 테이블에서 주문 코드로 검색하여 있다면 취소 요청
 		Order order = orderJpaRepository.findById(orderCode).orElseThrow();
+		// 현재 주문이 대기 상태인지 검증 필요?
 
-		return null;
+		if (!order.getOrderState().getOrderStateName().equals(OrderStateName.WAIT)) {
+			// 주문이 대기 상태가 아닌 경우 예외 발생 예정
+		}
+
+		// 주문 결제 승인이 되지 않은 경우, 포인트 차감, 적립, 쿠폰 사용 X,
+		// 승인 된 경우에만 외부 결제 있는지 확인 및 적립 포인트를 회수
+		// 결제여부 false인데 아직 batch에서 처리 못함(애초에 실제 무언가 결제한 적이 없고 재고만 차감됨)
+		// 이미 프론트에서 결제 안할 시 주문 취소 버튼이 비활성화됨
+		if (!order.isOrderPaymentStatus()) {
+			// 만약 결제 승인 안됐을 시 배치에서 삭제할 때까지 삭제 못함, 직접 요청 시 예외 발생 예정
+		}
+
+		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.CANCEL).orElseThrow();
+		order.updateOrderState(orderState);
+
+		long usedPoint = order.getOrderPointAmount();
+		// 사용한 포인트 수치만큼 복구 요청
+		MemberCoupon memberCoupon = order.getMemberCoupon();
+		if (memberCoupon != null) {
+			// 사용한 쿠폰이 있다면 똑같은 쿠폰을 새로 발급 요청
+		}
+
+		// 재고 복구
+
+		//적립된 포인트 회수 요청 -> 회원이 당시 받은 %를 어떻게 아는가? 등급이 그땐 지금보다 낮았을 수 있음
+
+		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
+		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
+		if (payment != null) {
+			ResponseEntity<ResponseTossPaymentConfirmDTO> tossResponse = tossAdaptor.cancelOrder(
+				payment.getPaymentKey(),
+				new RequestTossCancelDTO("구매자 변심", payment.getTotalPaymentAmount()),
+				secretKey);
+
+			return ResponseEntity.status(tossResponse.getStatusCode()).build();
+		}
+
+		return ResponseEntity.ok().build();
 	}
 
 	/**

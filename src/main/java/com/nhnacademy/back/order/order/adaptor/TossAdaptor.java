@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.nhnacademy.back.order.order.domain.dto.request.RequestTossCancelDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 
@@ -18,5 +19,7 @@ public interface TossAdaptor {
 		@RequestHeader("Authorization") String authHeader);
 
 	@PostMapping("/{paymentKey}/cancel")
-	ResponseEntity<Void> cancelOrder(@PathVariable String paymentKey);
+	ResponseEntity<ResponseTossPaymentConfirmDTO> cancelOrder(@PathVariable String paymentKey,
+		@RequestBody RequestTossCancelDTO requestTossCancelDTO,
+		@RequestHeader("Authorization") String authHeader);
 }

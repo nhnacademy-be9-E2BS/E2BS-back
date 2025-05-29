@@ -224,7 +224,6 @@ class OrderServiceImplTest {
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		verify(order).updatePaymentStatus(true);
-		verify(orderJpaRepository).save(order);
 	}
 
 	@Test
@@ -341,5 +340,60 @@ class OrderServiceImplTest {
 			assertEquals(1, result.getContent().size());
 			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
 		}
+	}
+
+	@Test
+	@DisplayName("배송 대기 상태인 상품의 주문 취소(외부 결제 X)")
+	void testCancelOrder() {
+		String orderCode = "TEST-ORDER-CODE";
+		Order order = mock(Order.class);
+		OrderState orderState = mock(OrderState.class);
+		OrderState cancelOrderState = mock(OrderState.class);
+
+		when(orderJpaRepository.findById(orderCode)).thenReturn(Optional.of(order));
+		when(order.getOrderState()).thenReturn(orderState);
+		when(orderState.getOrderStateName()).thenReturn(OrderStateName.WAIT);
+		when(order.isOrderPaymentStatus()).thenReturn(true);
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.CANCEL)).thenReturn(
+			Optional.ofNullable(cancelOrderState));
+		when(order.getOrderPointAmount()).thenReturn(1000L);
+		when(order.getMemberCoupon()).thenReturn(null);
+		when(paymentJpaRepository.findByOrderOrderCode(orderCode)).thenReturn(Optional.empty());
+
+		ResponseEntity<Void> response = orderService.cancelOrder(orderCode);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		verify(order).updateOrderState(cancelOrderState);
+
+	}
+
+	@Test
+	@DisplayName("배송 대기 상태인 상품의 주문 취소(외부 결제 O)")
+	void testCancelOrderWithPaymentMethod() {
+		String orderCode = "TEST-ORDER-CODE";
+		Order order = mock(Order.class);
+		OrderState orderState = mock(OrderState.class);
+		OrderState cancelOrderState = mock(OrderState.class);
+		Payment payment = mock(Payment.class);
+
+		when(orderJpaRepository.findById(orderCode)).thenReturn(Optional.of(order));
+		when(order.getOrderState()).thenReturn(orderState);
+		when(orderState.getOrderStateName()).thenReturn(OrderStateName.WAIT);
+		when(order.isOrderPaymentStatus()).thenReturn(true);
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.CANCEL)).thenReturn(
+			Optional.ofNullable(cancelOrderState));
+		when(order.getOrderPointAmount()).thenReturn(1000L);
+		when(order.getMemberCoupon()).thenReturn(null);
+		when(paymentJpaRepository.findByOrderOrderCode(orderCode)).thenReturn(Optional.of(payment));
+		when(payment.getPaymentKey()).thenReturn("TEST-PAYMENT-KEY");
+		when(payment.getTotalPaymentAmount()).thenReturn(1000L);
+		when(tossAdaptor.cancelOrder(any(), any(), any())).thenReturn(
+			ResponseEntity.ok(new ResponseTossPaymentConfirmDTO()));
+
+		ResponseEntity<Void> response = orderService.cancelOrder(orderCode);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		verify(order).updateOrderState(cancelOrderState);
+
 	}
 }
