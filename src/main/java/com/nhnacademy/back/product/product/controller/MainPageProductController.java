@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,12 +17,6 @@ public class MainPageProductController {
 
 	public MainPageProductController(MainPageProductService mainPageProductService) {
 		this.mainPageProductService = mainPageProductService;
-	}
-
-	@GetMapping("/{categoryId}")
-	public ResponseEntity<List<ResponseMainPageProductDTO>> getProducts(@PathVariable long categoryId) {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.getProductsByCategoryId(categoryId);
-		return ResponseEntity.ok(products);
 	}
 
 
@@ -55,9 +48,10 @@ public class MainPageProductController {
 
 	@GetMapping("/itemeditorchoice")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getItemEditorChoiceItems() {
-		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemNewSpecialProducts();
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemEditorChoiceProducts();
 		return ResponseEntity.ok(products);
 	}
+
 
 
 

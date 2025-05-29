@@ -9,9 +9,10 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageP
 public interface MainPageProductService {
 	//메인 페이지에서 책 보여주기
 
-
 	@Transactional(readOnly = true)
-	List<ResponseMainPageProductDTO> getProductsByCategoryId(long categoryId);
+
+	List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName);
+
 
 	List<ResponseMainPageProductDTO> getBestSellerProducts();
 
@@ -21,5 +22,5 @@ public interface MainPageProductService {
 
 	List<ResponseMainPageProductDTO> getItemNewSpecialProducts();
 
-	List<ResponseMainPageProductDTO> getItemItemEditorChoiceProducts();
+	List<ResponseMainPageProductDTO> getItemEditorChoiceProducts();
 }

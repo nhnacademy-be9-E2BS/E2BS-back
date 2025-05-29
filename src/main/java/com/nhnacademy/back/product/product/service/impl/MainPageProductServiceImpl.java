@@ -28,9 +28,11 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductCategoryJpaRepository productCategoryJpaRepository;
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 
+
+
 	@Override
-	public List<ResponseMainPageProductDTO> getProductsByCategoryId(long categoryId) {
-		Category category = categoryJpaRepository.findCategoryByCategoryId(categoryId);
+	public List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName) {
+		Category category = categoryJpaRepository.findCategoryByCategoryName(categoryName);
 		if (category == null) {
 			return List.of();
 		}
@@ -68,35 +70,31 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 			})
 			.toList();
 	}
-	//
+
 	@Override
 	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
-		Category category = categoryJpaRepository.findCategoryByCategoryName("Bestseller");
-		return getProductsByCategoryId(category.getCategoryId());
+		return getProductsByCategory("Bestseller");
 	}
 
-	 @Override
-	 public List<ResponseMainPageProductDTO> getBlogBestProducts() {
-		 Category category = categoryJpaRepository.findCategoryByCategoryName("BlogBest");
-		 return getProductsByCategoryId(category.getCategoryId());
-	 }
 	@Override
-	 public List<ResponseMainPageProductDTO> getNewItemsProducts() {
-		Category category = categoryJpaRepository.findCategoryByCategoryName("ItemNewAll");
-		return getProductsByCategoryId(category.getCategoryId());
-
+	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
+		return getProductsByCategory("BlogBest");
 	}
 
-	 @Override
-	 public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
-		 Category category = categoryJpaRepository.findCategoryByCategoryName("ItemNewSpecial");
-		 return getProductsByCategoryId(category.getCategoryId());
-	 }
+	@Override
+	public List<ResponseMainPageProductDTO> getNewItemsProducts() {
+		return getProductsByCategory("ItemNewAll");
+	}
 
 	@Override
-	public List<ResponseMainPageProductDTO> getItemItemEditorChoiceProducts() {
-		Category category = categoryJpaRepository.findCategoryByCategoryName("ItemEditorChoice");
-		return getProductsByCategoryId(category.getCategoryId());
+	public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
+		return getProductsByCategory("ItemNewSpecial");
+	}
+
+	@Override
+	public List<ResponseMainPageProductDTO> getItemEditorChoiceProducts() {
+		return getProductsByCategory("ItemEditorChoice");
+
 	}
 
 }

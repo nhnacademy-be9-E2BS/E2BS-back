@@ -26,4 +26,4 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:10236/api/category/
+GET http://localhost:10236/api/category/11

@@ -169,12 +169,4 @@ public class ProductAdminController {
 		productApiService.createProductByQuery(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
-
-
-
-
-
-
-
 }

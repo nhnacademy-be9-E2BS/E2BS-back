@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -26,19 +27,20 @@ import com.nhnacademy.back.product.contributor.repository.PositionJpaRepository;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.domain.entity.Product;
-import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
-import com.nhnacademy.back.product.product.exception.SearchBookException;
 import com.nhnacademy.back.product.product.api.AladdinOpenAPI;
 import com.nhnacademy.back.product.product.api.Item;
-import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
+import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
+import com.nhnacademy.back.product.product.exception.SearchBookException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.product.product.service.ProductAPIService;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
@@ -86,6 +88,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			throw new SearchBookException("Search book failed");
 		}
 
+		if (Objects.isNull(items)) {
+			throw new ProductNotFoundException();
+		}
+
 		List<ResponseProductsApiSearchDTO> responseList = new ArrayList<>();
 
 		for (Item item : items) {
@@ -125,6 +131,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			items = api.getListBooks();
 		} catch (Exception e) {
 			throw new SearchBookException("Search book failed");
+		}
+
+		if (Objects.isNull(items)) {
+			throw new ProductNotFoundException();
 		}
 
 		List<ResponseProductApiSearchByQueryTypeDTO> responseList = new ArrayList<>();
