@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
+import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryIdsDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
+import com.nhnacademy.back.product.category.service.ProductCategoryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryController {
 	private final CategoryService categoryService;
+	private final ProductCategoryService productCategoryService;
 
 	// 유저 페이지
 
@@ -41,6 +44,15 @@ public class CategoryController {
 	@GetMapping("/api/categories/all")
 	public ResponseEntity<List<ResponseCategoryDTO>> getAllCategories() {
 		List<ResponseCategoryDTO> response = categoryService.getCategories();
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	/**
+	 * product id 리스트로 각 product의 category id 리스트 조회
+	 */
+	@GetMapping("/api/categories/productIds")
+	public ResponseEntity<List<ResponseCategoryIdsDTO>> getCategoriesByProductIds(List<Long> productIds) {
+		List<ResponseCategoryIdsDTO> response = productCategoryService.getCategoriesByProductId(productIds);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
