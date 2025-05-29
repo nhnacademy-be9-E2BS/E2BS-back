@@ -34,7 +34,7 @@ public class MemberCouponController {
 	 * MQ 에 회원 ID, 쿠폰 ID 를 넣음
 	 */
 	@Admin
-	@PostMapping("/api/admin/member-coupons/issue")
+	@PostMapping("/api/admin/memberCoupons/issue")
 	public ResponseEntity<Void> issueCouponsToAllMembers(@RequestBody RequestAllMemberCouponDTO request) {
 		batchService.issueCouponToActiveMembers(request.getCouponId(), request.getMemberCouponPeriod());
 		return ResponseEntity.status(HttpStatus.OK).build();
@@ -44,7 +44,7 @@ public class MemberCouponController {
 	 * 쿠폰함 : 회원 ID로 회원쿠폰 테이블에서 쿠폰 조회
 	 */
 	@Member
-	@GetMapping("/api/mypage/{memberId}/coupons")
+	@GetMapping("/api/auth/mypage/{memberId}/coupons")
 	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@PathVariable String memberId, Pageable pageable) {
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getMemberCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -54,7 +54,7 @@ public class MemberCouponController {
 	 * !기능확인용 API -> orderController 의 서비스 구현으로 옭기면 삭제 예정
 	 * 사용자 쿠폰 사용 시 사용여부 업데이트 (미사용 -> 사용완료)
 	 */
-	@PutMapping("/api/member-coupons")
+	@PutMapping("/api/memberCoupons")
 	public ResponseEntity<Void> updateMemberCouponById(@RequestParam Long memberCouponId) {
 		memberCouponService.updateMemberCouponById(memberCouponId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -64,7 +64,7 @@ public class MemberCouponController {
 	 * !기능확인용 API -> orderController 의 서비스 구현으로 옮기면 삭제 예정
 	 * 주문취소 시 단일 회원에게 같은 내용의 쿠폰 재발급
 	 */
-	@PostMapping("/api/admin/member-coupons/re-issue")
+	@PostMapping("/api/admin/memberCoupons/reIssue")
 	public ResponseEntity<Void> reIssueCoupon(@RequestParam Long memberCouponId) {
 		memberCouponService.reIssueCouponById(memberCouponId);
 		return ResponseEntity.status(HttpStatus.CREATED).build();

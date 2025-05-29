@@ -44,7 +44,7 @@ eureka:
 
 order:
   url:
-    toss: https://api.tosspayments.com/v1/payments/confirm
+    toss: https://api.tosspayments.com/v1/payments
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
 
 # minio 원격 접근 설정

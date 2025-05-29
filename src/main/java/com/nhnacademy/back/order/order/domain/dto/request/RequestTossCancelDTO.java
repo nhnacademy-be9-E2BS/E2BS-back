@@ -1,4 +1,4 @@
-package com.nhnacademy.back.product.tag.domain.dto.response;
+package com.nhnacademy.back.order.order.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseTagDTO {
-	private Long tagId;
-	private String tagName;
+public class RequestTossCancelDTO {
+	private String cancelReason;
+	private long cancelAmount;
 }
