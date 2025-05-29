@@ -16,17 +16,19 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
 import com.nhnacademy.back.account.member.service.MemberService;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/members")
+@RequestMapping("/api/auth/members")
 public class MemberInfoController {
 
 	private final MemberService memberService;
 
+	@Member
 	@GetMapping("/{memberId}")
 	public ResponseEntity<ResponseMemberInfoDTO> getMember(@PathVariable("memberId") String memberId) {
 		ResponseMemberInfoDTO responseMemberInfoDTO = memberService.getMemberInfo(new RequestMemberIdDTO(memberId));
@@ -34,6 +36,7 @@ public class MemberInfoController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberInfoDTO);
 	}
 
+	@Member
 	@PutMapping("/{memberId}/info")
 	public ResponseEntity<Void> updateMemberInfo(@PathVariable("memberId") String memberId,
 		@Validated @RequestBody RequestMemberInfoDTO requestMemberInfoDTO,
@@ -46,6 +49,7 @@ public class MemberInfoController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	@Member
 	@PostMapping("/{memberId}/info")
 	public ResponseEntity<Void> withdrawMember(@PathVariable("memberId") String memberId) {
 		memberService.withdrawMember(memberId);

@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/home/{memberId}")
+@RequestMapping("/api/auth/home/{memberId}")
 public class HomeController {
 
 	private final HomeService homeService;

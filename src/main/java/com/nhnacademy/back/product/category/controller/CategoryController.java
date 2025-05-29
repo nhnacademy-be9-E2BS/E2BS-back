@@ -36,25 +36,15 @@ public class CategoryController {
 	}
 
 	/**
-	 * 도서 리스트 조회 시 사이드 바에 표시할 카테고리 리스트
+	 * 전체 카테고리 리스트 조회
 	 */
-	@GetMapping("/api/categories/{categoryId}")
-	public ResponseEntity<List<ResponseCategoryDTO>> getCategoriesById(@PathVariable Long categoryId) {
-		List<ResponseCategoryDTO> response = categoryService.getCategoriesById(categoryId);
+	@GetMapping("/api/categories/all")
+	public ResponseEntity<List<ResponseCategoryDTO>> getAllCategories() {
+		List<ResponseCategoryDTO> response = categoryService.getCategories();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	// 관리자 페이지
-
-	/**
-	 * 관리자 페이지에서 전체 카테고리 리스트 조회
-	 */
-	@Admin
-	@GetMapping("/api/admin/categories")
-	public ResponseEntity<List<ResponseCategoryDTO>> getCategories() {
-		List<ResponseCategoryDTO> response = categoryService.getCategories();
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
 
 	/**
 	 * 최상위 + 하위 카테고리 저장

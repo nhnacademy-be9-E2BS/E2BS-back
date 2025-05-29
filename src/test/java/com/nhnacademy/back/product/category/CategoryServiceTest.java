@@ -3,7 +3,6 @@ package com.nhnacademy.back.product.category;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,7 +82,9 @@ class CategoryServiceTest {
 		RequestCategoryDTO requestParent = new RequestCategoryDTO("parent category");
 		RequestCategoryDTO requestChild = new RequestCategoryDTO("child category");
 		List<RequestCategoryDTO> requests = List.of(requestParent, requestChild);
+		Category category = new Category("parent category", null);
 		when(categoryJpaRepository.existsByParentIsNullAndCategoryName(anyString())).thenReturn(false);
+		when(categoryJpaRepository.save(any())).thenReturn(category);
 
 		// when
 		categoryService.createCategoryTree(requests);
@@ -194,55 +195,6 @@ class CategoryServiceTest {
 		assertThat(grandchildDto.getChildren()).isEmpty();
 
 		verify(categoryJpaRepository, times(1)).findAllByParentIsNull();
-	}
-
-	@Test
-	@DisplayName("get categories by id - success")
-	void get_categories_by_id_success_test() {
-		// given
-		ResponseCategoryDTO grandChild = new ResponseCategoryDTO(4L, "Grandchild", new ArrayList<>());
-		ResponseCategoryDTO child1 = new ResponseCategoryDTO(2L, "Child 1", List.of(grandChild));
-		ResponseCategoryDTO child2 = new ResponseCategoryDTO(3L, "Child 2", new ArrayList<>());
-		ResponseCategoryDTO root = new ResponseCategoryDTO(1L, "Root", List.of(child1, child2));
-
-		when(self.getCategories()).thenReturn(List.of(root, child1, child2, grandChild));
-
-		// when
-		List<ResponseCategoryDTO> result = categoryService.getCategoriesById(1L);
-
-		// then
-		assertThat(result).hasSize(2); // child1, child2
-
-		ResponseCategoryDTO child1Dto = result.stream()
-			.filter(dto -> dto.getCategoryName().equals("Child 1"))
-			.findFirst().orElseThrow();
-
-		assertThat(child1Dto.getChildren()).hasSize(1);
-		assertThat(child1Dto.getChildren().get(0).getCategoryName()).isEqualTo("Grandchild");
-
-		ResponseCategoryDTO child2Dto = result.stream()
-			.filter(dto -> dto.getCategoryName().equals("Child 2"))
-			.findFirst().orElseThrow();
-
-		assertThat(child2Dto.getChildren()).isEmpty();
-
-		verify(categoryJpaRepository, never()).findById(any());
-	}
-
-	@Test
-	@DisplayName("get categories by id - fail")
-	void get_categories_by_id_fail_test() {
-		// given
-		ResponseCategoryDTO grandChild = new ResponseCategoryDTO(4L, "Grandchild", new ArrayList<>());
-		ResponseCategoryDTO child1 = new ResponseCategoryDTO(2L, "Child 1", List.of(grandChild));
-		ResponseCategoryDTO child2 = new ResponseCategoryDTO(3L, "Child 2", new ArrayList<>());
-		ResponseCategoryDTO root = new ResponseCategoryDTO(1L, "Root", List.of(child1, child2));
-
-		when(self.getCategories()).thenReturn(List.of(root, child1, child2, grandChild));
-
-		// when & then
-		assertThatThrownBy(() -> categoryService.getCategoriesById(5L))
-			.isInstanceOf(CategoryNotFoundException.class);
 	}
 
 	@Test

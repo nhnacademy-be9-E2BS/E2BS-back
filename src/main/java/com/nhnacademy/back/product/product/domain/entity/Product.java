@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
 
+	// product_id
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long productId;
@@ -44,7 +45,7 @@ public class Product {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 200, nullable = false)
 	private String productTitle;
 
 	@Column(nullable = false)
@@ -96,6 +97,7 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
@@ -120,6 +122,7 @@ public class Product {
 			.productPublishedAt(request.getProductPublishedAt())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
@@ -144,6 +147,7 @@ public class Product {
 			.productStock(request.getProductStock())
 			.productHits(0)
 			.productSearches(0)
+			.productImage(new ArrayList<>())
 			.build();
 	}
 
