@@ -13,6 +13,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
@@ -61,6 +62,9 @@ public class CartServiceImpl implements CartService {
 	public void createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 비회원/회원, 상품 존재 검증
 		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("Member not found");
+		}
 		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
 			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
@@ -122,6 +126,9 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public void deleteCartForMember(String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("Member not found");
+		}
 
 		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
 		if (Objects.isNull(findCart)) {

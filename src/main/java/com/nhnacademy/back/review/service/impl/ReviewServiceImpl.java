@@ -15,6 +15,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.product.domain.entity.Product;
@@ -57,6 +58,10 @@ public class ReviewServiceImpl implements ReviewService {
 		// 회원인 경우
 		if (Objects.nonNull(request.getMemberId())) {
 			Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
+			if (Objects.isNull(findMember)) {
+				throw new NotFoundMemberException("Member not found");
+			}
+
 			findCustomer = customerRepository.findById(findMember.getCustomerId())
 				.orElseThrow(CustomerNotFoundException::new);
 		}
