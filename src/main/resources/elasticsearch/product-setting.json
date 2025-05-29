@@ -1,0 +1,30 @@
+{
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "nori_tokenizer": {
+          "type": "nori_tokenizer"
+        }
+      },
+      "filter": {
+        "jaso_filter": {
+          "type": "jaso"
+        },
+        "my_icu_normalizer": {
+          "type": "icu_normalizer",
+          "name": "nfkc"
+        }
+      },
+      "analyzer": {
+        "korean": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer",
+          "filter": [
+            "my_icu_normalizer",
+            "jaso_filter"
+          ]
+        }
+      }
+    }
+  }
+}
