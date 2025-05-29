@@ -20,8 +20,10 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 
 	/**
 	 * 상품의 전체 평점 구하는 메소드
+	 * - 상품에 리뷰가 없을 수 있으므로 null 방지를 위해 coalesce() 함수 사용
+	 *   ex) coalesce(avg(r.reviewGrade), 0) avg(r.reviewGrade) 가 null 이면 0 지정
 	 */
-	@Query("select avg(r.reviewGrade) from Review r " +
+	@Query("select coalesce(avg(r.reviewGrade), 0.0) from Review r " +
 		   "where r.product.productId = :productId")
 	double totalAvgReviewsByProductId(long productId);
 
