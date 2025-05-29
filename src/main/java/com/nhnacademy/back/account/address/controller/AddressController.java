@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/{memberId}/addresses")
+@RequestMapping("/api/auth/mypage/{memberId}/addresses")
 public class AddressController {
 
 	private final AddressService addressService;

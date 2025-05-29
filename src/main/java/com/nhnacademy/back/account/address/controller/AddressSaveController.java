@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/{memberId}/addresses/save")
+@RequestMapping("/api/auth/mypage/{memberId}/addresses/save")
 public class AddressSaveController {
 
 	private final AddressService addressService;

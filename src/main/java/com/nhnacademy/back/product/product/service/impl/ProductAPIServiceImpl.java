@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -305,10 +304,12 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		}
 
 		//request에 담긴 tagID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 태그 아이디 넣기
-		List<Long> tagIds = request.getTagIds();
-		for (Long tagId : tagIds) {
-			Tag tag = tagJpaRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
-			productTagJpaRepository.save(new ProductTag(product,tag));
+		if (!Objects.isNull(request.getTagIds())) {
+			List<Long> tagIds = request.getTagIds();
+			for (Long tagId : tagIds) {
+				Tag tag = tagJpaRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
+				productTagJpaRepository.save(new ProductTag(product,tag));
+			}
 		}
 	}
 
