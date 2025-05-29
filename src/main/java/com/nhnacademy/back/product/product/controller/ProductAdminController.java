@@ -1,7 +1,5 @@
 package com.nhnacademy.back.product.product.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,18 +18,18 @@ import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.UnifiedProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,17 +62,6 @@ public class ProductAdminController {
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseProductReadDTO> response = productService.getProducts(pageable, 0);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	/**
-	 * order전용 productId들을 받아서 정보를 반환
-	 * 200 상태코드 반환
-	 */
-	@Admin
-	@GetMapping("/order")
-	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(@RequestBody List<Long> products) {
-		List<ResponseProductReadDTO> productsDTO = productService.getProducts(products);
-		return ResponseEntity.status(HttpStatus.OK).body(productsDTO);
 	}
 
 	/**
@@ -147,7 +134,8 @@ public class ProductAdminController {
 			RequestProductApiSearchByQueryTypeDTO showDTO = new RequestProductApiSearchByQueryTypeDTO();
 			showDTO.setQueryType(request.getQueryType());
 
-			Page<ResponseProductApiSearchByQueryTypeDTO> products = productApiService.searchProductsByQuery(showDTO, pageable);
+			Page<ResponseProductApiSearchByQueryTypeDTO> products = productApiService.searchProductsByQuery(showDTO,
+				pageable);
 			return ResponseEntity.status(HttpStatus.OK).body(products);
 
 		}
@@ -169,12 +157,5 @@ public class ProductAdminController {
 		productApiService.createProductByQuery(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
-
-
-
-
-
-
 
 }
