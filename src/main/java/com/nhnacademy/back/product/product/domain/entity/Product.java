@@ -100,6 +100,7 @@ public class Product {
 			.productImage(new ArrayList<>())
 			.build();
 
+
 		ProductImage image = new ProductImage(product, request.getProductImage());
 		product.getProductImage().add(image);
 
