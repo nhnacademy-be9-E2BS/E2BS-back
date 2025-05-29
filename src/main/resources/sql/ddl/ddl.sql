@@ -249,7 +249,7 @@ CREATE TABLE product
     product_state_id      BIGINT                NOT NULL,
     publisher_id          BIGINT                NOT NULL,
     product_title         VARCHAR(30)           NOT NULL,
-    product_content       VARCHAR(255)          NOT NULL,
+    product_content       TEXT                  NOT NULL,
     product_description   TEXT                  NOT NULL,
     product_published_at  date                  NOT NULL,
     product_isbn          VARCHAR(20)           NOT NULL,
