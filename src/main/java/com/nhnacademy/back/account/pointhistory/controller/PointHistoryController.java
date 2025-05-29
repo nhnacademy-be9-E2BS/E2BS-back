@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.pointhistory.domain.dto.response.ResponsePointHistoryDTO;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.common.annotation.Member;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ public class PointHistoryController {
 
 	private final PointHistoryService pointHistoryService;
 
+	@Member
 	@GetMapping("/api/auth/mypage/{memberId}/pointHistory")
 	public ResponseEntity<Page<ResponsePointHistoryDTO>> getPointList(@PathVariable("memberId") String memberId, Pageable pageable) {
 		Page<ResponsePointHistoryDTO> response = pointHistoryService.getPointHistoryByMemberId(memberId, pageable);
