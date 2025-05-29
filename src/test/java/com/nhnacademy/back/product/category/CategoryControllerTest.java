@@ -19,6 +19,7 @@ import com.nhnacademy.back.product.category.controller.CategoryController;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
+import com.nhnacademy.back.product.category.service.ProductCategoryService;
 
 @WebMvcTest(controllers = CategoryController.class)
 class CategoryControllerTest {
@@ -26,6 +27,8 @@ class CategoryControllerTest {
 	private MockMvc mockMvc;
 	@MockitoBean
 	private CategoryService categoryService;
+	@MockitoBean
+	private ProductCategoryService productCategoryService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
