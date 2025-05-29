@@ -1,11 +1,18 @@
 package com.nhnacademy.back.common.aop;
 
+import java.nio.file.AccessDeniedException;
+import java.util.Objects;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
+import com.nhnacademy.back.jwt.parser.JwtMemberIdParser;
+import com.nhnacademy.back.jwt.rule.JwtRule;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +27,21 @@ public class AuthorizationMemberAop {
 
 	@Around("@annotation(com.nhnacademy.back.common.annotation.Member)")
 	public Object checkAuthorizationMemberAop(ProceedingJoinPoint joinPoint) throws Throwable {
-		// String header = request.getHeader(JwtRule.JWT_ISSUE_HEADER.getValue());
-		//
-		// String accessToken = "";
-		// if (Objects.nonNull(header) && header.contains("=")) {
-		// 	accessToken = header.substring(header.indexOf("=") + 1).trim();
-		// }
-		//
-		// String memberId = JwtMemberIdParser.getMemberId(accessToken);
-		//
-		// Member member = memberJpaRepository.getMemberByMemberId(memberId);
-		// MemberRoleName memberRoleName = member.getMemberRole().getMemberRoleName();
-		//
-		// if (memberRoleName != MemberRoleName.MEMBER) {
-		// 	throw new AccessDeniedException("정회원만 접근 가능한 페이지입니다.");
-		// }
+		String header = request.getHeader(JwtRule.JWT_ISSUE_HEADER.getValue());
+
+		String accessToken = "";
+		if (Objects.nonNull(header) && header.contains("=")) {
+			accessToken = header.substring(header.indexOf("=") + 1).trim();
+		}
+
+		String memberId = JwtMemberIdParser.getMemberId(accessToken);
+
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		MemberRoleName memberRoleName = member.getMemberRole().getMemberRoleName();
+
+		if (memberRoleName != MemberRoleName.MEMBER) {
+			throw new AccessDeniedException("정회원만 접근 가능한 페이지입니다.");
+		}
 
 		return joinPoint.proceed();
 	}
