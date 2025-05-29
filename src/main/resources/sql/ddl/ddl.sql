@@ -161,6 +161,7 @@ CREATE TABLE `order`
     order_payment_amount BIGINT       NOT NULL,
     order_memo           TEXT         NULL,
     order_payment_status BIT(1)       NOT NULL,
+    order_reward_amount  BIGINT       NOT NULL,
     order_receive_date   datetime     NULL,
     order_shipment_date  datetime     NULL,
     order_created_at     datetime     NOT NULL,
