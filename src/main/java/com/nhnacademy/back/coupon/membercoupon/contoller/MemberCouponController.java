@@ -44,7 +44,7 @@ public class MemberCouponController {
 	 * 쿠폰함 : 회원 ID로 회원쿠폰 테이블에서 쿠폰 조회
 	 */
 	@Member
-	@GetMapping("/api/mypage/{memberId}/coupons")
+	@GetMapping("/api/auth/mypage/{memberId}/coupons")
 	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(@PathVariable String memberId, Pageable pageable) {
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getMemberCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
