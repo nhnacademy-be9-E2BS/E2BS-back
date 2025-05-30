@@ -54,9 +54,6 @@ public class MemberRegisterController {
 			WelcomeCouponRabbitConfig.WELCOME_ROUTING_KEY,
 			responseRegisterMemberDTO.getMemberId());
 
-		// 회원가입 포인트 적립
-		pointHistoryService.earnRegisterPoint(responseRegisterMemberDTO.getMemberId());
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseRegisterMemberDTO);
 	}
 

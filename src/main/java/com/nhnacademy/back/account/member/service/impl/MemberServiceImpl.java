@@ -3,6 +3,7 @@ package com.nhnacademy.back.account.member.service.impl;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ import com.nhnacademy.back.account.memberstate.domain.entity.MemberStateName;
 import com.nhnacademy.back.account.memberstate.repository.MemberStateJpaRepository;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
+import com.nhnacademy.back.event.event.RegisterPointEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,6 +52,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRoleJpaRepository memberRoleJpaRepository;
 	private final SocialAuthJpaRepository socialAuthJpaRepository;
 	private final CustomerJpaRepository customerJpaRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * 아이디에 해당하는 Member가 존재하는지 확인하는 메서드
@@ -131,6 +134,9 @@ public class MemberServiceImpl implements MemberService {
 			.build();
 
 		memberJpaRepository.saveAndFlush(member);
+
+		// 회원가입 포인트 적립 이벤트 발행
+		eventPublisher.publishEvent(new RegisterPointEvent(member.getMemberId()));
 
 		return new ResponseRegisterMemberDTO(
 			member.getMemberId(), member.getCustomer().getCustomerName(), member.getCustomer().getCustomerPassword(),
