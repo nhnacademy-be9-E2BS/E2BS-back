@@ -41,6 +41,8 @@ class MemberServiceImplTest {
 	private MemberRoleJpaRepository memberRoleJpaRepository;
 	@Mock
 	private SocialAuthJpaRepository socialAuthJpaRepository;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 
 	@Mock
 	private ApplicationEventPublisher applicationEventPublisher;

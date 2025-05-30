@@ -67,6 +67,9 @@ class ReviewServiceImplTest {
 	@Mock
 	private MinioUtils minioUtils;
 
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
 
