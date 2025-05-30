@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "productId": {
+      "type": "long"
+    },
+    "productTitle": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "productContent": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "productPublishedAt": {
+      "type": "date",
+      "format": "basic_date"
+    },
+    "productSalePrice": {
+      "type": "long"
+    },
+    "productHits": {
+      "type": "long"
+    },
+    "productSearches": {
+      "type": "long"
+    },
+    "productReviewRate": {
+      "type": "float"
+    },
+    "productReviewCount": {
+      "type": "long"
+    },
+    "productContributors": {
+      "type": "keyword"
+    },
+    "productTags": {
+      "type": "keyword"
+    },
+    "productCategoryIds": {
+      "type": "long"
+    }
+  }
+}

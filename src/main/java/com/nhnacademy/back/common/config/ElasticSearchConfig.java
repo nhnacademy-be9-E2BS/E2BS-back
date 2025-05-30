@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 @Configuration
 @EnableElasticsearchRepositories
-public class ElasticsearchConfig extends ElasticsearchConfiguration {
+public class ElasticSearchConfig extends ElasticsearchConfiguration {
 
 	@Value("${spring.elasticsearch.username}")
 	private String username;
