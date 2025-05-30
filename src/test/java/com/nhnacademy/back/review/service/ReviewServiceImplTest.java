@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +62,9 @@ class ReviewServiceImplTest {
 	private ReviewJpaRepository reviewRepository;
 
 	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
+
+	@Mock
 	private MinioUtils minioUtils;
 
 	@InjectMocks
@@ -94,7 +98,6 @@ class ReviewServiceImplTest {
 		when(memberRepository.getMemberByMemberId(anyString())).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-		when(reviewRepository.existsByCustomer_CustomerId(customerId)).thenReturn(false);
 		when(productRepository.findById(customerId)).thenReturn(Optional.of(product));
 		doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
 
