@@ -27,7 +27,7 @@ import com.nhnacademy.back.order.deliveryfee.service.DeliveryFeeService;
 
 @WebMvcTest(controllers = DeliveryFeeController.class)
 @ActiveProfiles("dev")
-public class DeliveryFeeControllerTest {
+class DeliveryFeeControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;

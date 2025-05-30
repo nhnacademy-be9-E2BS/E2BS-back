@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewJpaRepository reviewRepository;
 
 	private final MinioUtils minioUtils;
-	private final String BUCKET_NAME = "e2bs-reviews-image";
+	private static final String BUCKET_NAME = "e2bs-reviews-image";
 
 	private final ApplicationEventPublisher eventPublisher;
 
@@ -77,14 +77,11 @@ public class ReviewServiceImpl implements ReviewService {
 			findCustomer = customerRepository.findById(request.getCustomerId())
 				.orElseThrow(CustomerNotFoundException::new);
 		}
-
-		// if (reviewRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
-		// 	throw new ReviewAlreadyExistsException();
-		// }
-
+		
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
+		/// 현재 회원이 현재 주문한 리뷰를 이미 작성한 경우 처리 필요
 
 		// 이미지 있으면 이미지 리뷰 정책, 없으면 일반 리뷰 정책으로 포인트 적립 이벤트 발행
 		if (Objects.nonNull(request.getMemberId())) {
