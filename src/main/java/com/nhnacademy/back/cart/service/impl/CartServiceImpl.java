@@ -54,7 +54,7 @@ public class CartServiceImpl implements CartService {
 	private final ObjectMapper objectMapper;
 
 	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
-	
+
 	/**
 	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
@@ -103,7 +103,7 @@ public class CartServiceImpl implements CartService {
 	public int updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request) {
 		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
@@ -146,7 +146,7 @@ public class CartServiceImpl implements CartService {
 	public void deleteCartForMember(String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
@@ -219,7 +219,7 @@ public class CartServiceImpl implements CartService {
 	public Integer getCartItemsCountsForMember(String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
