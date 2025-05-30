@@ -11,4 +11,7 @@ public interface PointPolicyJpaRepository extends JpaRepository<PointPolicy, Lon
 	boolean existsByPointPolicyName(String pointPolicyName);
 
 	List<PointPolicy> findByPointPolicyTypeOrderByPointPolicyIsActiveDescPointPolicyCreatedAtDesc(PointPolicyType pointPolicyType);
+
+	PointPolicy findByPointPolicyTypeAndPointPolicyIsActive(PointPolicyType pointPolicyType, Boolean pointPolicyIsActive);
+
 }
