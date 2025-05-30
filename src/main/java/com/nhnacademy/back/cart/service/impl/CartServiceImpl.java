@@ -221,10 +221,8 @@ public class CartServiceImpl implements CartService {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
-			.orElseThrow(CartNotFoundException::new);
-
-		return findCart.getCartItems().size();
+		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
+		return findCart.map(cart -> cart.getCartItems().size()).orElse(0);
 	}
 
 
