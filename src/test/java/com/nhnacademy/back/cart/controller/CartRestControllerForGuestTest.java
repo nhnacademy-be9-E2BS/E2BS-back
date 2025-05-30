@@ -38,7 +38,7 @@ class CartRestControllerForGuestTest {
 	@DisplayName("POST /api/guests/carts/items - 게스트 장바구니 항목 추가 테스트")
 	void createCartItemForGuest() throws Exception {
 		// given
-		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1, 2);
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1L, 2);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then

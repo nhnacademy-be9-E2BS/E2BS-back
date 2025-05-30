@@ -2,6 +2,8 @@ package com.nhnacademy.back.cart.service;
 
 import java.util.List;
 
+import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
+import com.nhnacademy.back.cart.domain.dto.MergeCartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
@@ -22,4 +24,6 @@ public interface CartService {
 	void deleteCartForGuest(String sessionId);
 	List<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId);
 	Integer getCartItemsCountsForGuest(String sessionId);
+
+	Integer mergeCartItemsToMemberFromGuest(List<MergeCartItemDTO> request);
 }

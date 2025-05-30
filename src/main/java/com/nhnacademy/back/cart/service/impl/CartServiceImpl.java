@@ -18,6 +18,7 @@ import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
+import com.nhnacademy.back.cart.domain.dto.MergeCartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
@@ -383,7 +384,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 게스트일 때 장바구니 항목 개수 조회
+	 * 게스트일 때 장바구니 항목 개수 조회 메소드
 	 */
 	@Override
 	public Integer getCartItemsCountsForGuest(String sessionId) {
@@ -394,6 +395,21 @@ public class CartServiceImpl implements CartService {
 		}
 
 		return cart.getCartItems().size();
+	}
+
+	/**
+	 * 게스트 장바구니 -> 회원 장바구니와 병합 메소드
+	 */
+	@Override
+	public Integer mergeCartItemsToMemberFromGuest(List<MergeCartItemDTO> request) {
+		for (MergeCartItemDTO cartItem : request) {
+			Product findProduct = productRepository.findById(cartItem.getProductId())
+				.orElseThrow(ProductNotFoundException::new);
+
+
+		}
+
+		return 0;
 	}
 
 }
