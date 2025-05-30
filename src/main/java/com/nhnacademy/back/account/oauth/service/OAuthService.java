@@ -19,6 +19,7 @@ import com.nhnacademy.back.account.oauth.exception.RegisterOAuthFailedException;
 import com.nhnacademy.back.account.oauth.model.dto.request.RequestOAuthRegisterDTO;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
+import com.nhnacademy.back.common.parser.DateParser;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,10 +59,12 @@ public class OAuthService {
 		MemberRole memberRole = memberRoleJpaRepository.getMemberRoleByMemberRoleId(2);
 		SocialAuth socialAuth = socialAuthJpaRepository.getSocialAuthBySocialAuthId(2);
 
+		LocalDate birthdayMMdd = DateParser.LocalDateParser(requestOAuthRegisterDTO.getBirthdayMMdd());
+
 		Member member = Member.builder()
 			.customer(customer)
 			.memberId(requestOAuthRegisterDTO.getMemberId())
-			.memberBirth(LocalDate.parse(requestOAuthRegisterDTO.getBirthdayMMdd()))
+			.memberBirth(birthdayMMdd)
 			.memberPhone(requestOAuthRegisterDTO.getMobile())
 			.memberCreatedAt(LocalDate.now())
 			.memberLoginLatest(null)

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.account.address.domain.dto.request.RequestMemberAddressSaveDTO;
 import com.nhnacademy.back.account.address.domain.dto.response.ResponseMemberAddressDTO;
 import com.nhnacademy.back.account.address.service.AddressService;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class AddressController {
 	/**
 	 * 회원의 저장된 모든 배송지를 가져오는 메서드
 	 */
+	@Member
 	@GetMapping
 	public ResponseEntity<List<ResponseMemberAddressDTO>> getMemberAddresses(
 		@PathVariable("memberId") String memberId) {
@@ -42,6 +44,7 @@ public class AddressController {
 	/**
 	 * 회원의 특정 배송지 정보를 가져오는 메서드
 	 */
+	@Member
 	@GetMapping("/{addressId}")
 	public ResponseEntity<ResponseMemberAddressDTO> getAddress(@PathVariable("memberId") String memberId,
 		@PathVariable("addressId") long addressId) {
@@ -55,6 +58,7 @@ public class AddressController {
 	/**
 	 * 회원의 배송지 정보를 수정하는 메서드
 	 */
+	@Member
 	@PutMapping("/{addressId}")
 	public ResponseEntity<Void> updateAddress(
 		@Validated @RequestBody RequestMemberAddressSaveDTO requestMemberAddressSaveDTO,
@@ -72,6 +76,7 @@ public class AddressController {
 	/**
 	 * 회원의 배송지 정보를 삭제하는 메서드
 	 */
+	@Member
 	@DeleteMapping("/{addressId}")
 	public ResponseEntity<Void> deleteAddress(@PathVariable("memberId") String memberId,
 		@PathVariable("addressId") long addressId) {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.memberrank.domain.dto.response.ResponseMemberRankDTO;
 import com.nhnacademy.back.account.memberrank.service.MemberRankService;
+import com.nhnacademy.back.common.annotation.Member;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ public class MemberRankController {
 
 	private final MemberRankService memberRankService;
 
+	@Member
 	@GetMapping
 	public ResponseEntity<List<ResponseMemberRankDTO>> getMemberRankService(@PathVariable("memberId") String memberId) {
 		List<ResponseMemberRankDTO> response = memberRankService.getMemberRanks();
