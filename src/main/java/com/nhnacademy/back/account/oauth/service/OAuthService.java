@@ -2,6 +2,7 @@ package com.nhnacademy.back.account.oauth.service;
 
 import java.time.LocalDate;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,8 @@ import com.nhnacademy.back.account.oauth.model.dto.request.RequestOAuthRegisterD
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
 import com.nhnacademy.back.common.parser.DateParser;
+import com.nhnacademy.back.event.event.RegisterPointEvent;
+import com.nhnacademy.back.event.event.WelcomeCouponEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +38,7 @@ public class OAuthService {
 	private final MemberStateJpaRepository memberStateJpaRepository;
 	private final MemberRoleJpaRepository memberRoleJpaRepository;
 	private final SocialAuthJpaRepository socialAuthJpaRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * OAuth 로그인 전 이미 회원가입을 한 적이 있는지 확인하는 메서드
@@ -76,6 +80,12 @@ public class OAuthService {
 
 		try {
 			memberJpaRepository.saveAndFlush(member);
+
+			// 웰컴 쿠폰 발급 이벤트 발행
+			eventPublisher.publishEvent(new WelcomeCouponEvent(member.getMemberId()));
+
+			// 회원가입 포인트 적립 이벤트 발행
+			eventPublisher.publishEvent(new RegisterPointEvent(member.getMemberId()));
 		} catch (Exception ex) {
 			throw new RegisterOAuthFailedException("OAuth 회원 가입에 실패했습니다.");
 		}
