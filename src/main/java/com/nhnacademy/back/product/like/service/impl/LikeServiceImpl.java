@@ -87,7 +87,7 @@ public class LikeServiceImpl implements LikeService {
 	}
 
 	/**
-	 * 회원이 좋아요한 상품 페이징 목록 조히 메소드
+	 * 회원이 좋아요한 상품 페이징 목록 조회 메소드
 	 */
 	@Override
 	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(String memberId, Pageable pageable) {
@@ -103,6 +103,8 @@ public class LikeServiceImpl implements LikeService {
 		return likedProductsByCustomerId.map(product -> {
 			long likeCount = getLikeCount(product.getProductId());
 			double reviewAvg = reviewRepository.totalAvgReviewsByProductId(product.getProductId());
+			reviewAvg = Math.round(reviewAvg * 10) / 10.0;
+
 			Integer reviewCount = reviewRepository.countAllByProduct_ProductId(product.getProductId());
 			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId())
 				.orElseThrow(LikeNotFoundException::new);

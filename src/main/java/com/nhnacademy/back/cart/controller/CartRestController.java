@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.util.StringUtils;
 
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
@@ -32,41 +34,57 @@ public class CartRestController {
 	private final CartService cartService;
 
 	/**
+	 * 공통 처리
+	 */
+	@GetMapping("/api/carts/counts")
+	public ResponseEntity<Integer> getCartItemsCounts(@RequestParam String memberId, @RequestParam String sessionId) {
+		Integer result;
+
+		if (StringUtils.isEmpty(memberId)) {
+			result = cartService.getCartItemsCountsForGuest(sessionId);
+		} else {
+			result = cartService.getCartItemsCountsForMember(memberId);
+		}
+
+		return ResponseEntity.ok(result);
+	}
+
+	/**
 	 * 회원
 	 */
-	@PostMapping("/api/members/carts/items")
-	public ResponseEntity<Void> createCartItemForMember(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
+	@PostMapping("/api/auth/members/carts/items")
+	public ResponseEntity<Integer> createCartItemForMember(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors() || (Objects.isNull(requestDto.getMemberId()) && Objects.isNull(requestDto.getSessionId()))) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		cartService.createCartItemForMember(requestDto);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		int cartQuantity = cartService.createCartItemForMember(requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(cartQuantity);
 	}
 
-	@PutMapping("/api/members/carts/items/{cartItemId}")
-	public ResponseEntity<Void> updateCartItemForMember(@PathVariable long cartItemId, @Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
+	@PutMapping("/api/auth/members/carts/items/{cartItemId}")
+	public ResponseEntity<Integer> updateCartItemForMember(@PathVariable long cartItemId, @Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		cartService.updateCartItemForMember(cartItemId, requestDto);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		int cartQuantity = cartService.updateCartItemForMember(cartItemId, requestDto);
+		return ResponseEntity.ok(cartQuantity);
 	}
 
-	@DeleteMapping("/api/members/carts/items/{cartItemId}")
+	@DeleteMapping("/api/auth/members/carts/items/{cartItemId}")
 	public ResponseEntity<Void> deleteCartItemForMember(@PathVariable long cartItemId) {
 		cartService.deleteCartItemForMember(cartItemId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@DeleteMapping("/api/members/{memberId}/carts")
+	@DeleteMapping("/api/auth/members/{memberId}/carts")
 	public ResponseEntity<Void> deleteCartForMember(@PathVariable String memberId) {
 		cartService.deleteCartForMember(memberId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@GetMapping("/api/members/{memberId}/carts")
+	@GetMapping("/api/auth/members/{memberId}/carts")
 	public ResponseEntity<List<ResponseCartItemsForMemberDTO>> getCartItemsByMember(@PathVariable String memberId) {
 		List<ResponseCartItemsForMemberDTO> body = cartService.getCartItemsByMember(memberId);
 		return ResponseEntity.ok(body);
@@ -77,23 +95,23 @@ public class CartRestController {
 	 * 게스트
 	 */
 	@PostMapping("/api/guests/carts/items")
-	public ResponseEntity<Void> createCartItemForGuest(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Integer> createCartItemForGuest(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		cartService.createCartItemForGuest(requestDto);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		int cartQuantity = cartService.createCartItemForGuest(requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(cartQuantity);
 	}
 
 	@PutMapping("/api/guests/carts/items")
-	public ResponseEntity<Void> updateCartItemForGuest(@Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
+	public ResponseEntity<Integer> updateCartItemForGuest(@Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		cartService.updateCartItemForGuest(requestDto);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		int cartQuantity = cartService.updateCartItemForGuest(requestDto);
+		return ResponseEntity.ok(cartQuantity);
 	}
 
 	@DeleteMapping("/api/guests/carts/items")
@@ -117,4 +135,5 @@ public class CartRestController {
 		List<ResponseCartItemsForGuestDTO> body = cartService.getCartItemsByGuest(sessionId);
 		return ResponseEntity.ok(body);
 	}
+
 }

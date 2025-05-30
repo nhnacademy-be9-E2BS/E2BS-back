@@ -62,6 +62,9 @@ class ReviewServiceImplTest {
 	private ReviewJpaRepository reviewRepository;
 
 	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
+
+	@Mock
 	private MinioUtils minioUtils;
 
 	@Mock

@@ -3,6 +3,7 @@ package com.nhnacademy.back.cart.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,6 @@ import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
-import com.nhnacademy.back.cart.exception.CartItemAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
@@ -59,11 +59,11 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Transactional
 	@Override
-	public void createCartItemForMember(RequestAddCartItemsDTO request) {
+	public int createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 비회원/회원, 상품 존재 검증
 		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("Member not found");
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
 			.orElseThrow(CustomerNotFoundException::new);
@@ -75,16 +75,23 @@ public class CartServiceImpl implements CartService {
 		if (!cartRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
 			cart = cartRepository.save(new Cart(findCustomer));
 		} else {
-			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId());
+			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId())
+				.orElseThrow(CartNotFoundException::new);
 		}
 
-		// 현재 고객이 장바구니 아이템을 가지고 있을 수 있으므로 중복 검증
+		// 현재 고객이 장바구니 아이템을 가지고 있을 경우 병합
 		if (cartItemsRepository.existsByCartAndProduct(cart, findProduct)) {
-			throw new CartItemAlreadyExistsException();
+			CartItems findCartItem = cartItemsRepository.findByCartAndProduct(cart, findProduct)
+				.orElseThrow(CartItemNotFoundException::new);
+
+			findCartItem.changeCartItemsQuantity(findCartItem.getCartItemsQuantity() + request.getQuantity());
+			return cart.getCartItems().size();
 		}
 
 		// 장바구니 아이템 생성
 		cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
+
+		return cart.getCartItems().size();
 	}
 
 	/**
@@ -92,7 +99,15 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Transactional
 	@Override
-	public void updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request) {
+	public int updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request) {
+		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+
 		// 장바구니 항목 존재 검증
 		CartItems findCartItem = cartItemsRepository.findById(cartItemId)
 			.orElseThrow(CartItemNotFoundException::new);
@@ -100,8 +115,11 @@ public class CartServiceImpl implements CartService {
 		// 해당 장바구니 아이템의 수량 변경
 		if (request.getQuantity() > 0) {
 			findCartItem.changeCartItemsQuantity(request.getQuantity());
+			return findCart.getCartItems().size();
 		} else {
 			cartItemsRepository.delete(findCartItem);
+			findCart.getCartItems().remove(findCartItem);
+			return getCartItemsCountsForMember(findMember.getMemberId());
 		}
 	}
 
@@ -127,10 +145,12 @@ public class CartServiceImpl implements CartService {
 	public void deleteCartForMember(String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("Member not found");
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+
 		if (Objects.isNull(findCart)) {
 			throw new CartNotFoundException();
 		}
@@ -191,12 +211,28 @@ public class CartServiceImpl implements CartService {
 			.toList();
 	}
 
+	/**
+	 * 회원일 때 장바구니 항목 개수 조회
+	 */
+	@Override
+	public Integer getCartItemsCountsForMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+
+		return findCart.getCartItems().size();
+	}
+
 
 	/**
 	 * 게스트일 때 장바구니 항목 생성 메소드
 	 */
 	@Override
-	public void createCartItemForGuest(RequestAddCartItemsDTO request) {
+	public int createCartItemForGuest(RequestAddCartItemsDTO request) {
 		// 상품 존재 검증
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
@@ -208,10 +244,16 @@ public class CartServiceImpl implements CartService {
 			cart = new CartDTO();
 		}
 
-		boolean alreadyExists = cart.getCartItems().stream()
-			.anyMatch(item -> item.getProductId() == (findProduct.getProductId()));
-		if (alreadyExists) {
-			throw new CartItemAlreadyExistsException();
+		Optional<CartItemDTO> existingItemOpt = cart.getCartItems().stream()
+			.filter(item -> item.getProductId() == findProduct.getProductId())
+			.findFirst();
+		// 존재하면 수량 누적
+		if (existingItemOpt.isPresent()) {
+			CartItemDTO existingItem = existingItemOpt.get();
+			existingItem.setCartItemsQuantity(existingItem.getCartItemsQuantity() + request.getQuantity());
+
+			redisTemplate.opsForValue().set(request.getSessionId(), cart);
+			return cart.getCartItems().size();
 		}
 
 		// 장바구니 항목 생성 및 Cart에 추가
@@ -243,13 +285,15 @@ public class CartServiceImpl implements CartService {
 
 		// 변경된 Cart 객체를 Redis에 저장
 		redisTemplate.opsForValue().set(request.getSessionId(), cart);
+
+		return cart.getCartItems().size();
 	}
 
 	/**
 	 * 게스트일 때 장바구니 항목 수량 변경 메소드
 	 */
 	@Override
-	public void updateCartItemForGuest(RequestUpdateCartItemsDTO request) {
+	public int updateCartItemForGuest(RequestUpdateCartItemsDTO request) {
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
@@ -271,6 +315,8 @@ public class CartServiceImpl implements CartService {
 
 		// 변경된 Cart 객체를 Redis에 저장
 		redisTemplate.opsForValue().set(request.getSessionId(), cart);
+
+		return cart.getCartItems().size();
 	}
 
 	/**
@@ -334,6 +380,20 @@ public class CartServiceImpl implements CartService {
 				);
 			})
 			.toList();
+	}
+
+	/**
+	 * 게스트일 때 장바구니 항목 개수 조회
+	 */
+	@Override
+	public Integer getCartItemsCountsForGuest(String sessionId) {
+		Object o = redisTemplate.opsForValue().get(sessionId);
+		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
+		if (Objects.isNull(cart) || cart.getCartItems().isEmpty()) {
+			return 0;
+		}
+
+		return cart.getCartItems().size();
 	}
 
 }
