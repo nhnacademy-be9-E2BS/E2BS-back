@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -49,7 +50,9 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -95,7 +98,8 @@ public class OrderServiceImpl implements OrderService {
 		ResponseEntity<ResponseOrderResultDTO> response = saveOrder(requestOrderWrapperDTO);
 		//포인트 차감, 적립 요청, 쿠폰 사용 요청, 결제 여부 최신화
 
-		Order order = orderJpaRepository.findById(response.getBody().getOrderId()).orElseThrow();
+		Order order = orderJpaRepository.findById(Objects.requireNonNull(response.getBody()).getOrderId())
+			.orElseThrow();
 		order.updatePaymentStatus(true);
 		return response;
 	}
@@ -228,6 +232,7 @@ public class OrderServiceImpl implements OrderService {
 		order.updateOrderState(orderState);
 
 		long usedPoint = order.getOrderPointAmount();
+		log.info("usedPoint:{}", usedPoint);
 		// 사용한 포인트 수치만큼 복구 요청
 		MemberCoupon memberCoupon = order.getMemberCoupon();
 		if (memberCoupon != null) {
