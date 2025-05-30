@@ -3,7 +3,7 @@ CREATE TABLE address
     address_id         BIGINT AUTO_INCREMENT NOT NULL,
     address_code       VARCHAR(5)            NOT NULL,
     address_info       VARCHAR(255)          NULL,
-    address_Detail     VARCHAR(255)          NOT NULL,
+    address_detail     VARCHAR(255)          NOT NULL,
     address_extra      VARCHAR(255)          NOT NULL,
     address_alias      VARCHAR(20)           NULL,
     address_default    BIT(1)                NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE `like`
 CREATE TABLE member
 (
     customer_id         BIGINT      NOT NULL,
-    member_id           VARCHAR(20) NOT NULL,
+    member_id           VARCHAR(50) NOT NULL,
     member_birth        date        NOT NULL,
     member_phone        VARCHAR(11) NOT NULL,
     member_created_at   date        NOT NULL,

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.service.MemberService;
+import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.batch.service.RabbitService;
 import com.nhnacademy.back.batch.welcome.WelcomeCouponRabbitConfig;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
@@ -29,7 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class MemberRegisterController {
 
 	private final MemberService memberService;
+	private final PointHistoryService pointHistoryService;
 	private final RabbitService rabbitService;
+
 
 	/**
 	 * 회원가입 시 입력한 아이디와 같은 값이 존재하는지 확인하고 없으면 데이터베이스에 저장
@@ -42,8 +45,10 @@ public class MemberRegisterController {
 			throw new ValidationFailedException(bindingResult);
 		}
 
+		// 회원가입 (member 테이블에 저장)
 		ResponseRegisterMemberDTO responseRegisterMemberDTO = memberService.registerMember(requestRegisterMemberDTO);
 
+		// 웰컴 쿠폰 MQ 발급
 		rabbitService.sendToRabbitMQ(
 			WelcomeCouponRabbitConfig.WELCOME_EXCHANGE,
 			WelcomeCouponRabbitConfig.WELCOME_ROUTING_KEY,

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.address.domain.dto.request.RequestMemberAddressSaveDTO;
 import com.nhnacademy.back.account.address.service.AddressService;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AddressSaveController {
 	/**
 	 * 회원의 신규 배송지를 저장하는 메서드
 	 */
+	@Member
 	@PostMapping
 	public ResponseEntity<Void> saveMemberAddress(@PathVariable("memberId") String memberId,
 		@Validated @RequestBody RequestMemberAddressSaveDTO requestMemberAddressSaveDTO,
