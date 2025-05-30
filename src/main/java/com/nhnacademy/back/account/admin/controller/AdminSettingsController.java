@@ -23,6 +23,7 @@ import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettin
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.account.member.service.MemberService;
+import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class AdminSettingsController {
 	/**
 	 * 관리자 페이지에 값들 조회하는 컨트롤러
 	 */
+	@Admin
 	@GetMapping
 	public ResponseEntity<ResponseAdminSettingsDTO> getAdminSettings() {
 		ResponseAdminSettingsDTO response = adminSettingsService.getAdminSettings();
@@ -49,6 +51,7 @@ public class AdminSettingsController {
 	/**
 	 * 관리자 회원 관리 페이지에서 회원 조회하는 컨트롤러
 	 */
+	@Admin
 	@GetMapping("/members")
 	public ResponseEntity<Page<ResponseAdminSettingsMembersDTO>> getAdminSettingsMembers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -60,6 +63,7 @@ public class AdminSettingsController {
 	/**
 	 * 관리자 회원 관리 페이지에서 회원 상태 바꾸는 컨트롤러
 	 */
+	@Admin
 	@PostMapping("/members/{memberId}")
 	public ResponseEntity<Void> updateAdminSettingsMemberState(@PathVariable("memberId") String memberId,
 		@Validated @RequestBody RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO,
@@ -75,6 +79,7 @@ public class AdminSettingsController {
 	/**
 	 * 회원의 권한을 수정하는 메서드
 	 */
+	@Admin
 	@PutMapping("/members/{memberId}")
 	public ResponseEntity<Void> updateAdminSettingsMemberRole(@PathVariable("memberId") String memberId) {
 		memberService.updateMemberRole(memberId);
@@ -85,6 +90,7 @@ public class AdminSettingsController {
 	/**
 	 * 회원 상태를 탈퇴로 바꾸는 메서드
 	 */
+	@Admin
 	@DeleteMapping("/members/{memberId}")
 	public ResponseEntity<Void> deleteAdminSettingsMember(@PathVariable("memberId") String memberId) {
 		memberService.withdrawMember(memberId);
@@ -92,7 +98,8 @@ public class AdminSettingsController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@GetMapping("/non-members")
+	@Admin
+	@GetMapping("/customers")
 	public ResponseEntity<Page<ResponseAdminSettingsNonMembersDTO>> getAdminSettingsNonMembers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseAdminSettingsNonMembersDTO> response = customerService.getAdminSettingsNonMembers(pageable);

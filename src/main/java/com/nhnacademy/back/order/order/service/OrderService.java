@@ -17,11 +17,13 @@ public interface OrderService {
 
 	ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount);
 
-	ResponseEntity<Void> cancelOrder(String orderId);
+	ResponseEntity<Void> deleteOrder(String orderId);
 
 	ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode);
 
 	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
+
+	ResponseEntity<Void> cancelOrder(String orderCode);
 
 	long getAllOrders();
 
