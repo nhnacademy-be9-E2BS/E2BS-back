@@ -37,7 +37,7 @@ public class DeliveryFeeController {
 	 */
 	@Admin
 	@PostMapping("/api/admin/deliveryFee")
-	public ResponseEntity<Void> CreateDeliveryFee(@Validated @RequestBody RequestDeliveryFeeDTO deliveryFeeDTO,
+	public ResponseEntity<Void> createDeliveryFee(@Validated @RequestBody RequestDeliveryFeeDTO deliveryFeeDTO,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
