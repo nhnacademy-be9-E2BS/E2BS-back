@@ -19,6 +19,7 @@ import com.nhnacademy.back.account.oauth.exception.RegisterOAuthFailedException;
 import com.nhnacademy.back.account.oauth.model.dto.request.RequestOAuthRegisterDTO;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
+import com.nhnacademy.back.common.parser.DateParser;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,10 +48,18 @@ public class OAuthService {
 	 */
 	@Transactional
 	public void registerOAuth(RequestOAuthRegisterDTO requestOAuthRegisterDTO) {
+		String email =
+			requestOAuthRegisterDTO.getEmail() != null ? requestOAuthRegisterDTO.getEmail() : "payco@payco.com";
+		String mobile =
+			requestOAuthRegisterDTO.getMobile() != null ? requestOAuthRegisterDTO.getMobile() : "010-0000-0000";
+		String name = requestOAuthRegisterDTO.getName() != null ? requestOAuthRegisterDTO.getName() : "payco";
+		LocalDate birthdayMMdd = requestOAuthRegisterDTO.getBirthdayMMdd() !=
+			null ? DateParser.LocalDateParser(requestOAuthRegisterDTO.getBirthdayMMdd()) : LocalDate.now();
+
 		Customer customer = Customer.builder()
-			.customerEmail(requestOAuthRegisterDTO.getEmail())
+			.customerEmail(email)
 			.customerPassword("PAYCO_DUMMY_PASSWORD")
-			.customerName(requestOAuthRegisterDTO.getName())
+			.customerName(name)
 			.build();
 
 		MemberRank memberRank = memberRankJpaRepository.getMemberRankByMemberRankId(1);
@@ -61,8 +70,8 @@ public class OAuthService {
 		Member member = Member.builder()
 			.customer(customer)
 			.memberId(requestOAuthRegisterDTO.getMemberId())
-			.memberBirth(LocalDate.parse(requestOAuthRegisterDTO.getBirthdayMMdd()))
-			.memberPhone(requestOAuthRegisterDTO.getMobile())
+			.memberBirth(birthdayMMdd)
+			.memberPhone(mobile)
 			.memberCreatedAt(LocalDate.now())
 			.memberLoginLatest(null)
 			.memberRank(memberRank)

@@ -45,7 +45,7 @@ class OrderAdminControllerTest {
 		when(orderAdminService.getOrders(any(Pageable.class))).thenReturn(page);
 
 		// when & then
-		mockMvc.perform(get("/api/admin/orders")
+		mockMvc.perform(get("/api/auth/admin/orders")
 				.param("page", "0")
 				.param("size", "10"))
 			.andExpect(status().isOk());
@@ -62,7 +62,7 @@ class OrderAdminControllerTest {
 		when(orderAdminService.getOrders(any(Pageable.class), eq(1L))).thenReturn(page);
 
 		// when & then
-		mockMvc.perform(get("/api/admin/orders")
+		mockMvc.perform(get("/api/auth/admin/orders")
 				.param("page", "0")
 				.param("size", "10")
 				.param("stateId", "1"))
@@ -79,7 +79,7 @@ class OrderAdminControllerTest {
 		when(orderAdminService.startDelivery(orderCode)).thenReturn(ResponseEntity.ok().build());
 
 		// when & then
-		mockMvc.perform(post("/api/admin/orders/{orderCode}", orderCode))
+		mockMvc.perform(post("/api/auth/admin/orders/{orderCode}", orderCode))
 			.andExpect(status().isOk());
 
 		verify(orderAdminService).startDelivery(orderCode);

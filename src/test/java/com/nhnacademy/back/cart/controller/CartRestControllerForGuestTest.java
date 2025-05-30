@@ -54,14 +54,14 @@ class CartRestControllerForGuestTest {
 	@DisplayName("PUT /api/guests/carts/items - 게스트 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForGuest() throws Exception {
 		// given
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("session123", 1L,3);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", "session123", 1L,3);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
 		mockMvc.perform(put("/api/guests/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
-			.andExpect(status().isNoContent());
+			.andExpect(status().isOk());
 
 		verify(cartService).updateCartItemForGuest(any(RequestUpdateCartItemsDTO.class));
 	}

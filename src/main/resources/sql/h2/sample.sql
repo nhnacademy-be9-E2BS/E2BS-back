@@ -336,9 +336,10 @@ VALUES (1, 'TOSS');
 INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, order_receiver_tel, order_address_code,
                      order_address_info, order_address_detail, order_address_extra, order_point_amount,
                      order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
-                     order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id)
+                     order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
+                     order_reward_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5);
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
@@ -374,3 +375,12 @@ VALUES (1, 1),
 -- 상품 쿠폰
 INSERT INTO product_coupon (coupon_id, product_id)
 VALUES (2, 1);
+
+INSERT INTO point_policy (point_policy_id, point_policy_type, point_policy_name, point_policy_figure, point_policy_created_at, point_policy_is_active)
+VALUES (1, 'REGISTER', '2025년 회원가입 정책', 5000, now(), true),
+       (2, 'REVIEW', '일반 리뷰 정책', 500, now(), true),
+       (3, 'REVIEW_IMG', '이미지 리뷰 정책', 800, now(), true),
+       (4, 'BOOK', '기본 적립률(%) 정책', 5, now(), true),
+       (5, 'REGISTER', '2021년 회원가입 정책', 7000, now(), false),
+       (6, 'REGISTER', '2020년 회원가입 정책', 3000, now(), false),
+       (7, 'BOOK', '2024년 기본 적립률(%) 정책', 5, now(), false);

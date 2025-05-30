@@ -33,6 +33,8 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
         mc.memberCouponCreatedAt,
         mc.memberCouponPeriod,
         NULL,
+        NULL,
+        NULL,
         NULL
     )
     FROM MemberCoupon mc
@@ -60,6 +62,8 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
         mc.memberCouponCreatedAt,
         mc.memberCouponPeriod,
         NULL,
+        NULL,
+        p.productId,
         p.productTitle
     )
     FROM MemberCoupon mc
@@ -86,7 +90,9 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
         cp.couponPolicyName,
         mc.memberCouponCreatedAt,
         mc.memberCouponPeriod,
+        ca.categoryId,
         ca.categoryName,
+        NULL,
         NULL
     )
     FROM MemberCoupon mc

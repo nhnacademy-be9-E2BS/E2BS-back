@@ -36,7 +36,7 @@ public class Member {
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 50)
 	private String memberId;
 
 	@Column(nullable = false)

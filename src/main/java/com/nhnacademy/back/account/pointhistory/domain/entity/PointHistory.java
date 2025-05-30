@@ -37,4 +37,10 @@ public class PointHistory {
 	@JoinColumn(name = "customer_id")
 	private Member member;
 
+	public PointHistory(long pointAmount, String pointReason, LocalDateTime pointCreatedAt, Member member) {
+		this.pointAmount = pointAmount;
+		this.pointReason = pointReason;
+		this.pointCreatedAt = pointCreatedAt;
+		this.member = member;
+	}
 }
