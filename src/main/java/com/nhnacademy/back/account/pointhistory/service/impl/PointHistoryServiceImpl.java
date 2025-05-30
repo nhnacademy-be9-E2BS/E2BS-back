@@ -33,7 +33,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	private final MemberJpaRepository memberJpaRepository;
 	private final PointPolicyJpaRepository pointPolicyJpaRepository;
 
-	private final String MEMBER_NOT_FOUND_EXCEPTION = "아이디에 해당하는 회원을 찾지 못했습니다.";
+	private static final String MEMBER_NOT_FOUND_EXCEPTION = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
 	public ResponseMemberPointDTO getMemberPoints(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
@@ -44,8 +44,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 		List<PointHistory> pointHistories = pointHistoryJpaRepository.getPointHistoriesByMember(member);
 
 		long pointAmount = 0;
-		for (int i = 0; i < pointHistories.size(); i++) {
-			pointAmount += pointHistories.get(i).getPointAmount();
+		for (PointHistory pointHistory : pointHistories) {
+			pointAmount += pointHistory.getPointAmount();
 		}
 
 		return new ResponseMemberPointDTO(memberId, pointAmount);
