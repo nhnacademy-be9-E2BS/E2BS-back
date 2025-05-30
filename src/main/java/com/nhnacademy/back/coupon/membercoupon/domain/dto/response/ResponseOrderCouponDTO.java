@@ -2,6 +2,7 @@ package com.nhnacademy.back.coupon.membercoupon.domain.dto.response;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ResponseOrderCouponDTO {
 	private Long memberCouponId;
 	private String couponName;
@@ -22,24 +24,9 @@ public class ResponseOrderCouponDTO {
 	private String couponPolicyName;
 	private LocalDateTime memberCouponCreatedAt;
 	private LocalDateTime memberCouponPeriod;
-	private String CategoryName;
+	private Long categoryId;
+	private String categoryName;
+	private Long productId;
 	private String productTitle;
 
-	public ResponseOrderCouponDTO(Long memberCouponId, String couponName, Long couponPolicyMinimum,
-		Long couponPolicyMaximumAmount, Long couponPolicySalePrice, Integer couponPolicyDiscountRate,
-		String couponPolicyName, LocalDateTime memberCouponCreatedAt, LocalDateTime memberCouponPeriod,
-		String categoryName,
-		String productTitle) {
-		this.memberCouponId = memberCouponId;
-		this.couponName = couponName;
-		this.couponPolicyMinimum = couponPolicyMinimum;
-		this.couponPolicyMaximumAmount = couponPolicyMaximumAmount;
-		this.couponPolicySalePrice = couponPolicySalePrice;
-		this.couponPolicyDiscountRate = couponPolicyDiscountRate;
-		this.couponPolicyName = couponPolicyName;
-		this.memberCouponCreatedAt = memberCouponCreatedAt;
-		this.memberCouponPeriod = memberCouponPeriod;
-		CategoryName = categoryName;
-		this.productTitle = productTitle;
-	}
 }
