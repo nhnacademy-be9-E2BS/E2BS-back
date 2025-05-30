@@ -100,7 +100,7 @@ CREATE TABLE `like`
 CREATE TABLE member
 (
     customer_id         BIGINT      NOT NULL,
-    member_id           VARCHAR(20) NOT NULL,
+    member_id           VARCHAR(50) NOT NULL,
     member_birth        date        NOT NULL,
     member_phone        VARCHAR(11) NOT NULL,
     member_created_at   date        NOT NULL,
