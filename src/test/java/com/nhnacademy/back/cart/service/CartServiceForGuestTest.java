@@ -99,7 +99,7 @@ class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForGuest() {
 		// given
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(sessionId, 1L, 5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", sessionId, 1L, 5);
 
 		CartItemDTO cartItem = new CartItemDTO(1L, List.of(), "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(cartItem));
