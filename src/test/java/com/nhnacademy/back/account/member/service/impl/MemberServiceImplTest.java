@@ -44,6 +44,9 @@ class MemberServiceImplTest {
 	@Mock
 	private ApplicationEventPublisher eventPublisher;
 
+	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
+
 	@InjectMocks
 	private MemberServiceImpl memberService;
 
