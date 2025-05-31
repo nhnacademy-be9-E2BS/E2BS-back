@@ -45,6 +45,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+	private final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
+	private final String UPDATE_MEMBER_ROLE_FAILED = "회원 권한을 변경하지 못했습니다.";
 
 	private final MemberJpaRepository memberJpaRepository;
 	private final MemberRankJpaRepository memberRankJpaRepository;
@@ -82,7 +84,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = getMemberByMemberId(requestLoginMemberDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		if (member.getMemberState().getMemberStateName() == MemberStateName.WITHDRAW) {
@@ -151,7 +153,7 @@ public class MemberServiceImpl implements MemberService {
 	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		return new ResponseMemberInfoDTO(
@@ -170,7 +172,7 @@ public class MemberServiceImpl implements MemberService {
 	public void updateMemberInfo(RequestMemberInfoDTO requestMemberInfoDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberInfoDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		int memberResult = memberJpaRepository.updateMemberInfo(
@@ -201,7 +203,7 @@ public class MemberServiceImpl implements MemberService {
 	public void withdrawMember(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		MemberState withdrawMemberState = memberStateJpaRepository.getMemberStateByMemberStateId(3);
@@ -236,7 +238,7 @@ public class MemberServiceImpl implements MemberService {
 		RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		MemberStateName memberStateName = MemberStateName.valueOf(
@@ -246,7 +248,7 @@ public class MemberServiceImpl implements MemberService {
 
 		int result = memberJpaRepository.updateMemberMemberState(memberState, memberId);
 		if (result <= 0) {
-			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+			throw new UpdateMemberStateFailedException(UPDATE_MEMBER_ROLE_FAILED);
 		}
 	}
 
@@ -258,7 +260,7 @@ public class MemberServiceImpl implements MemberService {
 	public void updateMemberRole(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		int result = 0;
@@ -271,7 +273,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		if (result <= 0) {
-			throw new UpdateMemberRoleFailedException("회원 권한을 변경하지 못했습니다.");
+			throw new UpdateMemberRoleFailedException(UPDATE_MEMBER_ROLE_FAILED);
 		}
 	}
 

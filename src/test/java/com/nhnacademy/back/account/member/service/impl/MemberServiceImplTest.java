@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
@@ -40,6 +41,11 @@ class MemberServiceImplTest {
 	private MemberRoleJpaRepository memberRoleJpaRepository;
 	@Mock
 	private SocialAuthJpaRepository socialAuthJpaRepository;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+
+	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@InjectMocks
 	private MemberServiceImpl memberService;

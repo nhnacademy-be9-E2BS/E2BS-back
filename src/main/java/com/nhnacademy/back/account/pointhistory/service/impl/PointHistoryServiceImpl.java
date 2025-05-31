@@ -33,17 +33,19 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	private final MemberJpaRepository memberJpaRepository;
 	private final PointPolicyJpaRepository pointPolicyJpaRepository;
 
+	private static final String MEMBER_NOT_FOUND_EXCEPTION = "아이디에 해당하는 회원을 찾지 못했습니다.";
+
 	public ResponseMemberPointDTO getMemberPoints(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		List<PointHistory> pointHistories = pointHistoryJpaRepository.getPointHistoriesByMember(member);
 
 		long pointAmount = 0;
-		for (int i = 0; i < pointHistories.size(); i++) {
-			pointAmount += pointHistories.get(i).getPointAmount();
+		for (PointHistory pointHistory : pointHistories) {
+			pointAmount += pointHistory.getPointAmount();
 		}
 
 		return new ResponseMemberPointDTO(memberId, pointAmount);
@@ -53,7 +55,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public Page<ResponsePointHistoryDTO> getPointHistoryByMemberId(String memberId, Pageable pageable) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		return pointHistoryJpaRepository.getPointHistoriesByMember(member, pageable)
@@ -69,7 +71,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public void earnRegisterPoint(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		PointPolicy pointPolicy = pointPolicyJpaRepository
@@ -93,7 +95,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public void earnImgReviewPoint(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		PointPolicy pointPolicy = pointPolicyJpaRepository
@@ -117,7 +119,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public void earnReviewPoint(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		PointPolicy pointPolicy = pointPolicyJpaRepository
@@ -141,7 +143,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public void earnOrderPoint(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
 		PointPolicy pointPolicy = pointPolicyJpaRepository
