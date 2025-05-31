@@ -6,6 +6,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.event.event.OrderPointEvent;
+import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.event.event.RegisterPointEvent;
 import com.nhnacademy.back.event.event.ReviewImgPointEvent;
 import com.nhnacademy.back.event.event.ReviewPointEvent;
@@ -27,6 +28,7 @@ public class PointEventListener {
 	 */
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleRegisterPointEvent(RegisterPointEvent event) {
+		log.info("[이벤트 수신] RegisterPointEvent memberId={}", event.getMemberId());
 		try {
 			String memberId = event.getMemberId();
 			pointHistoryService.earnRegisterPoint(memberId);
@@ -69,9 +71,24 @@ public class PointEventListener {
 	public void handleOrderPointEvent(OrderPointEvent event) {
 		try {
 			String memberId = event.getMemberId();
-			pointHistoryService.earnOrderPoint(memberId);
+			Long pointFigure = event.getPointFigure();
+			pointHistoryService.earnOrderPoint(memberId, pointFigure);
 		} catch (Exception e) {
 			log.error("도서 주문 포인트 적립 실패", e);
+		}
+	}
+
+	/**
+	 * 주문시 포인트 사용
+	 */
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderPointPaymentEvent(OrderPointPaymentEvent event) {
+		try {
+			String memberId = event.getMemberId();
+			Long pointFigure = event.getPointFigure();
+			pointHistoryService.payPoint(memberId, pointFigure);
+		} catch (Exception e) {
+			log.error("주문 시 포인트 사용 실패", e);
 		}
 	}
 }
