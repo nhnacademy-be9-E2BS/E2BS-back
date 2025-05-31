@@ -54,7 +54,7 @@ public class OAuthService {
 			requestOAuthRegisterDTO.getMobile() != null ? requestOAuthRegisterDTO.getMobile() : "010-0000-0000";
 		String name = requestOAuthRegisterDTO.getName() != null ? requestOAuthRegisterDTO.getName() : "payco";
 		LocalDate birthdayMMdd = requestOAuthRegisterDTO.getBirthdayMMdd() !=
-			null ? DateParser.LocalDateParser(requestOAuthRegisterDTO.getBirthdayMMdd()) : LocalDate.now();
+			null ? DateParser.parseLocalDate(requestOAuthRegisterDTO.getBirthdayMMdd()) : LocalDate.now();
 
 		Customer customer = Customer.builder()
 			.customerEmail(email)
