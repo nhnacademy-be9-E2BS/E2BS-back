@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,24 +15,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductMetaDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.UnifiedProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,8 +52,9 @@ public class ProductAdminController {
 	 * 201 상태코드 반환
 	 */
 	@Admin
-	@PostMapping
-	public ResponseEntity<Void> createProduct(@RequestBody RequestProductDTO request) {
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Void> createProduct(@RequestPart("requestMeta") RequestProductMetaDTO requestMeta,  @RequestPart("productImage") List<MultipartFile> productImage) {
+		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(), requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(), requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(), requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(), productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
 		long productId = productService.createProduct(request);
 		productCategoryService.createProductCategory(productId, request.getCategoryIds(), false);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -83,7 +88,9 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@PutMapping("/{bookId}")
-	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestBody RequestProductDTO request) {
+	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestPart("product") RequestProductMetaDTO requestMeta, @RequestPart("productImage") List<MultipartFile> productImage) {
+		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(), requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(), requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(), requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(), productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
+
 		productService.updateProduct(bookId, request);
 		productCategoryService.createProductCategory(bookId, request.getCategoryIds(), true);
 		return ResponseEntity.status(HttpStatus.OK).build();

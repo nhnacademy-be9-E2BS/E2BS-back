@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,10 +54,13 @@ class ProductAdminControllerTest {
 	@DisplayName("도서 저장")
 	void create_product_test() throws Exception {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		when(productService.createProduct(request)).thenReturn(1L);
@@ -147,10 +151,13 @@ class ProductAdminControllerTest {
 	@DisplayName("도서 수정")
 	void update_product_test() throws Exception {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 200,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then

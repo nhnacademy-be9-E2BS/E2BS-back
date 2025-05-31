@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
@@ -80,10 +81,13 @@ class ProductServiceTest {
 	@DisplayName("create product - success")
 	void create_product_success_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
 		Tag tag = new Tag("tag A");
@@ -109,10 +113,13 @@ class ProductServiceTest {
 	@DisplayName("create product - fail1")
 	void create_product_fail1_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(true);
 
 		// when & then
@@ -124,10 +131,13 @@ class ProductServiceTest {
 	@DisplayName("create product - fail2")
 	void create_product_fail2_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -140,10 +150,13 @@ class ProductServiceTest {
 	@DisplayName("create product - fail3")
 	void create_product_fail3_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(productState));
@@ -158,10 +171,13 @@ class ProductServiceTest {
 	@DisplayName("create product - fail4")
 	void create_product_fail4_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
@@ -178,10 +194,13 @@ class ProductServiceTest {
 	@DisplayName("create product - fail5")
 	void create_product_fail5_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("Publisher");
 		Tag tag = new Tag("tag A");
@@ -349,11 +368,14 @@ class ProductServiceTest {
 	@DisplayName("update product - success")
 	void update_product_success_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
 		Tag tag = new Tag("tag A");
@@ -386,11 +408,14 @@ class ProductServiceTest {
 	@DisplayName("update product - fail1")
 	void update_product_fail1_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		when(productJpaRepository.findById(productId)).thenReturn(Optional.empty());
 
 		// when & then
@@ -402,11 +427,14 @@ class ProductServiceTest {
 	@DisplayName("update product - fail2")
 	void update_product_fail2_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
 		Product product = new Product(
@@ -425,11 +453,14 @@ class ProductServiceTest {
 	@DisplayName("update product - fail3")
 	void update_product_fail3_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
 		Product product = new Product(
@@ -449,11 +480,14 @@ class ProductServiceTest {
 	@DisplayName("update product - fail4")
 	void update_product_fail4_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
 		Product product = new Product(
@@ -474,11 +508,14 @@ class ProductServiceTest {
 	@DisplayName("update product - fail5")
 	void update_product_fail5_test() {
 		// given
+		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+
 		long productId = 1L;
 		RequestProductDTO request = new RequestProductDTO(
 			1L, 1L, "title", "content", "description", LocalDate.now(),
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
+			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
 		ProductState productState = new ProductState(ProductStateName.SALE);
 		Publisher publisher = new Publisher("publisher");
 		Tag tag = new Tag("tag A");
