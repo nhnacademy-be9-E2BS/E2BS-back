@@ -25,16 +25,16 @@
       "type": "long"
     },
     "productReviewRate": {
-      "type": "float"
+      "type": "double"
     },
     "productReviewCount": {
       "type": "long"
     },
     "productContributors": {
-      "type": "keyword"
+      "type": "text"
     },
     "productTags": {
-      "type": "keyword"
+      "type": "text"
     },
     "productCategoryIds": {
       "type": "long"

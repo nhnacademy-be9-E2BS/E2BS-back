@@ -1,12 +1,13 @@
 package com.nhnacademy.back.elasticsearch.repository;
 
-import org.springframework.data.domain.Page;
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.back.elasticsearch.domain.document.ProductDocument;
+import com.nhnacademy.back.elasticsearch.domain.document.ProductSortType;
 
 public interface CustomProductSearchRepository {
-	Page<ProductDocument> searchAndSortProduct(Pageable pageable, String search, String sort);
+	List<Long> searchAndSortProductIds(Pageable pageable, String keyword, ProductSortType sortType);
 
-	Page<ProductDocument> categoryAndSortProduct(Pageable pageable, Long categoryId, String sort);
+	List<Long> categoryAndSortProductIds(Pageable pageable, Long categoryId, ProductSortType sortType);
 }

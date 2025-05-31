@@ -30,11 +30,11 @@ public class ProductDocument {
 	@Field(type = FieldType.Long)
 	private Long productId;
 
-	// 도서명
+	// 도서명 (가중치)
 	@Field(type = FieldType.Text)
 	private String productTitle;
 
-	// 도서 설명
+	// 도서 설명 (가중치)
 	@Field(type = FieldType.Text)
 	private String productContent;
 
@@ -55,19 +55,19 @@ public class ProductDocument {
 	private Long productSearches;
 
 	// 평균 평점
-	@Field(type = FieldType.Float)
-	private Float productReviewRate;
+	@Field(type = FieldType.Double)
+	private Double productReviewRate;
 
 	// 리뷰 수
 	@Field(type = FieldType.Long)
 	private Long productReviewCount;
 
-	// 도서 저자 리스트
-	@Field(type = FieldType.Keyword)
+	// 도서 저자 리스트 (가중치)
+	@Field(type = FieldType.Text)
 	private List<String> productContributors;
 
-	// 도서 태그 리스트
-	@Field(type = FieldType.Keyword)
+	// 도서 태그 리스트 (가중치)
+	@Field(type = FieldType.Text)
 	private List<String> productTags;
 
 	// 도서 카테고리 ID 리스트
@@ -80,7 +80,7 @@ public class ProductDocument {
 		this.productContent = request.getProductContent();
 		this.productPublishedAt = request.getProductPublishedAt();
 		this.productSalePrice = request.getProductSalePrice();
-		this.productReviewRate = 0f;
+		this.productReviewRate = 0d;
 		this.productReviewCount = 0L;
 		this.productContributors = request.getProductContributors();
 		this.productTags = request.getProductTags();
@@ -97,7 +97,7 @@ public class ProductDocument {
 		this.productSalePrice = product.getProductSalePrice();
 		this.productHits = product.getProductHits();
 		this.productSearches = product.getProductSearches();
-		this.productReviewRate = 0f;
+		this.productReviewRate = 0d;
 		this.productReviewCount = 0L;
 		this.productTags = tags;
 		this.productContributors = contributors;
@@ -114,7 +114,7 @@ public class ProductDocument {
 		this.productCategoryIds = request.getProductCategoryIds();
 	}
 
-	public void updateReview(Float reviewRate) {
+	public void updateReview(Double reviewRate) {
 		this.productReviewRate = reviewRate;
 		this.productReviewCount++;
 	}
