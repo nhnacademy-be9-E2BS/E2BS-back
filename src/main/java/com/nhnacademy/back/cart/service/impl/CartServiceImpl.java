@@ -18,7 +18,6 @@ import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
-import com.nhnacademy.back.cart.domain.dto.MergeCartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
@@ -383,32 +382,57 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 게스트일 때 장바구니 항목 개수 조회 메소드
+	 * 게스트 장바구니 -> 회원 장바구니와 병합 메소드
 	 */
+	@Transactional
 	@Override
-	public Integer getCartItemsCountsForGuest(String sessionId) {
+	public Integer mergeCartItemsToMemberFromGuest(String memberId, String sessionId) {
+		// 회원 검증
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
+			.orElseThrow(CustomerNotFoundException::new);
+
+		// 장바구니 검증
+		Cart cart;
+		// 장바구니가 없으면 장바구니 생성
+		if (!cartRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
+			cart = cartRepository.save(new Cart(findCustomer));
+		} else {
+			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId())
+				.orElseThrow(CartNotFoundException::new);
+		}
+
+		// 게스트 장바구니 확인 
 		Object o = redisTemplate.opsForValue().get(sessionId);
-		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
-		if (Objects.isNull(cart) || cart.getCartItems().isEmpty()) {
-			return 0;
+		CartDTO redisCart = objectMapper.convertValue(o, CartDTO.class);
+		if (Objects.isNull(redisCart)) {
+			return cart.getCartItems().size();
+		}
+
+		// 병합
+		List<CartItemDTO> redisCartItems = redisCart.getCartItems();
+		for (CartItemDTO cartItem : redisCartItems) {
+			long productId = cartItem.getProductId();
+
+			Product findProduct = productRepository.findById(productId)
+				.orElseThrow(ProductNotFoundException::new);
+
+			// 현재 고객이 장바구니 아이템을 가지고 있을 경우 수량만 올려주기
+			if (cartItemsRepository.existsByCartAndProduct(cart, findProduct)) {
+				CartItems findCartItem = cartItemsRepository.findByCartAndProduct(cart, findProduct)
+					.orElseThrow(CartItemNotFoundException::new);
+
+				findCartItem.changeCartItemsQuantity(findCartItem.getCartItemsQuantity() + cartItem.getCartItemsQuantity());
+			} else {
+				// 현재 고객이 장바구니 아이템을 가지고 있지 않을 경우 새로 저장
+				cartItemsRepository.save(new CartItems(cart, findProduct, cartItem.getCartItemsQuantity()));
+			}
 		}
 
 		return cart.getCartItems().size();
-	}
-
-	/**
-	 * 게스트 장바구니 -> 회원 장바구니와 병합 메소드
-	 */
-	@Override
-	public Integer mergeCartItemsToMemberFromGuest(List<MergeCartItemDTO> request) {
-		for (MergeCartItemDTO cartItem : request) {
-			Product findProduct = productRepository.findById(cartItem.getProductId())
-				.orElseThrow(ProductNotFoundException::new);
-
-
-		}
-
-		return 0;
 	}
 
 }

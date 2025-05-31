@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.thymeleaf.util.StringUtils;
 
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
@@ -37,15 +36,14 @@ public class CartRestController {
 	 * 공통 처리
 	 */
 	@GetMapping("/api/carts/counts")
-	public ResponseEntity<Integer> getCartItemsCounts(@RequestParam String memberId, @RequestParam String sessionId) {
-		Integer result;
+	public ResponseEntity<Integer> getCartItemsCounts(@RequestParam String memberId) {
+		Integer result = cartService.getCartItemsCountsForMember(memberId);
+		return ResponseEntity.ok(result);
+	}
 
-		if (StringUtils.isEmpty(memberId)) {
-			result = cartService.getCartItemsCountsForGuest(sessionId);
-		} else {
-			result = cartService.getCartItemsCountsForMember(memberId);
-		}
-
+	@GetMapping("/api/carts/merge")
+	public ResponseEntity<Integer> mergeCartItemsToMemberFromGuest(@RequestParam String memberId, @RequestParam String sessionId) {
+		Integer result = cartService.mergeCartItemsToMemberFromGuest(memberId, sessionId);
 		return ResponseEntity.ok(result);
 	}
 
@@ -54,8 +52,11 @@ public class CartRestController {
 	 */
 	@PostMapping("/api/auth/members/carts/items")
 	public ResponseEntity<Integer> createCartItemForMember(@Validated @RequestBody RequestAddCartItemsDTO requestDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors() || (Objects.isNull(requestDto.getMemberId()) && Objects.isNull(requestDto.getSessionId()))) {
+		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
+		}
+		if (Objects.isNull(requestDto.getMemberId()) && Objects.isNull(requestDto.getSessionId())) {
+			throw new IllegalArgumentException("회원아이디와 세션아이디 둘 다 null 일 수 는 없습니다.");
 		}
 
 		int cartQuantity = cartService.createCartItemForMember(requestDto);
@@ -66,6 +67,9 @@ public class CartRestController {
 	public ResponseEntity<Integer> updateCartItemForMember(@PathVariable long cartItemId, @Validated @RequestBody RequestUpdateCartItemsDTO requestDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
+		}
+		if (Objects.isNull(requestDto.getMemberId()) && Objects.isNull(requestDto.getSessionId())) {
+			throw new IllegalArgumentException("회원아이디와 세션아이디 둘 다 null 일 수 는 없습니다.");
 		}
 
 		int cartQuantity = cartService.updateCartItemForMember(cartItemId, requestDto);
