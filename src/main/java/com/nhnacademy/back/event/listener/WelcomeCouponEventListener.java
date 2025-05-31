@@ -13,7 +13,7 @@ import com.nhnacademy.back.coupon.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.back.coupon.coupon.repository.CouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
-import com.nhnacademy.back.event.event.RegisterPointEvent;
+import com.nhnacademy.back.event.event.WelcomeCouponEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +27,7 @@ public class WelcomeCouponEventListener {
 
 	@Async
 	@EventListener
-	public void handleWelcomeCouponEvent(RegisterPointEvent event) {
+	public void handleWelcomeCouponEvent(WelcomeCouponEvent event) {
 		String memberId = event.getMemberId();
 
 		Member member = memberRepository.getMemberByMemberId(memberId);
