@@ -48,9 +48,6 @@ class CartServiceForMemberTest {
 	private ProductJpaRepository productRepository;
 
 	@Mock
-	private ProductCategoryJpaRepository productCategoryRepository;
-
-	@Mock
 	private CartJpaRepository cartRepository;
 
 	@Mock
@@ -178,7 +175,6 @@ class CartServiceForMemberTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId)).thenReturn(cartItems);
-		when(productCategoryRepository.findByProduct_ProductId(customerId)).thenReturn(List.of());
 
 		// when
 		List<ResponseCartItemsForMemberDTO> result = cartService.getCartItemsByMember(memberId);

@@ -17,8 +17,6 @@ public class ResponseCartItemsForGuestDTO {
 
 	private long productId;
 
-	private List<ProductCategoryDTO> categoryIds;
-
 	private String productTitle;
 
 	private long productSalePrice;

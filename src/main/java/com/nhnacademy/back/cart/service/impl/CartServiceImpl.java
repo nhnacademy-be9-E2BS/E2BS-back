@@ -47,7 +47,6 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
-	private final ProductCategoryJpaRepository productCategoryRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -185,24 +184,12 @@ public class CartServiceImpl implements CartService {
 					productImagePath = product.getProductImage().getFirst().getProductImagePath();
 				}
 
-				// 상품 카테고리 리스트 가져오기
-				List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(product.getProductId());
-				List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
-
-				// 카테고리 리스트가 null이 아니면 DTO로 변환
-				if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
-					findProductCategoriesDto = findProductCategories.stream()
-						.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-						.toList();
-				}
-
 				//  DTO 가공
 				long productTotalPrice = product.getProductSalePrice() * cartItem.getCartItemsQuantity();
 
 				return new ResponseCartItemsForMemberDTO(
 					cartItem.getCartItemsId(),
 					product.getProductId(),
-					findProductCategoriesDto,
 					product.getProductTitle(),
 					product.getProductSalePrice(),
 					productImagePath,
@@ -261,20 +248,8 @@ public class CartServiceImpl implements CartService {
 			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
 
-		// 카테고리 가져오기
-		List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(findProduct.getProductId());
-		List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
-
-		// 카테고리 리스트가 null이 아니면 DTO로 변환
-		if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
-			findProductCategoriesDto = findProductCategories.stream()
-				.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-				.toList();
-		}
-
 		CartItemDTO newItem = new CartItemDTO(
 			findProduct.getProductId(),
-			findProductCategoriesDto,
 			findProduct.getProductTitle(),
 			findProduct.getProductSalePrice(),
 			productImagePath,
@@ -370,7 +345,6 @@ public class CartServiceImpl implements CartService {
 
 				return new ResponseCartItemsForGuestDTO(
 					cartItem.getProductId(),
-					cartItem.getCategoryIds(),
 					cartItem.getProductTitle(),
 					cartItem.getProductSalePrice(),
 					cartItem.getProductImagePath(),
