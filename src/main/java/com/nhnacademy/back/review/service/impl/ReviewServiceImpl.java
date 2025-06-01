@@ -21,6 +21,9 @@ import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.event.event.ReviewImgPointEvent;
 import com.nhnacademy.back.event.event.ReviewPointEvent;
+import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
+import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -44,6 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
+	private final OrderDetailJpaRepository orderDetailRepository;
 	private final ReviewJpaRepository reviewRepository;
 
 	private final MinioUtils minioUtils;
@@ -81,8 +85,11 @@ public class ReviewServiceImpl implements ReviewService {
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
-		/// 현재 회원이 현재 주문한 리뷰를 이미 작성한 경우 처리 필요
-
+		// 현재 회원이 주문한 상품이면서 리뷰를 아직 작성하지 않았는지 검증
+		if (!orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
+			throw new OrderDetailNotFoundException();
+		}
+		
 		// 이미지 있으면 이미지 리뷰 정책, 없으면 일반 리뷰 정책으로 포인트 적립 이벤트 발행
 		if (Objects.nonNull(request.getMemberId())) {
 			if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
@@ -98,8 +105,17 @@ public class ReviewServiceImpl implements ReviewService {
 			imagePath = uploadFile(reviewImageFile);
 		}
 
+		// 리뷰가 아직 영속성 컨텍스트에 저장 전이므로 다른 필드를 통해 먼저 리뷰가 null 인 주문 상세를 찾아야함
+		OrderDetail findOrderDetail = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())
+			.orElseThrow(OrderDetailNotFoundException::new);
+
+		// 리뷰 저장
 		Review reviewEntity = Review.createReviewEntity(findProduct, findCustomer, request, imagePath);
 		reviewRepository.save(reviewEntity);
+
+		// 주문 상세에도 리뷰 필드 갱신
+		findOrderDetail.setReview(reviewEntity);
+		orderDetailRepository.save(findOrderDetail);
 	}
 
 	/**
