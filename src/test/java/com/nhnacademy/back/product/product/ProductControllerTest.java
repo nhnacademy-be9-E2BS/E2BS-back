@@ -114,14 +114,14 @@ class ProductControllerTest {
 			List.of(categoryBDTO), new ArrayList<>());
 		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB, responseC);
 
-		List<Long> productIds = List.of(1L, 2L, 3L);
-		String jsonRequest = objectMapper.writeValueAsString(productIds);
-		when(productService.getProducts(productIds)).thenReturn(dtos);
+		when(productService.getProducts(any())).thenReturn(dtos);
 
 		// when & then
 		mockMvc.perform(get("/api/books/order")
-				.content(jsonRequest)
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("products", "0")
+				.param("products", "1")
+				.param("products", "2"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$").isArray())
 			.andExpect(jsonPath("$[0].productTitle").value("title A"))
