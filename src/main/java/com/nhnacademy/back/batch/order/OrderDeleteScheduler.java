@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.order.order.domain.entity.Order;
-import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
+import com.nhnacademy.back.order.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,20 +19,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OrderDeleteScheduler {
 	private final OrderJpaRepository orderJpaRepository;
-	private final OrderDetailJpaRepository orderDetailJpaRepository;
+	private final OrderService orderService;
 
 	@Scheduled(fixedRate = 600_000) // 10분
 	@Transactional
 	public void deleteUnpaidOrders() {
+		int deletedCount = 0;
 		LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
-
 		List<Order> ordersToDelete = orderJpaRepository.findByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(cutoff);
 
 		for (Order order : ordersToDelete) {
-			orderDetailJpaRepository.deleteByOrderOrderCode(order.getOrderCode());
+			orderService.deleteOrder(order.getOrderCode());
+			++deletedCount;
 		}
 
-		int deletedCount = orderJpaRepository.deleteByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(cutoff);
 		log.info("미결제 10분 초과 주문 삭제 : {}건", deletedCount);
 	}
 }

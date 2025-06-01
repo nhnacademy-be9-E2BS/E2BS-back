@@ -1,5 +1,6 @@
 package com.nhnacademy.back.order.order.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +23,5 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 
 	List<Order> findByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(LocalDateTime cutoff);
 
-	int deleteByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(LocalDateTime cutoff);
-
+	List<Order> findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(long stateId, LocalDate cutoff);
 }
