@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.pointhistory.domain.dto.response.ResponseMemberPointDTO;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.common.annotation.Member;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ public class PointHistoryMypageCouponController {
 
 	private final PointHistoryService pointHistoryService;
 
+	@Member
 	@GetMapping
 	public ResponseEntity<ResponseMemberPointDTO> getPoints(
 		@PathVariable("memberId") String memberId) {

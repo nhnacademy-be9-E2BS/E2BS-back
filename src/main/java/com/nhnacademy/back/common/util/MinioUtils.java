@@ -7,13 +7,15 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.nhnacademy.back.common.exception.FileStreamOpenException;
 import com.nhnacademy.back.common.exception.InvalidImageFormatException;
+import com.nhnacademy.back.common.exception.MinioDeleteException;
+import com.nhnacademy.back.common.exception.MinioUploadException;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -46,9 +48,9 @@ public class MinioUtils {
 
 			s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 		}  catch (IOException e) {
-			throw new RuntimeException("파일 스트림 열기 실패", e);
+			throw new FileStreamOpenException();
 		} catch (S3Exception e) {
-			throw new RuntimeException("MinIO 업로드 실패: " + e.awsErrorDetails().errorMessage(), e);
+			throw new MinioUploadException();
 		}
 	}
 
@@ -64,7 +66,7 @@ public class MinioUtils {
 
 			s3Client.deleteObject(deleteObjectRequest);
 		} catch (S3Exception e) {
-			throw new RuntimeException("파일 삭제 실패: " + e.awsErrorDetails().errorMessage(), e);
+			throw new MinioDeleteException();
 		}
 	}
 
@@ -73,15 +75,12 @@ public class MinioUtils {
 	 */
 	public String getPresignedUrl(String bucketName, String objectKey) {
 		// object 파일을 가져오고
-		GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-			.bucket(bucketName)
-			.key(objectKey)
-			.build();
-
 		// 해당 파일에 대한 접근 url 생성
 		GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
 			.signatureDuration(Duration.ofMinutes(60))
-			.getObjectRequest(getObjectRequest)
+			.getObjectRequest(b -> b
+				.bucket(bucketName)
+				.key(objectKey))
 			.build();
 
 		return presigner.presignGetObject(presignRequest).url().toString();

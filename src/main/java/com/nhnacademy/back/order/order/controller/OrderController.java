@@ -5,10 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/auth/orders")
 public class OrderController {
 
 	private final OrderService orderService;
@@ -35,7 +38,7 @@ public class OrderController {
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
 	@Member
-	@PostMapping("/api/order/create/tossPay")
+	@PostMapping("/create/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -48,7 +51,7 @@ public class OrderController {
 	 * 포인트 주문에 대한 처리
 	 */
 	@Member
-	@PostMapping("/api/order/create/point")
+	@PostMapping("/create/point")
 	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(
 		@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -65,7 +68,7 @@ public class OrderController {
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
 	@Member
-	@PostMapping("/api/order/confirm")
+	@PostMapping("/confirm")
 	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
 		@RequestParam long amount) {
 		// 승인 하고 이후에 결과에 따른 롤백처리 필요 할 수 있음
@@ -74,7 +77,7 @@ public class OrderController {
 			//결제 승인 완료 시 포인트 차감, 쿠폰 사용, 포인트 적립 호출, 결제 정보 저장
 			paymentService.createPayment(response.getBody());
 		} else { // 승인 실패 시 롤백
-			cancelOrder(orderId);
+			orderService.deleteOrder(orderId);
 		}
 		return ResponseEntity.status(response.getStatusCode()).build();
 	}
@@ -83,24 +86,35 @@ public class OrderController {
 	 * 특정 주문서를 삭제하는 기능, 안에서 재고 복구도 진행함
 	 */
 	@Member
-	@PostMapping("/api/order/cancel")
-	public ResponseEntity<Void> cancelOrder(@RequestParam String orderId) {
-		return orderService.cancelOrder(orderId);
+	@PostMapping("/cancel")
+	public ResponseEntity<Void> deleteOrder(@RequestParam String orderId) {
+		return orderService.deleteOrder(orderId);
 	}
 
 	/**
 	 * 특정 주문 코드에 대한 주문 상세 정보를 반환하는 메서드
 	 * 관리자 + 고객 둘 다 사용 메서드
 	 */
-	@GetMapping("/api/order/{orderCode}")
+	@GetMapping("/{orderCode}")
 	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(@PathVariable String orderCode) {
 		return ResponseEntity.ok(orderService.getOrderByOrderCode(orderCode));
 	}
 
+	/**
+	 * 회원의 주문 목록 조회
+	 */
 	@Member
-	@GetMapping("/api/order/orders")
+	@GetMapping
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId) {
 		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));
 	}
 
+	/**
+	 * 회원의 주문 취소 처리
+	 */
+	@Member
+	@DeleteMapping("/{orderCode}")
+	public ResponseEntity<Void> cancelOrder(@PathVariable String orderCode) {
+		return orderService.cancelOrder(orderCode);
+	}
 }

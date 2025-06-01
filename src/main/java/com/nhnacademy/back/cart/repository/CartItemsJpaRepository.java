@@ -1,6 +1,7 @@
 package com.nhnacademy.back.cart.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,8 @@ public interface CartItemsJpaRepository extends JpaRepository<CartItems, Long> {
 
 	/// 특정 고객의 cartItems 목록 조회 메소드
 	List<CartItems> findByCart_Customer_CustomerId(long customerId);
+
+	/// 특정 장바구니 및 상품이 해당하는 장바구니 항목 조회
+	Optional<CartItems> findByCartAndProduct(Cart cart, Product product);
+
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.event.event.ReviewImgPointEvent;
+import com.nhnacademy.back.event.event.ReviewPointEvent;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -27,7 +30,6 @@ import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.entity.Review;
-import com.nhnacademy.back.review.exception.ReviewAlreadyExistsException;
 import com.nhnacademy.back.review.exception.ReviewNotFoundException;
 import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 import com.nhnacademy.back.review.service.ReviewService;
@@ -45,7 +47,9 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewJpaRepository reviewRepository;
 
 	private final MinioUtils minioUtils;
-	private final String BUCKET_NAME = "e2bs-reviews-image";
+	private static final String BUCKET_NAME = "e2bs-reviews-image";
+
+	private final ApplicationEventPublisher eventPublisher;
 
 
 	/**
@@ -55,9 +59,12 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public void createReview(RequestCreateReviewDTO request) {
 		Customer findCustomer = null;
+		Member findMember = null;
+		MultipartFile reviewImageFile = request.getReviewImage();
+
 		// 회원인 경우
 		if (Objects.nonNull(request.getMemberId())) {
-			Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
+			findMember = memberRepository.getMemberByMemberId(request.getMemberId());
 			if (Objects.isNull(findMember)) {
 				throw new NotFoundMemberException("Member not found");
 			}
@@ -66,21 +73,27 @@ public class ReviewServiceImpl implements ReviewService {
 				.orElseThrow(CustomerNotFoundException::new);
 		}
 		// 비회원인 경우
-		if (Objects.nonNull(request.getCustomerId())) {
+		else if (Objects.nonNull(request.getCustomerId())) {
 			findCustomer = customerRepository.findById(request.getCustomerId())
 				.orElseThrow(CustomerNotFoundException::new);
 		}
-
-		if (reviewRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
-			throw new ReviewAlreadyExistsException();
-		}
-
+		
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
+		/// 현재 회원이 현재 주문한 리뷰를 이미 작성한 경우 처리 필요
+
+		// 이미지 있으면 이미지 리뷰 정책, 없으면 일반 리뷰 정책으로 포인트 적립 이벤트 발행
+		if (Objects.nonNull(request.getMemberId())) {
+			if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
+				eventPublisher.publishEvent(new ReviewImgPointEvent(findMember.getMemberId()));
+			} else {
+				eventPublisher.publishEvent(new ReviewPointEvent(findMember.getMemberId()));
+			}
+		}
+
 		// 파일이 존재하면 업로드
 		String imagePath = "";
-		MultipartFile reviewImageFile = request.getReviewImage();
 		if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
 			imagePath = uploadFile(reviewImageFile);
 		}

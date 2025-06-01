@@ -142,7 +142,15 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		result.addAll(memberCouponJpaRepository.findProductCoupons(customerId, productIds));
 		result.addAll(memberCouponJpaRepository.findCategoryCoupons(customerId, productIds));
 
-		return result.stream().distinct().collect(Collectors.toList());
+		// 쿼리 결과, 리스트에서 memberCouponID 를 기준으로 중복을 제거한 후 반환
+		return new ArrayList<>(result.stream()
+			.collect(Collectors.toMap(
+				ResponseOrderCouponDTO::getMemberCouponId,
+				dto -> dto,
+				(existing, replacement) -> existing
+			))
+			.values());
+
 	}
 
 }
