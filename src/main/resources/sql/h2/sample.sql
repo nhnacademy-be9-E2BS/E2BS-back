@@ -337,9 +337,9 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_address_info, order_address_detail, order_address_extra, order_point_amount,
                      order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
-                     order_reward_amount)
+                     order_reward_amount, order_pure_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160);
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160, 6000);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)

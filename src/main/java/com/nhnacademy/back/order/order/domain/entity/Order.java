@@ -64,6 +64,9 @@ public class Order {
 	@Column(nullable = false)
 	private long orderRewardAmount;
 
+	@Column(nullable = false)
+	private long orderPureAmount;
+
 	// 희망 수령일, 출고일은 Date 타입으로 변경
 	private LocalDate orderReceiveDate;
 
@@ -115,6 +118,7 @@ public class Order {
 		this.orderMemo = requestOrderDTO.getOrderMemo();
 		this.orderPaymentStatus = false;
 		this.orderRewardAmount = rewardAmount;
+		this.orderPureAmount = requestOrderDTO.getOrderPureAmount();
 		this.orderReceiveDate = requestOrderDTO.getOrderReceivedDate();
 		this.orderShipmentDate = requestOrderDTO.getOrderShipmentDate();
 		this.orderCreatedAt = LocalDateTime.now();
