@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.batch.service.BatchService;
+import com.nhnacademy.back.batch.service.AdminIssueBatchService;
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.coupon.membercoupon.domain.dto.request.RequestAllMemberCouponDTO;
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberCouponController {
 
 	private final MemberCouponService memberCouponService;
-	private final BatchService batchService;
+	private final AdminIssueBatchService adminIssueBatchService;
 
 
 	/**
@@ -36,7 +36,7 @@ public class MemberCouponController {
 	@Admin
 	@PostMapping("/api/admin/memberCoupons/issue")
 	public ResponseEntity<Void> issueCouponsToAllMembers(@RequestBody RequestAllMemberCouponDTO request) {
-		batchService.issueCouponToActiveMembers(request.getCouponId(), request.getMemberCouponPeriod());
+		adminIssueBatchService.issueCouponToActiveMembers(request.getCouponId(), request.getMemberCouponPeriod());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
