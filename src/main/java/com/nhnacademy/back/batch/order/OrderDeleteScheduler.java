@@ -21,7 +21,7 @@ public class OrderDeleteScheduler {
 	private final OrderJpaRepository orderJpaRepository;
 	private final OrderDetailJpaRepository orderDetailJpaRepository;
 
-	@Scheduled(fixedRate = 60_000) // 10분
+	@Scheduled(fixedRate = 600_000) // 10분
 	@Transactional
 	public void deleteUnpaidOrders() {
 		LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
