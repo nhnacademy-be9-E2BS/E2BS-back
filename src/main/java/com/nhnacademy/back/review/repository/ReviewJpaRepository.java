@@ -38,7 +38,12 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 	Integer countAllByProduct_ProductId(long productProductId);
 
 	/**
-	 * 고객이 이미 작성한 리뷰가 있는지 여부 확인 메소드
+	 * 고객이 주문한 상품에 이미 작성한 리뷰가 있는지 여부 확인 메소드
 	 */
-	boolean existsByCustomer_CustomerId(long customerCustomerId);
+	@Query("select count(od) > 0 " +
+		   "from OrderDetail od " +
+		   "join od.order o " +
+		   "where o.customer.customerId = :customerId and od.product.productId = :productId and od.review is not null")
+	boolean existsReviewedOrderDetailsByCustomerIdAndProductId(long customerId, long productId);
+
 }
