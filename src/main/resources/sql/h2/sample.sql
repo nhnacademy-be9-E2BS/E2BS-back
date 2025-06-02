@@ -51,7 +51,7 @@ VALUES (1,
         DATE '1990-01-01',
         '01012345678',
         DATE '2024-01-01',
-        DATE '2024-05-01',
+        DATE '2025-06-01',
         1, -- NORMAL
         1, -- ACTIVE
         2, -- Member
@@ -175,7 +175,7 @@ VALUES (1, '국내도서', null),
 INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
                      product_sale_price, product_state_id, publisher_id, product_isbn, product_title, product_content,
                      product_description)
-VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Spring 입문', 'Spring 프레임워크 소개',
+VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Spring 입문ㅇㅇ긴 문자인 경우 출력 테스트 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ', 'Spring 프레임워크 소개ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
         '초보자를 위한 Spring 가이드입니다.'),
        (0, '2023-11-30', 50, 2, 18000, 14000, 2, 2, '978-89-12345-02-2', 'JPA 기초', 'JPA 사용법 정리',
         'Entity 설계부터 관계 매핑까지 JPA의 핵심을 담았습니다.'),
@@ -288,7 +288,6 @@ VALUES
 INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
 VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 'review1.jpg'),
        (1, 2, '노트북 별로네요', 2, TIMESTAMP '2025-05-05 16:30:00', 'review1.jpg'),
-       (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
        (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 18:30:00', 'review2.jpg'),
        (7, 1, 'Machine Learning 좋네', 5, TIMESTAMP '2025-05-08 21:30:00', 'review3.jpg'),
        (7, 2, 'Machine Learning 별로', 1, TIMESTAMP '2025-05-09 22:30:00', 'review3.jpg'),
@@ -366,7 +365,7 @@ VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, '
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
-VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000),
+VALUES (1, 'TEST-ORDER-CODE', 1, null, 1, 1000),
        (1, 'TEST-DELIVERY-COMPLETE', null, null, 2, 1000);
 
 -- 카테고리 쿠폰
