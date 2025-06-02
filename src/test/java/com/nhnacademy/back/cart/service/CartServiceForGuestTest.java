@@ -28,7 +28,6 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGues
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
-import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -40,9 +39,6 @@ class CartServiceForGuestTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
-
-	@Mock
-	private ProductCategoryJpaRepository productCategoryRepository;
 
 	@Mock
 	private RedisTemplate<String, Object> redisTemplate;
@@ -81,7 +77,6 @@ class CartServiceForGuestTest {
 		CartDTO cart = Mockito.mock(CartDTO.class);
 
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-		when(productCategoryRepository.findByProduct_ProductId(1L)).thenReturn(List.of());
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cart);
 
@@ -101,7 +96,7 @@ class CartServiceForGuestTest {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", sessionId, 1L, 5);
 
-		CartItemDTO cartItem = new CartItemDTO(1L, List.of(), "Product", 1000, "img.jpg", 2);
+		CartItemDTO cartItem = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(cartItem));
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
@@ -119,7 +114,7 @@ class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 항목 삭제 테스트")
 	void deleteCartItemForGuest_shouldRemoveItem() {
 		// given
-		CartItemDTO item = new CartItemDTO(1L, List.of(), "Product", 1000, "img.jpg", 2);
+		CartItemDTO item = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(new ArrayList<>(List.of(item)));
 		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(1L, sessionId);
 
@@ -153,8 +148,8 @@ class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 목록 조회 테스트")
 	void getCartItemsByGuest() {
 		// given
-		CartItemDTO item1 = new CartItemDTO(1L, List.of(), "Product1", 1000, "img1.jpg", 1);
-		CartItemDTO item2 = new CartItemDTO(2L, List.of(), "Product2", 2000, "img2.jpg", 2);
+		CartItemDTO item1 = new CartItemDTO(1L, "Product1", 1000, "img1.jpg", 1);
+		CartItemDTO item2 = new CartItemDTO(2L, "Product2", 2000, "img2.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(item1, item2));
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
