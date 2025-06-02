@@ -41,7 +41,7 @@ class CouponPolicyServiceTest {
 	void createCouponPolicySuccess() {
 		// given
 		RequestCouponPolicyDTO requestDTO = new RequestCouponPolicyDTO(
-			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy"
+			50000L, 5000L, 3000L, 5, "Test Coupon Policy"
 		);
 		when(couponPolicyJpaRepository.existsByCouponPolicyName(anyString())).thenReturn(false);
 
@@ -58,7 +58,7 @@ class CouponPolicyServiceTest {
 	void createCouponPolicyFail() {
 		// given
 		RequestCouponPolicyDTO requestDTO = new RequestCouponPolicyDTO(
-			50000L, 5000L, 3000L, 5, LocalDateTime.now(), "Test Coupon Policy"
+			50000L, 5000L, 3000L, 5, "Test Coupon Policy"
 		);
 		when(couponPolicyJpaRepository.existsByCouponPolicyName(anyString())).thenReturn(true);
 

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BatchService {
+public class AdminIssueBatchService {
 
 	private final JobLauncher jobLauncher;
 	private final Job adminCouponJob;
@@ -29,9 +29,9 @@ public class BatchService {
 
 		try {
 			jobLauncher.run(adminCouponJob, params);
-			log.info("관리자 쿠폰 배치 실행 성공");
+			log.info("관리자 쿠폰 발급 배치 실행 성공");
 		} catch (JobExecutionException e) {
-			log.error("관리자 쿠폰 배치 실행 실패 : {}", e.getMessage());
+			log.error("관리자 쿠폰 발급 배치 실행 실패 : {}", e.getMessage());
 		}
 	}
 }

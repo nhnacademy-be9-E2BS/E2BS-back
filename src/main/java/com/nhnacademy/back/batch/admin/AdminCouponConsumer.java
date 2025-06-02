@@ -1,9 +1,6 @@
-package com.nhnacademy.back.batch.birthday;
+package com.nhnacademy.back.batch.admin;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -19,33 +16,32 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class BirthdayCouponConsumer {
+public class AdminCouponConsumer {
 
 	private final MemberJpaRepository memberRepository;
 	private final CouponJpaRepository couponRepository;
 	private final MemberCouponJpaRepository memberCouponRepository;
 
-	@RabbitListener(queues = RabbitConfig.BIRTHDAY_QUEUE)
-	public void issueCoupon(Long memberId) {
-		Member member = memberRepository.findById(memberId)
+	@RabbitListener(queues = RabbitConfig.DIRECT_QUEUE)
+	public void issueCoupon(AdminIssueMessage message) {
+		Member member = memberRepository.findById(message.getMemberId())
 			.orElseThrow(CustomerNotFoundException::new);
 
-		String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("M월"));
-		String birthCouponName = currentMonth + " 생일 쿠폰";
-
-		Coupon birthdayCoupon = couponRepository
-			.findFirstByCouponNameAndCouponIsActiveOrderByCouponIdDesc(birthCouponName, true)
-			.orElseThrow(() -> new CouponNotFoundException("활성화된 생일 쿠폰이 존재하지 않습니다."));
+		Coupon coupon = couponRepository.findById(message.getCouponId())
+			.orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
 
 		MemberCoupon memberCoupon = new MemberCoupon(
 			member,
-			birthdayCoupon,
+			coupon,
 			LocalDateTime.now(),
-			LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()), LocalTime.MAX)
+			message.getExpireAt()
 		);
 		memberCouponRepository.save(memberCoupon);
+		log.info("관리자 쿠폰 발급 완료");
 	}
 }

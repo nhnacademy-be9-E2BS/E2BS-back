@@ -339,11 +339,14 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
                      order_reward_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160);
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160),
+       ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-01 00:00:00.000000', TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 3, 160);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
-VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000);
+VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000),
+       (1, 'TEST-DELIVERY-COMPLETE', null, null, 2, 1000);
 
 -- Cart (비회원/회원용 장바구니)
 INSERT INTO cart (cart_id, customer_id)
