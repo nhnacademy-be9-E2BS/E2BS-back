@@ -6,13 +6,16 @@ import org.springframework.data.domain.Pageable;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerLoginDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerRegisterDTO;
 
 public interface CustomerService {
 
 	Page<ResponseAdminSettingsNonMembersDTO> getAdminSettingsNonMembers(Pageable pageable);
 
-	void createCustomer(RequestCustomerRegisterDTO request);
+	ResponseCustomerLoginDTO postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO);
 
-	boolean loginCustomer(RequestCustomerLoginDTO request);
+	ResponseCustomerRegisterDTO postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO);
 
+	boolean isExistsCustomerEmail(String customerEmail);
 }

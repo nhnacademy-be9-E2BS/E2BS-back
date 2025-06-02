@@ -1,7 +1,5 @@
 package com.nhnacademy.back.account.customer.domain.entity;
 
-import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,11 +37,4 @@ public class Customer {
 		this.customerName = customerName;
 	}
 
-	public static Customer createCustomerEntity(RequestCustomerRegisterDTO request) {
-		return Customer.builder()
-			.customerEmail(request.getEmail())
-			.customerPassword(request.getPassword())
-			.customerName(request.getName())
-			.build();
-	}
 }

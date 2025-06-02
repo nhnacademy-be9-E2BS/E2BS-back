@@ -11,6 +11,8 @@ import com.nhnacademy.back.account.address.exception.DeleteAddressFailedExceptio
 import com.nhnacademy.back.account.address.exception.NotFoundAddressException;
 import com.nhnacademy.back.account.address.exception.SaveAddressFailedException;
 import com.nhnacademy.back.account.address.exception.UpdateAddressFailedException;
+import com.nhnacademy.back.account.customer.exception.CustomerEmailAlreadyExistsException;
+import com.nhnacademy.back.account.customer.exception.CustomerEmailNotExistsException;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.DeleteMemberFailedException;
@@ -62,7 +64,8 @@ public class GlobalExceptionHandler {
 		UpdateMemberRoleFailedException.class,
 		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class,
 		DeleteAddressFailedException.class,
-		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class})
+		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class, CustomerEmailNotExistsException.class,
+		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
