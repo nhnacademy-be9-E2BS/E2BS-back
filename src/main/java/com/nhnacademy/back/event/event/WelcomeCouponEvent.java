@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class OrderPointEvent {
+public class WelcomeCouponEvent {
 	private final String memberId;
-	private final Long pointFigure;
 }

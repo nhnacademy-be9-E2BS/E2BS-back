@@ -1,5 +1,7 @@
 package com.nhnacademy.back.coupon.couponpolicy.service.impl;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 			requestDTO.getCouponPolicyMaximumAmount(),
 			requestDTO.getCouponPolicySalePrice(),
 			requestDTO.getCouponPolicyDiscountRate(),
-			requestDTO.getCouponPolicyCreatedAt(),
+			LocalDateTime.now(),
 			requestDTO.getCouponPolicyName());
 
 		couponPolicyJpaRepository.save(couponPolicy);
