@@ -17,21 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
-import com.nhnacademy.back.product.category.service.ProductCategoryService;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.UnifiedProductApiSearchDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +40,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductAdminController {
 	private final ProductService productService;
 	private final ProductAPIService productApiService;
-	private final ProductCategoryService productCategoryService;
 
 	/**
 	 * 도서 받아와서 DB에 저장
@@ -50,8 +48,7 @@ public class ProductAdminController {
 	@Admin
 	@PostMapping
 	public ResponseEntity<Void> createProduct(@RequestBody RequestProductDTO request) {
-		long productId = productService.createProduct(request);
-		productCategoryService.createProductCategory(productId, request.getCategoryIds(), false);
+		productService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -85,7 +82,6 @@ public class ProductAdminController {
 	@PutMapping("/{bookId}")
 	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestBody RequestProductDTO request) {
 		productService.updateProduct(bookId, request);
-		productCategoryService.createProductCategory(bookId, request.getCategoryIds(), true);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
@@ -147,7 +143,8 @@ public class ProductAdminController {
 			RequestProductApiSearchByQueryTypeDTO showDTO = new RequestProductApiSearchByQueryTypeDTO();
 			showDTO.setQueryType(request.getQueryType());
 
-			Page<ResponseProductApiSearchByQueryTypeDTO> products = productApiService.searchProductsByQuery(showDTO, pageable);
+			Page<ResponseProductApiSearchByQueryTypeDTO> products = productApiService.searchProductsByQuery(showDTO,
+				pageable);
 			return ResponseEntity.status(HttpStatus.OK).body(products);
 
 		}
@@ -169,12 +166,5 @@ public class ProductAdminController {
 		productApiService.createProductByQuery(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
-
-
-
-
-
-
-
 
 }

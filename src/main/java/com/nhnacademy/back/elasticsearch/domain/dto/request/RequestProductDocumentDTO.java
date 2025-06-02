@@ -24,6 +24,9 @@ public class RequestProductDocumentDTO {
 	private String productContent;
 
 	@NotNull
+	private String productPublisherName;
+
+	@NotNull
 	private LocalDate productPublishedAt;
 
 	@NotNull
@@ -36,4 +39,5 @@ public class RequestProductDocumentDTO {
 
 	@NotNull
 	private List<Long> productCategoryIds;
+
 }

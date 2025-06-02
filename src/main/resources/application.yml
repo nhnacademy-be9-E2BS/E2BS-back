@@ -39,9 +39,9 @@ spring:
       database: 294
 
   elasticsearch:
-    uris: http://s4.java21.net:9200
+    uris: s4.java21.net:9200
     username: elastic
-    password: nhnacademy123
+    password: nhnacademy123!
 
 logging:
   level:

@@ -3,6 +3,7 @@ package com.nhnacademy.back.elasticsearch.domain.document;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -11,9 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
-import com.nhnacademy.back.product.product.domain.entity.Product;
 
-import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +36,10 @@ public class ProductDocument {
 	// 도서 설명 (가중치)
 	@Field(type = FieldType.Text)
 	private String productContent;
+
+	// 출판사명 (가중치)
+	@Field(type = FieldType.Text)
+	private String productPublisherName;
 
 	// 도서 출판일자
 	@Field(type = FieldType.Date, format = DateFormat.basic_date)
@@ -78,6 +81,7 @@ public class ProductDocument {
 		this.productId = request.getProductId();
 		this.productTitle = request.getProductTitle();
 		this.productContent = request.getProductContent();
+		this.productPublisherName = request.getProductPublisherName();
 		this.productPublishedAt = request.getProductPublishedAt();
 		this.productSalePrice = request.getProductSalePrice();
 		this.productReviewRate = 0d;
@@ -89,29 +93,19 @@ public class ProductDocument {
 		this.productSearches = 0L;
 	}
 
-	public ProductDocument(Product product, List<String> tags, List<String> contributors, List<Long> categoryIds) {
-		this.productId = product.getProductId();
-		this.productTitle = product.getProductTitle();
-		this.productContent = product.getProductContent();
-		this.productPublishedAt = product.getProductPublishedAt();
-		this.productSalePrice = product.getProductSalePrice();
-		this.productHits = product.getProductHits();
-		this.productSearches = product.getProductSearches();
-		this.productReviewRate = 0d;
-		this.productReviewCount = 0L;
-		this.productTags = tags;
-		this.productContributors = contributors;
-		this.productCategoryIds = categoryIds;
-	}
-
 	public void updateProductDocument(RequestProductDocumentDTO request) {
 		this.productTitle = request.getProductTitle();
 		this.productContent = request.getProductContent();
+		this.productPublisherName = request.getProductPublisherName();
 		this.productPublishedAt = request.getProductPublishedAt();
 		this.productSalePrice = request.getProductSalePrice();
 		this.productContributors = request.getProductContributors();
 		this.productTags = request.getProductTags();
 		this.productCategoryIds = request.getProductCategoryIds();
+	}
+
+	public void updateSalePrice(Long productSalePrice) {
+		this.productSalePrice = productSalePrice;
 	}
 
 	public void updateReview(Double reviewRate) {

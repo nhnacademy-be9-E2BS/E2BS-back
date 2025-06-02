@@ -5,15 +5,19 @@
     },
     "productTitle": {
       "type": "text",
-      "analyzer": "korean"
+      "analyzer": "jaso_analyzer"
     },
     "productContent": {
       "type": "text",
-      "analyzer": "korean"
+      "analyzer": "nori_analyzer"
+    },
+    "productPublisherName": {
+      "type": "text",
+      "analyzer": "nori_analyzer"
     },
     "productPublishedAt": {
       "type": "date",
-      "format": "basic_date"
+      "format": "strict_date_optional_time||epoch_millis||basic_date"
     },
     "productSalePrice": {
       "type": "long"
@@ -31,10 +35,12 @@
       "type": "long"
     },
     "productContributors": {
-      "type": "text"
+      "type": "text",
+      "analyzer": "jaso_analyzer"
     },
     "productTags": {
-      "type": "text"
+      "type": "text",
+      "analyzer": "jaso_analyzer"
     },
     "productCategoryIds": {
       "type": "long"

@@ -26,4 +26,5 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
 			.withBasicAuth(username, password)
 			.build();
 	}
+
 }

@@ -23,14 +23,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
+import com.nhnacademy.back.product.product.controller.ProductAdminController;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.controller.ProductAdminController;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
@@ -58,8 +58,6 @@ class ProductAdminControllerTest {
 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 		String jsonRequest = objectMapper.writeValueAsString(request);
-
-		when(productService.createProduct(request)).thenReturn(1L);
 
 		// when & then
 		mockMvc.perform(post("/api/admin/books")
