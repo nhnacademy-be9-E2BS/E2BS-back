@@ -19,5 +19,8 @@ public interface CustomerJpaRepository extends JpaRepository<Customer, Long> {
 	@Query("SELECT c FROM Customer c WHERE c NOT IN (SELECT m.customer FROM Member m)")
 	Page<Customer> findCustomersNotMembers(Pageable pageable);
 
-	boolean existsByCustomerEmailAndCustomerPassword(String customerEmail, String customerPassword);
+	boolean existsCustomerByCustomerEmail(String customerEmail);
+
+	Customer getCustomerByCustomerEmail(String customerEmail);
+
 }

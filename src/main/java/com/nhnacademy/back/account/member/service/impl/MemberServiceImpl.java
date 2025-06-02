@@ -16,6 +16,7 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberStateDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
@@ -279,6 +280,17 @@ public class MemberServiceImpl implements MemberService {
 		if (result <= 0) {
 			throw new UpdateMemberRoleFailedException(UPDATE_MEMBER_ROLE_FAILED);
 		}
+	}
+
+	@Override
+	public ResponseMemberStateDTO getMemberState(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+
+		MemberState memberState = member.getMemberState();
+		return new ResponseMemberStateDTO(memberState.getMemberStateName().name());
 	}
 
 }
