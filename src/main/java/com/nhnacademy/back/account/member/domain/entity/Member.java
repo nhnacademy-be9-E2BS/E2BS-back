@@ -70,4 +70,8 @@ public class Member {
 		this.memberState = dormantState;
 	}
 
+	public void updateMemberRank(MemberRank memberRank) {
+		this.memberRank = memberRank;
+	}
+
 }
