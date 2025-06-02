@@ -100,18 +100,18 @@ INSERT INTO address (address_detail,
                      address_default,
                      address_created_at,
                      customer_id)
-VALUES ('서울특별시 강남구 테헤란로',
+VALUES ('위워크 10층',
         '06130',
+        '서울특별시 강남구 테헤란로',
         '삼성동 123-45',
-        '위워크 10층',
         '회사',
         TRUE,
         CURRENT_TIMESTAMP,
         1),
-       ('경기도 성남시 분당구 정자동',
+       ('OO오피스텔 101호',
         '13560',
+        '경기도 성남시 분당구 정자동',
         '정자역 5번 출구',
-        'OO오피스텔 101호',
         '집',
         FALSE,
         CURRENT_TIMESTAMP,
@@ -358,11 +358,11 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_address_info, order_address_detail, order_address_extra, order_point_amount,
                      order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
-                     order_reward_amount)
+                     order_reward_amount, order_pure_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160),
-       ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-01 00:00:00.000000', TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 3, 160);
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160, 6000),
+        ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-01 00:00:00.000000', TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 3, 160, 6000);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
