@@ -72,9 +72,9 @@ public class PointEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderPointEvent(OrderPointEvent event) {
 		try {
-			String memberId = event.getMemberId();
+			Long customerId = event.getCustomerId();
 			Long pointFigure = event.getPointFigure();
-			pointHistoryService.earnOrderPoint(memberId, pointFigure);
+			pointHistoryService.earnOrderPoint(customerId, pointFigure);
 		} catch (Exception e) {
 			log.error("도서 주문 포인트 적립 실패", e);
 		}
@@ -86,9 +86,9 @@ public class PointEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderPointPaymentEvent(OrderPointPaymentEvent event) {
 		try {
-			String memberId = event.getMemberId();
-			Long pointFigure = event.getPointFigure();
-			pointHistoryService.payPoint(memberId, pointFigure);
+			Long customerId = event.getCustomerId();
+			Long pointFigure = event.getPointFigure() * -1;
+			pointHistoryService.payPoint(customerId, pointFigure);
 		} catch (Exception e) {
 			log.error("주문 시 포인트 사용 실패", e);
 		}
@@ -100,9 +100,9 @@ public class PointEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderCancelPointPaymentEvent(OrderCancelPointPaymentEvent event) {
 		try {
-			String memberId = event.getMemberId();
+			Long customerId = event.getCustomerId();
 			Long pointFigure = event.getPointFigure();
-			pointHistoryService.recoverPoint(memberId, pointFigure);
+			pointHistoryService.recoverPoint(customerId, pointFigure);
 		} catch (Exception e) {
 			log.error("주문취소 포인트 복구 실패", e);
 		}
@@ -114,9 +114,9 @@ public class PointEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderCancelPointEvent(OrderCancelPointEvent event) {
 		try {
-			String memberId = event.getMemberId();
-			Long pointFigure = event.getPointFigure();
-			pointHistoryService.retrievePoint(memberId, pointFigure);
+			Long customerId = event.getCustomerId();
+			Long pointFigure = event.getPointFigure() * -1;
+			pointHistoryService.retrievePoint(customerId, pointFigure);
 		} catch (Exception e) {
 			log.error("주문취소 포인트 회수 실패", e);
 		}

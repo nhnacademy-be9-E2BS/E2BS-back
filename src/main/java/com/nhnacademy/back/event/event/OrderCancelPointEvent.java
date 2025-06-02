@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class OrderCancelPointEvent {
-	private final String memberId;
+	private final Long customerId;
 	private final Long pointFigure;
 }

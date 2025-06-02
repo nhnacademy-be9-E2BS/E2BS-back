@@ -42,4 +42,5 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
 	Optional<Member> findByCustomer(Customer customer);
 
+	Member getMemberByCustomerId(long customerId);
 }

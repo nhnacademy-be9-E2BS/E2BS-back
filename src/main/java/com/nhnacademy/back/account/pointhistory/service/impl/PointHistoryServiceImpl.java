@@ -154,8 +154,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void earnOrderPoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	public void earnOrderPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
@@ -172,13 +172,13 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void payPoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	public void payPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
-		ResponseMemberPointDTO points = this.getMemberPoints(memberId);
+		ResponseMemberPointDTO points = this.getMemberPoints(member.getMemberId());
 		if(points.getPointAmount() < pointFigure) {
 			throw new InsufficientPointException("사용가능한 포인트가 부족합니다.");
 		}
@@ -194,8 +194,9 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	}
 
 	@Override
-	public void recoverPoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void recoverPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
@@ -211,8 +212,9 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	}
 
 	@Override
-	public void retrievePoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void retrievePoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
