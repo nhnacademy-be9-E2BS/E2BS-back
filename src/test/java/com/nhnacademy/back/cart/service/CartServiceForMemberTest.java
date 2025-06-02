@@ -28,7 +28,6 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
-import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -46,9 +45,6 @@ class CartServiceForMemberTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
-
-	@Mock
-	private ProductCategoryJpaRepository productCategoryRepository;
 
 	@Mock
 	private CartJpaRepository cartRepository;
@@ -178,7 +174,6 @@ class CartServiceForMemberTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId)).thenReturn(cartItems);
-		when(productCategoryRepository.findByProduct_ProductId(customerId)).thenReturn(List.of());
 
 		// when
 		List<ResponseCartItemsForMemberDTO> result = cartService.getCartItemsByMember(memberId);

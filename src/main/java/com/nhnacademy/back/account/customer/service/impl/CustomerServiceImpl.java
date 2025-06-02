@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
+import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
+import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.account.customer.exception.CustomerAlreadyExistsException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 
@@ -25,6 +28,21 @@ public class CustomerServiceImpl implements CustomerService {
 
 		return customers.map(customer -> ResponseAdminSettingsNonMembersDTO.builder()
 			.customer(customer).build());
+	}
+
+	@Override
+	public void createCustomer(RequestCustomerRegisterDTO request) {
+		if (customerJpaRepository.existsByCustomerEmailAndCustomerPassword(request.getEmail(), request.getPassword())) {
+			throw new CustomerAlreadyExistsException();
+		}
+
+		Customer customerEntity = Customer.createCustomerEntity(request);
+		customerJpaRepository.save(customerEntity);
+	}
+
+	@Override
+	public boolean loginCustomer(RequestCustomerLoginDTO request) {
+		return customerJpaRepository.existsByCustomerEmailAndCustomerPassword(request.getEmail(), request.getPassword());
 	}
 
 }

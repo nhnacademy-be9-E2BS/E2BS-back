@@ -100,18 +100,18 @@ INSERT INTO address (address_detail,
                      address_default,
                      address_created_at,
                      customer_id)
-VALUES ('서울특별시 강남구 테헤란로',
+VALUES ('위워크 10층',
         '06130',
+        '서울특별시 강남구 테헤란로',
         '삼성동 123-45',
-        '위워크 10층',
         '회사',
         TRUE,
         CURRENT_TIMESTAMP,
         1),
-       ('경기도 성남시 분당구 정자동',
+       ('OO오피스텔 101호',
         '13560',
+        '경기도 성남시 분당구 정자동',
         '정자역 5번 출구',
-        'OO오피스텔 101호',
         '집',
         FALSE,
         CURRENT_TIMESTAMP,
@@ -249,6 +249,17 @@ VALUES (1, 1),
        (4, 8),
        (7, 8);
 
+-- Cart
+INSERT INTO cart (cart_id, customer_id)
+VALUES (1, 1);
+
+-- CartItems
+INSERT INTO cart_items (cart_items_id, cart_id, product_id, cart_items_quantity)
+VALUES (1, 1, 1, 5),
+       (2, 1, 2, 2),
+       (3, 1, 3, 6),
+       (4, 1, 4, 1);
+
 -- Like
 INSERT INTO `like` (like_id, product_id, customer_id, like_created_at)
 VALUES
@@ -273,6 +284,16 @@ VALUES
     (19, 8, 1, '2024-08-01T10:00:00'),
     (20, 8, 2, '2024-08-02T11:45:00');
 
+-- Review
+INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
+VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 'review1.jpg'),
+       (1, 2, '노트북 별로네요', 2, TIMESTAMP '2025-05-05 16:30:00', 'review1.jpg'),
+       (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
+       (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 18:30:00', 'review2.jpg'),
+       (7, 1, 'Machine Learning 좋네', 5, TIMESTAMP '2025-05-08 21:30:00', 'review3.jpg'),
+       (7, 2, 'Machine Learning 별로', 1, TIMESTAMP '2025-05-09 22:30:00', 'review3.jpg'),
+       (8, 1, 'Kubernetes 좋네', 4, TIMESTAMP '2025-05-10 18:30:00', 'review4.jpg'),
+       (8, 2, 'Kubernetes 별로', 1, TIMESTAMP '2025-05-11 20:30:00', 'review4.jpg');
 
 ----------------------- 주문 관련 데이터------------------------
 -- DeliveryFee
@@ -337,38 +358,16 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_address_info, order_address_detail, order_address_extra, order_point_amount,
                      order_payment_amount, order_memo, order_payment_status, order_receive_date, order_shipment_date,
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
-                     order_reward_amount)
+                     order_reward_amount, order_pure_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160),
-       ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-01 00:00:00.000000', TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 3, 160);
+        1000, 5000, null, false, DATE '2025-01-01', null, TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 5, 160, 6000),
+        ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-01 00:00:00.000000', TIMESTAMP '2025-01-01 00:00:00.000000', null, 1, 1, 3, 160, 6000);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
 VALUES (1, 'TEST-ORDER-CODE', null, null, 1, 1000),
        (1, 'TEST-DELIVERY-COMPLETE', null, null, 2, 1000);
-
--- Cart (비회원/회원용 장바구니)
-INSERT INTO cart (cart_id, customer_id)
-VALUES (1, 1);
-
--- CartItems
-INSERT INTO cart_items (cart_items_id, cart_id, product_id, cart_items_quantity)
-VALUES (1, 1, 1, 5),
-       (2, 1, 2, 2),
-       (3, 1, 3, 6),
-       (4, 1, 4, 1);
-
--- Review
-INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
-VALUES (1, 1, '노트북 최고네요!', 5, TIMESTAMP '2025-05-07 16:30:00', 'review1.jpg'),
-       (1, 2, '노트북 별로네요', 2, TIMESTAMP '2025-05-05 16:30:00', 'review1.jpg'),
-       (2, 1, '스마트폰 최고', 4, TIMESTAMP '2025-05-06 17:30:00', 'review2.jpg'),
-       (2, 2, '스마트폰 별로', 1, TIMESTAMP '2025-05-07 18:30:00', 'review2.jpg'),
-       (7, 1, 'Machine Learning 좋네', 5, TIMESTAMP '2025-05-08 21:30:00', 'review3.jpg'),
-       (7, 2, 'Machine Learning 별로', 1, TIMESTAMP '2025-05-09 22:30:00', 'review3.jpg'),
-       (8, 1, 'Kubernetes 좋네', 4, TIMESTAMP '2025-05-10 18:30:00', 'review4.jpg'),
-       (8, 2, 'Kubernetes 별로', 1, TIMESTAMP '2025-05-11 20:30:00', 'review4.jpg');
 
 -- 카테고리 쿠폰
 INSERT INTO category_coupon (coupon_id, category_id)

@@ -29,6 +29,7 @@ import com.nhnacademy.back.common.error.dto.GlobalErrorResponse;
 import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.exception.InvalidImageFormatException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
+import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
 		ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
 		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
-		NotFoundAddressException.class})
+		NotFoundAddressException.class, OrderDetailNotFoundException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());

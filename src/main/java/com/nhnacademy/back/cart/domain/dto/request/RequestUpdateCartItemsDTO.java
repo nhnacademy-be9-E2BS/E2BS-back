@@ -15,5 +15,5 @@ public class RequestUpdateCartItemsDTO {
 	private String sessionId;
 	private Long productId;
 	@NotNull
-	private int quantity;
+	private Integer quantity;
 }
