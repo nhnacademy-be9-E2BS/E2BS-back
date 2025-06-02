@@ -52,6 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
 		return new ResponseCustomerLoginDTO(customer);
 	}
 
+	@Transactional
 	public ResponseCustomerRegisterDTO postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO) {
 		if (customerJpaRepository.existsCustomerByCustomerEmail(requestCustomerRegisterDTO.getCustomerEmail())) {
 			throw new CustomerEmailAlreadyExistsException("비회원 이메일이 이미 존재합니다.");

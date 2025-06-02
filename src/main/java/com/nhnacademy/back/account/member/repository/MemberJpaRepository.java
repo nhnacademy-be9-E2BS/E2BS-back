@@ -1,11 +1,13 @@
 package com.nhnacademy.back.account.member.repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
@@ -37,5 +39,7 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE Member m SET m.memberRole = :memberRole WHERE m.memberId = :memberId")
 	int updateMemberRole(MemberRole memberRole, String memberId);
+
+	Optional<Member> findByCustomer(Customer customer);
 
 }

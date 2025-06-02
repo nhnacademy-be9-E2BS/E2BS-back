@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.common.config.RabbitConfig;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 import com.nhnacademy.back.coupon.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.back.coupon.coupon.repository.CouponJpaRepository;
@@ -24,7 +25,7 @@ public class WelcomeCouponConsumer {
 	private final CouponJpaRepository couponRepository;
 	private final MemberCouponJpaRepository memberCouponRepository;
 
-	@RabbitListener(queues = WelcomeCouponRabbitConfig.WELCOME_QUEUE)
+	@RabbitListener(queues = RabbitConfig.WELCOME_QUEUE)
 	public void issueCoupon(Long customerId) {
 		Member member = memberRepository.findById(customerId)
 			.orElseThrow(CustomerNotFoundException::new);

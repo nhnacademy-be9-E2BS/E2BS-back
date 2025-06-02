@@ -1,6 +1,5 @@
 package com.nhnacademy.back.cart.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
-import com.nhnacademy.back.cart.domain.dto.ProductCategoryDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
@@ -31,8 +29,6 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
-import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -47,7 +43,6 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
-	private final ProductCategoryJpaRepository productCategoryRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -185,24 +180,12 @@ public class CartServiceImpl implements CartService {
 					productImagePath = product.getProductImage().getFirst().getProductImagePath();
 				}
 
-				// 상품 카테고리 리스트 가져오기
-				List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(product.getProductId());
-				List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
-
-				// 카테고리 리스트가 null이 아니면 DTO로 변환
-				if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
-					findProductCategoriesDto = findProductCategories.stream()
-						.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-						.toList();
-				}
-
 				//  DTO 가공
 				long productTotalPrice = product.getProductSalePrice() * cartItem.getCartItemsQuantity();
 
 				return new ResponseCartItemsForMemberDTO(
 					cartItem.getCartItemsId(),
 					product.getProductId(),
-					findProductCategoriesDto,
 					product.getProductTitle(),
 					product.getProductSalePrice(),
 					productImagePath,
@@ -261,20 +244,8 @@ public class CartServiceImpl implements CartService {
 			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
 
-		// 카테고리 가져오기
-		List<ProductCategory> findProductCategories = productCategoryRepository.findByProduct_ProductId(findProduct.getProductId());
-		List<ProductCategoryDTO> findProductCategoriesDto = new ArrayList<>();
-
-		// 카테고리 리스트가 null이 아니면 DTO로 변환
-		if (Objects.nonNull(findProductCategories) && !findProductCategories.isEmpty()) {
-			findProductCategoriesDto = findProductCategories.stream()
-				.map(productCategory -> new ProductCategoryDTO(productCategory.getCategory().getCategoryId()))
-				.toList();
-		}
-
 		CartItemDTO newItem = new CartItemDTO(
 			findProduct.getProductId(),
-			findProductCategoriesDto,
 			findProduct.getProductTitle(),
 			findProduct.getProductSalePrice(),
 			productImagePath,
@@ -370,7 +341,6 @@ public class CartServiceImpl implements CartService {
 
 				return new ResponseCartItemsForGuestDTO(
 					cartItem.getProductId(),
-					cartItem.getCategoryIds(),
 					cartItem.getProductTitle(),
 					cartItem.getProductSalePrice(),
 					cartItem.getProductImagePath(),
@@ -382,14 +352,54 @@ public class CartServiceImpl implements CartService {
 	}
 
 	/**
-	 * 게스트일 때 장바구니 항목 개수 조회
+	 * 게스트 장바구니 -> 회원 장바구니와 병합 메소드
 	 */
+	@Transactional
 	@Override
-	public Integer getCartItemsCountsForGuest(String sessionId) {
+	public Integer mergeCartItemsToMemberFromGuest(String memberId, String sessionId) {
+		// 회원 검증
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
+			.orElseThrow(CustomerNotFoundException::new);
+
+		// 장바구니 검증
+		Cart cart;
+		// 장바구니가 없으면 장바구니 생성
+		if (!cartRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
+			cart = cartRepository.save(new Cart(findCustomer));
+		} else {
+			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId())
+				.orElseThrow(CartNotFoundException::new);
+		}
+
+		// 게스트 장바구니 확인 
 		Object o = redisTemplate.opsForValue().get(sessionId);
-		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
-		if (Objects.isNull(cart) || cart.getCartItems().isEmpty()) {
-			return 0;
+		CartDTO redisCart = objectMapper.convertValue(o, CartDTO.class);
+		if (Objects.isNull(redisCart)) {
+			return cart.getCartItems().size();
+		}
+
+		// 병합
+		List<CartItemDTO> redisCartItems = redisCart.getCartItems();
+		for (CartItemDTO cartItem : redisCartItems) {
+			long productId = cartItem.getProductId();
+
+			Product findProduct = productRepository.findById(productId)
+				.orElseThrow(ProductNotFoundException::new);
+
+			// 현재 고객이 장바구니 아이템을 가지고 있을 경우 수량만 올려주기
+			if (cartItemsRepository.existsByCartAndProduct(cart, findProduct)) {
+				CartItems findCartItem = cartItemsRepository.findByCartAndProduct(cart, findProduct)
+					.orElseThrow(CartItemNotFoundException::new);
+
+				findCartItem.changeCartItemsQuantity(findCartItem.getCartItemsQuantity() + cartItem.getCartItemsQuantity());
+			} else {
+				// 현재 고객이 장바구니 아이템을 가지고 있지 않을 경우 새로 저장
+				cartItemsRepository.save(new CartItems(cart, findProduct, cartItem.getCartItemsQuantity()));
+			}
 		}
 
 		return cart.getCartItems().size();
