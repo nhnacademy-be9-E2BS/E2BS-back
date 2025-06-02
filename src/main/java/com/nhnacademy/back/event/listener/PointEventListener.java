@@ -5,6 +5,8 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.event.event.OrderCancelPointEvent;
+import com.nhnacademy.back.event.event.OrderCancelPointPaymentEvent;
 import com.nhnacademy.back.event.event.OrderPointEvent;
 import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.event.event.RegisterPointEvent;
@@ -89,6 +91,34 @@ public class PointEventListener {
 			pointHistoryService.payPoint(memberId, pointFigure);
 		} catch (Exception e) {
 			log.error("주문 시 포인트 사용 실패", e);
+		}
+	}
+
+	/**
+	 * 주문취소 시 포인트 복구
+	 */
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderCancelPointPaymentEvent(OrderCancelPointPaymentEvent event) {
+		try {
+			String memberId = event.getMemberId();
+			Long pointFigure = event.getPointFigure();
+			pointHistoryService.recoverPoint(memberId, pointFigure);
+		} catch (Exception e) {
+			log.error("주문취소 포인트 복구 실패", e);
+		}
+	}
+
+	/**
+	 * 주문취소 시 포인트 회수
+	 */
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderCancelPointEvent(OrderCancelPointEvent event) {
+		try {
+			String memberId = event.getMemberId();
+			Long pointFigure = event.getPointFigure();
+			pointHistoryService.retrievePoint(memberId, pointFigure);
+		} catch (Exception e) {
+			log.error("주문취소 포인트 회수 실패", e);
 		}
 	}
 }

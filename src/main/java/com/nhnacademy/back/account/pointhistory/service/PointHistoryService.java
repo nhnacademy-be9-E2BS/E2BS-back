@@ -29,6 +29,18 @@ public interface PointHistoryService {
 
 	void earnOrderPoint(String memberId, Long pointFigure);
 
+	/**
+	 * 포인트 사용
+	 */
 	void payPoint(String memberId, Long pointFigure);
 
+	/**
+	 * 주문 취소로 인한 포인트 복구
+	 */
+	void recoverPoint(String memberId, Long pointFigure);
+
+	/**
+	 * 주문 취소로 인한 포인트 회수
+	 */
+	void retrievePoint(String memberId, Long pointFigure);
 }
