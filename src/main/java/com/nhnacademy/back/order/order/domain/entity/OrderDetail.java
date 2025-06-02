@@ -57,4 +57,8 @@ public class OrderDetail {
 		this.review = null;
 	}
 
+	public void setReview(Review review) {
+		this.review = review;
+	}
+
 }

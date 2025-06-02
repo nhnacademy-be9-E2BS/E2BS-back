@@ -17,9 +17,9 @@ public class RequestAddCartItemsDTO {
 	private String sessionId;
 
 	@NotNull
-	private long productId;
+	private Long productId;
 
 	@NotNull
-	private int quantity;
+	private Integer quantity;
 
 }

@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RequestDeleteCartItemsForGuestDTO {
 	@NotNull
-	private long productId;
+	private Long productId;
 	@NotNull
 	private String sessionId;
 }
