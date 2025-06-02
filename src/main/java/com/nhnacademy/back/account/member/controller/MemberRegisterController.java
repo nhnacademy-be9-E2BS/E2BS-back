@@ -19,7 +19,7 @@ import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMe
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.batch.service.RabbitService;
-import com.nhnacademy.back.batch.welcome.WelcomeCouponRabbitConfig;
+import com.nhnacademy.back.common.config.RabbitConfig;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import lombok.RequiredArgsConstructor;
@@ -50,8 +50,8 @@ public class MemberRegisterController {
 
 		// 웰컴 쿠폰 MQ 발급
 		rabbitService.sendToRabbitMQ(
-			WelcomeCouponRabbitConfig.WELCOME_EXCHANGE,
-			WelcomeCouponRabbitConfig.WELCOME_ROUTING_KEY,
+			RabbitConfig.WELCOME_EXCHANGE,
+			RabbitConfig.WELCOME_ROUTING_KEY,
 			responseRegisterMemberDTO.getMemberId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseRegisterMemberDTO);

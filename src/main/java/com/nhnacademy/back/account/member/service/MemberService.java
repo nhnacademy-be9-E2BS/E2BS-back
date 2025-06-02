@@ -7,6 +7,7 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberStateDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 
@@ -33,4 +34,6 @@ public interface MemberService {
 	void updateMemberState(String memberId, RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO);
 
 	void updateMemberRole(String memberId);
+
+	ResponseMemberStateDTO getMemberState(String memberId);
 }

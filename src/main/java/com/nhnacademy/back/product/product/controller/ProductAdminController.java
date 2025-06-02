@@ -1,7 +1,5 @@
 package com.nhnacademy.back.product.product.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -61,17 +59,6 @@ public class ProductAdminController {
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseProductReadDTO> response = productService.getProducts(pageable, 0);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	/**
-	 * order전용 productId들을 받아서 정보를 반환
-	 * 200 상태코드 반환
-	 */
-	@Admin
-	@GetMapping("/order")
-	public ResponseEntity<List<ResponseProductReadDTO>> getProducts(@RequestBody List<Long> products) {
-		List<ResponseProductReadDTO> productsDTO = productService.getProducts(products);
-		return ResponseEntity.status(HttpStatus.OK).body(productsDTO);
 	}
 
 	/**

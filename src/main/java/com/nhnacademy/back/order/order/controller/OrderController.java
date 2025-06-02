@@ -83,7 +83,7 @@ public class OrderController {
 	}
 
 	/**
-	 * 특정 주문서를 삭제하는 기능, 안에서 재고 복구도 진행함
+	 * 특정 주문서를 삭제하는 기능
 	 */
 	@Member
 	@PostMapping("/cancel")

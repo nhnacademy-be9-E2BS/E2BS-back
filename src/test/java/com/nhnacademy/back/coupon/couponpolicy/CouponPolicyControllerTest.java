@@ -78,7 +78,6 @@ class CouponPolicyControllerTest {
 		request.setCouponPolicyMinimum(1000L);
 		request.setCouponPolicyMaximumAmount(10000L);
 		request.setCouponPolicyDiscountRate(20);
-		request.setCouponPolicyCreatedAt(LocalDateTime.now());
 		request.setCouponPolicyName("테스트 정책");
 
 		doNothing().when(couponPolicyService).createCouponPolicy(request);

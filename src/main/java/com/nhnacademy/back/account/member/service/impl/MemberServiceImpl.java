@@ -16,6 +16,7 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberStateDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
@@ -40,7 +41,9 @@ import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository
 import com.nhnacademy.back.event.event.RegisterPointEvent;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -135,9 +138,11 @@ public class MemberServiceImpl implements MemberService {
 			.socialAuth(socialAuth)
 			.build();
 
-		memberJpaRepository.saveAndFlush(member);
+		// memberJpaRepository.saveAndFlush(member);
+		memberJpaRepository.save(member);
 
 		// 회원가입 포인트 적립 이벤트 발행
+		log.info("[이벤트 발행] RegisterPointEvent memberId={}", member.getMemberId());
 		eventPublisher.publishEvent(new RegisterPointEvent(member.getMemberId()));
 
 		return new ResponseRegisterMemberDTO(
@@ -275,6 +280,17 @@ public class MemberServiceImpl implements MemberService {
 		if (result <= 0) {
 			throw new UpdateMemberRoleFailedException(UPDATE_MEMBER_ROLE_FAILED);
 		}
+	}
+
+	@Override
+	public ResponseMemberStateDTO getMemberState(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+
+		MemberState memberState = member.getMemberState();
+		return new ResponseMemberStateDTO(memberState.getMemberStateName().name());
 	}
 
 }
