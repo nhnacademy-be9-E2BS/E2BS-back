@@ -41,9 +41,10 @@ public class Customer {
 
 	public static Customer createCustomerEntity(RequestCustomerRegisterDTO request) {
 		return Customer.builder()
-			.customerEmail(request.getEmail())
-			.customerPassword(request.getPassword())
-			.customerName(request.getName())
+			.customerEmail(request.getCustomerEmail())
+			.customerPassword(request.getCustomerPassword())
+			.customerName(request.getCustomerName())
 			.build();
 	}
+
 }
