@@ -30,9 +30,8 @@ public class OrderCompleteScheduler {
 		OrderState delivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).orElse(null);
 		OrderState complete = orderStateJpaRepository.findByOrderStateName(OrderStateName.COMPLETE).orElse(null);
 
-		LocalDate cutoff = LocalDate.now().minusDays(1);
 		List<Order> shippingOrders = orderJpaRepository.findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(
-			Objects.requireNonNull(delivery).getOrderStateId(), cutoff
+			Objects.requireNonNull(delivery).getOrderStateId(), LocalDate.now()
 		);
 
 		for (Order order : shippingOrders) {
