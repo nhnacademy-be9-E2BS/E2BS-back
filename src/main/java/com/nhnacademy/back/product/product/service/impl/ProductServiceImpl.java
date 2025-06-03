@@ -83,10 +83,9 @@ public class ProductServiceImpl implements ProductService {
 		//상태 저장
 		ProductState productState = productStateJpaRepository.findByProductStateId(request.getProductStateId());
 		Integer productStock = request.getProductStock();
-		if (Objects.isNull(productState) && productStock != 0) {
-			productState = productStateJpaRepository.findByProductStateName(ProductStateName.SALE);
-		}
-		else if (productStock == 0) {
+		ProductState stateSale = productStateJpaRepository.findByProductStateName(ProductStateName.SALE);
+
+		if (productStock == 0 && productState == stateSale) {
 			productState = productStateJpaRepository.findByProductStateName(ProductStateName.OUT);
 		}
 
@@ -191,43 +190,82 @@ public class ProductServiceImpl implements ProductService {
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
-		// 상품 정보 업데이트 (수정)
-		product.updateProduct(request, productState, publisher);
+
 
 		List<MultipartFile> productImageFiles = request.getProductImage();
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
 
-		// 이미지 저장
+
+
 		// 자식 추가 (ProductImage)
+		// - 이미지가 들어왔다면
 		if (Objects.nonNull(productImageFiles) && !productImageFiles.isEmpty()) {
+			// - 기존 리스트 조회
+			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
+
+			// - miniO 기존 파일 삭제
+			for (ProductImage productImage : product.getProductImage()) {
+				minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+			}
+
+			// - DB에서 삭제
+			productImageJpaRepository.deleteAll(productImages);
+
+
+			List<ProductImage> newProductImages = new ArrayList<>();
 			for (MultipartFile productImageFile : productImageFiles) {
-				String imagePath = "";
-
-				// 기존 파일 삭제
-				for (ProductImage productImage : product.getProductImage()) {
-					minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
-				}
-				// 새로 업로드할 파일 등록
 				String originalFilename = productImageFile.getOriginalFilename();
+				String objectName = UUID.randomUUID() + "_" + originalFilename;
 
-				UUID uuid = UUID.randomUUID();
-				String objectName = uuid + "_" + originalFilename;
+				// MinIO에 파일 업로드
 				minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
 
-				ProductImage productImage = new ProductImage(product, imagePath);
-
-				product.getProductImage().add(productImage);
-				productImageJpaRepository.save(productImage);
+				// 새로운 ProductImage 엔티티 생성
+				ProductImage productImage = new ProductImage(product, objectName);
+				newProductImages.add(productImage);
 			}
+			// Product의 productImage 리스트 갱신
+			product.getProductImage().clear(); // 기존 리스트 비우기
+			product.getProductImage().addAll(newProductImages);
+			productImageJpaRepository.saveAll(newProductImages); // 새로운 이미지 저장
 		}
 
+		// 	// - 수정해서 받은 사진의 갯수만큼 반복
+		// 	for (MultipartFile productImageFile : productImageFiles) {
+		//
+		//
+		// 		// - miniO에 새로 업로드할 파일이름
+		// 		String originalFilename = productImageFile.getOriginalFilename();
+		//
+		// 		// - 빈 경로 생성
+		// 		String updateImagePath = "";
+		//
+		// 		// - 이름 설정 후 업로드
+		// 		UUID uuid = UUID.randomUUID();
+		// 		String objectName = uuid + "_" + originalFilename;
+		// 		minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
+		//
+		// 		// 가공된 파일명 적용
+		// 		updateImagePath = objectName;
+		//
+		// 		ProductImage productImage = new ProductImage(product, updateImagePath);
+		// 		product.getProductImage().add(productImage);
+		// 		productImageJpaRepository.save(productImage);
+		// 	}
+		// }
+
+		// 상품 정보 업데이트 (수정)
+		product.updateProduct(request, productState, publisher);
+
 		// 태그 삭제 후 저장
-		productTagJpaRepository.deleteByProduct_ProductId(productId);
-		for (Long tagId : tagIds) {
-			Tag tag = tagJpaRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
-			productTagJpaRepository.save(new ProductTag(product, tag));
+		if (!Objects.isNull(request.getTagIds())) {
+			productTagJpaRepository.deleteByProduct_ProductId(productId);
+			for (Long tagId : tagIds) {
+				Tag tag = tagJpaRepository.findById(tagId)
+					.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
+				productTagJpaRepository.save(new ProductTag(product, tag));
+			}
 		}
 
 		// 기여자 삭제 후 저장
@@ -291,11 +329,11 @@ public class ProductServiceImpl implements ProductService {
 	/**
 	 * 파일 업로드 메소드
 	 */
-	private String uploadFile(MultipartFile reviewImageFile) {
-		String originalFilename = reviewImageFile.getOriginalFilename();
+	private String uploadFile(MultipartFile productImageFile) {
+		String originalFilename = productImageFile.getOriginalFilename();
 		UUID uuid = UUID.randomUUID();
 		String objectName = uuid + "_" + originalFilename;
-		minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+		minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
 		return objectName;
 	}
 

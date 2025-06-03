@@ -32,4 +32,5 @@ public interface ProductImageJpaRepository extends JpaRepository<ProductImage, L
 	@Query("SELECT pi.productImageId FROM ProductImage pi WHERE pi.productImagePath IN :productImage")
 	Long findByProductImagePath(@Param("productImage") String productImage);
 
+	List<ProductImage> getAllByProduct_ProductId(long productProductId);
 }
