@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
+import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth/admin/orders")
 public class OrderAdminController {
 	private final OrderAdminService orderAdminService;
+	private final OrderReturnService orderReturnService;
 
 	/**
 	 * 전체 주문 내역 목록을 주문 상태에 따라 반환하는 메서드
@@ -44,6 +47,12 @@ public class OrderAdminController {
 	@PostMapping("/{orderCode}")
 	public ResponseEntity<Void> startDelivery(@PathVariable String orderCode) {
 		return orderAdminService.startDelivery(orderCode);
+	}
+
+	@Admin
+	@GetMapping("/return")
+	public ResponseEntity<Page<ResponseOrderReturnDTO>> getOrderReturns(Pageable pageable) {
+		return orderReturnService.getOrderReturnsAll(pageable);
 	}
 
 }
