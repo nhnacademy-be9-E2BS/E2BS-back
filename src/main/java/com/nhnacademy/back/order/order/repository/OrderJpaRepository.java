@@ -24,4 +24,5 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 	List<Order> findByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(LocalDateTime cutoff);
 
 	List<Order> findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(long stateId, LocalDate cutoff);
+
 }
