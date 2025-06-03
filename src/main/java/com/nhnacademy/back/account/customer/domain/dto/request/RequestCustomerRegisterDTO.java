@@ -7,17 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class RequestCustomerRegisterDTO {
 
-	@NotBlank
-	private String name;
-
 	@Email
-	private String email;
-
+	private String customerEmail;
 	@NotBlank
-	private String password;
+	private String memberName;
+	@NotBlank
+	private String customerPassword;
+	@NotBlank
+	private String customerPasswordCheck;
 
 }

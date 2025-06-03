@@ -15,13 +15,16 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestLoginMemberD
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberIdDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestMemberInfoDTO;
 import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemberDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberEmailDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberInfoDTO;
+import com.nhnacademy.back.account.member.domain.dto.response.ResponseMemberStateDTO;
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsException;
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberStateException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
@@ -279,6 +282,41 @@ public class MemberServiceImpl implements MemberService {
 		if (result <= 0) {
 			throw new UpdateMemberRoleFailedException(UPDATE_MEMBER_ROLE_FAILED);
 		}
+	}
+
+	@Override
+	public ResponseMemberStateDTO getMemberState(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+
+		MemberState memberState = member.getMemberState();
+		return new ResponseMemberStateDTO(memberState.getMemberStateName().name());
+	}
+
+	@Override
+	@Transactional
+	public void changeDormantMemberStateActive(String memberId) {
+		MemberState memberState = memberStateJpaRepository.getMemberStateByMemberStateId(1);
+		if (Objects.isNull(memberState)) {
+			throw new NotFoundMemberStateException("회원 상태를 가져오지 못했습니다.");
+		}
+
+		int result = memberJpaRepository.updateMemberMemberState(memberState, memberId);
+		if (result <= 0) {
+			throw new UpdateMemberStateFailedException("회원 상태를 변경하지 못했습니다.");
+		}
+	}
+
+	@Override
+	public ResponseMemberEmailDTO getMemberEmail(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+
+		return new ResponseMemberEmailDTO(member.getCustomer().getCustomerEmail());
 	}
 
 }

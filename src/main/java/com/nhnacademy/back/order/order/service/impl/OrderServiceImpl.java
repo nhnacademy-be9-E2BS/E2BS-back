@@ -33,6 +33,7 @@ import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
+import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossCancelDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
@@ -48,6 +49,8 @@ import com.nhnacademy.back.order.order.exception.OrderProcessException;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderService;
+import com.nhnacademy.back.order.orderreturn.domain.entity.OrderReturn;
+import com.nhnacademy.back.order.orderreturn.repository.OrderReturnJpaRepository;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderStateName;
 import com.nhnacademy.back.order.orderstate.repository.OrderStateJpaRepository;
@@ -89,6 +92,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderStateJpaRepository orderStateJpaRepository;
 	private final WrapperJpaRepository wrapperJpaRepository;
 	private final PointPolicyJpaRepository pointPolicyJpaRepository;
+	private final OrderReturnJpaRepository orderReturnJpaRepository;
 
 	private final ProductService productService;
 	private final PointHistoryService pointHistoryService;
@@ -345,6 +349,48 @@ public class OrderServiceImpl implements OrderService {
 			return ResponseEntity.status(tossResponse.getStatusCode()).build();
 		}
 
+		return ResponseEntity.ok().build();
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<Void> returnOrder(RequestOrderReturnDTO returnDTO) {
+		Order order = orderJpaRepository.findById(returnDTO.getOrderCode()).orElseThrow(OrderNotFoundException::new);
+		if (!order.getOrderState().getOrderStateName().equals(OrderStateName.COMPLETE)) {
+			throw new OrderProcessException("반품할 수 있는 주문이 아닙니다.");
+		}
+
+		long returnAmount = 0;
+		if (returnDTO.getReturnCategory().equals("BREAK")) {
+			//파손, 불량의 경우 배송비, 포장지 포함 전체 금액 환불
+			returnAmount = order.getOrderPointAmount() + order.getOrderPaymentAmount();
+		} else if (returnDTO.getReturnCategory().equals("CHANGE_MIND")) {
+			// 단순 변심일 시 내야하는 반품 배송비
+			long deliveryFee = deliveryFeeJpaRepository.findTopByOrderByDeliveryFeeDateDesc().getDeliveryFeeAmount();
+			// 단순 변심에는 순수 상품 금액 - 쿠폰 할인가만 환불한다.
+			returnAmount = order.getOrderPureAmount() - deliveryFee;
+		}
+
+		// 배송비를 제외한 금액이 0원 이하라면 반품이 불가함
+		if (returnAmount <= 0) {
+			throw new OrderProcessException("반품 금액이 0원 이하입니다.");
+		}
+		// 포인트 환불
+		// 적립 금액 회수
+
+		// 사용한 쿠폰이 있을 시 쿠폰 복구
+		MemberCoupon memberCoupon = order.getMemberCoupon();
+		if (memberCoupon != null) {
+			memberCouponService.reIssueCouponById(memberCoupon.getMemberCouponId());
+		}
+
+		//재고 복구?
+
+		OrderReturn orderReturn = new OrderReturn(returnDTO, order, returnAmount);
+		orderReturnJpaRepository.save(orderReturn);
+
+		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.RETURN).orElse(null);
+		order.updateOrderState(orderState);
 		return ResponseEntity.ok().build();
 	}
 

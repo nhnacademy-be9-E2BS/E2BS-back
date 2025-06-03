@@ -148,7 +148,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		List<MemberCoupon> memberCoupons = memberCouponJpaRepository.getMemberCouponsByMember(member);
+		List<MemberCoupon> memberCoupons = memberCouponJpaRepository.getMemberCouponsByMemberAndMemberCouponUsed(member,
+			false);
 		int couponCnt = 0;
 		if (Objects.nonNull(memberCoupons) && !memberCoupons.isEmpty()) {
 			couponCnt = memberCoupons.size();
