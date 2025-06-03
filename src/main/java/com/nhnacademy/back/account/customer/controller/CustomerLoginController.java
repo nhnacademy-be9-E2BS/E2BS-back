@@ -6,7 +6,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/customer/login")
 public class CustomerLoginController {
 
 	private final CustomerService customerService;
@@ -25,7 +23,7 @@ public class CustomerLoginController {
 	/**
 	 * 비회원 로그인
 	 */
-	@PostMapping
+	@PostMapping("/api/customers/login")
 	public ResponseEntity<Long> customerLogin(@Validated @RequestBody RequestCustomerLoginDTO requestCustomerLoginDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
