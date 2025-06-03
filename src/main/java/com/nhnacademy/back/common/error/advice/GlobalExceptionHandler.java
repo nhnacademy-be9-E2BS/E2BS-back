@@ -33,6 +33,8 @@ import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.exception.InvalidImageFormatException;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
+import com.nhnacademy.back.order.order.exception.OrderNotFoundException;
+import com.nhnacademy.back.order.order.exception.OrderProcessException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
@@ -66,7 +68,7 @@ public class GlobalExceptionHandler {
 		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class,
 		DeleteAddressFailedException.class,
 		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class, CustomerEmailNotExistsException.class,
-		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class})
+		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class, OrderProcessException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
@@ -82,7 +84,8 @@ public class GlobalExceptionHandler {
 		ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
 		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
-		NotFoundAddressException.class, OrderDetailNotFoundException.class, NotFoundMemberStateException.class})
+		NotFoundAddressException.class, OrderDetailNotFoundException.class, NotFoundMemberStateException.class,
+		OrderNotFoundException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());
