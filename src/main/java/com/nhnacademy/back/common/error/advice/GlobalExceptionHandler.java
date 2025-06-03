@@ -20,6 +20,7 @@ import com.nhnacademy.back.account.member.exception.LoginMemberIsNotExistsExcept
 import com.nhnacademy.back.account.member.exception.MemberRoleException;
 import com.nhnacademy.back.account.member.exception.MemberStateWithdrawException;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberStateException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberInfoFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberRoleFailedException;
 import com.nhnacademy.back.account.member.exception.UpdateMemberStateFailedException;
@@ -81,7 +82,7 @@ public class GlobalExceptionHandler {
 		ReviewNotFoundException.class, TagNotFoundException.class,
 		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
 		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
-		NotFoundAddressException.class, OrderDetailNotFoundException.class})
+		NotFoundAddressException.class, OrderDetailNotFoundException.class, NotFoundMemberStateException.class})
 	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
 			LocalDateTime.now());
