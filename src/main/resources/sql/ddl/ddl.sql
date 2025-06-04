@@ -259,8 +259,6 @@ CREATE TABLE product
     product_sale_price    BIGINT                NOT NULL,
     product_packageable   BIT(1)                NOT NULL,
     product_stock         INT                   NOT NULL,
-    product_hits          BIGINT DEFAULT 0      NOT NULL,
-    product_searches      BIGINT DEFAULT 0      NOT NULL,
     CONSTRAINT pk_product PRIMARY KEY (product_id)
 );
 

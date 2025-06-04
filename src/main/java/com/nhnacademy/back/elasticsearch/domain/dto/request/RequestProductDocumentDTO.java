@@ -21,7 +21,7 @@ public class RequestProductDocumentDTO {
 	private String productTitle;
 
 	@NotNull
-	private String productContent;
+	private String productDescription;
 
 	@NotNull
 	private String productPublisherName;

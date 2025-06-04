@@ -30,7 +30,7 @@ public class ProductSearchController {
 	 */
 	@GetMapping("/search")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProductsBySearch(
-		@PageableDefault(page = 0, size = 9) Pageable pageable,
+		@PageableDefault(page = 0, size = 10) Pageable pageable,
 		@RequestParam String keyword, @RequestParam(required = false) ProductSortType sort) {
 		Page<Long> productIds = productSearchService.getProductIdsBySearch(pageable, keyword, sort);
 		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);
@@ -42,7 +42,7 @@ public class ProductSearchController {
 	 */
 	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProductsByCategory(
-		@PageableDefault(page = 0, size = 9) Pageable pageable,
+		@PageableDefault(page = 0, size = 10) Pageable pageable,
 		@PathVariable Long categoryId, @RequestParam(required = false) ProductSortType sort) {
 		Page<Long> productIds = productSearchService.getProductIdsByCategoryId(pageable, categoryId, sort);
 		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);

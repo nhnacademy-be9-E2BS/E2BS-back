@@ -14,10 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.product.category.domain.dto.ProductCategoryFlatDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryIdsDTO;
-import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.category.service.impl.ProductCategoryServiceImpl;
-import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProductCategoryServiceTest {
@@ -25,104 +23,6 @@ class ProductCategoryServiceTest {
 	private ProductCategoryServiceImpl productCategoryService;
 	@Mock
 	private ProductCategoryJpaRepository productCategoryJpaRepository;
-	@Mock
-	private ProductJpaRepository productJpaRepository;
-	@Mock
-	private CategoryJpaRepository categoryJpaRepository;
-
-	// @Test
-	// @DisplayName("create productCategory - success")
-	// void create_productCategory_success_test() {
-	// 	// given
-	// 	long productId = 1L;
-	// 	List<Long> categoryIds = List.of(2L);
-	// 	boolean isUpdate = true;
-	// 	Product product = Product.builder()
-	// 		.productState(new ProductState(ProductStateName.SALE))
-	// 		.publisher(new Publisher("publisher"))
-	// 		.productTitle("Product")
-	// 		.productContent("Product content")
-	// 		.productDescription("Product description")
-	// 		.productPublishedAt(LocalDate.now())
-	// 		.productIsbn("978-89-12345-01-1")
-	// 		.productRegularPrice(10000)
-	// 		.productSalePrice(8000)
-	// 		.productPackageable(true)
-	// 		.productStock(100)
-	// 		.productHits(0)
-	// 		.productSearches(0)
-	// 		.productImage(new ArrayList<>())
-	// 		.build();
-	// 	Category categoryA = new Category("Category A", null);
-	// 	Category categoryB = new Category("Category B", categoryA);
-	// 	ReflectionTestUtils.setField(categoryA, "categoryId", 1L);
-	// 	ReflectionTestUtils.setField(categoryB, "categoryId", 2L);
-	// 	when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(categoryA));
-	// 	when(categoryJpaRepository.findById(2L)).thenReturn(Optional.of(categoryB));
-	// 	when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
-	//
-	// 	// when
-	// 	productCategoryService.createProductCategory(productId, categoryIds, isUpdate);
-	//
-	// 	// then
-	// 	verify(productCategoryJpaRepository, times(2)).save(any(ProductCategory.class));
-	// }
-	//
-	// @Test
-	// @DisplayName("create productCategory - fail1")
-	// void create_productCategory_success_fail1_test() {
-	// 	// given
-	// 	long productId = 1L;
-	// 	List<Long> categoryIds = Collections.emptyList();
-	// 	boolean isUpdate = true;
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> productCategoryService.createProductCategory(productId, categoryIds, isUpdate))
-	// 		.isInstanceOf(ProductCategoryCreateNotAllowException.class);
-	// }
-	//
-	// @Test
-	// @DisplayName("create productCategory - fail2")
-	// void create_productCategory_success_fail2_test() {
-	// 	// given
-	// 	long productId = 1L;
-	// 	List<Long> categoryIds = List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L);
-	// 	boolean isUpdate = true;
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> productCategoryService.createProductCategory(productId, categoryIds, isUpdate))
-	// 		.isInstanceOf(ProductCategoryCreateNotAllowException.class);
-	// }
-	//
-	// @Test
-	// @DisplayName("create productCategory - fail3")
-	// void create_productCategory_success_fail3_test() {
-	// 	// given
-	// 	long productId = 1L;
-	// 	List<Long> categoryIds = List.of(1L);
-	// 	boolean isUpdate = true;
-	// 	when(categoryJpaRepository.findById(1L)).thenReturn(Optional.empty());
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> productCategoryService.createProductCategory(productId, categoryIds, isUpdate))
-	// 		.isInstanceOf(CategoryNotFoundException.class);
-	// }
-	//
-	// @Test
-	// @DisplayName("create productCategory - fail4")
-	// void create_productCategory_success_fail4_test() {
-	// 	long productId = 1L;
-	// 	List<Long> categoryIds = List.of(1L);
-	// 	boolean isUpdate = false;
-	// 	Category categoryA = new Category("Category A", null);
-	// 	ReflectionTestUtils.setField(categoryA, "categoryId", 1L);
-	// 	when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(categoryA));
-	// 	when(productJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> productCategoryService.createProductCategory(productId, categoryIds, isUpdate))
-	// 		.isInstanceOf(ProductNotFoundException.class);
-	// }
 
 	@Test
 	@DisplayName("get categories by productId - success")

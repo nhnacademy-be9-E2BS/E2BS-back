@@ -47,6 +47,10 @@ order:
     toss: https://api.tosspayments.com/v1/payments
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
 
+search:
+  index:
+    name: e2bs_product_dev
+
 # minio 원격 접근 설정
 minio:
   host: http://storage.java21.net:8000

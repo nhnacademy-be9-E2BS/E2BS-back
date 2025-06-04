@@ -5,19 +5,21 @@
     },
     "productTitle": {
       "type": "text",
-      "analyzer": "jaso_analyzer"
+      "analyzer": "nori_analyzer",
+      "search_analyzer": "synonym"
     },
-    "productContent": {
+    "productDescription": {
       "type": "text",
-      "analyzer": "nori_analyzer"
+      "analyzer": "nori_analyzer",
+      "search_analyzer": "synonym"
     },
     "productPublisherName": {
       "type": "text",
-      "analyzer": "nori_analyzer"
+      "analyzer": "jaso_analyzer"
     },
     "productPublishedAt": {
       "type": "date",
-      "format": "strict_date_optional_time||epoch_millis||basic_date"
+      "format": "basic_date"
     },
     "productSalePrice": {
       "type": "long"

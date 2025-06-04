@@ -137,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
 
 		// 엘라스틱 서치에 저장
 		productSearchService.createProductDocument(new RequestProductDocumentDTO(
-			product.getProductId(), product.getProductTitle(), product.getProductContent(),
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
 			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
 			tagNames, contributorNames, categoryIds));
 	}
@@ -328,7 +328,7 @@ public class ProductServiceImpl implements ProductService {
 
 		// 엘라스틱 서치에서 수정
 		productSearchService.updateProductDocument(new RequestProductDocumentDTO(
-			productId, product.getProductTitle(), product.getProductContent(),
+			productId, product.getProductTitle(), product.getProductDescription(),
 			product.getPublisher().getPublisherName(), product.getProductPublishedAt(),
 			product.getProductSalePrice(), tagNames, contributorNames, categoryIds));
 
@@ -349,7 +349,15 @@ public class ProductServiceImpl implements ProductService {
 			throw new ProductStockDecrementException("재고 수량 변경 불가");
 		}
 
-		product.setProductSale(stock);
+		if (stock == 0) {
+			product.setState(productStateJpaRepository.findByProductStateName(ProductStateName.OUT));
+		}
+
+		if (stock > 0) {
+			product.setState(productStateJpaRepository.findByProductStateName(ProductStateName.SALE));
+		}
+
+		product.setStock(stock);
 		productJpaRepository.save(product);
 	}
 
@@ -362,7 +370,7 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
-		product.setProduct(request.getProductSalePrice());
+		product.setSalePrice(request.getProductSalePrice());
 		productJpaRepository.save(product);
 
 		// 엘라스틱 서치에서 수정

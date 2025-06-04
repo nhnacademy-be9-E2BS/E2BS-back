@@ -6,8 +6,6 @@ import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategory
 
 public interface ProductCategoryService {
 
-	// void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate);
-
 	List<ResponseCategoryIdsDTO> getCategoriesByProductId(List<Long> productIds);
 
 }

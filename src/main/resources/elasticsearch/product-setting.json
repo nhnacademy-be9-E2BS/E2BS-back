@@ -5,7 +5,7 @@
         "type": "nori_tokenizer",
         "decompound_mode": "mixed"
       },
-      "jaso_index_tokenizer": {
+      "my_jaso_tokenizer": {
         "type": "jaso_tokenizer",
         "mistype": true,
         "chosung": true
@@ -16,12 +16,109 @@
         "type": "edge_ngram",
         "min_gram": 1,
         "max_gram": 50
+      },
+      "synonym_filter": {
+        "type": "synonym",
+        "synonyms": [
+          "책,도서,서적,책자,book",
+          "소설,픽션,novel,fiction",
+          "비소설,논픽션,nonfiction",
+          "자서전,회고록,전기",
+          "참고서,학습서,문제집",
+          "교과서,학습서,학습교재",
+          "만화,웹툰,코믹스,comic,cartoon,webtoon",
+          "그림책,동화책,유아도서",
+          "에세이,수필,컬럼,칼럼,essay,column",
+          "잡지,매거진,magazine",
+          "문학,문예,문학작품,literature",
+          "스릴러,추리,미스터리,thriller,mystery",
+          "판타지,sf,science_fiction,공상과학,fantasy",
+          "로맨스,연애,사랑,romance",
+          "시집,시,시문학,poem,poetry",
+          "수학,산수,math",
+          "과학,사이언스,science",
+          "물리,물리학,physics",
+          "화학,케미스트리,chemistry",
+          "생물,생명과학,바이오,biology",
+          "사회,사회과학,social_science",
+          "역사,히스토리,history",
+          "지리,geography",
+          "경제,금융,economy",
+          "경영,비즈니스,비지니스,MBA,business",
+          "철학,사상,philosophy",
+          "심리학,정신,psychology",
+          "정치,politics",
+          "법학,법률,로스쿨,law",
+          "교육,교수법,education",
+          "성장,자기계발,자기개발,동기부여",
+          "재태크,금융,투자",
+          "영어,토익,토플,english,toeic",
+          "일본어,JLPT",
+          "한국어,TOPIK,토픽",
+          "공무원,공시",
+          "자격증,인증시험,기사",
+          "컴퓨터,IT,information_technology,정보기술",
+          "프로그래밍,코딩,개발",
+          "파이썬,python",
+          "자바,java",
+          "C언어,C,C\\+\\+",
+          "데이터분석,빅데이터",
+          "인공지능,AI,머신러닝",
+          "알고리즘,algorithm",
+          "해커톤,경진대회",
+          "요리,레시피,쿠킹,cooking,recipe",
+          "여행,트래블,관광,travel",
+          "사진,포토그래피,photography",
+          "음악,뮤직,music",
+          "미술,회화,드로잉,스케치,drawing,sketch",
+          "운동,헬스,피트니스,fitness",
+          "명상,마음챙김,정신건강",
+          "위로,힐링,치유,healing",
+          "감성,감수성,정서적인,섬세한",
+          "공감,이해,연대",
+          "독서,책읽기",
+          "인간관계,커뮤니케이션",
+          "공부법,학습법,학습전략",
+          "성공,성취,승리",
+          "육아,자녀교육,자녀",
+          "반려동물,애완동물,pet,펫",
+          "유튜브,youtube,동영상",
+          "sns,소셜미디어,social_media",
+          "초판,1쇄,첫판",
+          "개정판,수정판",
+          "합본,통합본",
+          "전집,시리즈,세트,모음집",
+          "소책자,브로셔,pamphlet",
+          "리커버,한정판,특별판,리미티드_에디션",
+          "전자책,이북,e-book,ebook",
+          "유아,아기,아동,영유아",
+          "초등학생,어린이",
+          "성인,어른",
+          "직장인,회사원",
+          "슬픔,우울,눈물,상실,sadness",
+          "외로움,고독,쓸쓸함,허전함,lonely",
+          "절망,포기,좌절",
+          "그리움,추억,회상",
+          "감동,울림,여운",
+          "행복,즐거운,기쁨,웃음",
+          "유쾌한,신나는",
+          "웃긴,재미있는,유머,개그,funny,comedy",
+          "밝은,환한,희망찬",
+          "긴장,몰입,박진감",
+          "공포,무서운,오싹한,horror",
+          "반전,충격적인,예측불허",
+          "사색,고찰,자기성찰",
+          "이별,상실,헤어짐",
+          "설렘,두근거림",
+          "감정,느낌,기분,정서,emotion,feeling"
+        ],
+        "updateable": true
       }
     },
     "analyzer": {
       "jaso_analyzer": {
         "type": "custom",
-        "tokenizer": "jaso_index_tokenizer",
+        "tokenizer": "my_jaso_tokenizer",
         "filter": [
           "icu_normalizer",
           "suggest_filter"
@@ -32,6 +129,12 @@
         "tokenizer": "my_nori_tokenizer",
         "filter": [
           "icu_normalizer"
+        ]
+      },
+      "synonym": {
+        "tokenizer": "whitespace",
+        "filter": [
+          "synonym_filter"
         ]
       }
     }

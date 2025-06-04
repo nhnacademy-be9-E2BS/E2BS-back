@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Document(indexName = "e2bs_product")
+@Document(indexName = "#{@environment.getProperty('search.index.name')}")
 @Setting(settingPath = "elasticsearch/product-setting.json")
 @Mapping(mappingPath = "elasticsearch/product-mapping.json")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,7 +35,7 @@ public class ProductDocument {
 
 	// 도서 설명 (가중치)
 	@Field(type = FieldType.Text)
-	private String productContent;
+	private String productDescription;
 
 	// 출판사명 (가중치)
 	@Field(type = FieldType.Text)
@@ -80,7 +80,7 @@ public class ProductDocument {
 	public ProductDocument(RequestProductDocumentDTO request) {
 		this.productId = request.getProductId();
 		this.productTitle = request.getProductTitle();
-		this.productContent = request.getProductContent();
+		this.productDescription = request.getProductDescription();
 		this.productPublisherName = request.getProductPublisherName();
 		this.productPublishedAt = request.getProductPublishedAt();
 		this.productSalePrice = request.getProductSalePrice();
@@ -95,7 +95,7 @@ public class ProductDocument {
 
 	public void updateProductDocument(RequestProductDocumentDTO request) {
 		this.productTitle = request.getProductTitle();
-		this.productContent = request.getProductContent();
+		this.productDescription = request.getProductDescription();
 		this.productPublisherName = request.getProductPublisherName();
 		this.productPublishedAt = request.getProductPublishedAt();
 		this.productSalePrice = request.getProductSalePrice();

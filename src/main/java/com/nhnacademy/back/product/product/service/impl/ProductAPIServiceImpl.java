@@ -242,7 +242,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		// 엘라스틱 서치에 저장
 		productSearchService.createProductDocument(new RequestProductDocumentDTO(
-			product.getProductId(), product.getProductTitle(), product.getProductContent(),
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
 			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
 			tagNames, contributorNames,
 			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
@@ -337,7 +337,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		// 엘라스틱 서치에 저장
 		productSearchService.createProductDocument(new RequestProductDocumentDTO(
-			product.getProductId(), product.getProductTitle(), product.getProductContent(),
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
 			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
 			tagNames, contributorNames,
 			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
