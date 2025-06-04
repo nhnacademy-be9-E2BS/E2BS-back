@@ -31,6 +31,7 @@ import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
@@ -67,6 +68,9 @@ class ReviewServiceImplTest {
 	private ReviewJpaRepository reviewRepository;
 
 	@Mock
+	private ProductSearchService productSearchService;
+
+	@Mock
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	@Mock
@@ -77,7 +81,6 @@ class ReviewServiceImplTest {
 
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
-
 
 	Customer customer;
 	Member member;
@@ -92,30 +95,33 @@ class ReviewServiceImplTest {
 
 		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
 			"Product A", "content", "description", LocalDate.now(), "isbn",
-			10000, 10000, false, 3, 0,0, null);
+			10000, 10000, false, 3, null);
 	}
-
 
 	@Test
 	@DisplayName("리뷰 생성 테스트")
 	void createReview() {
 		// given
-		MockMultipartFile mockFile = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockFile = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg",
+			"dummy image content".getBytes());
 		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, customerId, "", "좋네요", 5, mockFile);
 
 		when(memberRepository.getMemberByMemberId(anyString())).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(customerId)).thenReturn(Optional.of(product));
-		when(orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
+		when(orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(customerId,
+			product.getProductId())).thenReturn(true);
 		doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
-		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(Optional.of(mock(OrderDetail.class)));
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(
+			Optional.of(mock(OrderDetail.class)));
 
 		// when
 		reviewService.createReview(request);
 
 		// then
 		verify(reviewRepository, times(1)).save(any(Review.class));
+		verify(productSearchService, times(1)).updateProductDocumentReview(anyLong(), anyInt());
 	}
 
 	@Test
@@ -138,14 +144,14 @@ class ReviewServiceImplTest {
 	void updateReview() {
 		// given
 		long reviewId = 1L;
-		MockMultipartFile mockUpdateFile = new MockMultipartFile("reviewImage", "update-image.jpg", "image/jpeg", "dummy image content".getBytes());
+		MockMultipartFile mockUpdateFile = new MockMultipartFile("reviewImage", "update-image.jpg", "image/jpeg",
+			"dummy image content".getBytes());
 		RequestUpdateReviewDTO request = new RequestUpdateReviewDTO("수정된 내용", mockUpdateFile);
 
 		Review review = mock(Review.class);
 		when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
 		doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
 		when(minioUtils.getPresignedUrl(any(), any())).thenReturn("storageUrl");
-
 
 		// when
 		ResponseUpdateReviewDTO result = reviewService.updateReview(reviewId, request);

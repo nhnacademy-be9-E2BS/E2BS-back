@@ -44,4 +44,7 @@ public interface ProductCategoryJpaRepository extends JpaRepository<ProductCateg
 	}
 
 	List<ProductCategory> findProductIdByCategory(Category category);
+
+	@Query("SELECT pc.category.categoryId FROM ProductCategory pc WHERE pc.product.productId = :productId")
+	List<Long> findCategoryIdsByProductId(@Param("productId") Long productId);
 }

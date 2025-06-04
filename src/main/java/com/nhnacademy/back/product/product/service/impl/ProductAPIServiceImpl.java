@@ -14,9 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
@@ -76,6 +79,8 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	private final CategoryJpaRepository categoryJpaRepository;
 	private final TagJpaRepository tagJpaRepository;
 
+	private final ProductSearchService productSearchService;
+
 	/**
 	 * 검색결과에 맞는 책 목록들 가져오기
 	 */
@@ -88,10 +93,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			items = api.searchBooks();
 		} catch (Exception e) {
 			throw new SearchBookException("Search book failed");
-		}
-
-		if (Objects.isNull(items)) {
-			throw new ProductNotFoundException();
 		}
 
 		List<ResponseProductsApiSearchDTO> responseList = new ArrayList<>();
@@ -123,9 +124,9 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		return new PageImpl<>(pagedList, pageable, responseList.size());
 	}
 
-
 	@Override
-	public Page<ResponseProductApiSearchByQueryTypeDTO> searchProductsByQuery(RequestProductApiSearchByQueryTypeDTO request, Pageable pageable) {
+	public Page<ResponseProductApiSearchByQueryTypeDTO> searchProductsByQuery(
+		RequestProductApiSearchByQueryTypeDTO request, Pageable pageable) {
 		AladdinOpenAPI api = new AladdinOpenAPI(request.getQueryType());
 		List<Item> items;
 
@@ -133,10 +134,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			items = api.getListBooks();
 		} catch (Exception e) {
 			throw new SearchBookException("Search book failed");
-		}
-
-		if (Objects.isNull(items)) {
-			throw new ProductNotFoundException();
 		}
 
 		List<ResponseProductApiSearchByQueryTypeDTO> responseList = new ArrayList<>();
@@ -190,9 +187,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productStateJpaRepository.save(state);
 		}
 
-		Product product = Product.createProductApiEntity(request, publisher, state);
+		Product product = productJpaRepository.save(Product.createProductApiEntity(request, publisher, state));
 
-		productJpaRepository.save(product);
+		List<String> tagNames = new ArrayList<>();
+		List<String> contributorNames = new ArrayList<>();
 
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
 
@@ -209,15 +207,22 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			Contributor contributor = new Contributor(contributorName, position);
 			contributorJpaRepository.save(contributor);
 
+			contributorNames.add(contributorName);
+
 			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
 			ProductContributor productContributor = new ProductContributor(contributor, product);
 			productContributorJpaRepository.save(productContributor);
-
 		}
 
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
+
+		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
+		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
+			throw new ProductCategoryCreateNotAllowException();
+		}
+
 		Set<Category> allCategoriesToSave = new HashSet<>();
 
 		for (Long categoryId : categoryIds) {
@@ -234,9 +239,18 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		//request에 담긴 tagID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 태그 아이디 넣기
 		List<Long> tagIds = request.getTagIds();
 		for (Long tagId : tagIds) {
-			Tag tag = tagJpaRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
-			productTagJpaRepository.save(new ProductTag(product,tag));
+			Tag tag = tagJpaRepository.findById(tagId)
+				.orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
+			tagNames.add(tag.getTagName());
+			productTagJpaRepository.save(new ProductTag(product, tag));
 		}
+
+		// 엘라스틱 서치에 저장
+		productSearchService.createProductDocument(new RequestProductDocumentDTO(
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
+			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
+			tagNames, contributorNames,
+			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
 	}
 
 	//베스트셀러, 블로그베스트, 신간 이런 카테고리 가져오는거
@@ -264,6 +278,9 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		Product product = Product.createProductApiByQueryEntity(request, publisher, state);
 
+		List<String> tagNames = new ArrayList<>();
+		List<String> contributorNames = new ArrayList<>();
+
 		productJpaRepository.save(product);
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
 		Map<String, String> map = parse(request.getContributors());
@@ -278,11 +295,11 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			Position position = positionJpaRepository.findPositionByPositionName(positionName);
 			Contributor contributor = new Contributor(contributorName, position);
 			contributorJpaRepository.save(contributor);
+			contributorNames.add(contributorName);
 
 			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
 			ProductContributor productContributor = new ProductContributor(contributor, product);
 			productContributorJpaRepository.save(productContributor);
-
 		}
 
 		String categoryName = request.getQueryType(); //파라미터로 들어온 카테고리 이름
@@ -318,6 +335,12 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
+
+		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
+		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
+			throw new ProductCategoryCreateNotAllowException();
+		}
+
 		Set<Category> allCategoriesToSave = new HashSet<>();
 
 		for (Long categoryId : categoryIds) {
@@ -335,10 +358,19 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		if (!Objects.isNull(request.getTagIds())) {
 			List<Long> tagIds = request.getTagIds();
 			for (Long tagId : tagIds) {
-				Tag tag = tagJpaRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
-				productTagJpaRepository.save(new ProductTag(product,tag));
+				Tag tag = tagJpaRepository.findById(tagId)
+					.orElseThrow(() -> new TagNotFoundException("tag Not Found: %s".formatted(tagId)));
+				tagNames.add(tag.getTagName());
+				productTagJpaRepository.save(new ProductTag(product, tag));
 			}
 		}
+
+		// 엘라스틱 서치에 저장
+		productSearchService.createProductDocument(new RequestProductDocumentDTO(
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
+			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
+			tagNames, contributorNames,
+			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
 	}
 
 	private Map<String, String> parse(String contributors) {
