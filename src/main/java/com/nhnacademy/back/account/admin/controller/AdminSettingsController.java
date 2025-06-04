@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.admin.domain.dto.request.RequestAdminSettingsMemberStateDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsDTO;
+import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsDailySummaryDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMembersDTO;
+import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMonthlySummaryDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
 import com.nhnacademy.back.account.customer.service.CustomerService;
@@ -46,6 +48,28 @@ public class AdminSettingsController {
 		ResponseAdminSettingsDTO response = adminSettingsService.getAdminSettings();
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	/**
+	 * 관리자 페이지 일자별 요약 조회
+	 */
+	@Admin
+	@GetMapping("/daily")
+	public ResponseEntity<ResponseAdminSettingsDailySummaryDTO> getAdminSettingsDailySummaries() {
+		ResponseAdminSettingsDailySummaryDTO responseAdminSettingsDailySummaryDTO = adminSettingsService.getAdminSettingsDailySummaries();
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseAdminSettingsDailySummaryDTO);
+	}
+
+	/**
+	 * 관리자 페이지 이번 달 데이터 조회
+	 */
+	@Admin
+	@GetMapping("/monthly")
+	public ResponseEntity<ResponseAdminSettingsMonthlySummaryDTO> getAdminSettingsMonthlySummary() {
+		ResponseAdminSettingsMonthlySummaryDTO responseAdminSettingsMonthlySummaryDTO = adminSettingsService.getAdminSettingsMonthlySummary();
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseAdminSettingsMonthlySummaryDTO);
 	}
 
 	/**

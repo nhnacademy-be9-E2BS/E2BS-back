@@ -42,4 +42,10 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
 	Optional<Member> findByCustomer(Customer customer);
 
+	@Query("SELECT COUNT(m) FROM Member m WHERE m.memberCreatedAt = :date")
+	int countSignupMembersByLocalDate(LocalDate date);
+
+	@Query("SELECT COUNT(m) FROM Member m WHERE m.memberCreatedAt BETWEEN :start AND :end")
+	int countSignupMembersByMonthlyDate(LocalDate start, LocalDate end);
+
 }
