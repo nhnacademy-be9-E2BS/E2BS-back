@@ -51,9 +51,14 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Void> createProduct(@RequestPart("requestMeta") RequestProductMetaDTO requestMeta,  @RequestPart("productImage") List<MultipartFile> productImage) {
-		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(), requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(), requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(), requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(), productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
-		long productId = productService.createProduct(request);
+	public ResponseEntity<Void> createProduct(@RequestPart("requestMeta") RequestProductMetaDTO requestMeta,
+		@RequestPart("productImage") List<MultipartFile> productImage) {
+		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(),
+			requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(),
+			requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(),
+			requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(),
+			productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
+		productService.createProduct(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -74,8 +79,14 @@ public class ProductAdminController {
 	 */
 	@Admin
 	@PutMapping("/{bookId}")
-	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId, @RequestPart("product") RequestProductMetaDTO requestMeta, @RequestPart("productImage") List<MultipartFile> productImage) {
-		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(), requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(), requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(), requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(), productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
+	public ResponseEntity<Void> updateProduct(@PathVariable Long bookId,
+		@RequestPart("product") RequestProductMetaDTO requestMeta,
+		@RequestPart("productImage") List<MultipartFile> productImage) {
+		RequestProductDTO request = new RequestProductDTO(requestMeta.getProductStateId(), requestMeta.getPublisherId(),
+			requestMeta.getProductTitle(), requestMeta.getProductContent(), requestMeta.getProductDescription(),
+			requestMeta.getProductPublishedAt(), requestMeta.getProductIsbn(), requestMeta.getProductRegularPrice(),
+			requestMeta.getProductSalePrice(), requestMeta.isProductPackageable(), requestMeta.getProductStock(),
+			productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
 
 		productService.updateProduct(bookId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
