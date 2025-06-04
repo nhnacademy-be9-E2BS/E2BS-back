@@ -20,8 +20,11 @@
 // import org.springframework.data.domain.PageImpl;
 // import org.springframework.data.domain.PageRequest;
 // import org.springframework.data.domain.Pageable;
-// import org.springframework.mock.web.MockMultipartFile;
 //
+// import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
+// import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+// import com.nhnacademy.back.product.category.domain.entity.Category;
+// import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 // import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 // import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 // import com.nhnacademy.back.product.contributor.domain.entity.Position;
@@ -39,8 +42,8 @@
 // import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 // import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 // import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
-// import com.nhnacademy.back.product.product.service.impl.ProductServiceImpl;
 // import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+// import com.nhnacademy.back.product.product.service.impl.ProductServiceImpl;
 // import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 // import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 // import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
@@ -76,26 +79,32 @@
 // 	private TagJpaRepository tagJpaRepository;
 // 	@Mock
 // 	private ProductTagJpaRepository productTagJpaRepository;
+// 	@Mock
+// 	private CategoryJpaRepository categoryJpaRepository;
+// 	@Mock
+// 	private ProductSearchService productSearchService;
 //
 // 	@Test
 // 	@DisplayName("create product - success")
 // 	void create_product_success_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("Publisher");
 // 		Tag tag = new Tag("tag A");
 // 		Position position = new Position("writer");
 // 		Contributor contributor = new Contributor("conA", position);
+// 		Category category = new Category("category", null);
+// 		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+// 			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 // 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(anyLong())).thenReturn(Optional.of(publisher));
+// 		when(productJpaRepository.save(any(Product.class))).thenReturn(product);
+// 		when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(category));
 // 		when(tagJpaRepository.findById(anyLong())).thenReturn(Optional.of(tag));
 // 		when(contributorJpaRepository.findById(anyLong())).thenReturn(Optional.of(contributor));
 //
@@ -107,19 +116,17 @@
 // 		verify(productImageJpaRepository, times(2)).save(any());
 // 		verify(productTagJpaRepository, times(1)).save(any(ProductTag.class));
 // 		verify(productContributorJpaRepository, times(1)).save(any(ProductContributor.class));
+// 		verify(productSearchService, times(1)).createProductDocument(any(RequestProductDocumentDTO.class));
 // 	}
 //
 // 	@Test
 // 	@DisplayName("create product - fail1")
 // 	void create_product_fail1_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(true);
 //
 // 		// when & then
@@ -131,13 +138,10 @@
 // 	@DisplayName("create product - fail2")
 // 	void create_product_fail2_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 // 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 //
@@ -150,13 +154,10 @@
 // 	@DisplayName("create product - fail3")
 // 	void create_product_fail3_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 // 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(productState));
@@ -171,18 +172,18 @@
 // 	@DisplayName("create product - fail4")
 // 	void create_product_fail4_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("Publisher");
+// 		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+// 			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 // 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(anyLong())).thenReturn(Optional.of(publisher));
+// 		when(productJpaRepository.save(any(Product.class))).thenReturn(product);
 // 		when(tagJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 //
 // 		// when & then
@@ -194,19 +195,19 @@
 // 	@DisplayName("create product - fail5")
 // 	void create_product_fail5_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("Publisher");
 // 		Tag tag = new Tag("tag A");
+// 		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+// 			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
 // 		when(productJpaRepository.existsByProductIsbn(any())).thenReturn(false);
 // 		when(productStateJpaRepository.findById(anyLong())).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(anyLong())).thenReturn(Optional.of(publisher));
+// 		when(productJpaRepository.save(any(Product.class))).thenReturn(product);
 // 		when(tagJpaRepository.findById(anyLong())).thenReturn(Optional.of(tag));
 // 		when(contributorJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
 //
@@ -223,7 +224,7 @@
 // 		Product product = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 //
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productImageJpaRepository.findImageDTOsByProductId(productId)).thenReturn(List.of());
@@ -259,11 +260,11 @@
 // 		Product product1 = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		Product product2 = new Product(
 // 			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		List<Product> products = List.of(product1, product2);
 //
 // 		Pageable pageable = PageRequest.of(0, 9);
@@ -292,11 +293,11 @@
 // 		Product product1 = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		Product product2 = new Product(
 // 			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		List<Product> products = List.of(product1);
 //
 // 		Pageable pageable = PageRequest.of(0, 9);
@@ -324,11 +325,11 @@
 // 		Product product1 = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		Product product2 = new Product(
 // 			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		List<Product> products = List.of(product1, product2);
 //
 // 		when(productJpaRepository.findAllById(productIds)).thenReturn(products);
@@ -354,7 +355,7 @@
 // 		Product product1 = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		List<Product> products = List.of(product1);
 //
 // 		when(productJpaRepository.findAllById(productIds)).thenReturn(products);
@@ -368,26 +369,25 @@
 // 	@DisplayName("update product - success")
 // 	void update_product_success_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("publisher");
 // 		Tag tag = new Tag("tag A");
 // 		Position position = new Position("writer");
 // 		Contributor contributor = new Contributor("conA", position);
+// 		Category category = new Category("category", null);
 // 		Product product = new Product(
 // 			1L, productState, publisher, "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productStateJpaRepository.findById(1L)).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(1L)).thenReturn(Optional.of(publisher));
+// 		when(categoryJpaRepository.findById(any())).thenReturn(Optional.of(category));
 // 		when(tagJpaRepository.findById(1L)).thenReturn(Optional.of(tag));
 // 		when(contributorJpaRepository.findById(1L)).thenReturn(Optional.of(contributor));
 //
@@ -408,14 +408,11 @@
 // 	@DisplayName("update product - fail1")
 // 	void update_product_fail1_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.empty());
 //
 // 		// when & then
@@ -427,20 +424,17 @@
 // 	@DisplayName("update product - fail2")
 // 	void update_product_fail2_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("publisher");
 // 		Product product = new Product(
 // 			1L, productState, publisher, "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productStateJpaRepository.findById(1L)).thenReturn(Optional.empty());
 //
@@ -453,20 +447,17 @@
 // 	@DisplayName("update product - fail3")
 // 	void update_product_fail3_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("publisher");
 // 		Product product = new Product(
 // 			1L, productState, publisher, "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productStateJpaRepository.findById(1L)).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(1L)).thenReturn(Optional.empty());
@@ -480,20 +471,17 @@
 // 	@DisplayName("update product - fail4")
 // 	void update_product_fail4_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("publisher");
 // 		Product product = new Product(
 // 			1L, productState, publisher, "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productStateJpaRepository.findById(1L)).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(1L)).thenReturn(Optional.of(publisher));
@@ -508,21 +496,18 @@
 // 	@DisplayName("update product - fail5")
 // 	void update_product_fail5_test() {
 // 		// given
-// 		MockMultipartFile mockFile1 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-// 		MockMultipartFile mockFile2 = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg", "dummy image content".getBytes());
-//
 // 		long productId = 1L;
 // 		RequestProductDTO request = new RequestProductDTO(
 // 			1L, 1L, "title", "content", "description", LocalDate.now(),
 // 			"978-89-12345-01-1", 10000L, 8000L, true, 100,
-// 			List.of(mockFile1, mockFile2), List.of(1L), List.of(1L), List.of(1L));
+// 			List.of("a.png", "b.png"), List.of(1L), List.of(1L), List.of(1L));
 // 		ProductState productState = new ProductState(ProductStateName.SALE);
 // 		Publisher publisher = new Publisher("publisher");
 // 		Tag tag = new Tag("tag A");
 // 		Product product = new Product(
 // 			1L, productState, publisher, "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 // 		when(productStateJpaRepository.findById(1L)).thenReturn(Optional.of(productState));
 // 		when(publisherJpaRepository.findById(1L)).thenReturn(Optional.of(publisher));
@@ -543,7 +528,7 @@
 // 		Product product = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 //
 // 		// when
@@ -575,7 +560,7 @@
 // 		Product product = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 //
 // 		// when & then
@@ -592,7 +577,7 @@
 // 		Product product = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		when(productJpaRepository.findById(productId)).thenReturn(Optional.of(product));
 //
 // 		// when
@@ -621,11 +606,11 @@
 // 		Product product1 = new Product(
 // 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		Product product2 = new Product(
 // 			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
 // 			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
-// 			true, 100, 0, 0, new ArrayList<>());
+// 			true, 100, new ArrayList<>());
 // 		List<Product> products = List.of(product1, product2);
 //
 // 		Pageable pageable = PageRequest.of(0, 10);

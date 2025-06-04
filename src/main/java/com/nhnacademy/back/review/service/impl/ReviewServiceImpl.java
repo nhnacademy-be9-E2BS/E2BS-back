@@ -19,6 +19,7 @@ import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.event.event.ReviewImgPointEvent;
 import com.nhnacademy.back.event.event.ReviewPointEvent;
 import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
@@ -50,11 +51,12 @@ public class ReviewServiceImpl implements ReviewService {
 	private final OrderDetailJpaRepository orderDetailRepository;
 	private final ReviewJpaRepository reviewRepository;
 
+	private final ProductSearchService productSearchService;
+
 	private final MinioUtils minioUtils;
 	private static final String BUCKET_NAME = "e2bs-reviews-image";
 
 	private final ApplicationEventPublisher eventPublisher;
-
 
 	/**
 	 * 리뷰 생성 메소드
@@ -81,7 +83,7 @@ public class ReviewServiceImpl implements ReviewService {
 			findCustomer = customerRepository.findById(request.getCustomerId())
 				.orElseThrow(CustomerNotFoundException::new);
 		}
-		
+
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
@@ -116,6 +118,9 @@ public class ReviewServiceImpl implements ReviewService {
 				eventPublisher.publishEvent(new ReviewPointEvent(findMember.getMemberId()));
 			}
 		}
+
+		// 엘라스틱 서치에서 리뷰 업데이트 (개수, 평균 평점)
+		productSearchService.updateProductDocumentReview(request.getProductId(), request.getReviewGrade());
 	}
 
 	/**
@@ -152,7 +157,7 @@ public class ReviewServiceImpl implements ReviewService {
 			UUID uuid = UUID.randomUUID();
 			String objectName = uuid + "_" + originalFilename;
 			minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
-			
+
 			// 가공된 파일명 적용
 			updateImage = objectName;
 		}
