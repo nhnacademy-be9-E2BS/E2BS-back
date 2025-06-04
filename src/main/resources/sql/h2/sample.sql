@@ -195,13 +195,13 @@ VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Sprin
 -- ProductImage
 INSERT INTO product_image (product_id, product_image_path)
 VALUES (1, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (2, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (3, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (4, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (5, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (6, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (7, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg'),
-       (8, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833588_1.jpg');
+       (2, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833587_1.jpg'),
+       (3, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833585_1.jpg'),
+       (4, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833584_1.jpg'),
+       (5, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833583_1.jpg'),
+       (6, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833582_1.jpg'),
+       (7, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833581_1.jpg'),
+       (8, 'https://image.aladin.co.kr/product/31688/89/coversum/k482833580_1.jpg');
 
 -- ProductContributor
 INSERT INTO product_contributor (contributor_id, product_contributor_id, product_id)
