@@ -48,7 +48,7 @@ public class Product {
 	@Column(length = 200, nullable = false)
 	private String productTitle;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String productContent;
 
 	@Column(nullable = false, columnDefinition = "TEXT")
@@ -72,12 +72,6 @@ public class Product {
 	@Column(nullable = false)
 	private int productStock;
 
-	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
-	private long productHits = 0;
-
-	@Column(nullable = false, columnDefinition = "bigint DEFAULT 0")
-	private long productSearches = 0;
-
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImage = new ArrayList<>();
 
@@ -95,11 +89,8 @@ public class Product {
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
 			.productPublishedAt(request.getProductPublishedAt())
-			.productHits(0)
-			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build();
-
 
 		ProductImage image = new ProductImage(product, request.getProductImage());
 		product.getProductImage().add(image);
@@ -121,8 +112,6 @@ public class Product {
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
 			.productPublishedAt(request.getProductPublishedAt())
-			.productHits(0)
-			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build();
 
@@ -146,8 +135,6 @@ public class Product {
 			.productSalePrice(request.getProductSalePrice())
 			.productPackageable(request.isProductPackageable())
 			.productStock(request.getProductStock())
-			.productHits(0)
-			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build();
 	}
@@ -166,11 +153,15 @@ public class Product {
 		this.productStock = request.getProductStock();
 	}
 
-	public void setProductSale(int productStock) {
+	public void setStock(int productStock) {
 		this.productStock = productStock;
 	}
 
-	public void setProduct(long productSalePrice) {
+	public void setState(ProductState productState) {
+		this.productState = productState;
+	}
+
+	public void setSalePrice(long productSalePrice) {
 		this.productSalePrice = productSalePrice;
 	}
 

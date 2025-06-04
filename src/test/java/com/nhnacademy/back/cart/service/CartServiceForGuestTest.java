@@ -53,10 +53,8 @@ class CartServiceForGuestTest {
 	@InjectMocks
 	private CartServiceImpl cartService;
 
-
 	private final String sessionId = "guest-session-123";
 	private Product product;
-
 
 	@BeforeEach
 	void setUp() {
@@ -64,9 +62,8 @@ class CartServiceForGuestTest {
 
 		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
 			"title1", "content1", "description", LocalDate.now(), "isbn",
-			10000, 8000, false, 1, 0, 0, null);
+			10000, 8000, false, 1, null);
 	}
-
 
 	@Test
 	@DisplayName("게스트 장바구니 항목 추가 테스트")

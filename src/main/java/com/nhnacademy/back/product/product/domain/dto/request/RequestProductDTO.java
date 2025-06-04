@@ -3,6 +3,8 @@ package com.nhnacademy.back.product.product.domain.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,7 +56,7 @@ public class RequestProductDTO {
 
 	// 이미지
 	@NotNull
-	private List<String> productImagePaths;
+	private List<MultipartFile> productImage;
 	// 태그
 	private List<Long> tagIds;
 	// 카테고리 Id

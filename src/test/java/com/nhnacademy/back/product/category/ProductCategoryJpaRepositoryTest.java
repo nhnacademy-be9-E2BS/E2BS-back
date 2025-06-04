@@ -54,8 +54,6 @@ class ProductCategoryJpaRepositoryTest {
 			.productSalePrice(8000)
 			.productPackageable(true)
 			.productStock(100)
-			.productHits(0)
-			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build());
 		product2 = em.persist(Product.builder()
@@ -70,8 +68,6 @@ class ProductCategoryJpaRepositoryTest {
 			.productSalePrice(4000)
 			.productPackageable(true)
 			.productStock(100)
-			.productHits(0)
-			.productSearches(0)
 			.productImage(new ArrayList<>())
 			.build());
 

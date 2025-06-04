@@ -1,0 +1,51 @@
+{
+  "properties": {
+    "productId": {
+      "type": "long"
+    },
+    "productTitle": {
+      "type": "text",
+      "analyzer": "nori_analyzer",
+      "search_analyzer": "synonym"
+    },
+    "productDescription": {
+      "type": "text",
+      "analyzer": "nori_analyzer",
+      "search_analyzer": "synonym"
+    },
+    "productPublisherName": {
+      "type": "text",
+      "analyzer": "jaso_analyzer"
+    },
+    "productPublishedAt": {
+      "type": "date",
+      "format": "basic_date"
+    },
+    "productSalePrice": {
+      "type": "long"
+    },
+    "productHits": {
+      "type": "long"
+    },
+    "productSearches": {
+      "type": "long"
+    },
+    "productReviewRate": {
+      "type": "double"
+    },
+    "productReviewCount": {
+      "type": "long"
+    },
+    "productContributors": {
+      "type": "text",
+      "analyzer": "jaso_analyzer"
+    },
+    "productTags": {
+      "type": "text",
+      "analyzer": "jaso_analyzer"
+    },
+    "productCategoryIds": {
+      "type": "long"
+    }
+  }
+}
