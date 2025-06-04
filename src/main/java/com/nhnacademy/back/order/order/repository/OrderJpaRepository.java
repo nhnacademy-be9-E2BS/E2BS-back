@@ -25,4 +25,7 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 
 	List<Order> findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(long stateId, LocalDate cutoff);
 
+	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderCreatedAt BETWEEN :start AND :end")
+	int countOrdersByLocalDateTime(LocalDateTime start, LocalDateTime end);
+
 }
