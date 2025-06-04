@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nhnacademy.back.common.annotation.Admin;
-import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestModifyWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperDTO;
 import com.nhnacademy.back.order.wrapper.domain.dto.request.RequestRegisterWrapperMetaDTO;
@@ -33,7 +32,6 @@ public class WrapperController {
 	/**
 	 * Wrapper 리스트 조회 (판매 중)
 	 */
-	@Member
 	@GetMapping("/api/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappersBySaleable(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
