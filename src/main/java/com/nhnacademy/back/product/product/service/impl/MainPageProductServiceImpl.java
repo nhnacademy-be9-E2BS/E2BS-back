@@ -65,7 +65,9 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 					product.getProductTitle(),
 					contributorName,
 					imagePath,
-					product.getProductSalePrice()
+					product.getProductSalePrice(),
+					product.getProductDescription(),
+					product.getPublisher().getPublisherName()
 				);
 			})
 			.toList();
