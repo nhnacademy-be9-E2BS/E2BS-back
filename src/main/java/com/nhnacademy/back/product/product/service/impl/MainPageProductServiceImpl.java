@@ -73,22 +73,21 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 
 	@Override
 	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
-		return getProductsByCategory("Bestseller");
+		return getProductsByCategory("베스트셀러");
 	}
-
 	@Override
 	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
-		return getProductsByCategory("BlogBest");
+		return getProductsByCategory("블로그베스트");
 	}
 
 	@Override
 	public List<ResponseMainPageProductDTO> getNewItemsProducts() {
-		return getProductsByCategory("ItemNewAll");
+		return getProductsByCategory("신간");
 	}
 
 	@Override
 	public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
-		return getProductsByCategory("ItemNewSpecial");
+		return getProductsByCategory("신간스페셜");
 	}
 
 	@Override
