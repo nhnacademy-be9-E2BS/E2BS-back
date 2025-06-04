@@ -16,6 +16,7 @@ import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -44,6 +45,7 @@ public class OrderDetail {
 	@JoinColumn(name = "wrapper_id")
 	private Wrapper wrapper;
 
+	@Setter
 	@OneToOne
 	@JoinColumn(name = "review_id")
 	private Review review;
@@ -55,10 +57,6 @@ public class OrderDetail {
 		this.product = product;
 		this.order = order;
 		this.review = null;
-	}
-
-	public void setReview(Review review) {
-		this.review = review;
 	}
 
 }

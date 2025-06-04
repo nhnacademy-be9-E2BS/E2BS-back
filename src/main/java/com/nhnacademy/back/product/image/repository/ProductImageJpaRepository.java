@@ -12,7 +12,6 @@ import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImag
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 
 public interface ProductImageJpaRepository extends JpaRepository<ProductImage, Long> {
-	List<ProductImage> findByProduct_ProductId(long productProductId);
 
 	void deleteByProduct_ProductId(long productId);
 
@@ -26,4 +25,12 @@ public interface ProductImageJpaRepository extends JpaRepository<ProductImage, L
 		return findAllByProductIds(productIds).stream()
 			.collect(Collectors.groupingBy(pi -> pi.getProduct().getProductId()));
 	}
+
+	@Query("SELECT pi.productImagePath FROM ProductImage pi WHERE pi.product.productId = :productId")
+	List<String> findAllByProduct_ProductId(@Param("productId") long productId);
+
+	@Query("SELECT pi.productImageId FROM ProductImage pi WHERE pi.productImagePath IN :productImage")
+	Long findByProductImagePath(@Param("productImage") String productImage);
+
+	List<ProductImage> getAllByProduct_ProductId(long productProductId);
 }

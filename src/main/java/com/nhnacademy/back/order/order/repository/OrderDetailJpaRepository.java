@@ -23,12 +23,12 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 	@Query("SELECT SUM(od.orderDetailPerPrice * od.orderQuantity) FROM OrderDetail od WHERE od.order.orderCreatedAt BETWEEN :start AND :end")
 	Long getTotalDailySales(LocalDateTime start, LocalDateTime end);
 
-	@Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
+	@Query("SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
 		   "FROM OrderDetail od " +
 		   "JOIN od.order o " +
 		   "WHERE o.customer.customerId = :customerId " +
 		   "AND od.product.productId = :productId " +
-		   "AND od.review IS NULL")
+		   "AND od.review.reviewId IS NULL")
 	boolean existsOrderDetailByCustomerIdAndProductId(long customerId, long productId);
 
 	@Query("SELECT od " +
@@ -37,4 +37,5 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 		"WHERE o.customer.customerId = :customerId " +
 		"AND od.product.productId = :productId")
 	Optional<OrderDetail> findByCustomerIdAndProductId(Long customerId, Long productId);
+
 }

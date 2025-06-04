@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
@@ -24,6 +25,8 @@ public interface OrderService {
 	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
 
 	ResponseEntity<Void> cancelOrder(String orderCode);
+
+	ResponseEntity<Void> returnOrder(RequestOrderReturnDTO returnDTO);
 
 	long getAllOrders();
 

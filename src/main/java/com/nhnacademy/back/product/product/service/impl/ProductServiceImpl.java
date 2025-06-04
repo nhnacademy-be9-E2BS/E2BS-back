@@ -1,8 +1,11 @@
 package com.nhnacademy.back.product.product.service.impl;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -13,7 +16,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
@@ -23,7 +29,6 @@ import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
-import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
 import com.nhnacademy.back.product.contributor.exception.ContributorNotFoundException;
@@ -52,7 +57,6 @@ import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 import com.nhnacademy.back.product.state.exception.ProductStateNotFoundException;
 import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
-import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
@@ -78,6 +82,9 @@ public class ProductServiceImpl implements ProductService {
 
 	private final ProductSearchService productSearchService;
 
+	private final MinioUtils minioUtils;
+	private final String BUCKET_NAME = "e2bs-products-image";
+
 	/**
 	 * 도서를 DB에 저장
 	 * 도서가 이미 존재하면 Exception 발생
@@ -90,13 +97,19 @@ public class ProductServiceImpl implements ProductService {
 			throw new ProductAlreadyExistsException("Product already exists");
 		}
 
-		ProductState productState = productStateJpaRepository.findById(request.getProductStateId())
-			.orElseThrow(() -> new ProductStateNotFoundException("상품상태 조회 실패"));
+		//상태 저장
+		ProductState productState = productStateJpaRepository.findByProductStateId(request.getProductStateId());
+		Integer productStock = request.getProductStock();
+		ProductState stateSale = productStateJpaRepository.findByProductStateName(ProductStateName.SALE);
+
+		if (productStock == 0 && productState == stateSale) {
+			productState = productStateJpaRepository.findByProductStateName(ProductStateName.OUT);
+		}
 
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
-		List<String> imagePaths = request.getProductImagePaths();
+		List<MultipartFile> productImageFiles = request.getProductImage();
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
 
@@ -108,18 +121,24 @@ public class ProductServiceImpl implements ProductService {
 
 		// 이미지 저장
 		// 자식 추가 (ProductImage)
-		for (String imagePath : imagePaths) {
+		for (MultipartFile productImageFile : productImageFiles) {
+			String imagePath = "";
+			if (Objects.nonNull(productImageFile) && !productImageFile.isEmpty()) {
+				imagePath = uploadFile(productImageFile);
+			}
 			ProductImage productImage = new ProductImage(product, imagePath);
 			product.getProductImage().add(productImage);
 			productImageJpaRepository.save(productImage);
 		}
 
 		// 태그 저장
-		for (Long tagId : tagIds) {
-			Tag tag = tagJpaRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
-			tagNames.add(tag.getTagName());
-			productTagJpaRepository.save(new ProductTag(product, tag));
+		if (!Objects.isNull(request.getTagIds())) {
+			for (Long tagId : tagIds) {
+				Tag tag = tagJpaRepository.findById(tagId)
+					.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
+				tagNames.add(tag.getTagName());
+				productTagJpaRepository.save(new ProductTag(product, tag));
+			}
 		}
 
 		// 기여자 저장
@@ -153,26 +172,7 @@ public class ProductServiceImpl implements ProductService {
 		// 엘라스틱 서치에서 조회수 update
 		productSearchService.updateProductDocumentHits(productId);
 
-		return new ResponseProductReadDTO(
-			product.getProductId(),
-			new ResponseProductStateDTO(product.getProductState().getProductStateId(),
-				product.getProductState().getProductStateName().name()),
-			new ResponsePublisherDTO(product.getPublisher().getPublisherId(),
-				product.getPublisher().getPublisherName()),
-			product.getProductTitle(),
-			product.getProductContent(),
-			product.getProductDescription(),
-			product.getProductPublishedAt(),
-			product.getProductIsbn(),
-			product.getProductRegularPrice(),
-			product.getProductSalePrice(),
-			product.isProductPackageable(),
-			product.getProductStock(),
-			productImageJpaRepository.findImageDTOsByProductId(productId),
-			productTagJpaRepository.findTagDTOsByProductId(productId),
-			productCategoryJpaRepository.findCategoryDTOsByProductId(productId),
-			productContributorJpaRepository.findContributorDTOsByProductId(productId)
-		);
+		return getProductByChangedImagePath(product);
 	}
 
 	/**
@@ -187,51 +187,8 @@ public class ProductServiceImpl implements ProductService {
 		} else {
 			productPage = productJpaRepository.findAllByCategoryId(categoryId, pageable);
 		}
-		List<Long> productIds = productPage.stream().map(Product::getProductId).toList();
 
-		Map<Long, List<ProductImage>> imageMap = productImageJpaRepository.findAllByProductIdsGrouped(productIds);
-		Map<Long, List<Tag>> tagMap = productTagJpaRepository.findTagsGroupedByProductIds(productIds);
-		Map<Long, List<Category>> categoryMap = productCategoryJpaRepository.findCategoriesGroupedByProductIds(
-			productIds);
-		Map<Long, List<Contributor>> contributorMap = productContributorJpaRepository.findContributorsGroupedByProductIds(
-			productIds);
-
-		return productPage.map(product -> {
-			Long id = product.getProductId();
-			return new ResponseProductReadDTO(
-				id,
-				new ResponseProductStateDTO(product.getProductState().getProductStateId(),
-					product.getProductState().getProductStateName().name()),
-				new ResponsePublisherDTO(product.getPublisher().getPublisherId(),
-					product.getPublisher().getPublisherName()),
-				product.getProductTitle(),
-				product.getProductContent(),
-				product.getProductDescription(),
-				product.getProductPublishedAt(),
-				product.getProductIsbn(),
-				product.getProductRegularPrice(),
-				product.getProductSalePrice(),
-				product.isProductPackageable(),
-				product.getProductStock(),
-				imageMap.getOrDefault(id, List.of())
-					.stream()
-					.map(image -> new ResponseProductImageDTO(image.getProductImageId(), image.getProductImagePath()))
-					.toList(),
-				tagMap.getOrDefault(id, List.of()).stream()
-					.map(tag -> new ResponseTagDTO(tag.getTagId(), tag.getTagName())).toList(),
-				categoryMap.getOrDefault(id, List.of())
-					.stream()
-					.map(
-						category -> new ResponseCategoryDTO(category.getCategoryId(), category.getCategoryName(), null))
-					.toList(),
-				contributorMap.getOrDefault(id, List.of())
-					.stream()
-					.map(contributor -> new ResponseContributorDTO(contributor.getContributorId(),
-						contributor.getContributorName(),
-						contributor.getPosition().getPositionId(), contributor.getPosition().getPositionName()))
-					.toList()
-			);
-		});
+		return productPage.map(this::getProductByChangedImagePath);
 	}
 
 	/**
@@ -247,26 +204,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		return products.stream()
-			.map(product -> new ResponseProductReadDTO(
-				product.getProductId(),
-				new ResponseProductStateDTO(product.getProductState().getProductStateId(),
-					product.getProductState().getProductStateName().name()),
-				new ResponsePublisherDTO(product.getPublisher().getPublisherId(),
-					product.getPublisher().getPublisherName()),
-				product.getProductTitle(),
-				product.getProductContent(),
-				product.getProductDescription(),
-				product.getProductPublishedAt(),
-				product.getProductIsbn(),
-				product.getProductRegularPrice(),
-				product.getProductSalePrice(),
-				product.isProductPackageable(),
-				product.getProductStock(),
-				productImageJpaRepository.findImageDTOsByProductId(product.getProductId()),
-				productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
-				productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
-				productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
-			)).toList();
+			.map(this::getProductByChangedImagePath).toList();
 	}
 
 	/**
@@ -284,10 +222,8 @@ public class ProductServiceImpl implements ProductService {
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
-		// 상품 정보 업데이트 (수정)
-		product.updateProduct(request, productState, publisher);
 
-		List<String> imagePaths = request.getProductImagePaths();
+		List<MultipartFile> productImageFiles = request.getProductImage();
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
 
@@ -296,20 +232,50 @@ public class ProductServiceImpl implements ProductService {
 
 		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
-		productImageJpaRepository.deleteByProduct_ProductId(productId);
-		for (String imagePath : imagePaths) {
-			ProductImage productImage = new ProductImage(product, imagePath);
-			product.getProductImage().add(productImage);
-			productImageJpaRepository.save(productImage);
+		// - 이미지가 들어왔다면
+		if (Objects.nonNull(productImageFiles) && !productImageFiles.isEmpty()) {
+			// - 기존 리스트 조회
+			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
+
+			// - miniO 기존 파일 삭제
+			for (ProductImage productImage : product.getProductImage()) {
+				minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+			}
+
+			// - DB에서 삭제
+			productImageJpaRepository.deleteAll(productImages);
+
+
+			List<ProductImage> newProductImages = new ArrayList<>();
+			for (MultipartFile productImageFile : productImageFiles) {
+				String originalFilename = productImageFile.getOriginalFilename();
+				String objectName = UUID.randomUUID() + "_" + originalFilename;
+
+				// MinIO에 파일 업로드
+				minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
+
+				// 새로운 ProductImage 엔티티 생성
+				ProductImage productImage = new ProductImage(product, objectName);
+				newProductImages.add(productImage);
+			}
+			// Product의 productImage 리스트 갱신
+			product.getProductImage().clear(); // 기존 리스트 비우기
+			product.getProductImage().addAll(newProductImages);
+			productImageJpaRepository.saveAll(newProductImages); // 새로운 이미지 저장
 		}
 
+		// 상품 정보 업데이트 (수정)
+		product.updateProduct(request, productState, publisher);
+
 		// 태그 삭제 후 저장
-		productTagJpaRepository.deleteByProduct_ProductId(productId);
-		for (Long tagId : tagIds) {
-			Tag tag = tagJpaRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
-			tagNames.add(tag.getTagName());
-			productTagJpaRepository.save(new ProductTag(product, tag));
+		if (!Objects.isNull(request.getTagIds())) {
+			productTagJpaRepository.deleteByProduct_ProductId(productId);
+			for (Long tagId : tagIds) {
+				Tag tag = tagJpaRepository.findById(tagId)
+					.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
+				tagNames.add(tag.getTagName());
+				productTagJpaRepository.save(new ProductTag(product, tag));
+			}
 		}
 
 		// 기여자 삭제 후 저장
@@ -470,4 +436,62 @@ public class ProductServiceImpl implements ProductService {
 			productCategoryJpaRepository.save(new ProductCategory(product, category));
 		}
 	}
+
+	/**
+	 * 파일 업로드 메소드
+	 */
+	private String uploadFile(MultipartFile productImageFile) {
+		String originalFilename = productImageFile.getOriginalFilename();
+		UUID uuid = UUID.randomUUID();
+		String objectName = uuid + "_" + originalFilename;
+		minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
+		return objectName;
+	}
+
+	/**
+	 * 이미지 경로 가공 메소드
+	 */
+	private ResponseProductReadDTO getProductByChangedImagePath(Product product) {
+		String productImagePath = "";
+		List<String> productImagePaths = productImageJpaRepository.findAllByProduct_ProductId(product.getProductId());
+		List<ResponseProductImageDTO> changedResponseProductImageDTOs = new ArrayList<>();
+
+		// 알라딘 api 이미지인 경우
+		ProductImage firstProductImage = product.getProductImage().getFirst();
+		if (firstProductImage.getProductImagePath().startsWith("http")) {
+			changedResponseProductImageDTOs.add(new ResponseProductImageDTO(firstProductImage.getProductImageId(), firstProductImage.getProductImagePath()));
+		} else {
+			for (String productImage : productImagePaths) {
+				if (!StringUtils.isEmpty(productImage)) {
+					productImagePath = minioUtils.getPresignedUrl(BUCKET_NAME, productImage);
+					ResponseProductImageDTO responseProductImageDTO = new ResponseProductImageDTO(
+						productImageJpaRepository.findByProductImagePath(productImage), productImagePath);
+					changedResponseProductImageDTOs.add(responseProductImageDTO);
+				}
+			}
+		}
+
+		return new ResponseProductReadDTO(
+			product.getProductId(),
+			new ResponseProductStateDTO(product.getProductState().getProductStateId(),
+				product.getProductState().getProductStateName().name()),
+			new ResponsePublisherDTO(product.getPublisher().getPublisherId(),
+				product.getPublisher().getPublisherName()),
+			product.getProductTitle(),
+			product.getProductContent(),
+			product.getProductDescription(),
+			product.getProductPublishedAt(),
+			product.getProductIsbn(),
+			product.getProductRegularPrice(),
+			product.getProductSalePrice(),
+			product.isProductPackageable(),
+			product.getProductStock(),
+			changedResponseProductImageDTOs,
+			productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
+			productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
+			productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId()
+			)
+		);
+	}
+
 }

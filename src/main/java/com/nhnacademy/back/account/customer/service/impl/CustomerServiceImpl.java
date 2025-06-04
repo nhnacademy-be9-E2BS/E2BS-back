@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
-import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerLoginDTO;
-import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerRegisterDTO;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerEmailAlreadyExistsException;
 import com.nhnacademy.back.account.customer.exception.CustomerEmailNotExistsException;
@@ -37,38 +35,42 @@ public class CustomerServiceImpl implements CustomerService {
 			.customer(customer).build());
 	}
 
-	public ResponseCustomerLoginDTO postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO) {
+	/**
+	 * 비회원 로그인 메소드
+	 */
+	@Override
+	public Long postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO) {
 		if (!customerJpaRepository.existsCustomerByCustomerEmail(requestCustomerLoginDTO.getCustomerEmail())) {
 			throw new CustomerEmailNotExistsException("이메일이 존재하지 않습니다.");
 		}
 
-		Customer customer = customerJpaRepository.getCustomerByCustomerEmail(
-			requestCustomerLoginDTO.getCustomerEmail());
-
+		Customer customer = customerJpaRepository.getCustomerByCustomerEmail(requestCustomerLoginDTO.getCustomerEmail());
 		if (!passwordEncoder.matches(requestCustomerLoginDTO.getCustomerPassword(), customer.getCustomerPassword())) {
 			throw new CustomerPasswordNotMatchException("비밀번호가 일치하지 않습니다.");
 		}
 
-		return new ResponseCustomerLoginDTO(customer);
+		return customer.getCustomerId();
 	}
 
+	/**
+	 * 비회원 등록 메소드
+	 */
 	@Transactional
-	public ResponseCustomerRegisterDTO postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO) {
+	@Override
+	public Long postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO) {
 		if (customerJpaRepository.existsCustomerByCustomerEmail(requestCustomerRegisterDTO.getCustomerEmail())) {
 			throw new CustomerEmailAlreadyExistsException("비회원 이메일이 이미 존재합니다.");
 		}
 
-		Customer customer = Customer.builder()
-			.customerEmail(requestCustomerRegisterDTO.getCustomerEmail())
-			.customerName(requestCustomerRegisterDTO.getMemberName())
-			.customerPassword(requestCustomerRegisterDTO.getCustomerPassword())
-			.build();
-
+		Customer customer = Customer.createCustomerEntity(requestCustomerRegisterDTO);
 		customerJpaRepository.save(customer);
 
-		return new ResponseCustomerRegisterDTO(customer);
+		return customer.getCustomerId();
 	}
 
+	/**
+	 * 중복 아이디 검증 메소드
+	 */
 	public boolean isExistsCustomerEmail(String customerEmail) {
 		return customerJpaRepository.existsCustomerByCustomerEmail(customerEmail);
 	}
