@@ -345,11 +345,18 @@ public class ProductServiceImpl implements ProductService {
 		List<String> productImagePaths = productImageJpaRepository.findAllByProduct_ProductId(product.getProductId());
 		List<ResponseProductImageDTO> changedResponseProductImageDTOs = new ArrayList<>();
 
-		for (String productImage : productImagePaths){
-			if (!StringUtils.isEmpty(productImage)) {
-				productImagePath = minioUtils.getPresignedUrl(BUCKET_NAME, productImage);
-				ResponseProductImageDTO responseProductImageDTO = new ResponseProductImageDTO(productImageJpaRepository.findByProductImagePath(productImage), productImagePath);
-				changedResponseProductImageDTOs.add(responseProductImageDTO);
+		// 알라딘 api 이미지인 경우
+		ProductImage firstProductImage = product.getProductImage().getFirst();
+		if (firstProductImage.getProductImagePath().startsWith("http")) {
+			changedResponseProductImageDTOs.add(new ResponseProductImageDTO(firstProductImage.getProductImageId(), firstProductImage.getProductImagePath()));
+		} else {
+			for (String productImage : productImagePaths) {
+				if (!StringUtils.isEmpty(productImage)) {
+					productImagePath = minioUtils.getPresignedUrl(BUCKET_NAME, productImage);
+					ResponseProductImageDTO responseProductImageDTO = new ResponseProductImageDTO(
+						productImageJpaRepository.findByProductImagePath(productImage), productImagePath);
+					changedResponseProductImageDTOs.add(responseProductImageDTO);
+				}
 			}
 		}
 
