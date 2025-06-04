@@ -23,7 +23,7 @@ import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository
 import com.nhnacademy.back.order.deliveryfee.service.impl.DeliveryFeeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class DeliveryFeeServiceTest {
+class DeliveryFeeServiceTest {
 	@Mock
 	private DeliveryFeeJpaRepository deliveryFeeJpaRepository;
 

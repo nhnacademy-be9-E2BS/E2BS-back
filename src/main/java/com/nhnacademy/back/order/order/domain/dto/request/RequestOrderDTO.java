@@ -46,6 +46,8 @@ public class RequestOrderDTO {
 	private String orderMemo;
 	@NotNull
 	private boolean orderPaymentStatus;
+	@NotNull
+	private long orderPureAmount;
 
 	private LocalDate orderReceivedDate;
 	private LocalDate orderShipmentDate;

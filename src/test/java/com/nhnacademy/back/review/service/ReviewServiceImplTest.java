@@ -31,6 +31,8 @@ import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -57,6 +59,9 @@ class ReviewServiceImplTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
+
+	@Mock
+	private OrderDetailJpaRepository orderDetailRepository;
 
 	@Mock
 	private ReviewJpaRepository reviewRepository;
@@ -102,7 +107,9 @@ class ReviewServiceImplTest {
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(customerId)).thenReturn(Optional.of(product));
+		when(orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
 		doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(Optional.of(mock(OrderDetail.class)));
 
 		// when
 		reviewService.createReview(request);

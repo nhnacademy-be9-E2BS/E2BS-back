@@ -27,6 +27,8 @@ public interface PointHistoryService {
 
 	void earnReviewPoint(String memberId);
 
-	void earnOrderPoint(String memberId);
+	void earnOrderPoint(String memberId, Long pointFigure);
+
+	void payPoint(String memberId, Long pointFigure);
 
 }

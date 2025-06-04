@@ -66,4 +66,8 @@ public class Member {
 	@JoinColumn(name = "social_auth_id")
 	private SocialAuth socialAuth;
 
+	public void updateStateToDormant(MemberState dormantState) {
+		this.memberState = dormantState;
+	}
+
 }

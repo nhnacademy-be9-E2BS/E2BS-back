@@ -162,6 +162,7 @@ CREATE TABLE `order`
     order_memo           TEXT         NULL,
     order_payment_status BIT(1)       NOT NULL,
     order_reward_amount  BIGINT       NOT NULL,
+    order_pure_amount    BIGINT       NOT NULL,
     order_receive_date   datetime     NULL,
     order_shipment_date  datetime     NULL,
     order_created_at     datetime     NOT NULL,
@@ -188,7 +189,7 @@ CREATE TABLE order_return
     order_return_id     BIGINT AUTO_INCREMENT NOT NULL,
     order_return_reason TEXT                  NOT NULL,
     return_category     VARCHAR(255)          NOT NULL,
-    order_detail_id     BIGINT                NOT NULL,
+    order_code          BIGINT                NOT NULL,
     CONSTRAINT pk_orderreturn PRIMARY KEY (order_return_id)
 );
 
@@ -449,7 +450,7 @@ ALTER TABLE order_detail
     ADD CONSTRAINT FK_ORDERDETAIL_ON_WRAPPER FOREIGN KEY (wrapper_id) REFERENCES wrapper (wrapper_id);
 
 ALTER TABLE order_return
-    ADD CONSTRAINT FK_ORDERRETURN_ON_ORDER_DETAIL FOREIGN KEY (order_detail_id) REFERENCES order_detail (order_detail_id);
+    ADD CONSTRAINT FK_ORDERRETURN_ON_ORDER FOREIGN KEY (order_code) REFERENCES `order` (order_code);
 
 ALTER TABLE `order`
     ADD CONSTRAINT FK_ORDER_ON_CUSTOMER FOREIGN KEY (customer_id) REFERENCES customer (customer_id);

@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
+	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
@@ -37,7 +38,6 @@ public class LikeServiceImpl implements LikeService {
 	private final LikeJpaRepository likeRepository;
 	private final ReviewJpaRepository reviewRepository;
 
-	
 	/**
 	 * 좋아요 생성 메소드
 	 */
@@ -46,7 +46,7 @@ public class LikeServiceImpl implements LikeService {
 	public void createLike(long productId, String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -72,7 +72,7 @@ public class LikeServiceImpl implements LikeService {
 	public void deleteLike(long productId, String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -93,7 +93,7 @@ public class LikeServiceImpl implements LikeService {
 	public Page<ResponseLikedProductDTO> getLikedProductsByCustomer(String memberId, Pageable pageable) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
 		long customerId = findMember.getCustomerId();
@@ -106,7 +106,8 @@ public class LikeServiceImpl implements LikeService {
 			reviewAvg = Math.round(reviewAvg * 10) / 10.0;
 
 			Integer reviewCount = reviewRepository.countAllByProduct_ProductId(product.getProductId());
-			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, product.getProductId())
+			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId,
+					product.getProductId())
 				.orElseThrow(LikeNotFoundException::new);
 
 			return new ResponseLikedProductDTO(

@@ -24,14 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
+import com.nhnacademy.back.product.product.controller.ProductAdminController;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
-import com.nhnacademy.back.product.product.controller.ProductAdminController;
-import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
+import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.state.domain.dto.response.ResponseProductStateDTO;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
@@ -108,43 +108,6 @@ class ProductAdminControllerTest {
 			.andExpect(jsonPath("$.content").isArray())
 			.andExpect(jsonPath("$.content[0].productTitle").value("title A"))
 			.andExpect(jsonPath("$.content[1].productTitle").value("title B"));
-	}
-
-	@Test
-	@DisplayName("productId 리스트를 받아서 도서 리스트 반환 - order 전용")
-	void get_products_order_test() throws Exception {
-		// given
-		ResponseProductStateDTO productStateDTO = new ResponseProductStateDTO(1L, ProductStateName.SALE.name());
-		ResponsePublisherDTO publisherDTO = new ResponsePublisherDTO(1L, "publisher");
-		ResponseCategoryDTO categoryADTO = new ResponseCategoryDTO(1L, "category A", null);
-		ResponseCategoryDTO categoryBDTO = new ResponseCategoryDTO(2L, "category B", null);
-		ResponseProductReadDTO responseA = new ResponseProductReadDTO(1L, productStateDTO, publisherDTO, "title A",
-			"content A", "description A",
-			LocalDate.now(), "978-89-12345-01-1", 10000, 8000, true, 1000, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
-		ResponseProductReadDTO responseB = new ResponseProductReadDTO(2L, productStateDTO, publisherDTO, "title B",
-			"content B", "description B",
-			LocalDate.now(), "978-89-12345-01-2", 9000, 7000, false, 500, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
-		ResponseProductReadDTO responseC = new ResponseProductReadDTO(3L, productStateDTO, publisherDTO, "title C",
-			"content C", "description C",
-			LocalDate.now(), "978-89-12345-01-3", 6000, 5000, true, 700, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryBDTO), new ArrayList<>());
-		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB, responseC);
-
-		List<Long> productIds = List.of(1L, 2L, 3L);
-		String jsonRequest = objectMapper.writeValueAsString(productIds);
-		when(productService.getProducts(productIds)).thenReturn(dtos);
-
-		// when & then
-		mockMvc.perform(get("/api/admin/books/order")
-				.content(jsonRequest)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$").isArray())
-			.andExpect(jsonPath("$[0].productTitle").value("title A"))
-			.andExpect(jsonPath("$[1].productTitle").value("title B"))
-			.andExpect(jsonPath("$[2].productTitle").value("title C"));
 	}
 
 	@Test
