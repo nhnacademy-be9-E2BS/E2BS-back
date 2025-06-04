@@ -29,7 +29,7 @@ spring:
       host: s4.java21.net
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
-      database: 294
+      database: 293
 
   # RabbitMQ 사용한 이유 설명
   # RabbitMQ 연결 설정 <-> Spring EventListener (비교적 가벼운 작업에 유리)
@@ -57,6 +57,10 @@ order:
   url:
     toss: https://api.tosspayments.com/v1/payments
   sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
+
+search:
+  index:
+    name: e2bs_product_dev
 
 # minio 원격 접근 설정
 minio:

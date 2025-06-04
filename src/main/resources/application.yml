@@ -22,8 +22,13 @@ spring:
     # (= 트랜잭션의 영향 범위 설정)
   cache:
     type: redis # 카테고리 항상 가져올 수 없으니 redis caching 처리 (예) front/back 중 back 에 캐싱 처리하는 이유 설명 + 캐싱을 어디에 적용할 수 있을지)
-    # 스프링에서 사용할 수 있는 캐시 매니저의 종류 약 4가지:
+      # 스프링에서 사용할 수 있는 캐시 매니저의 종류 약 4가지:
     # PSA: Portable Service Abstraction
+
+  elasticsearch:
+    uris: s4.java21.net:9200
+    username: elastic
+    password: nhnacademy123!
 
 order:
   url:
