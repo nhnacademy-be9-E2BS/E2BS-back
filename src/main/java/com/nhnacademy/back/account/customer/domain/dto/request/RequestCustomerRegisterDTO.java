@@ -14,7 +14,7 @@ public class RequestCustomerRegisterDTO {
 	@Email
 	private String customerEmail;
 	@NotBlank
-	private String memberName;
+	private String customerName;
 	@NotBlank
 	private String customerPassword;
 	@NotBlank
