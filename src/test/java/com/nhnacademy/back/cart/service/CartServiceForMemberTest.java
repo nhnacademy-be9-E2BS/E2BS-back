@@ -55,7 +55,6 @@ class CartServiceForMemberTest {
 	@InjectMocks
 	private CartServiceImpl cartService;
 
-
 	private final long customerId = 1L;
 	private final String memberId = "id123";
 	private final long productId = 1L;
@@ -74,10 +73,9 @@ class CartServiceForMemberTest {
 		cart = new Cart(customer);
 
 		product = new Product(productId, new ProductState(ProductStateName.SALE), new Publisher("a"),
-			        "title1", "content1", "description", LocalDate.now(), "isbn",
-			   10000, 8000, false, 1, 0, 0, null);
+			"title1", "content1", "description", LocalDate.now(), "isbn",
+			10000, 8000, false, 1, null);
 	}
-
 
 	@Test
 	@DisplayName("회원 장바구니 항목 추가 테스트")
@@ -162,7 +160,6 @@ class CartServiceForMemberTest {
 			cartService.deleteCartForMember(memberId)
 		);
 	}
-	
 
 	@Test
 	@DisplayName("회원의 장바구니 목록 조회 테스트")

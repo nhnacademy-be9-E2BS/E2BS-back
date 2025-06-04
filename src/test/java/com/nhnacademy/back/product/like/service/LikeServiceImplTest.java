@@ -59,7 +59,6 @@ class LikeServiceImplTest {
 	@InjectMocks
 	private LikeServiceImpl likeService;
 
-
 	long productId = 1L;
 	long customerId = 1L;
 	String memberId = "member1Id";
@@ -75,10 +74,9 @@ class LikeServiceImplTest {
 
 		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
 			"Product A", "content", "description", LocalDate.now(), "isbn",
-			10000, 10000, false, 3, 0,0, List.of(new ProductImage(product, "imageUrl")));
+			10000, 10000, false, 3, List.of(new ProductImage(product, "imageUrl")));
 	}
 
-	
 	@Test
 	@DisplayName("좋아요 생성")
 	void createLike() {
@@ -117,7 +115,8 @@ class LikeServiceImplTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(likeRepository.existsByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)).thenReturn(true);
-		when(likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)).thenReturn(Optional.of(like));
+		when(likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)).thenReturn(
+			Optional.of(like));
 
 		// when
 		likeService.deleteLike(productId, memberId);
@@ -149,7 +148,8 @@ class LikeServiceImplTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(likeRepository.findLikedProductsByCustomerId(customerId, pageable)).thenReturn(likeProductPage);
-		when(likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, productId)).thenReturn(Optional.of(like));
+		when(likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, productId)).thenReturn(
+			Optional.of(like));
 		when(reviewRepository.totalAvgReviewsByProductId(productId)).thenReturn(4.5);
 		when(reviewRepository.countAllByProduct_ProductId(productId)).thenReturn(3);
 		when(likeRepository.countAllByProduct_ProductId(productId)).thenReturn(5L);

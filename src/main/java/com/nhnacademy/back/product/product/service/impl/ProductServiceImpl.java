@@ -1,11 +1,18 @@
 package com.nhnacademy.back.product.product.service.impl;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
+import com.nhnacademy.back.product.category.domain.entity.Category;
+import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
+import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
+import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
+import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
@@ -63,10 +78,12 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 	private final TagJpaRepository tagJpaRepository;
 	private final ProductTagJpaRepository productTagJpaRepository;
+	private final CategoryJpaRepository categoryJpaRepository;
+
+	private final ProductSearchService productSearchService;
 
 	private final MinioUtils minioUtils;
 	private final String BUCKET_NAME = "e2bs-products-image";
-
 
 	/**
 	 * 도서를 DB에 저장
@@ -74,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	@Transactional
-	public Long createProduct(RequestProductDTO request) {
+	public void createProduct(RequestProductDTO request) {
 		// 이미 존재하는지 unique인 isbn으로 DB에서 조회
 		if (productJpaRepository.existsByProductIsbn(request.getProductIsbn())) {
 			throw new ProductAlreadyExistsException("Product already exists");
@@ -96,11 +113,11 @@ public class ProductServiceImpl implements ProductService {
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
 
-		// product 객체 생성
-		Product product = Product.createProductEntity(request, productState, publisher);
+		// product 객체 생성 및 DB에 Product 저장
+		Product product = productJpaRepository.save(Product.createProductEntity(request, productState, publisher));
 
-		// DB에 Product저장
-		productJpaRepository.save(product);
+		List<String> tagNames = new ArrayList<>();
+		List<String> contributorNames = new ArrayList<>();
 
 		// 이미지 저장
 		// 자식 추가 (ProductImage)
@@ -119,6 +136,7 @@ public class ProductServiceImpl implements ProductService {
 			for (Long tagId : tagIds) {
 				Tag tag = tagJpaRepository.findById(tagId)
 					.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
+				tagNames.add(tag.getTagName());
 				productTagJpaRepository.save(new ProductTag(product, tag));
 			}
 		}
@@ -127,10 +145,20 @@ public class ProductServiceImpl implements ProductService {
 		for (Long contributorId : contributorIds) {
 			Contributor contributor = contributorJpaRepository.findById(contributorId)
 				.orElseThrow(() -> new ContributorNotFoundException("기여자 조회 실패"));
+			contributorNames.add(contributor.getContributorName());
 			productContributorJpaRepository.save(new ProductContributor(product, contributor));
 		}
 
-		return product.getProductId();
+		// 카테고리 저장
+		createProductCategory(product.getProductId(), request.getCategoryIds(), false);
+
+		List<Long> categoryIds = productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId());
+
+		// 엘라스틱 서치에 저장
+		productSearchService.createProductDocument(new RequestProductDocumentDTO(
+			product.getProductId(), product.getProductTitle(), product.getProductDescription(),
+			product.getPublisher().getPublisherName(), product.getProductPublishedAt(), product.getProductSalePrice(),
+			tagNames, contributorNames, categoryIds));
 	}
 
 	/**
@@ -140,6 +168,10 @@ public class ProductServiceImpl implements ProductService {
 	public ResponseProductReadDTO getProduct(long productId) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
+
+		// 엘라스틱 서치에서 조회수 update
+		productSearchService.updateProductDocumentHits(productId);
+
 		return getProductByChangedImagePath(product);
 	}
 
@@ -191,13 +223,14 @@ public class ProductServiceImpl implements ProductService {
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
 
-
 		List<MultipartFile> productImageFiles = request.getProductImage();
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
 
+		List<String> tagNames = new ArrayList<>();
+		List<String> contributorNames = new ArrayList<>();
 
-
+		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
 		// - 이미지가 들어왔다면
 		if (Objects.nonNull(productImageFiles) && !productImageFiles.isEmpty()) {
@@ -240,6 +273,7 @@ public class ProductServiceImpl implements ProductService {
 			for (Long tagId : tagIds) {
 				Tag tag = tagJpaRepository.findById(tagId)
 					.orElseThrow(() -> new TagNotFoundException("태그 조회 실패"));
+				tagNames.add(tag.getTagName());
 				productTagJpaRepository.save(new ProductTag(product, tag));
 			}
 		}
@@ -249,8 +283,20 @@ public class ProductServiceImpl implements ProductService {
 		for (Long contributorId : contributorIds) {
 			Contributor contributor = contributorJpaRepository.findById(contributorId)
 				.orElseThrow(() -> new ContributorNotFoundException("기여자 조회 실패"));
+			contributorNames.add(contributor.getContributorName());
 			productContributorJpaRepository.save(new ProductContributor(product, contributor));
 		}
+
+		// 카테고리 삭제 후 저장
+		createProductCategory(productId, request.getCategoryIds(), true);
+
+		List<Long> categoryIds = productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId());
+
+		// 엘라스틱 서치에서 수정
+		productSearchService.updateProductDocument(new RequestProductDocumentDTO(
+			productId, product.getProductTitle(), product.getProductDescription(),
+			product.getPublisher().getPublisherName(), product.getProductPublishedAt(),
+			product.getProductSalePrice(), tagNames, contributorNames, categoryIds));
 
 		productJpaRepository.save(product);
 	}
@@ -269,7 +315,15 @@ public class ProductServiceImpl implements ProductService {
 			throw new ProductStockDecrementException("재고 수량 변경 불가");
 		}
 
-		product.setProductSale(stock);
+		if (stock == 0) {
+			product.setState(productStateJpaRepository.findByProductStateName(ProductStateName.OUT));
+		}
+
+		if (stock > 0) {
+			product.setState(productStateJpaRepository.findByProductStateName(ProductStateName.SALE));
+		}
+
+		product.setStock(stock);
 		productJpaRepository.save(product);
 	}
 
@@ -282,8 +336,11 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
-		product.setProduct(request.getProductSalePrice());
+		product.setSalePrice(request.getProductSalePrice());
 		productJpaRepository.save(product);
+
+		// 엘라스틱 서치에서 수정
+		productSearchService.updateProductSalePrice(productId, request.getProductSalePrice());
 	}
 
 	/**
@@ -300,6 +357,84 @@ public class ProductServiceImpl implements ProductService {
 				product.getProductTitle(),
 				product.getPublisher().getPublisherName()
 			));
+	}
+
+	@Override
+	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds) {
+		List<Long> idOrder = productIds.getContent();
+		List<Product> unorderedProducts = productJpaRepository.findAllById(idOrder);
+
+		// 한 권이라도 존재하지 않으면 예외 발생
+		if (unorderedProducts.size() != idOrder.size()) {
+			throw new ProductNotFoundException();
+		}
+
+		Map<Long, Product> productMap = unorderedProducts.stream()
+			.collect(Collectors.toMap(Product::getProductId, Function.identity()));
+
+		List<ResponseProductReadDTO> responseProductReadDTOS = idOrder.stream()
+			.map(id -> {
+				Product product = productMap.get(id);
+				return new ResponseProductReadDTO(
+					product.getProductId(),
+					new ResponseProductStateDTO(
+						product.getProductState().getProductStateId(),
+						product.getProductState().getProductStateName().name()
+					),
+					new ResponsePublisherDTO(
+						product.getPublisher().getPublisherId(),
+						product.getPublisher().getPublisherName()
+					),
+					product.getProductTitle(),
+					product.getProductContent(),
+					product.getProductDescription(),
+					product.getProductPublishedAt(),
+					product.getProductIsbn(),
+					product.getProductRegularPrice(),
+					product.getProductSalePrice(),
+					product.isProductPackageable(),
+					product.getProductStock(),
+					productImageJpaRepository.findImageDTOsByProductId(product.getProductId()),
+					productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
+					productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
+					productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
+				);
+			})
+			.toList();
+
+		return new PageImpl<>(responseProductReadDTOS, productIds.getPageable(), productIds.getTotalElements());
+	}
+
+	private void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate) {
+		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
+		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
+			throw new ProductCategoryCreateNotAllowException();
+		}
+
+		if (isUpdate) {
+			productCategoryJpaRepository.deleteAllByProductId(productId);
+		}
+
+		Set<Long> uniqueCategoryIds = new HashSet<>();
+
+		for (Long categoryId : categoryIds) {
+			Category category = categoryJpaRepository.findById(categoryId)
+				.orElseThrow(CategoryNotFoundException::new);
+
+			while (category != null) {
+				uniqueCategoryIds.add(category.getCategoryId());
+				category = category.getParent();
+			}
+		}
+
+		Product product = productJpaRepository.findById(productId)
+			.orElseThrow(ProductNotFoundException::new);
+
+		for (Long id : uniqueCategoryIds) {
+			Category category = categoryJpaRepository.findById(id)
+				.orElseThrow(CategoryNotFoundException::new);
+			productCategoryJpaRepository.save(new ProductCategory(product, category));
+		}
 	}
 
 	/**
