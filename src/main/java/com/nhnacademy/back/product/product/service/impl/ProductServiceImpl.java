@@ -231,30 +231,6 @@ public class ProductServiceImpl implements ProductService {
 			productImageJpaRepository.saveAll(newProductImages); // 새로운 이미지 저장
 		}
 
-		// 	// - 수정해서 받은 사진의 갯수만큼 반복
-		// 	for (MultipartFile productImageFile : productImageFiles) {
-		//
-		//
-		// 		// - miniO에 새로 업로드할 파일이름
-		// 		String originalFilename = productImageFile.getOriginalFilename();
-		//
-		// 		// - 빈 경로 생성
-		// 		String updateImagePath = "";
-		//
-		// 		// - 이름 설정 후 업로드
-		// 		UUID uuid = UUID.randomUUID();
-		// 		String objectName = uuid + "_" + originalFilename;
-		// 		minioUtils.uploadObject(BUCKET_NAME, objectName, productImageFile);
-		//
-		// 		// 가공된 파일명 적용
-		// 		updateImagePath = objectName;
-		//
-		// 		ProductImage productImage = new ProductImage(product, updateImagePath);
-		// 		product.getProductImage().add(productImage);
-		// 		productImageJpaRepository.save(productImage);
-		// 	}
-		// }
-
 		// 상품 정보 업데이트 (수정)
 		product.updateProduct(request, productState, publisher);
 

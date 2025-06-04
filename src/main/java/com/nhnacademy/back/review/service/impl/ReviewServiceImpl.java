@@ -90,15 +90,6 @@ public class ReviewServiceImpl implements ReviewService {
 			throw new OrderDetailNotFoundException();
 		}
 
-		// 이미지 있으면 이미지 리뷰 정책, 없으면 일반 리뷰 정책으로 포인트 적립 이벤트 발행
-		if (Objects.nonNull(request.getMemberId())) {
-			if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
-				eventPublisher.publishEvent(new ReviewImgPointEvent(findMember.getMemberId()));
-			} else {
-				eventPublisher.publishEvent(new ReviewPointEvent(findMember.getMemberId()));
-			}
-		}
-
 		// 파일이 존재하면 업로드
 		String imagePath = "";
 		if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
