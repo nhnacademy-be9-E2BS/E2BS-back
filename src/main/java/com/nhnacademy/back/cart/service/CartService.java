@@ -21,5 +21,6 @@ public interface CartService {
 	void deleteCartItemForGuest(RequestDeleteCartItemsForGuestDTO request);
 	void deleteCartForGuest(String sessionId);
 	List<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId);
-	Integer getCartItemsCountsForGuest(String sessionId);
+
+	Integer mergeCartItemsToMemberFromGuest(String memberId, String sessionId);
 }

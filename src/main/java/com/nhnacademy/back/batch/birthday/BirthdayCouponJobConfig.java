@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.common.config.RabbitConfig;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -76,8 +77,8 @@ public class BirthdayCouponJobConfig {
 		return items -> {
 			for (Member member : items) {
 				rabbitTemplate.convertAndSend(
-					BirthdayCouponRabbitConfig.BIRTHDAY_EXCHANGE,
-					BirthdayCouponRabbitConfig.BIRTHDAY_ROUTING_KEY,
+					RabbitConfig.BIRTHDAY_EXCHANGE,
+					RabbitConfig.BIRTHDAY_ROUTING_KEY,
 					member.getCustomerId());
 			}
 		};

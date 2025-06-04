@@ -35,6 +35,7 @@ import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDT
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
+import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
 @WebMvcTest(OrderController.class)
@@ -49,6 +50,9 @@ class OrderControllerTest {
 
 	@MockitoBean
 	private PaymentService paymentService;
+
+	@MockitoBean
+	private OrderReturnService orderReturnService;
 
 	@Autowired
 	private ObjectMapper objectMapper;

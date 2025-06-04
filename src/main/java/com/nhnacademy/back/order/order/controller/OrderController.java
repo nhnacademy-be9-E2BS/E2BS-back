@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
+import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
+import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ public class OrderController {
 
 	private final OrderService orderService;
 	private final PaymentService paymentService;
+	private final OrderReturnService orderReturnService;
 
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
@@ -83,7 +87,7 @@ public class OrderController {
 	}
 
 	/**
-	 * 특정 주문서를 삭제하는 기능, 안에서 재고 복구도 진행함
+	 * 특정 주문서를 삭제하는 기능
 	 */
 	@Member
 	@PostMapping("/cancel")
@@ -117,4 +121,21 @@ public class OrderController {
 	public ResponseEntity<Void> cancelOrder(@PathVariable String orderCode) {
 		return orderService.cancelOrder(orderCode);
 	}
+
+	@PostMapping("/return")
+	public ResponseEntity<Void> returnOrder(@RequestBody RequestOrderReturnDTO request) {
+		return orderService.returnOrder(request);
+	}
+
+	@GetMapping("/return")
+	public ResponseEntity<Page<ResponseOrderReturnDTO>> getReturnOrders(Pageable pageable,
+		@RequestParam String memberId) {
+		return orderReturnService.getOrderReturnsByMemberId(memberId, pageable);
+	}
+
+	@GetMapping("/return/{orderCode}")
+	public ResponseEntity<ResponseOrderReturnDTO> getReturnOrderByOrderCode(@PathVariable String orderCode) {
+		return orderReturnService.getOrderReturnByOrderCode(orderCode);
+	}
+
 }

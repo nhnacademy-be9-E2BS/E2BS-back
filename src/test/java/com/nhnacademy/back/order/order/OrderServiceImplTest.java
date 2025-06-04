@@ -28,6 +28,8 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
@@ -56,6 +58,7 @@ import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.product.product.service.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -83,6 +86,12 @@ class OrderServiceImplTest {
 	private MemberJpaRepository memberJpaRepository;
 	@Mock
 	private TossAdaptor tossAdaptor;
+	@Mock
+	private ProductService productService;
+	@Mock
+	private PointHistoryService pointHistoryService;
+	@Mock
+	private MemberCouponService memberCouponService;
 
 	@BeforeEach
 	void setUp() {
@@ -186,11 +195,8 @@ class OrderServiceImplTest {
 		when(orderJpaRepository.findById(anyString())).thenReturn(Optional.of(order));
 		doNothing().when(order).updatePaymentStatus(true);
 
-		// 스파이로 createOrder() 모킹
-		OrderServiceImpl spyService = Mockito.spy(orderService);
-
 		// when
-		ResponseEntity<ResponseOrderResultDTO> response = spyService.createPointOrder(wrapperDTO);
+		ResponseEntity<ResponseOrderResultDTO> response = orderService.createPointOrder(wrapperDTO);
 
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -216,6 +222,7 @@ class OrderServiceImplTest {
 		when(tossAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
 			.thenReturn(responseEntity);
 		when(orderJpaRepository.findById(orderId)).thenReturn(Optional.of(order));
+		when(order.getMemberCoupon()).thenReturn(null);
 
 		// when
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response =
