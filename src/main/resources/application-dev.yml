@@ -29,8 +29,19 @@ spring:
       host: s4.java21.net
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
-      database: 293
+      database: 294
+
+  # RabbitMQ 사용한 이유 설명
+  # RabbitMQ 연결 설정 <-> Spring EventListener (비교적 가벼운 작업에 유리)
   rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: admin
+    password: nhnacademy123!
+    listener:
+      simple:
+        acknowledge-mode: auto
+        default-requeue-rejected: false
     virtual-host: "e2bs_dev"
 
 eureka:
@@ -53,3 +64,8 @@ minio:
   access-key: OCO4F9OO5naKnVCpAPBZ
   secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
   region: us-east-1
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 로그를 trace 레벨로 출력
+    org.springframework.transaction.interceptor: trace # 트랜잭션 처리 로그를 trace 로 출력

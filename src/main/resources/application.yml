@@ -2,6 +2,12 @@
 spring:
   application:
     name: BACK
+
+  profiles:
+    active: prod
+  config:
+    import: optional:configserver:http://localhost:10240 # config 서버 연결
+
   jpa:
     hibernate:
       ddl-auto: update  # DB 테이블 자동 생성/업데이트 방식 설정 (개발 중에는 update, 운영에는 validate 추천)
@@ -16,32 +22,13 @@ spring:
     # (= 트랜잭션의 영향 범위 설정)
   cache:
     type: redis # 카테고리 항상 가져올 수 없으니 redis caching 처리 (예) front/back 중 back 에 캐싱 처리하는 이유 설명 + 캐싱을 어디에 적용할 수 있을지)
-      # 스프링에서 사용할 수 있는 캐시 매니저의 종류 약 4가지:
+    # 스프링에서 사용할 수 있는 캐시 매니저의 종류 약 4가지:
     # PSA: Portable Service Abstraction
 
-  # RabbitMQ 사용한 이유 설명
-  # RabbitMQ 연결 설정 <-> Spring EventListener (비교적 가벼운 작업에 유리)
-  rabbitmq:
-    host: s4.java21.net
-    port: 5672
-    username: admin
-    password: nhnacademy123!
-    listener:
-      simple:
-        acknowledge-mode: auto
-        default-requeue-rejected: false
-
-  data:
-    redis:
-      host: s4.java21.net
-      port: 6379
-      password: "*N2vya7H@muDTwdNMR!"
-      database: 294
-
-logging:
-  level:
-    org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 로그를 trace 레벨로 출력
-    org.springframework.transaction.interceptor: trace # 트랜잭션 처리 로그를 trace 로 출력
+order:
+  url:
+    toss: https://api.tosspayments.com/v1/payments/confirm
+  sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
 
 # 서버가 종료됐을 때 대기 시간 (kill -15, -9 차이점)
 server:
@@ -52,8 +39,3 @@ management:
     web:
       exposure: # Actuator 는 일부만 노출하는게 좋음
         include: "*" # Actuator 의 모든 엔드포인트를 웹에서 노출 (운영환경에선 최소화 필요)
-
-order:
-  url:
-    toss: https://api.tosspayments.com/v1/payments/confirm
-  sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
