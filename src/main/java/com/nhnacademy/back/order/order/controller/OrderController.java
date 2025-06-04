@@ -41,7 +41,6 @@ public class OrderController {
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
-	@Member
 	@PostMapping("/create/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -71,7 +70,6 @@ public class OrderController {
 	 * 이는 이후 다른 부분 구현 완료 시 진행할 예정
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
-	@Member
 	@PostMapping("/confirm")
 	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
 		@RequestParam long amount) {
@@ -89,7 +87,6 @@ public class OrderController {
 	/**
 	 * 특정 주문서를 삭제하는 기능
 	 */
-	@Member
 	@PostMapping("/cancel")
 	public ResponseEntity<Void> deleteOrder(@RequestParam String orderId) {
 		return orderService.deleteOrder(orderId);
@@ -107,7 +104,6 @@ public class OrderController {
 	/**
 	 * 회원의 주문 목록 조회
 	 */
-	@Member
 	@GetMapping
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId) {
 		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));

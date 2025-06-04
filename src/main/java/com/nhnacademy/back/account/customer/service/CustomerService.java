@@ -6,14 +6,15 @@ import org.springframework.data.domain.Pageable;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerDTO;
 
 public interface CustomerService {
 
 	Page<ResponseAdminSettingsNonMembersDTO> getAdminSettingsNonMembers(Pageable pageable);
 
-	Long postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO);
+	ResponseCustomerDTO postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO);
 
-	Long postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO);
+	ResponseCustomerDTO postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO);
 
 	boolean isExistsCustomerEmail(String customerEmail);
 }
