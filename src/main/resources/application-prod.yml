@@ -33,3 +33,32 @@
 #  access-key: OCO4F9OO5naKnVCpAPBZ
 #  secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
 #  region: us-east-1
+
+#spring:
+#  datasource:
+#    type: org.apache.commons.dbcp2.BasicDataSource # 명확하게 dbcp2 타입 지정
+#    url: jdbc:mysql://s4.java21.net:13306/be9-team2 # DB URL 설정
+#    driver-class-name: com.mysql.cj.jdbc.Driver # 최신 MySQL 드라이버 사용
+#    username: be9-team2
+#    password: "*gzxziN[g9kwl]Ln"
+#    dbcp2:
+#      initial-size: 5 # 초기에 커넥션 5개 생성
+#      max-total: 20 # 최대 20개 커넥션
+#      max-idle: 10 # 최대 유휴 커넥션
+#      min-idle: 5 # 최소 유휴 커넥션
+#      validation-query: SELECT 1 # 커넥션 유효성 확인 쿼리 적절
+#      test-on-borrow: true # 커넥션 가져올 때 유효성 검사
+#      test-while-idle: true # 유휴 상태 검사 활성화
+
+
+
+
+
+
+
+
+
+
+
+
+

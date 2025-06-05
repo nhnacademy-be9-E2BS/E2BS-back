@@ -24,6 +24,8 @@ public interface OrderService {
 
 	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
 
+	Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId);
+
 	ResponseEntity<Void> cancelOrder(String orderCode);
 
 	ResponseEntity<Void> returnOrder(RequestOrderReturnDTO returnDTO);
