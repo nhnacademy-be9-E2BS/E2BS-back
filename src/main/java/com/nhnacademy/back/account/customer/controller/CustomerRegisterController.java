@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerDTO;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
@@ -31,13 +32,14 @@ public class CustomerRegisterController {
 	 * 비회원 등록
 	 */
 	@PostMapping
-	public ResponseEntity<Long> registerCustomer(@Validated @RequestBody RequestCustomerRegisterDTO requestCustomerRegisterDTO, BindingResult bindingResult) {
+	public ResponseEntity<ResponseCustomerDTO> registerCustomer(
+		@Validated @RequestBody RequestCustomerRegisterDTO requestCustomerRegisterDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		Long customerId = customerService.postCustomerRegister(requestCustomerRegisterDTO);
-		return ResponseEntity.status(HttpStatus.CREATED).body(customerId);
+		ResponseCustomerDTO customer = customerService.postCustomerRegister(requestCustomerRegisterDTO);
+		return ResponseEntity.status(HttpStatus.CREATED).body(customer);
 	}
 
 	/**

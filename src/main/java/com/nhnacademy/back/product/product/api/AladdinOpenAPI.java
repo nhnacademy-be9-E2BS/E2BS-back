@@ -34,6 +34,7 @@ public class AladdinOpenAPI {
 		hashMap.put("cover", "Big");
 		hashMap.put("SearchTarget", "All"); //검색대상 - Book, Foreign
 		hashMap.put("output", "xml");
+		hashMap.put("cover", "Big");
 		hashMap.put("Version", "20131101");
 
 		StringBuffer sb = new StringBuffer();
@@ -60,6 +61,7 @@ public class AladdinOpenAPI {
 		hashMap.put("SearchTarget", "Book");
 		hashMap.put("cover", "Big");
 		hashMap.put("output", "xml");
+		hashMap.put("cover", "Big");
 		hashMap.put("Version", "20131101");
 
 		StringBuffer sb = new StringBuffer();

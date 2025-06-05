@@ -33,4 +33,7 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 		"AND o.orderCreatedAt >= :threeMonthsAgo")
 	Long sumOrderPureAmount(@Param("customerId") Long customerId, @Param("threeMonthsAgo") LocalDateTime threeMonthsAgo);
 
+	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderCreatedAt BETWEEN :start AND :end")
+	int countOrdersByLocalDateTime(LocalDateTime start, LocalDateTime end);
+
 }

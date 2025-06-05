@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerDTO;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerEmailAlreadyExistsException;
 import com.nhnacademy.back.account.customer.exception.CustomerEmailNotExistsException;
@@ -39,17 +40,18 @@ public class CustomerServiceImpl implements CustomerService {
 	 * 비회원 로그인 메소드
 	 */
 	@Override
-	public Long postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO) {
+	public ResponseCustomerDTO postCustomerLogin(RequestCustomerLoginDTO requestCustomerLoginDTO) {
 		if (!customerJpaRepository.existsCustomerByCustomerEmail(requestCustomerLoginDTO.getCustomerEmail())) {
 			throw new CustomerEmailNotExistsException("이메일이 존재하지 않습니다.");
 		}
 
-		Customer customer = customerJpaRepository.getCustomerByCustomerEmail(requestCustomerLoginDTO.getCustomerEmail());
+		Customer customer = customerJpaRepository.getCustomerByCustomerEmail(
+			requestCustomerLoginDTO.getCustomerEmail());
 		if (!passwordEncoder.matches(requestCustomerLoginDTO.getCustomerPassword(), customer.getCustomerPassword())) {
 			throw new CustomerPasswordNotMatchException("비밀번호가 일치하지 않습니다.");
 		}
 
-		return customer.getCustomerId();
+		return new ResponseCustomerDTO(customer.getCustomerName(), customer.getCustomerId());
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
 	 */
 	@Transactional
 	@Override
-	public Long postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO) {
+	public ResponseCustomerDTO postCustomerRegister(RequestCustomerRegisterDTO requestCustomerRegisterDTO) {
 		if (customerJpaRepository.existsCustomerByCustomerEmail(requestCustomerRegisterDTO.getCustomerEmail())) {
 			throw new CustomerEmailAlreadyExistsException("비회원 이메일이 이미 존재합니다.");
 		}
@@ -65,7 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customer = Customer.createCustomerEntity(requestCustomerRegisterDTO);
 		customerJpaRepository.save(customer);
 
-		return customer.getCustomerId();
+		return new ResponseCustomerDTO(customer.getCustomerName(), customer.getCustomerId());
 	}
 
 	/**

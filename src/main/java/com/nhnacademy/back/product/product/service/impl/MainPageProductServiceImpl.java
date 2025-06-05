@@ -11,7 +11,6 @@ import com.nhnacademy.back.product.category.repository.ProductCategoryJpaReposit
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -29,17 +28,13 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductCategoryJpaRepository productCategoryJpaRepository;
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 
-	@Override
-	public List<ResponseMainPageProductDTO> getProducts(RequestMainPageProductDTO request) {
-		return List.of();
-	}
 
 
 	@Override
 	public List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName) {
 		Category category = categoryJpaRepository.findCategoryByCategoryName(categoryName);
 		if (category == null) {
-			return List.of(); // 혹은 예외 던지기
+			return List.of();
 		}
 
 		List<Long> productIds = productCategoryJpaRepository.findProductIdByCategory(category)
@@ -70,7 +65,9 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 					product.getProductTitle(),
 					contributorName,
 					imagePath,
-					product.getProductSalePrice()
+					product.getProductSalePrice(),
+					product.getProductDescription(),
+					product.getPublisher().getPublisherName()
 				);
 			})
 			.toList();
@@ -78,22 +75,27 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 
 	@Override
 	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
-		return getProductsByCategory("Bestseller");
+		return getProductsByCategory("베스트셀러");
 	}
-
 	@Override
 	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
-		return getProductsByCategory("BlogBest");
+		return getProductsByCategory("블로그베스트");
 	}
 
 	@Override
 	public List<ResponseMainPageProductDTO> getNewItemsProducts() {
-		return getProductsByCategory("ItemNewAll");
+		return getProductsByCategory("신간");
 	}
 
 	@Override
 	public List<ResponseMainPageProductDTO> getItemNewSpecialProducts() {
-		return getProductsByCategory("ItemNewSpecial");
+		return getProductsByCategory("신간스페셜");
+	}
+
+	@Override
+	public List<ResponseMainPageProductDTO> getItemEditorChoiceProducts() {
+		return getProductsByCategory("ItemEditorChoice");
+
 	}
 
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
+import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerDTO;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
@@ -24,13 +25,13 @@ public class CustomerLoginController {
 	 * 비회원 로그인
 	 */
 	@PostMapping("/api/customers/login")
-	public ResponseEntity<Long> customerLogin(@Validated @RequestBody RequestCustomerLoginDTO requestCustomerLoginDTO, BindingResult bindingResult) {
+	public ResponseEntity<ResponseCustomerDTO> customerLogin(@Validated @RequestBody RequestCustomerLoginDTO requestCustomerLoginDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
 
-		Long customerId = customerService.postCustomerLogin(requestCustomerLoginDTO);
-		return ResponseEntity.status(HttpStatus.CREATED).body(customerId);
+		ResponseCustomerDTO customer = customerService.postCustomerLogin(requestCustomerLoginDTO);
+		return ResponseEntity.status(HttpStatus.CREATED).body(customer);
 	}
 
 }

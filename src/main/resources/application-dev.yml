@@ -44,6 +44,11 @@ spring:
         default-requeue-rejected: false
     virtual-host: "e2bs_dev"
 
+  elasticsearch:
+    uris: s4.java21.net:9200
+    username: elastic
+    password: nhnacademy123!
+
 eureka:
   client:
     fetch-registry: true # Eureka에서 다른 서비스 정보를 받아올지 여부
