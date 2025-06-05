@@ -3,20 +3,10 @@
     "tokenizer": {
       "my_nori_tokenizer": {
         "type": "nori_tokenizer",
-        "decompound_mode": "mixed"
-      },
-      "my_jaso_tokenizer": {
-        "type": "jaso_tokenizer",
-        "mistype": true,
-        "chosung": true
+        "decompound_mode": "none"
       }
     },
     "filter": {
-      "suggest_filter": {
-        "type": "edge_ngram",
-        "min_gram": 1,
-        "max_gram": 50
-      },
       "synonym_filter": {
         "type": "synonym",
         "synonyms": [
@@ -116,14 +106,6 @@
       }
     },
     "analyzer": {
-      "jaso_analyzer": {
-        "type": "custom",
-        "tokenizer": "my_jaso_tokenizer",
-        "filter": [
-          "icu_normalizer",
-          "suggest_filter"
-        ]
-      },
       "nori_analyzer": {
         "type": "custom",
         "tokenizer": "my_nori_tokenizer",
@@ -131,9 +113,11 @@
           "icu_normalizer"
         ]
       },
-      "synonym": {
-        "tokenizer": "whitespace",
+      "nori_synonym": {
+        "type": "custom",
+        "tokenizer": "my_nori_tokenizer",
         "filter": [
+          "icu_normalizer",
           "synonym_filter"
         ]
       }

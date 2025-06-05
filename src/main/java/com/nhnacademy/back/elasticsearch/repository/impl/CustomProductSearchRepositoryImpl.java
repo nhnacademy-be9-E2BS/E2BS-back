@@ -33,7 +33,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 	public Page<Long> searchAndSortProductIds(Pageable pageable, String keyword, ProductSortType sortType) {
 		Criteria criteria = new Criteria()
 			.or(new Criteria("productTitle").matches(keyword).boost(10.0f))
-			.or(new Criteria("productContent").matches(keyword).boost(3.0f))
+			.or(new Criteria("productDescription").matches(keyword).boost(3.0f))
 			.or(new Criteria("productPublisherName").matches(keyword).boost(2.0f))
 			.or(new Criteria("productContributors").matches(keyword).boost(4.0f))
 			.or(new Criteria("productTags").matches(keyword).boost(5.0f));
