@@ -278,6 +278,12 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId) {
+		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
+			.map(ResponseOrderDTO::fromEntity);
+	}
+
+	@Override
 	@Transactional
 	public ResponseEntity<Void> cancelOrder(String orderCode) {
 		// 주문 코드로 주문서의 상태 취소로 변경

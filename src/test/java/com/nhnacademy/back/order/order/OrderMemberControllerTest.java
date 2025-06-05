@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
-import com.nhnacademy.back.order.order.controller.OrderController;
+import com.nhnacademy.back.order.order.controller.OrderMemberController;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
@@ -38,9 +38,9 @@ import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
-@WebMvcTest(OrderController.class)
+@WebMvcTest(OrderMemberController.class)
 @ActiveProfiles("dev")
-class OrderControllerTest {
+class OrderMemberControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
