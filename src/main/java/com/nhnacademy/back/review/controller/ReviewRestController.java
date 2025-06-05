@@ -21,6 +21,7 @@ import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewMetaDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -67,6 +68,12 @@ public class ReviewRestController {
 	@GetMapping("/api/products/{productId}/reviews/info")
 	public ResponseEntity<ResponseReviewInfoDTO> getReviewInfo(@PathVariable long productId) {
 		ResponseReviewInfoDTO body = reviewService.getReviewInfo(productId);
+		return ResponseEntity.ok(body);
+	}
+
+	@GetMapping("/api/members/{memberId}/reviews")
+	public ResponseEntity<Page<ResponseMemberReviewDTO>> getReviewsByMember(@PathVariable String memberId, Pageable pageable) {
+		Page<ResponseMemberReviewDTO> body = reviewService.getReviewsByMember(memberId, pageable);
 		return ResponseEntity.ok(body);
 	}
 
