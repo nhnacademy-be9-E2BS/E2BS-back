@@ -21,7 +21,7 @@ public class BirthdayCouponScheduler {
 	private final JobLauncher jobLauncher;
 	private final Job birthdayCouponJob;
 
-	@Scheduled(cron = "0 0/15 * * * *") // 테스트용: 매분 -> 실서비스 : 매월 1일 00시 (cron = "0 0 0 1 * *")
+	@Scheduled(cron = "0 0 0 * * *") // 테스트용: 매분 -> 실서비스 : 매월 1일 00시 (cron = "0 0 0 1 * *")
 	@SchedulerLock(name = "birthdayCouponJob", lockAtMostFor = "10m", lockAtLeastFor = "1m")
 	public void runBirthdayCouponJob() throws
 		JobInstanceAlreadyCompleteException,
