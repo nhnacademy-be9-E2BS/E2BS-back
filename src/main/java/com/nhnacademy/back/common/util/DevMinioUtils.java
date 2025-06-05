@@ -28,9 +28,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @RequiredArgsConstructor
 public class DevMinioUtils implements MinioUtils {
 
-	@Value("${minio.host}")
-	private String host;
-
 	private final S3Client s3Client;
 	private final S3Presigner presigner;
 
