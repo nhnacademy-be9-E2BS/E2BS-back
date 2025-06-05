@@ -43,7 +43,8 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 		"FROM OrderDetail od " +
 		"JOIN od.order o " +
 		"WHERE o.customer.customerId = :customerId " +
-		"AND od.product.productId = :productId")
+		"AND od.product.productId = :productId " +
+		"AND od.review IS NULL")
 	Optional<OrderDetail> findByCustomerIdAndProductId(Long customerId, Long productId);
 
 }
