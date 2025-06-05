@@ -127,10 +127,12 @@ public class OrderServiceImpl implements OrderService {
 			.orElseThrow(OrderNotFoundException::new);
 
 		// 포인트 차감
-		eventPublisher.publishEvent(new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+		eventPublisher.publishEvent(
+			new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
 
 		// 포인트 적립
-		eventPublisher.publishEvent(new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+		eventPublisher.publishEvent(
+			new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 쿠폰 사용 처리
 		if (order.getMemberCoupon() != null) {
@@ -226,10 +228,12 @@ public class OrderServiceImpl implements OrderService {
 		if (response.getStatusCode().is2xxSuccessful()) {
 			Order order = orderJpaRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
 			// 포인트 차감
-			eventPublisher.publishEvent(new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+			eventPublisher.publishEvent(
+				new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
 
 			// 포인트 적립
-			eventPublisher.publishEvent(new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+			eventPublisher.publishEvent(
+				new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 			// 쿠폰 사용 처리
 			if (order.getMemberCoupon() != null) {
@@ -294,6 +298,12 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId) {
+		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
+			.map(ResponseOrderDTO::fromEntity);
+	}
+
+	@Override
 	@Transactional
 	public ResponseEntity<Void> cancelOrder(String orderCode) {
 		// 주문 코드로 주문서의 상태 취소로 변경
@@ -336,7 +346,8 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		//적립된 포인트 회수 요청
-		eventPublisher.publishEvent(new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+		eventPublisher.publishEvent(
+			new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
@@ -376,7 +387,11 @@ public class OrderServiceImpl implements OrderService {
 			throw new OrderProcessException("반품 금액이 0원 이하입니다.");
 		}
 		// 포인트 환불
+		eventPublisher.publishEvent(
+			new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
 		// 적립 금액 회수
+		eventPublisher.publishEvent(
+			new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 사용한 쿠폰이 있을 시 쿠폰 복구
 		MemberCoupon memberCoupon = order.getMemberCoupon();
