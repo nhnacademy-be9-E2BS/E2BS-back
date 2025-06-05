@@ -69,7 +69,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
-		return pointHistoryJpaRepository.getPointHistoriesByMember(member, pageable)
+		return pointHistoryJpaRepository.findByMemberOrderByPointCreatedAtDesc(member, pageable)
 			.map(pointHistory -> new ResponsePointHistoryDTO(
 				pointHistory.getPointAmount(),
 				pointHistory.getPointReason(),

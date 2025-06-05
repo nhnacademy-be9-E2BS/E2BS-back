@@ -85,12 +85,16 @@ public class PointEventListener {
 	 */
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderPointPaymentEvent(OrderPointPaymentEvent event) {
-		try {
-			Long customerId = event.getCustomerId();
-			Long pointFigure = event.getPointFigure() * -1;
-			pointHistoryService.payPoint(customerId, pointFigure);
-		} catch (Exception e) {
-			log.error("주문 시 포인트 사용 실패", e);
+		// 포인트 사용한 경우에만 히스토리 추가
+		if(event.getPointFigure() > 0) {
+			try {
+				Long customerId = event.getCustomerId();
+				Long pointFigure = event.getPointFigure() * -1;
+
+				pointHistoryService.payPoint(customerId, pointFigure);
+			} catch (Exception e) {
+				log.error("주문 시 포인트 사용 실패", e);
+			}
 		}
 	}
 
