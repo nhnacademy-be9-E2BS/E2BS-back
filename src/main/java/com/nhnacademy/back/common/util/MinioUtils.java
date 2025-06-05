@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,9 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @Component
 @RequiredArgsConstructor
 public class MinioUtils {
+
+	@Value("${minio.host}")
+	private String host;
 
 	private final S3Client s3Client;
 	private final S3Presigner presigner;
@@ -82,8 +86,9 @@ public class MinioUtils {
 				.bucket(bucketName)
 				.key(objectKey))
 			.build();
+		String imageUrl = presigner.presignGetObject(presignRequest).url().toString();
 
-		return presigner.presignGetObject(presignRequest).url().toString();
+		return imageUrl.replace(host, "/storage");
 	}
 
 }
