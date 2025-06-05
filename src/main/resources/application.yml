@@ -39,3 +39,9 @@ management:
     web:
       exposure: # Actuator 는 일부만 노출하는게 좋음
         include: "*" # Actuator 의 모든 엔드포인트를 웹에서 노출 (운영환경에선 최소화 필요)
+
+shedlock:
+  mode: db
+  table-name: shedlock
+  lock-provider:
+    type: jdbc

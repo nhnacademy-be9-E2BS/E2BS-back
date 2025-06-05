@@ -11,6 +11,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -20,6 +22,7 @@ public class BirthdayCouponScheduler {
 	private final Job birthdayCouponJob;
 
 	@Scheduled(cron = "0 0 * * * *") // 테스트용: 매분 -> 실서비스 : 매월 1일 00시 (cron = "0 0 0 1 * *")
+	@SchedulerLock(name = "birthdayCouponJob", lockAtMostFor = "10m", lockAtLeastFor = "1m")
 	public void runBirthdayCouponJob() throws
 		JobInstanceAlreadyCompleteException,
 		JobExecutionAlreadyRunningException,
