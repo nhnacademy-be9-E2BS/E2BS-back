@@ -43,6 +43,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	private static final String REVIEW_POINT_REASON = "일반 리뷰 작성";
 	private static final String BOOK_POINT_REASON = "도서 구매 적립";
 	private static final String PAY_POINT_REASON = "포인트 사용";
+	private static final String RECOVER_POINT_REASON = "주문취소로 인한 포인트 복구";
+	private static final String RETRIEVE_POINT_REASON = "주문취소로 인한 포인트 회수";
 
 	public ResponseMemberPointDTO getMemberPoints(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
@@ -67,7 +69,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
-		return pointHistoryJpaRepository.getPointHistoriesByMember(member, pageable)
+		return pointHistoryJpaRepository.findByMemberOrderByPointCreatedAtDesc(member, pageable)
 			.map(pointHistory -> new ResponsePointHistoryDTO(
 				pointHistory.getPointAmount(),
 				pointHistory.getPointReason(),
@@ -152,8 +154,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void earnOrderPoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	public void earnOrderPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
@@ -170,13 +172,13 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void payPoint(String memberId, Long pointFigure) {
-		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+	public void payPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
 		if (Objects.isNull(member)) {
 			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
 		}
 
-		ResponseMemberPointDTO points = this.getMemberPoints(memberId);
+		ResponseMemberPointDTO points = this.getMemberPoints(member.getMemberId());
 		if(points.getPointAmount() < pointFigure) {
 			throw new InsufficientPointException("사용가능한 포인트가 부족합니다.");
 		}
@@ -184,6 +186,42 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 		PointHistory pointHistory = new PointHistory(
 			pointFigure,
 			PAY_POINT_REASON,
+			LocalDateTime.now(),
+			member
+		);
+
+		pointHistoryJpaRepository.save(pointHistory);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void recoverPoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
+		}
+
+		PointHistory pointHistory = new PointHistory(
+			pointFigure,
+			RECOVER_POINT_REASON,
+			LocalDateTime.now(),
+			member
+		);
+
+		pointHistoryJpaRepository.save(pointHistory);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void retrievePoint(Long customerId, Long pointFigure) {
+		Member member = memberJpaRepository.getMemberByCustomerId(customerId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(MEMBER_NOT_FOUND_EXCEPTION);
+		}
+
+		PointHistory pointHistory = new PointHistory(
+			pointFigure,
+			RETRIEVE_POINT_REASON,
 			LocalDateTime.now(),
 			member
 		);

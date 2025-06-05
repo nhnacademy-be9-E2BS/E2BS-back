@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.nhnacademy.back.order.order.domain.entity.Order;
 
@@ -24,6 +25,13 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 	List<Order> findByOrderPaymentStatusIsFalseAndOrderCreatedAtBefore(LocalDateTime cutoff);
 
 	List<Order> findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(long stateId, LocalDate cutoff);
+
+	@Query("SELECT COALESCE(SUM(o.orderPureAmount), 0) " +
+		"FROM Order o " +
+		"WHERE o.customer.customerId = :customerId " +
+		"AND o.orderState.orderStateName = 'COMPLETE' " +
+		"AND o.orderCreatedAt >= :threeMonthsAgo")
+	Long sumOrderPureAmount(@Param("customerId") Long customerId, @Param("threeMonthsAgo") LocalDateTime threeMonthsAgo);
 
 	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderCreatedAt BETWEEN :start AND :end")
 	int countOrdersByLocalDateTime(LocalDateTime start, LocalDateTime end);
