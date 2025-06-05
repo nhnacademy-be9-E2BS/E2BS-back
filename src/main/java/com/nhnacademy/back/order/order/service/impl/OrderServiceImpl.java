@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,10 @@ import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
+import com.nhnacademy.back.event.event.OrderCancelPointEvent;
+import com.nhnacademy.back.event.event.OrderCancelPointPaymentEvent;
+import com.nhnacademy.back.event.event.OrderPointEvent;
+import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
@@ -95,6 +100,8 @@ public class OrderServiceImpl implements OrderService {
 
 	private final TossAdaptor tossAdaptor;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	/**
 	 * 주문서를 저장하는 서비스
 	 * 재고 차감은 이후 추후 추가 예정
@@ -118,8 +125,13 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderJpaRepository.findById(Objects.requireNonNull(response.getBody()).getOrderId())
 			.orElseThrow(OrderNotFoundException::new);
+
 		// 포인트 차감
+		eventPublisher.publishEvent(new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+
 		// 포인트 적립
+		eventPublisher.publishEvent(new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+
 		// 쿠폰 사용 처리
 		if (order.getMemberCoupon() != null) {
 			memberCouponService.updateMemberCouponById(order.getMemberCoupon().getMemberCouponId());
@@ -214,7 +226,11 @@ public class OrderServiceImpl implements OrderService {
 		if (response.getStatusCode().is2xxSuccessful()) {
 			Order order = orderJpaRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
 			// 포인트 차감
+			eventPublisher.publishEvent(new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+
 			// 포인트 적립
+			eventPublisher.publishEvent(new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+
 			// 쿠폰 사용 처리
 			if (order.getMemberCoupon() != null) {
 				memberCouponService.updateMemberCouponById(order.getMemberCoupon().getMemberCouponId());
@@ -310,6 +326,7 @@ public class OrderServiceImpl implements OrderService {
 		long usedPoint = order.getOrderPointAmount();
 		log.info("usedPoint:{}", usedPoint);
 		// 사용한 포인트 수치만큼 복구 요청
+		eventPublisher.publishEvent(new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), usedPoint));
 
 		MemberCoupon memberCoupon = order.getMemberCoupon();
 		if (memberCoupon != null) {
@@ -325,6 +342,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		//적립된 포인트 회수 요청
+		eventPublisher.publishEvent(new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);

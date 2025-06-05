@@ -50,6 +50,20 @@ public class MemberCouponController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
+	@Member
+	@GetMapping("/api/auth/mypage/{memberId}/couponsUsable")
+	public ResponseEntity<Page<ResponseMemberCouponDTO>> getUsableMemberCouponsByMemberId(@PathVariable String memberId, Pageable pageable) {
+		Page<ResponseMemberCouponDTO> response = memberCouponService.getUsableMemberCouponsByMemberId(memberId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@Member
+	@GetMapping("/api/auth/mypage/{memberId}/couponsUnusable")
+	public ResponseEntity<Page<ResponseMemberCouponDTO>> getUnusableMemberCouponsByMemberId(@PathVariable String memberId, Pageable pageable) {
+		Page<ResponseMemberCouponDTO> response = memberCouponService.getUnusableMemberCouponsByMemberId(memberId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
 	/**
 	 * !기능확인용 API -> orderController 의 서비스 구현으로 옭기면 삭제 예정
 	 * 사용자 쿠폰 사용 시 사용여부 업데이트 (미사용 -> 사용완료)

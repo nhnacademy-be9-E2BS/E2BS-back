@@ -24,11 +24,11 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 	Long getTotalDailySales(LocalDateTime start, LocalDateTime end);
 
 	@Query("SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
-		   "FROM OrderDetail od " +
-		   "JOIN od.order o " +
-		   "WHERE o.customer.customerId = :customerId " +
-		   "AND od.product.productId = :productId " +
-		   "AND od.review.reviewId IS NULL")
+		"FROM OrderDetail od " +
+		"JOIN od.order o " +
+		"WHERE o.customer.customerId = :customerId " +
+		"AND od.product.productId = :productId " +
+		"AND od.review.reviewId IS NULL")
 	boolean existsOrderDetailByCustomerIdAndProductId(long customerId, long productId);
 
 	@Query("SELECT od " +

@@ -5,6 +5,8 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.event.event.OrderCancelPointEvent;
+import com.nhnacademy.back.event.event.OrderCancelPointPaymentEvent;
 import com.nhnacademy.back.event.event.OrderPointEvent;
 import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.event.event.RegisterPointEvent;
@@ -70,9 +72,9 @@ public class PointEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderPointEvent(OrderPointEvent event) {
 		try {
-			String memberId = event.getMemberId();
+			Long customerId = event.getCustomerId();
 			Long pointFigure = event.getPointFigure();
-			pointHistoryService.earnOrderPoint(memberId, pointFigure);
+			pointHistoryService.earnOrderPoint(customerId, pointFigure);
 		} catch (Exception e) {
 			log.error("도서 주문 포인트 적립 실패", e);
 		}
@@ -83,12 +85,44 @@ public class PointEventListener {
 	 */
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleOrderPointPaymentEvent(OrderPointPaymentEvent event) {
+		// 포인트 사용한 경우에만 히스토리 추가
+		if(event.getPointFigure() > 0) {
+			try {
+				Long customerId = event.getCustomerId();
+				Long pointFigure = event.getPointFigure() * -1;
+
+				pointHistoryService.payPoint(customerId, pointFigure);
+			} catch (Exception e) {
+				log.error("주문 시 포인트 사용 실패", e);
+			}
+		}
+	}
+
+	/**
+	 * 주문취소 시 포인트 복구
+	 */
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderCancelPointPaymentEvent(OrderCancelPointPaymentEvent event) {
 		try {
-			String memberId = event.getMemberId();
+			Long customerId = event.getCustomerId();
 			Long pointFigure = event.getPointFigure();
-			pointHistoryService.payPoint(memberId, pointFigure);
+			pointHistoryService.recoverPoint(customerId, pointFigure);
 		} catch (Exception e) {
-			log.error("주문 시 포인트 사용 실패", e);
+			log.error("주문취소 포인트 복구 실패", e);
+		}
+	}
+
+	/**
+	 * 주문취소 시 포인트 회수
+	 */
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderCancelPointEvent(OrderCancelPointEvent event) {
+		try {
+			Long customerId = event.getCustomerId();
+			Long pointFigure = event.getPointFigure() * -1;
+			pointHistoryService.retrievePoint(customerId, pointFigure);
+		} catch (Exception e) {
+			log.error("주문취소 포인트 회수 실패", e);
 		}
 	}
 }

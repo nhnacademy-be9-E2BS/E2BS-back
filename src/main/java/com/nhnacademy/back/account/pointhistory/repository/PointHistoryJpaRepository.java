@@ -13,6 +13,6 @@ public interface PointHistoryJpaRepository extends JpaRepository<PointHistory, L
 
 	List<PointHistory> getPointHistoriesByMember(Member member);
 
-	Page<PointHistory> getPointHistoriesByMember(Member member, Pageable pageable);
+	Page<PointHistory> findByMemberOrderByPointCreatedAtDesc(Member member, Pageable pageable);
 
 }

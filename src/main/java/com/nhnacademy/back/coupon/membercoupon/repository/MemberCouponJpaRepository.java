@@ -1,5 +1,6 @@
 package com.nhnacademy.back.coupon.membercoupon.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +21,11 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
 	 * 쿠폰함 : 회원 ID로 쿠폰 조회
 	 */
 	Page<MemberCoupon> findByMember_CustomerId(Long customerId, Pageable pageable);
+
+	Page<MemberCoupon> findByMember_CustomerIdAndMemberCouponUsedIsFalseAndMemberCouponPeriodGreaterThanEqual(Long customerId, LocalDateTime now, Pageable pageable);
+
+	Page<MemberCoupon> findByMember_CustomerIdAndMemberCouponUsedIsTrueOrMemberCouponPeriodBefore(Long customerId, LocalDateTime now, Pageable pageable);
+
 
 	@Query("""
 		    SELECT new com.nhnacademy.back.coupon.membercoupon.domain.dto.response.ResponseOrderCouponDTO(
