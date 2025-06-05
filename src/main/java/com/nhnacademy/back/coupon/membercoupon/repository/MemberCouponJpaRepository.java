@@ -24,7 +24,10 @@ public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, L
 
 	Page<MemberCoupon> findByMember_CustomerIdAndMemberCouponUsedIsFalseAndMemberCouponPeriodGreaterThanEqual(Long customerId, LocalDateTime now, Pageable pageable);
 
-	Page<MemberCoupon> findByMember_CustomerIdAndMemberCouponUsedIsTrueOrMemberCouponPeriodBefore(Long customerId, LocalDateTime now, Pageable pageable);
+	@Query("SELECT m FROM MemberCoupon m WHERE m.member.customerId = :customerId AND (m.memberCouponUsed = true OR m.memberCouponPeriod < :now)")
+	Page<MemberCoupon> findUsedOrExpiredByCustomerId(@Param("customerId") Long customerId,
+		@Param("now") LocalDateTime now,
+		Pageable pageable);
 
 
 	@Query("""

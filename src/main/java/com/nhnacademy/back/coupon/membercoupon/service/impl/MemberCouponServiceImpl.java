@@ -74,7 +74,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		Long memberCustomerId = member.getCustomerId();
 
 		Page<MemberCoupon> memberCoupons =
-			memberCouponJpaRepository.findByMember_CustomerIdAndMemberCouponUsedIsTrueOrMemberCouponPeriodBefore(
+			memberCouponJpaRepository.findUsedOrExpiredByCustomerId(
 				memberCustomerId,
 				LocalDateTime.now(),
 				pageable);
