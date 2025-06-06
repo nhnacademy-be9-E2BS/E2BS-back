@@ -31,12 +31,12 @@ public class OrderAdminController {
 	 */
 	@Admin
 	@GetMapping
-	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(@RequestParam(required = false) Long stateId,
+	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(@RequestParam(required = false) String stateName,
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		if (stateId == null) {
+		if (stateName == null || stateName.isEmpty()) {
 			return ResponseEntity.ok(orderAdminService.getOrders(pageable));
 		} else {
-			return ResponseEntity.ok(orderAdminService.getOrders(pageable, stateId));
+			return ResponseEntity.ok(orderAdminService.getOrders(pageable, stateName));
 		}
 	}
 

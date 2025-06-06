@@ -22,7 +22,7 @@ public interface OrderService {
 
 	ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode);
 
-	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
+	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName);
 
 	Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId);
 

@@ -9,7 +9,7 @@ import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
 public interface OrderAdminService {
 	Page<ResponseOrderDTO> getOrders(Pageable pageable);
 
-	Page<ResponseOrderDTO> getOrders(Pageable pageable, Long stateId);
+	Page<ResponseOrderDTO> getOrders(Pageable pageable, String stateName);
 
 	ResponseEntity<Void> startDelivery(String orderCode);
 }

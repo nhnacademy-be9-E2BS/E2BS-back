@@ -79,7 +79,9 @@ public class OrderMemberController {
 	 * 회원의 주문 목록 조회
 	 */
 	@GetMapping
-	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId) {
-		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));
+	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId,
+		@RequestParam(required = false) String stateName) {
+
+		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId, stateName));
 	}
 }

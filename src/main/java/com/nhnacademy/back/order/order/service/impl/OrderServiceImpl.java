@@ -290,11 +290,19 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId) {
+	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		long customerId = member.getCustomerId();
-		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
-			.map(ResponseOrderDTO::fromEntity);
+		if (stateName == null || stateName.isEmpty()) {
+			return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
+				.map(ResponseOrderDTO::fromEntity);
+		} else {
+			OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.valueOf(stateName))
+				.orElse(null);
+			return orderJpaRepository
+				.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, customerId, orderState)
+				.map(ResponseOrderDTO::fromEntity);
+		}
 	}
 
 	@Override
@@ -388,7 +396,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		// 포인트 환불
 		eventPublisher.publishEvent(
-			new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+			new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), returnAmount));
 		// 적립 금액 회수
 		eventPublisher.publishEvent(
 			new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));

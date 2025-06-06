@@ -40,8 +40,9 @@ public class OrderAdminServiceImpl implements OrderAdminService {
 	 * 페이지와 주문 상태를 매개변수로 받아서 해당하는 주문 목록을 반환하는 메서드
 	 */
 	@Override
-	public Page<ResponseOrderDTO> getOrders(Pageable pageable, Long stateId) {
-		return orderJpaRepository.findAllByOrderState_OrderStateIdOrderByOrderCreatedAtDesc(pageable, stateId)
+	public Page<ResponseOrderDTO> getOrders(Pageable pageable, String stateName) {
+		OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.valueOf(stateName)).orElse(null);
+		return orderJpaRepository.findAllByOrderStateOrderByOrderCreatedAtDesc(pageable, orderState)
 			.map(ResponseOrderDTO::fromEntity);
 	}
 
