@@ -23,5 +23,9 @@ public class RequestMemberAddressSaveDTO {
 	private String addressExtra;
 	@NotNull
 	private boolean addressDefault;
+	@NotNull
+	private String addressReceiver;
+	@NotNull
+	private String addressReceiverPhone;
 
 }

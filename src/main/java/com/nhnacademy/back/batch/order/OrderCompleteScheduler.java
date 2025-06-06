@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderStateName;

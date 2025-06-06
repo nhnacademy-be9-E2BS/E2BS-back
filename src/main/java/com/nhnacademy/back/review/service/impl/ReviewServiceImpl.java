@@ -22,7 +22,7 @@ import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.event.event.ReviewImgPointEvent;
 import com.nhnacademy.back.event.event.ReviewPointEvent;
-import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
@@ -90,7 +90,8 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(ProductNotFoundException::new);
 
 		// 현재 회원이 주문한 상품이면서 (주문 배송이 완료된 상태이면서는 추후에) 리뷰를 아직 작성하지 않았는지 검증
-		if (!orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
+		if (!orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(findCustomer.getCustomerId(),
+			findProduct.getProductId())) {
 			throw new OrderDetailNotFoundException();
 		}
 
@@ -101,7 +102,8 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		// 리뷰가 아직 영속성 컨텍스트에 저장 전이므로 다른 필드를 통해 먼저 리뷰가 null 인 주문 상세를 찾아야함
-		OrderDetail findOrderDetail = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())
+		OrderDetail findOrderDetail = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(),
+				findProduct.getProductId())
 			.orElseThrow(OrderDetailNotFoundException::new);
 
 		// 리뷰 저장
@@ -227,12 +229,14 @@ public class ReviewServiceImpl implements ReviewService {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		Page<Review> getReviewsByCustomerId = reviewRepository.findAllByCustomer_CustomerId(findMember.getCustomerId(), pageable);
+		Page<Review> getReviewsByCustomerId = reviewRepository.findAllByCustomer_CustomerId(findMember.getCustomerId(),
+			pageable);
 
 		return getReviewsByCustomerId.map(review -> {
 			String productThumbnailImagePath = "";
 			if (Objects.nonNull(review.getProduct().getProductImage())) {
-				productThumbnailImagePath =  minioUtils.getPresignedUrl(PRODUCT_BUCKET, review.getProduct().getProductImage().getFirst().getProductImagePath());
+				productThumbnailImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET,
+					review.getProduct().getProductImage().getFirst().getProductImagePath());
 			}
 
 			String reviewImagePath = "";
