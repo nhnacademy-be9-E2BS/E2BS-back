@@ -150,9 +150,11 @@ public class ReviewServiceImpl implements ReviewService {
 
 		String updateImage = "";
 		MultipartFile reviewImageFile = request.getReviewImage();
-		if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
+		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
 			// 기존 파일 삭제
-			minioUtils.deleteObject(REVIEW_BUCKET, findReview.getReviewImage());
+			if (!StringUtils.isEmpty(findReview.getReviewImage())) {
+				minioUtils.deleteObject(REVIEW_BUCKET, findReview.getReviewImage());
+			}
 
 			// 새로 업로드할 파일 등록
 			String originalFilename = reviewImageFile.getOriginalFilename();
@@ -168,10 +170,12 @@ public class ReviewServiceImpl implements ReviewService {
 		// 변경 감지로 DB의 값 변경
 		findReview.changeReview(request, updateImage);
 
-		// 변경 이미지에 대한 url 가공
-		String updateImageUrl = minioUtils.getPresignedUrl(REVIEW_BUCKET, updateImage);
+		// 반환할 때 JS로 적용할 이미지 url 필요하여 가공
+		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
+			updateImage = minioUtils.getPresignedUrl(REVIEW_BUCKET, updateImage);
+		}
 
-		return new ResponseUpdateReviewDTO(updateReviewContent, updateImageUrl);
+		return new ResponseUpdateReviewDTO(updateReviewContent, updateImage);
 	}
 
 	/**
@@ -264,7 +268,12 @@ public class ReviewServiceImpl implements ReviewService {
 		Review findReview = reviewRepository.findByOrderDetailId(orderDetailId)
 			.orElseThrow(ReviewNotFoundException::new);
 
-		return new ReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), minioUtils.getPresignedUrl(REVIEW_BUCKET, findReview.getReviewImage()));
+		String imageUrl = "";
+		if (!StringUtils.isEmpty(findReview.getReviewImage())) {
+			imageUrl = minioUtils.getPresignedUrl(REVIEW_BUCKET, findReview.getReviewImage());
+		}
+
+		return new ReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), imageUrl);
 	}
 
 }
