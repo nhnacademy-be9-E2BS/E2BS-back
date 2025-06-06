@@ -81,7 +81,7 @@ public class OrderController {
 	}
 
 	/**
-	 * 비회원용 주문 조회
+	 * 비회원용 주문 목록 조회
 	 */
 	@GetMapping("/customers/orders")
 	ResponseEntity<Page<ResponseOrderDTO>> getOrdersByCustomerId(Pageable pageable, @RequestParam long customerId) {

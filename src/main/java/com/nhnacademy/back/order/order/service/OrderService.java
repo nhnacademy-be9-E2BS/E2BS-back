@@ -2,6 +2,8 @@ package com.nhnacademy.back.order.order.service;
 
 import java.util.List;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,8 @@ public interface OrderService {
 
 	ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode);
 
-	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId);
+	Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName,
+		LocalDate startDate, LocalDate endDate, String orderCode);
 
 	Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId);
 

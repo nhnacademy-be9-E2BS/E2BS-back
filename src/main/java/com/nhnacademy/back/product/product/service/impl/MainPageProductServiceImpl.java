@@ -28,8 +28,6 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	private final ProductCategoryJpaRepository productCategoryJpaRepository;
 	private final ProductContributorJpaRepository productContributorJpaRepository;
 
-
-
 	@Override
 	public List<ResponseMainPageProductDTO> getProductsByCategory(String categoryName) {
 		Category category = categoryJpaRepository.findCategoryByCategoryName(categoryName);
@@ -65,6 +63,7 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 					product.getProductTitle(),
 					contributorName,
 					imagePath,
+					product.getProductRegularPrice(),
 					product.getProductSalePrice(),
 					product.getProductDescription(),
 					product.getPublisher().getPublisherName()
@@ -77,6 +76,7 @@ public class MainPageProductServiceImpl implements MainPageProductService {
 	public List<ResponseMainPageProductDTO> getBestSellerProducts() {
 		return getProductsByCategory("베스트셀러");
 	}
+
 	@Override
 	public List<ResponseMainPageProductDTO> getBlogBestProducts() {
 		return getProductsByCategory("블로그베스트");

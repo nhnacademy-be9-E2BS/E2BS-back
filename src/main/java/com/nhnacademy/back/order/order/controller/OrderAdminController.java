@@ -1,8 +1,9 @@
 package com.nhnacademy.back.order.order.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,13 +32,16 @@ public class OrderAdminController {
 	 */
 	@Admin
 	@GetMapping
-	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(@RequestParam(required = false) Long stateId,
-		@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		if (stateId == null) {
-			return ResponseEntity.ok(orderAdminService.getOrders(pageable));
-		} else {
-			return ResponseEntity.ok(orderAdminService.getOrders(pageable, stateId));
-		}
+	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable,
+		@RequestParam(required = false) String stateName,
+		@RequestParam(required = false) LocalDate startDate,
+		@RequestParam(required = false) LocalDate endDate,
+		@RequestParam(required = false) String orderCode,
+		@RequestParam(required = false) String memberId) {
+
+		return ResponseEntity.ok(
+			orderAdminService.getOrders(pageable, stateName, startDate, endDate, orderCode, memberId));
+
 	}
 
 	/**
