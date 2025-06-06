@@ -1,6 +1,7 @@
 package com.nhnacademy.back.review.service.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import com.nhnacademy.back.event.event.ReviewPointEvent;
 import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
 import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -102,8 +104,8 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		// 리뷰가 아직 영속성 컨텍스트에 저장 전이므로 다른 필드를 통해 먼저 리뷰가 null 인 주문 상세를 찾아야함
-		OrderDetail findOrderDetail = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())
-			.orElseThrow(OrderDetailNotFoundException::new);
+		List<OrderDetail> findOrderDetails = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId());
+		OrderDetail findOrderDetail = findOrderDetails.getFirst();
 
 		// 리뷰 저장
 		Review reviewEntity = Review.createReviewEntity(findProduct, findCustomer, request, imagePath);
@@ -237,7 +239,12 @@ public class ReviewServiceImpl implements ReviewService {
 		return getReviewsByCustomerId.map(review -> {
 			String productThumbnailImagePath = "";
 			if (Objects.nonNull(review.getProduct().getProductImage())) {
-				productThumbnailImagePath =  minioUtils.getPresignedUrl(PRODUCT_BUCKET, review.getProduct().getProductImage().getFirst().getProductImagePath());
+				ProductImage thumbnailImage = review.getProduct().getProductImage().getFirst();
+				if (thumbnailImage.getProductImagePath().startsWith("http")) {
+					productThumbnailImagePath = thumbnailImage.getProductImagePath();
+				} else {
+					productThumbnailImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, thumbnailImage.getProductImagePath());
+				}
 			}
 
 			String reviewImagePath = "";

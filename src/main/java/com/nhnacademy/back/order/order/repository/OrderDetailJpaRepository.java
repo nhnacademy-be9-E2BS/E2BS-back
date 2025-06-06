@@ -2,7 +2,6 @@ package com.nhnacademy.back.order.order.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +27,8 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 		"JOIN od.order o " +
 		"WHERE o.customer.customerId = :customerId " +
 		"AND od.product.productId = :productId " +
-		"AND od.review IS NULL")
-	Optional<OrderDetail> findByCustomerIdAndProductId(Long customerId, Long productId);
+		"AND od.review IS NULL " +
+		"ORDER BY o.orderCreatedAt")
+	List<OrderDetail> findByCustomerIdAndProductId(Long customerId, Long productId);
 
 }
