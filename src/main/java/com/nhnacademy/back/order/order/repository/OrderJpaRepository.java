@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 
 public interface OrderJpaRepository extends JpaRepository<Order, String> {
@@ -81,5 +82,10 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 
 	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderCreatedAt BETWEEN :start AND :end")
 	int countOrdersByLocalDateTime(LocalDateTime start, LocalDateTime end);
+
+	Integer countOrdersByCustomer(Customer customer);
+
+	@Query("SELECT o FROM Order o WHERE o.customer = :customer AND o.orderState IN :orderStates")
+	List<Order> findOrdersByCustomerAndOrderState(Customer customer, List<OrderState> orderStates);
 
 }

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.nhnacademy.back.order.order.domain.dto.request.RequestTossCancelDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestTossCancelDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
 
 @FeignClient(name = "tossPaymentClient", url = "${order.url.toss}")
 public interface TossAdaptor {

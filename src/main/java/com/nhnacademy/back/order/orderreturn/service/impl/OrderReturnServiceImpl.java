@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.orderreturn.domain.entity.OrderReturn;
 import com.nhnacademy.back.order.orderreturn.repository.OrderReturnJpaRepository;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
