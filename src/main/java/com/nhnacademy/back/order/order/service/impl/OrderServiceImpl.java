@@ -290,17 +290,27 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName) {
+	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName,
+		LocalDate startDate, LocalDate endDate, String orderCode) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		long customerId = member.getCustomerId();
-		if (stateName == null || stateName.isEmpty()) {
-			return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
-				.map(ResponseOrderDTO::fromEntity);
-		} else {
+
+		if (stateName != null && !stateName.isEmpty()) { // 주문 상태 검색
 			OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.valueOf(stateName))
 				.orElse(null);
 			return orderJpaRepository
 				.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, customerId, orderState)
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (startDate != null && endDate != null) { // 날짜 검색인 경우
+			return orderJpaRepository
+				.findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable, customerId, startDate.atStartOfDay(),
+					endDate.atTime(LocalTime.MAX))
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (orderCode != null && !orderCode.isEmpty()) { // 주문 코드로 검색
+			return orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(customerId, orderCode, pageable)
+				.map(ResponseOrderDTO::fromEntity);
+		} else { // 전체 조회
+			return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
 				.map(ResponseOrderDTO::fromEntity);
 		}
 	}

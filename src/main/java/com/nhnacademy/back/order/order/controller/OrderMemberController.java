@@ -1,5 +1,7 @@
 package com.nhnacademy.back.order.order.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -80,8 +82,11 @@ public class OrderMemberController {
 	 */
 	@GetMapping
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId,
-		@RequestParam(required = false) String stateName) {
+		@RequestParam(required = false) String stateName,
+		@RequestParam(required = false) LocalDate startDate,
+		@RequestParam(required = false) LocalDate endDate,
+		@RequestParam(required = false) String orderCode) {
 
-		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId, stateName));
+		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId, stateName, startDate, endDate, orderCode));
 	}
 }

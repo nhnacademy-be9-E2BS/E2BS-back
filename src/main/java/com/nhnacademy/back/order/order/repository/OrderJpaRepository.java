@@ -18,9 +18,51 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 
 	Page<Order> findAllByOrderStateOrderByOrderCreatedAtDesc(Pageable pageable, OrderState orderState);
 
+	Page<Order> findAllByOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(Pageable pageable,
+		LocalDateTime startDate, LocalDateTime endDate);
+
+	@Query("""
+			SELECT o FROM Order o
+			WHERE LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%'))
+			ORDER BY o.orderCreatedAt DESC
+		""")
+	Page<Order> searchByOrderCodeIgnoreCase(
+		@Param("orderCode") String orderCode,
+		Pageable pageable
+	);
+
+	@Query(value = """
+		SELECT o.* FROM `order` o 
+		JOIN customer c ON o.customer_id = c.customer_id
+		JOIN member m ON m.customer_id = c.customer_id 
+		WHERE LOWER(m.member_id) LIKE LOWER(CONCAT('%', :memberId, '%'))
+		ORDER BY o.order_created_at DESC
+		""", nativeQuery = true)
+	Page<Order> searchByMemberIdIgnoreCase(
+		@Param("memberId") String memberId,
+		Pageable pageable
+	);
+
 	Page<Order> findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(Pageable pageable, Long customerId);
 
-	Page<Order> findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(Pageable pageable, Long customerId, OrderState orderState);
+	Page<Order> findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(Pageable pageable, Long customerId,
+		OrderState orderState);
+
+	Page<Order> findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(Pageable pageable,
+		Long customerId,
+		LocalDateTime startDate, LocalDateTime endDate);
+
+	@Query("""
+			SELECT o FROM Order o
+			WHERE o.customer.customerId = :customerId
+			  AND LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%'))
+			ORDER BY o.orderCreatedAt DESC
+		""")
+	Page<Order> searchByCustomerIdAndOrderCodeIgnoreCase(
+		@Param("customerId") Long customerId,
+		@Param("orderCode") String orderCode,
+		Pageable pageable
+	);
 
 	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderState.orderStateName = 'WAIT' AND o.orderState.orderStateName = 'DELIVERY'")
 	long countAllOrders();
