@@ -28,6 +28,7 @@ import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
+import com.nhnacademy.back.review.domain.dto.ReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
@@ -251,6 +252,19 @@ public class ReviewServiceImpl implements ReviewService {
 				review.getReviewCreatedAt()
 			);
 		});
+	}
+
+	@Override
+	public boolean existsReviewedOrderCode(String orderCode) {
+		return reviewRepository.existsReviewedOrderCode(orderCode);
+	}
+
+	@Override
+	public ReviewDTO findByOrderDetailId(long orderDetailId) {
+		Review findReview = reviewRepository.findByOrderDetailId(orderDetailId)
+			.orElseThrow(ReviewNotFoundException::new);
+
+		return new ReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), minioUtils.getPresignedUrl(REVIEW_BUCKET, findReview.getReviewImage()));
 	}
 
 }
