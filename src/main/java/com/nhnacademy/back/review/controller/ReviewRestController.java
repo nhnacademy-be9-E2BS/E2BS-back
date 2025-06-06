@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nhnacademy.back.common.exception.ValidationFailedException;
+import com.nhnacademy.back.review.domain.dto.ReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewMetaDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
@@ -74,6 +75,18 @@ public class ReviewRestController {
 	@GetMapping("/api/members/{memberId}/reviews")
 	public ResponseEntity<Page<ResponseMemberReviewDTO>> getReviewsByMember(@PathVariable String memberId, Pageable pageable) {
 		Page<ResponseMemberReviewDTO> body = reviewService.getReviewsByMember(memberId, pageable);
+		return ResponseEntity.ok(body);
+	}
+
+	@GetMapping("/api/orders/{orderCode}/reviewed")
+	public ResponseEntity<Boolean> isReviewedByOrder(@PathVariable String orderCode) {
+		boolean body = reviewService.existsReviewedOrderCode(orderCode);
+		return ResponseEntity.ok(body);
+	}
+
+	@GetMapping("/api/reviews/{orderDetailId}")
+	public ResponseEntity<ReviewDTO> findReviewByOrderDetailId(@PathVariable long orderDetailId) {
+		ReviewDTO body = reviewService.findByOrderDetailId(orderDetailId);
 		return ResponseEntity.ok(body);
 	}
 
