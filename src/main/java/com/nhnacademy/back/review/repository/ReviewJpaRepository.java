@@ -57,7 +57,7 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		   "  join od.order o " +
 		   "  where o.customer.customerId = :customerId " +
 		   "  and od.product.productId = :productId " +
-		   "  and od.review is not null" +
+		   "  and od.review is null" +
 		   ")")
 	boolean existsReviewedOrderDetailsByCustomerIdAndProductId(long customerId, long productId);
 
