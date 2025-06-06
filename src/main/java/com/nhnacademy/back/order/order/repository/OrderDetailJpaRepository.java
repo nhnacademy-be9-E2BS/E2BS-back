@@ -23,22 +23,6 @@ public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Lon
 	@Query("SELECT SUM(od.orderDetailPerPrice * od.orderQuantity) FROM OrderDetail od WHERE od.order.orderCreatedAt BETWEEN :start AND :end")
 	Long getTotalDailySales(LocalDateTime start, LocalDateTime end);
 
-	/// 주문 상태가 완료 된 경우 쿼리, 이 쿼리로 적용할 시 추가로 서비스단에 OrderDetail 을 가져오는 메소드도 수정해야함
-	// @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
-	// 	"FROM OrderDetail od " +
-	// 	"JOIN od.order o " +
-	// 	"WHERE o.orderState.orderStateId = 2 " +
-	// 	"AND o.customer.customerId = :customerId " +
-	// 	"AND od.product.productId = :productId " +
-	// 	"AND od.review IS NULL")
-	@Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
-		   "FROM OrderDetail od " +
-		    "JOIN od.order o " +
-		    "WHERE o.customer.customerId = :customerId " +
-		    "AND od.product.productId = :productId " +
-		    "AND od.review IS NULL")
-	boolean existsOrderDetailByCustomerIdAndProductId(long customerId, long productId);
-
 	@Query("SELECT od " +
 		"FROM OrderDetail od " +
 		"JOIN od.order o " +

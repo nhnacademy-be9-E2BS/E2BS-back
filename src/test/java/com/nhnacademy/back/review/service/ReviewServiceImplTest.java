@@ -110,8 +110,7 @@ class ReviewServiceImplTest {
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(customerId)).thenReturn(Optional.of(product));
-		when(orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(customerId,
-			product.getProductId())).thenReturn(true);
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
 		doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
 		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(
 			Optional.of(mock(OrderDetail.class)));

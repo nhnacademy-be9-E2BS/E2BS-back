@@ -91,7 +91,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(ProductNotFoundException::new);
 
 		// 현재 회원이 주문한 상품이면서 (주문 배송이 완료된 상태이면서는 추후에) 리뷰를 아직 작성하지 않았는지 검증
-		if (!orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
+		if (!reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
 			throw new OrderDetailNotFoundException();
 		}
 
