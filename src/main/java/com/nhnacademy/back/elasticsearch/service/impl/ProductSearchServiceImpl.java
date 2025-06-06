@@ -1,5 +1,6 @@
 package com.nhnacademy.back.elasticsearch.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -61,6 +62,26 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 		}
 
 		return customProductSearchRepository.categoryAndSortProductIds(pageable, categoryId, sortType);
+	}
+
+	@Override
+	public List<Long> getBestProductIds() {
+		return customProductSearchRepository.bestSellerProductIdsInMain();
+	}
+
+	@Override
+	public List<Long> getNewProductIds() {
+		return customProductSearchRepository.newestSellerProductIdsInMain();
+	}
+
+	@Override
+	public Page<Long> getBestProductIdsHeader(Pageable pageable) {
+		return customProductSearchRepository.bestSellerProductIds(pageable);
+	}
+
+	@Override
+	public Page<Long> getNewProductIdsHeader(Pageable pageable) {
+		return customProductSearchRepository.newestSellerProductIds(pageable);
 	}
 
 	@Override

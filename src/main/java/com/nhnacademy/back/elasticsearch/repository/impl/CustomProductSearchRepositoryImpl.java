@@ -1,6 +1,8 @@
 package com.nhnacademy.back.elasticsearch.repository.impl;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -57,6 +59,93 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 		}
 
 		return executeSearchWithCriteria(criteria, pageable, sortType);
+	}
+
+	/**
+	 * 메인페이지 - 인기도서 12권
+	 */
+	@Override
+	public List<Long> bestSellerProductIdsInMain() {
+		Criteria criteria = new Criteria();
+
+		Query query = new CriteriaQuery(criteria);
+		query.addSort(Sort.by(
+			Sort.Order.desc("productHits"),
+			Sort.Order.desc("productSearches")
+		));
+		query.setPageable(PageRequest.of(0, 12));
+
+		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+
+		return searchHits.getSearchHits().stream()
+			.map(hit -> hit.getContent().getProductId())
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 메인페이지 - 신상 12권
+	 */
+	@Override
+	public List<Long> newestSellerProductIdsInMain() {
+		Criteria criteria = new Criteria();
+
+		Query query = new CriteriaQuery(criteria);
+		query.addSort(Sort.by(Sort.Order.desc("productPublishedAt")));
+		query.setPageable(PageRequest.of(0, 12));
+
+		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+
+		return searchHits.getSearchHits().stream()
+			.map(hit -> hit.getContent().getProductId())
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 상품 리스트 - 인기도서 (top 30)
+	 */
+	@Override
+	public Page<Long> bestSellerProductIds(Pageable pageable) {
+		if (pageable.getPageNumber() > 2) {
+			throw new IllegalArgumentException();
+		}
+
+		Criteria criteria = new Criteria();
+
+		Query query = new CriteriaQuery(criteria);
+		query.addSort(Sort.by(
+			Sort.Order.desc("productHits"),
+			Sort.Order.desc("productSearches")
+		));
+		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+
+		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+
+		List<Long> productIds = searchHits.getSearchHits().stream()
+			.map(hit -> hit.getContent().getProductId())
+			.collect(Collectors.toList());
+
+		return new PageImpl<>(productIds, pageable, searchHits.getTotalHits());
+	}
+
+	/**
+	 * 상품 리스트 - 신상 (3개월 이내 출판)
+	 */
+	@Override
+	public Page<Long> newestSellerProductIds(Pageable pageable) {
+		LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
+		Criteria criteria = new Criteria("productPublishedAt").greaterThanEqual(threeMonthsAgo);
+
+		Query query = new CriteriaQuery(criteria);
+		query.addSort(Sort.by(Sort.Order.desc("productPublishedAt")));
+		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+
+		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+
+		List<Long> productIds = searchHits.getSearchHits().stream()
+			.map(hit -> hit.getContent().getProductId())
+			.collect(Collectors.toList());
+
+		return new PageImpl<>(productIds, pageable, searchHits.getTotalHits());
 	}
 
 	/**
