@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.nhnacademy.back.order.order.domain.model.OrderDetail;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 
 public interface OrderDetailJpaRepository extends JpaRepository<OrderDetail, Long> {
 	void deleteByOrderOrderCode(String orderCode);
