@@ -1,6 +1,6 @@
-package com.nhnacademy.back.order.order.domain.dto.response;
+package com.nhnacademy.back.order.order.model.dto.response;
 
-import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

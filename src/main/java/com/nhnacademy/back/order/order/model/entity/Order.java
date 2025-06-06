@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.order.domain.entity;
+package com.nhnacademy.back.order.order.model.entity;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 
 import jakarta.persistence.Column;

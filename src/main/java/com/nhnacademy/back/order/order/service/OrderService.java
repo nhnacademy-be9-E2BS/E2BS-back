@@ -1,15 +1,19 @@
 package com.nhnacademy.back.order.order.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberRecentOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
 
 public interface OrderService {
 	ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
@@ -37,4 +41,8 @@ public interface OrderService {
 	long getTotalMonthlySales();
 
 	long getTotalDailySales();
+
+	ResponseMemberOrderDTO getMemberOrdersCnt(String memberId);
+
+	List<ResponseMemberRecentOrderDTO> getMemberRecentOrders(String memberId);
 }

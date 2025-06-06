@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,6 +82,18 @@ public class AddressController {
 	public ResponseEntity<Void> deleteAddress(@PathVariable("memberId") String memberId,
 		@PathVariable("addressId") long addressId) {
 		addressService.deleteAddress(memberId, addressId);
+
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	/**
+	 * 회원의 기본 배송지를 수정하는 메서드
+	 */
+	@Member
+	@PostMapping("/{addressId}/default")
+	public ResponseEntity<Void> setDefaultAddress(@PathVariable("memberId") String memberId,
+		@PathVariable("addressId") long addressId) {
+		addressService.setDefaultAddress(memberId, addressId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}

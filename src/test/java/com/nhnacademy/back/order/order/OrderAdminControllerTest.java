@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.order.order.controller.OrderAdminController;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 
@@ -36,7 +36,7 @@ class OrderAdminControllerTest {
 
 	@MockitoBean
 	private OrderReturnService orderReturnService;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
 

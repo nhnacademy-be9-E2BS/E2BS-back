@@ -1,9 +1,9 @@
-package com.nhnacademy.back.order.order.domain.dto.response;
+package com.nhnacademy.back.order.order.model.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.Order;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -44,6 +44,8 @@ public class AddressServiceImpl implements AddressService {
 				.addressAlias(address.getAddressAlias())
 				.addressDefault(address.isAddressDefault())
 				.addressCreatedAt(address.getAddressCreatedAt())
+				.addressReceiver(address.getAddressReceiver())
+				.addressReceiverPhone(address.getAddressReceiverPhone())
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -61,12 +63,16 @@ public class AddressServiceImpl implements AddressService {
 			.addressDefault(requestMemberAddressSaveDTO.isAddressDefault())
 			.addressCreatedAt(LocalDateTime.now())
 			.member(member)
+			.addressReceiver(requestMemberAddressSaveDTO.getAddressReceiver())
+			.addressReceiverPhone(requestMemberAddressSaveDTO.getAddressReceiverPhone())
 			.build();
 
 		Address savedAddress = addressJpaRepository.save(address);
 		if (savedAddress.getAddressId() <= 0) {
 			throw new SaveAddressFailedException("배송지를 저장히지 못했습니다.");
 		}
+
+		setDefaultAddress(memberId, savedAddress.getAddressId());
 	}
 
 	public ResponseMemberAddressDTO getAddressByAddressId(String memberId, long addressId) {
@@ -84,6 +90,8 @@ public class AddressServiceImpl implements AddressService {
 			.addressAlias(address.getAddressAlias())
 			.addressDefault(address.isAddressDefault())
 			.addressCreatedAt(address.getAddressCreatedAt())
+			.addressReceiver(address.getAddressReceiver())
+			.addressReceiverPhone(address.getAddressReceiverPhone())
 			.build();
 	}
 
@@ -100,6 +108,8 @@ public class AddressServiceImpl implements AddressService {
 			.addressDefault(request.isAddressDefault())
 			.addressCreatedAt(LocalDateTime.now())
 			.addressId(addressId)
+			.addressReceiver(request.getAddressReceiver())
+			.addressReceiverPhone(request.getAddressReceiverPhone())
 			.build();
 
 		int result = addressJpaRepository.updateAddress(updateAddressDTO);
@@ -107,6 +117,8 @@ public class AddressServiceImpl implements AddressService {
 		if (result <= 0) {
 			throw new UpdateAddressFailedException("배송지 정보를 수정하지 못했습니다.");
 		}
+
+		setDefaultAddress(memberId, addressId);
 	}
 
 	@Transactional
@@ -115,6 +127,21 @@ public class AddressServiceImpl implements AddressService {
 
 		if (addressJpaRepository.existsById(addressId)) {
 			throw new DeleteAddressFailedException("배송지 정보를 삭제하지 못했습니다.");
+		}
+	}
+
+	@Transactional
+	public void setDefaultAddress(String memberId, long addressId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+
+		int result = addressJpaRepository.updateAllAddressDefaultFalse(member);
+		if (result < 0) {
+			throw new UpdateAddressFailedException("기본 배송지를 수정하지 못했습니다.");
+		}
+
+		int resultDefault = addressJpaRepository.updateAddressDefaultTrue(addressId);
+		if (resultDefault < 0) {
+			throw new UpdateAddressFailedException("기본 배송지를 수정하지 못했습니다.");
 		}
 	}
 

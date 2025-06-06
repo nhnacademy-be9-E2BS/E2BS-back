@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.order.domain.dto.response;
+package com.nhnacademy.back.order.order.model.dto.response;
 
 import java.util.List;
 

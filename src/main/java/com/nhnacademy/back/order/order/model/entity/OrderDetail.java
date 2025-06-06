@@ -1,6 +1,6 @@
-package com.nhnacademy.back.order.order.domain.entity;
+package com.nhnacademy.back.order.order.model.entity;
 
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.wrapper.domain.entity.Wrapper;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.review.domain.entity.Review;

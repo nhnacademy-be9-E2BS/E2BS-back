@@ -10,7 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.account.customer.domain.entity.Customer;
+import com.nhnacademy.back.order.order.model.entity.Order;
+import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 
 public interface OrderJpaRepository extends JpaRepository<Order, String> {
 	Page<Order> findAllByOrderByOrderCreatedAtDesc(Pageable pageable);
@@ -31,9 +33,15 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 		"WHERE o.customer.customerId = :customerId " +
 		"AND o.orderState.orderStateName = 'COMPLETE' " +
 		"AND o.orderCreatedAt >= :threeMonthsAgo")
-	Long sumOrderPureAmount(@Param("customerId") Long customerId, @Param("threeMonthsAgo") LocalDateTime threeMonthsAgo);
+	Long sumOrderPureAmount(@Param("customerId") Long customerId,
+		@Param("threeMonthsAgo") LocalDateTime threeMonthsAgo);
 
 	@Query("SELECT COUNT(o) FROM Order o WHERE o.orderCreatedAt BETWEEN :start AND :end")
 	int countOrdersByLocalDateTime(LocalDateTime start, LocalDateTime end);
+
+	Integer countOrdersByCustomer(Customer customer);
+
+	@Query("SELECT o FROM Order o WHERE o.customer = :customer AND o.orderState IN :orderStates")
+	List<Order> findOrdersByCustomerAndOrderState(Customer customer, List<OrderState> orderStates);
 
 }

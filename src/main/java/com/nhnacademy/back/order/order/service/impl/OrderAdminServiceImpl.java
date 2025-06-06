@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderAdminService;

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 

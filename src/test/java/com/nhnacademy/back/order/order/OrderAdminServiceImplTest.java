@@ -22,8 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.impl.OrderAdminServiceImpl;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;

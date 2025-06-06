@@ -52,4 +52,10 @@ public class Address {
 	@JoinColumn(name = "customer_id")
 	private Member member;
 
+	@Column(nullable = false)
+	private String addressReceiver;
+
+	@Column(nullable = false)
+	private String addressReceiverPhone;
+
 }

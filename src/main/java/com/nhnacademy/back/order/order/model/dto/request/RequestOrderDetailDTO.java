@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.order.domain.dto.request;
+package com.nhnacademy.back.order.order.model.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -2,8 +2,8 @@ package com.nhnacademy.back.order.orderreturn.domain.entity;
 
 import java.time.LocalDateTime;
 
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

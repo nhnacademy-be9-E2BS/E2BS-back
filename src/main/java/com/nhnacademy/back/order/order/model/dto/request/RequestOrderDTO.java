@@ -1,4 +1,4 @@
-package com.nhnacademy.back.order.order.domain.dto.request;
+package com.nhnacademy.back.order.order.model.dto.request;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
