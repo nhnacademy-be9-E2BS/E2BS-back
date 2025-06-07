@@ -30,10 +30,10 @@ import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
-import com.nhnacademy.back.review.domain.dto.ReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -271,7 +271,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public ReviewDTO findByOrderDetailId(long orderDetailId) {
+	public ResponseReviewDTO findByOrderDetailId(long orderDetailId) {
 		Review findReview = reviewRepository.findByOrderDetailId(orderDetailId)
 			.orElseThrow(ReviewNotFoundException::new);
 
@@ -280,7 +280,7 @@ public class ReviewServiceImpl implements ReviewService {
 			imageUrl = minioUtils.getPresignedUrl(REVIEW_BUCKET, findReview.getReviewImage());
 		}
 
-		return new ReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), imageUrl);
+		return new ResponseReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), imageUrl);
 	}
 
 }
