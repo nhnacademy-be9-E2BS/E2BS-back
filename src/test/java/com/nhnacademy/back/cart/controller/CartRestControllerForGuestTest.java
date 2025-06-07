@@ -70,7 +70,7 @@ class CartRestControllerForGuestTest {
 	@DisplayName("DELETE /api/guests/carts/items - 게스트 장바구니 항목 삭제 테스트")
 	void deleteCartItemForGuest() throws Exception {
 		// given
-		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(1L, "session123");
+		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO("session123", 1L);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then

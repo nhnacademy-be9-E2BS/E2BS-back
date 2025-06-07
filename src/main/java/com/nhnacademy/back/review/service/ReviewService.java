@@ -5,10 +5,10 @@ import java.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.back.review.domain.dto.ReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -20,5 +20,5 @@ public interface ReviewService {
 	ResponseReviewInfoDTO getReviewInfo(long productId);
 	Page<ResponseMemberReviewDTO> getReviewsByMember(String memberId, Pageable pageable);
 	boolean existsReviewedOrderCode(String orderCode);
-	ReviewDTO findByOrderDetailId(long orderDetailId);
+	ResponseReviewDTO findByOrderDetailId(long orderDetailId);
 }
