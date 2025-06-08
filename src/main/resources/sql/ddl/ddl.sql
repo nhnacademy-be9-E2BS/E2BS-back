@@ -9,6 +9,8 @@ CREATE TABLE address
     address_default    BIT(1)                NOT NULL,
     address_created_at datetime              NOT NULL,
     customer_id        BIGINT                NOT NULL,
+    address_receiver   VARCHAR(255)          NOT NULL,
+    address_receiver_phone VARCHAR(13)       NOT NULL,
     CONSTRAINT pk_address PRIMARY KEY (address_id)
 );
 

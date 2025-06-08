@@ -63,7 +63,9 @@ INSERT INTO address (address_detail,
                      address_alias,
                      address_default,
                      address_created_at,
-                     customer_id)
+                     customer_id,
+                     address_receiver,
+                     address_receiver_phone)
 VALUES ('서울특별시 강남구 테헤란로',
         '06130',
         '삼성동 123-45',
@@ -71,7 +73,9 @@ VALUES ('서울특별시 강남구 테헤란로',
         '회사',
         true,
         NOW(),
-        1),
+        1,
+        '김도윤',
+        '010-9140-6307'),
        ('경기도 성남시 분당구 정자동',
         '13560',
         '정자역 5번 출구',
@@ -79,7 +83,9 @@ VALUES ('서울특별시 강남구 테헤란로',
         '집',
         false,
         NOW(),
-        1);
+        1,
+        '최종성',
+        '010-1234-5678');
 
 INSERT INTO point_history (point_amount, point_created_at, point_reason, customer_id)
 VALUES (5000, '2025-05-04', '회원가입', 1);

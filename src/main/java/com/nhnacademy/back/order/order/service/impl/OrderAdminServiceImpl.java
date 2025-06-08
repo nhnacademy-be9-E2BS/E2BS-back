@@ -1,6 +1,7 @@
 package com.nhnacademy.back.order.order.service.impl;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
@@ -32,17 +33,26 @@ public class OrderAdminServiceImpl implements OrderAdminService {
 	 * 최근 날짜 순으로 보여줌
 	 */
 	@Override
-	public Page<ResponseOrderDTO> getOrders(Pageable pageable) {
-		return orderJpaRepository.findAllByOrderByOrderCreatedAtDesc(pageable).map(ResponseOrderDTO::fromEntity);
-	}
-
-	/**
-	 * 페이지와 주문 상태를 매개변수로 받아서 해당하는 주문 목록을 반환하는 메서드
-	 */
-	@Override
-	public Page<ResponseOrderDTO> getOrders(Pageable pageable, Long stateId) {
-		return orderJpaRepository.findAllByOrderState_OrderStateIdOrderByOrderCreatedAtDesc(pageable, stateId)
-			.map(ResponseOrderDTO::fromEntity);
+	public Page<ResponseOrderDTO> getOrders(Pageable pageable, String stateName, LocalDate startDate, LocalDate endDate,
+		String orderCode, String memberId) {
+		if (stateName != null && !stateName.isEmpty()) { // 주문 상태 검색
+			OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.valueOf(stateName))
+				.orElse(null);
+			return orderJpaRepository.findAllByOrderStateOrderByOrderCreatedAtDesc(pageable, orderState)
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (startDate != null && endDate != null) { // 날짜 검색
+			return orderJpaRepository
+				.findAllByOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable, startDate.atStartOfDay(),
+					endDate.atTime(LocalTime.MAX))
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (orderCode != null && !orderCode.isEmpty()) { // 주문 코드로 검색
+			return orderJpaRepository.searchByOrderCodeIgnoreCase(orderCode, pageable)
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (memberId != null && !memberId.isEmpty()) { // 멤버 id 검색
+			return orderJpaRepository.searchByMemberIdIgnoreCase(memberId, pageable).map(ResponseOrderDTO::fromEntity);
+		} else { // 전체 검색
+			return orderJpaRepository.findAllByOrderByOrderCreatedAtDesc(pageable).map(ResponseOrderDTO::fromEntity);
+		}
 	}
 
 	/**

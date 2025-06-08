@@ -21,5 +21,7 @@ public class UpdateAddressDTO {
 	private boolean addressDefault;
 	private LocalDateTime addressCreatedAt;
 	private long addressId;
+	private String addressReceiver;
+	private String addressReceiverPhone;
 
 }

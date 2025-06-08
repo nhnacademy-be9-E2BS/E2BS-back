@@ -21,5 +21,7 @@ public class ResponseMemberAddressDTO {
 	private String addressAlias;
 	private boolean addressDefault;
 	private LocalDateTime addressCreatedAt;
+	private String addressReceiver;
+	private String addressReceiverPhone;
 
 }
