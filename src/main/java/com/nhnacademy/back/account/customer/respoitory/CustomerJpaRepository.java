@@ -11,9 +11,11 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 public interface CustomerJpaRepository extends JpaRepository<Customer, Long> {
 
 	@Modifying(clearAutomatically = true)
-	@Query("UPDATE Customer c SET c.customerName = :customerName, c.customerEmail = :customerEmail WHERE c.customerId = :customerId")
+	@Query(
+		"UPDATE Customer c SET c.customerName = :customerName, c.customerEmail = :customerEmail, c.customerPassword = :customerPassword "
+			+ "WHERE c.customerId = :customerId")
 	int updateCustomerNameAndCustomerEmail(
-		String customerName, String customerEmail, long customerId
+		String customerName, String customerEmail, String customerPassword, long customerId
 	);
 
 	@Query("SELECT c FROM Customer c WHERE c NOT IN (SELECT m.customer FROM Member m)")
