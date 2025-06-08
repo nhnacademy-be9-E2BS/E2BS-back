@@ -85,7 +85,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(requests);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/categories")
+		mockMvc.perform(post("/api/auth/admin/categories")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -99,7 +99,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/categories/1")
+		mockMvc.perform(post("/api/auth/admin/categories/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -113,7 +113,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/admin/categories/1")
+		mockMvc.perform(put("/api/auth/admin/categories/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -123,7 +123,7 @@ class CategoryControllerTest {
 	@DisplayName("Admin - 카테고리 삭제")
 	void delete_category_test() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/admin/categories/1"))
+		mockMvc.perform(delete("/api/auth/admin/categories/1"))
 			.andExpect(status().isOk());
 	}
 }

@@ -139,4 +139,22 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 		}
 		productSearchRepository.save(productDocument);
 	}
+
+	@Override
+	public void updateProductDocumentTag(Long productId, String beforeName, String afterName) {
+		ProductDocument productDocument = productSearchRepository.findById(productId)
+			.orElseThrow(ProductNotFoundException::new);
+
+		productDocument.updateTagName(beforeName, afterName);
+		productSearchRepository.save(productDocument);
+	}
+
+	@Override
+	public void updateProductDocumentPublisher(Long productId, String newName) {
+		ProductDocument productDocument = productSearchRepository.findById(productId)
+			.orElseThrow(ProductNotFoundException::new);
+
+		productDocument.updatePublisherName(newName);
+		productSearchRepository.save(productDocument);
+	}
 }

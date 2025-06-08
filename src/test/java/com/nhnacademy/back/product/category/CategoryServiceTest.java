@@ -198,8 +198,8 @@ class CategoryServiceTest {
 	}
 
 	@Test
-	@DisplayName("update category - success")
-	void update_category_success_test() {
+	@DisplayName("update category - success1")
+	void update_category_success1_test() {
 		// given
 		RequestCategoryDTO request = new RequestCategoryDTO("new name category");
 		Category parentCategory = mock(Category.class);
@@ -257,6 +257,20 @@ class CategoryServiceTest {
 
 		// when & then
 		assertThatThrownBy(() -> categoryService.updateCategory(3L, request))
+			.isInstanceOf(CategoryAlreadyExistsException.class);
+	}
+
+	@Test
+	@DisplayName("update category - fail4")
+	void update_category_fail4_test() {
+		// given
+		RequestCategoryDTO request = new RequestCategoryDTO("new name category");
+		Category category = new Category("category", null);
+		when(categoryJpaRepository.findById(anyLong())).thenReturn(Optional.of(category));
+		when(categoryJpaRepository.existsByParentIsNullAndCategoryName(anyString())).thenReturn(true);
+
+		// when & then
+		assertThatThrownBy(() -> categoryService.updateCategory(1L, request))
 			.isInstanceOf(CategoryAlreadyExistsException.class);
 	}
 

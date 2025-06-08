@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.publisher.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -23,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class PublisherServiceImpl implements PublisherService {
 	private final PublisherJpaRepository publisherJpaRepository;
+	private final ProductJpaRepository productJpaRepository;
+	private final ProductSearchService productSearchService;
 
 	/**
 	 * Publisher을 DB에 저장하는 로직
@@ -76,5 +82,11 @@ public class PublisherServiceImpl implements PublisherService {
 
 		publisher.get().setPublisher(request.getPublisherName());
 		publisherJpaRepository.save(publisher.get());
+
+		// 엘라스틱 서치에 업데이트
+		List<Product> products = productJpaRepository.findAllByPublisher_PublisherId(publisherId);
+		for (Product product : products) {
+			productSearchService.updateProductDocumentPublisher(product.getProductId(), request.getPublisherName());
+		}
 	}
 }

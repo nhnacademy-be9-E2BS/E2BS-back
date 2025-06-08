@@ -49,7 +49,7 @@ class PublisherControllerTest {
 		when(publisherService.getPublishers(pageable)).thenReturn(wrappers);
 
 		// when & then
-		mockMvc.perform(get("/api/admin/publishers")
+		mockMvc.perform(get("/api/auth/admin/publishers")
 				.param("page", "0")
 				.param("size", "10")
 				.accept(MediaType.APPLICATION_JSON))
@@ -68,7 +68,7 @@ class PublisherControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/publishers")
+		mockMvc.perform(post("/api/auth/admin/publishers")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -82,7 +82,7 @@ class PublisherControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(modifyRequest);
 
 		// when & then
-		mockMvc.perform(put("/api/admin/publishers/1")
+		mockMvc.perform(put("/api/auth/admin/publishers/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
