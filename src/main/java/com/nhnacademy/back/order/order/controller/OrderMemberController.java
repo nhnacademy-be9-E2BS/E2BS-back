@@ -1,6 +1,7 @@
 package com.nhnacademy.back.order.order.controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,6 @@ import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
-import com.nhnacademy.back.order.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderMemberController {
 
 	private final OrderService orderService;
-	private final PaymentService paymentService;
 	private final OrderReturnService orderReturnService;
 
 	/**
@@ -62,7 +61,10 @@ public class OrderMemberController {
 	}
 
 	@PostMapping("/return")
-	public ResponseEntity<Void> returnOrder(@RequestBody RequestOrderReturnDTO request) {
+	public ResponseEntity<Void> returnOrder(@Validated @RequestBody RequestOrderReturnDTO request, BindingResult bindingResult) {
+		if(bindingResult.hasErrors()) {
+			throw new ValidationFailedException(bindingResult);
+		}
 		return orderService.returnOrder(request);
 	}
 
@@ -83,10 +85,23 @@ public class OrderMemberController {
 	@GetMapping
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId,
 		@RequestParam(required = false) String stateName,
-		@RequestParam(required = false) LocalDate startDate,
-		@RequestParam(required = false) LocalDate endDate,
+		@RequestParam(required = false) String startDate,
+		@RequestParam(required = false) String endDate,
 		@RequestParam(required = false) String orderCode) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId, stateName, startDate, endDate, orderCode));
+		// prod 환경에서만 LocalDate가 이상하게 주고 받아 직접 문자열을 전송한다.
+		LocalDate start = null;
+		LocalDate end = null;
+
+		if (startDate != null && !startDate.isEmpty()) {
+			start = LocalDate.parse(startDate, formatter);
+		}
+		if (endDate != null && !endDate.isEmpty()) {
+			end = LocalDate.parse(endDate, formatter);
+		}
+
+		return ResponseEntity.ok(
+			orderService.getOrdersByMemberId(pageable, memberId, stateName, start, end, orderCode));
 	}
 }
