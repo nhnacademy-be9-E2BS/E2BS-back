@@ -16,8 +16,14 @@ import com.nhnacademy.back.account.oauth.model.dto.response.ResponseCheckOAuthId
 import com.nhnacademy.back.account.oauth.service.OAuthService;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "PAYCO 로그인", description = "PAYCO 로그인 기능")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/oauth/login")
@@ -28,6 +34,7 @@ public class OAuthLoginController {
 	/**
 	 * oauth 계정이 이미 회원 가입이 되어 있는지 확인하는 컨트롤러
 	 */
+	@Operation(summary = "PAYCO 계정 중복체크", description = "PAYCO 계정 중복체크 기능")
 	@GetMapping("/{memberId}")
 	public ResponseEntity<ResponseCheckOAuthIdDTO> checkOAuthId(@PathVariable("memberId") String memberId) {
 		ResponseCheckOAuthIdDTO responseCheckOAuthIdDTO = new ResponseCheckOAuthIdDTO(
@@ -37,6 +44,11 @@ public class OAuthLoginController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseCheckOAuthIdDTO);
 	}
 
+	@Operation(summary = "PAYCO 로그인 기능", description = "PAYCO 로그인 기능 제공",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "PAYCO 로그인 기능 성공 응답"),
+			@ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PostMapping
 	public ResponseEntity<Void> loginOAuth(@Validated @RequestBody RequestOAuthLoginDTO requestOAuthLoginDTO,
 		BindingResult bindingResult) {
