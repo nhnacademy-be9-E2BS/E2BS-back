@@ -19,10 +19,10 @@ VALUES ('WEB'),
 INSERT INTO member_rank (member_rank_name,
                          member_rank_tier_bonus_rate,
                          member_rank_require_amount)
-VALUES ('NORMAL', 0, 0),
-       ('ROYAL', 5, 100000),
-       ('GOLD', 10, 500000),
-       ('PLATINUM', 20, 900000);
+VALUES ('NORMAL', 1, 0),
+       ('ROYAL', 2, 100000),
+       ('GOLD', 3, 200000),
+       ('PLATINUM', 4, 300000);
 
 
 -- 테스트를 위한 임의 유저, 관리자 생성
