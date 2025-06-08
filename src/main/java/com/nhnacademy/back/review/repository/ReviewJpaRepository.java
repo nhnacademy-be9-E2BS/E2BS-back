@@ -1,5 +1,7 @@
 package com.nhnacademy.back.review.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,10 +42,42 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 	/**
 	 * 고객이 주문한 상품에 이미 작성한 리뷰가 있는지 여부 확인 메소드
 	 */
-	@Query("select count(od) > 0 " +
-		   "from OrderDetail od " +
-		   "join od.order o " +
-		   "where o.customer.customerId = :customerId and od.product.productId = :productId and od.review is not null")
+	/// 성능과 명확성을 위해 count(od) > 0 보다는 exists 를 사용
+	/// exists 는 하나만 찾으면 멈추기 때문에 일반적으로 더 빠름
+	/// 주문 상태가 완료 된 경우 쿼리, 이 쿼리로 적용할 시 추가로 서비스단에 OrderDetail 을 가져오는 메소드도 수정해야함
+	// @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
+	// 	"FROM OrderDetail od " +
+	// 	"JOIN od.order o " +
+	// 	"WHERE o.orderState.orderStateId = 2 " +
+	// 	"AND o.customer.customerId = :customerId " +
+	// 	"AND od.product.productId = :productId " +
+	// 	"AND od.review IS NULL")
+	@Query("select exists (" +
+		   "  select 1 from OrderDetail od " +
+		   "  join od.order o " +
+		   "  where o.customer.customerId = :customerId " +
+		   "  and od.product.productId = :productId " +
+		   "  and od.review is null" +
+		   ")")
 	boolean existsReviewedOrderDetailsByCustomerIdAndProductId(long customerId, long productId);
+
+	/**
+	 * 주문 코드를 통해 작성한 리뷰가 있는지 여부 확인 메소드
+	 */
+	@Query("select exists (" +
+		   "  select 1 from OrderDetail od " +
+		   "  join od.order o " +
+		   "  where o.orderCode = :orderCode " +
+		   "  and od.review is not null" +
+		   ")")
+	boolean existsReviewedOrderCode(String orderCode);
+
+
+	@Query("select r " +
+		   "from Review r " +
+		   "left join OrderDetail od " +
+		   "on r.reviewId = od.review.reviewId " +
+		   "where od.orderDetailId = :orderDetailId")
+	Optional<Review> findByOrderDetailId(long orderDetailId);
 
 }
