@@ -28,6 +28,9 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.order.deliveryfee.domain.dto.request.RequestDeliveryFeeDTO;
+import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
+import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -45,6 +48,9 @@ class CartServiceForMemberTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
+
+	@Mock
+	private DeliveryFeeJpaRepository deliveryFeeRepository;
 
 	@Mock
 	private CartJpaRepository cartRepository;
@@ -167,10 +173,12 @@ class CartServiceForMemberTest {
 		// given
 		CartItems cartItem = new CartItems(cart, product, 2);
 		List<CartItems> cartItems = List.of(cartItem);
+		DeliveryFee deliveryFee = new DeliveryFee(new RequestDeliveryFeeDTO(1000, 5000));
 
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(customerId)).thenReturn(cartItems);
+		when(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()).thenReturn(deliveryFee);
 
 		// when
 		List<ResponseCartItemsForMemberDTO> result = cartService.getCartItemsByMember(memberId);
