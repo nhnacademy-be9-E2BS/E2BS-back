@@ -113,7 +113,7 @@ class CartServiceForGuestTest {
 		// given
 		CartItemDTO item = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
 		CartDTO cart = new CartDTO(new ArrayList<>(List.of(item)));
-		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(1L, sessionId);
+		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(sessionId, 1L);
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
