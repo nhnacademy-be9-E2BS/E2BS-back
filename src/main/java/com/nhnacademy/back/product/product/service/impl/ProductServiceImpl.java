@@ -229,7 +229,7 @@ public class ProductServiceImpl implements ProductService {
 		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
 		// - 이미지가 들어왔다면
-		if (Objects.nonNull(productImageFiles) && !productImageFiles.isEmpty()) {
+		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
 			// - 기존 리스트 조회
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
