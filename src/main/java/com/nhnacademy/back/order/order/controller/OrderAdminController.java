@@ -1,6 +1,7 @@
 package com.nhnacademy.back.order.order.controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,13 +35,25 @@ public class OrderAdminController {
 	@GetMapping
 	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable,
 		@RequestParam(required = false) String stateName,
-		@RequestParam(required = false) LocalDate startDate,
-		@RequestParam(required = false) LocalDate endDate,
+		@RequestParam(required = false) String startDate,
+		@RequestParam(required = false) String endDate,
 		@RequestParam(required = false) String orderCode,
 		@RequestParam(required = false) String memberId) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		// prod 환경에서만 LocalDate가 이상하게 주고 받아 직접 문자열을 전송한다.
+		LocalDate start = null;
+		LocalDate end = null;
+
+		if (startDate != null && !startDate.isEmpty()) {
+			start = LocalDate.parse(startDate, formatter);
+		}
+		if (endDate != null && !endDate.isEmpty()) {
+			end = LocalDate.parse(endDate, formatter);
+		}
 
 		return ResponseEntity.ok(
-			orderAdminService.getOrders(pageable, stateName, startDate, endDate, orderCode, memberId));
+			orderAdminService.getOrders(pageable, stateName, start, end, orderCode, memberId));
 
 	}
 

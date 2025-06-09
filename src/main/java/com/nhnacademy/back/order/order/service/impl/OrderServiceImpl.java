@@ -424,8 +424,6 @@ public class OrderServiceImpl implements OrderService {
 			memberCouponService.reIssueCouponById(memberCoupon.getMemberCouponId());
 		}
 
-		//재고 복구?
-
 		OrderReturn orderReturn = new OrderReturn(returnDTO, order, returnAmount);
 		orderReturnJpaRepository.save(orderReturn);
 

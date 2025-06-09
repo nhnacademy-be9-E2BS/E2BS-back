@@ -15,7 +15,7 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 
 public interface MemberCouponJpaRepository extends JpaRepository<MemberCoupon, Long> {
 
-	List<MemberCoupon> getMemberCouponsByMemberAndMemberCouponUsed(Member member, boolean memberCouponUsed);
+	List<MemberCoupon> getMemberCouponsByMemberAndMemberCouponUsedAndMemberCouponPeriodAfter(Member member, boolean memberCouponUsed, LocalDateTime now);
 
 	/**
 	 * 쿠폰함 : 회원 ID로 쿠폰 조회
