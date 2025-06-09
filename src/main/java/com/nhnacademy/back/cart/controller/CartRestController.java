@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestMergeCartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
@@ -54,14 +55,19 @@ public class CartRestController {
 	}
 
 	@Operation(summary = "비회원 장바구니 병합", description = "비회원의 장바구니를 회원 장바구니로 병합합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "장바구니 병합 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
-	})
+	@ApiResponse(responseCode = "200", description = "장바구니 병합 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
 	@PostMapping("/api/carts/merge")
-	public ResponseEntity<Integer> mergeCartItemsToMemberFromGuest(
-		@Parameter(description = "병합 요청 DTO", required = true) @RequestBody RequestMergeCartItemDTO requestDto) {
+	public ResponseEntity<Integer> mergeCartItemsToMemberFromGuest(@Parameter(description = "병합 요청 DTO", required = true) @RequestBody RequestMergeCartItemDTO requestDto) {
 		Integer result = cartService.mergeCartItemsToMemberFromGuest(requestDto.getMemberId(), requestDto.getSessionId());
 		return ResponseEntity.ok(result);
+	}
+
+	@Operation(summary = "주문한 장바구니 항목 삭제", description = "회원/비회원이 주문한 장바구니를 삭제합니다.")
+	@ApiResponse(responseCode = "200", description = "주문한 장바구니 항목 삭제 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
+	@PostMapping("/api/carts/orders")
+	public ResponseEntity<Integer> deleteOrderCompleteCartItems(@Parameter(description = "주문한 상품 요청 DTO", required = true) @RequestBody RequestDeleteCartOrderDTO requestDto) {
+		Integer body = cartService.deleteOrderCompleteCartItems(requestDto);
+		return ResponseEntity.ok(body);
 	}
 
 	

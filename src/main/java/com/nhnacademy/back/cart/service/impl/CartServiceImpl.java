@@ -2,6 +2,8 @@ package com.nhnacademy.back.cart.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
@@ -37,6 +40,7 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
 @Transactional(readOnly = true)
@@ -443,4 +447,66 @@ public class CartServiceImpl implements CartService {
 		return cart.getCartItems().size();
 	}
 
+	/**
+	 * 주문 완료한 상품 항목 장바구니에 수량 변경 또는 삭제 업데이트
+	 */
+	@Transactional
+	@Override
+	public Integer deleteOrderCompleteCartItems(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+		List<Long> productIds = requestOrderCartDeleteDTO.getProductIds();
+		List<Integer> cartQuantities = requestOrderCartDeleteDTO.getCartQuantities();
+
+		// 회원인 경우는 DB에 이미 수량이 더 존재할 수 있으므로 수량 업데이트
+		if (!StringUtils.isEmpty(requestOrderCartDeleteDTO.getMemberId())) {
+			Member findMember = memberRepository.getMemberByMemberId(requestOrderCartDeleteDTO.getMemberId());
+			if (Objects.isNull(findMember)) {
+				throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			}
+
+			Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+				.orElseThrow(CartNotFoundException::new);
+
+			List<CartItems> cartItems = findCart.getCartItems();
+
+			// 현재 cartItems 리스트를 순회 중인데 동시에 remove 도 일어나므로 ConcurrentModificationException 발생 방지를 위해 리스트 복사
+			List<CartItems> copiedCartItems = new ArrayList<>(cartItems);
+			for (CartItems cartItem : copiedCartItems) {
+				for (int i = 0; i < productIds.size(); i++) {
+					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
+						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i);
+
+						if (newQuantity > 0) {
+							cartItem.changeCartItemsQuantity(newQuantity);
+						} else {
+							cartItemsRepository.delete(cartItem);
+							cartItems.remove(cartItem); // 관계 정리
+						}
+						break;
+					}
+				}
+			}
+
+			return getCartItemsCountsForMember(findMember.getMemberId());
+		} else { // 비회원인 경우는 삭제만 처리하면 됨
+			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
+			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
+
+			List<CartItemDTO> cartItems = cart.getCartItems();
+			Iterator<CartItemDTO> iterator = cartItems.iterator();
+
+			// for 루프 도중 remove()를 하기 위해서는 Iterator 활용
+			while (iterator.hasNext()) {
+				CartItemDTO cartItem = iterator.next();
+				for (Long productId : productIds) {
+					if (cartItem.getProductId() == productId) {
+						deleteCartItemForGuest(new RequestDeleteCartItemsForGuestDTO(requestOrderCartDeleteDTO.getSessionId(), productId));
+						iterator.remove(); // 안전하게 삭제
+						break;
+					}
+				}
+			}
+
+			return cartItems.size();
+		}
+	}
 }

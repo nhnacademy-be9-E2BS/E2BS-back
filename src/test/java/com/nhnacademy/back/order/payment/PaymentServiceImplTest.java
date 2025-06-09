@@ -49,13 +49,14 @@ class PaymentServiceImplTest {
 		when(dto.getTotalAmount()).thenReturn(totalAmount);
 		when(dto.getRequestedAt()).thenReturn(requestedAt);
 		when(dto.getApprovedAt()).thenReturn(approvedAt);
+		when(dto.getMethod()).thenReturn("휴대폰");
 
 		// 모의 Order, PaymentMethod
 		Order order = mock(Order.class);
 		PaymentMethod paymentMethod = mock(PaymentMethod.class);
 
 		when(orderJpaRepository.findById(orderId)).thenReturn(Optional.of(order));
-		when(paymentMethodJpaRepository.findById(1L)).thenReturn(Optional.of(paymentMethod));
+		when(paymentMethodJpaRepository.findByPaymentMethodName(any())).thenReturn(Optional.of(paymentMethod));
 
 		// when
 		paymentService.createPayment(dto);
