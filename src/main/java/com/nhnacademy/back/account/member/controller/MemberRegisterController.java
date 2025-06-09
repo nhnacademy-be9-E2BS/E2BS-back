@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "회원가입 API", description = "회원 회원가입 기능")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/register")
+@RequestMapping("/api/members")
 public class MemberRegisterController {
 
 	private final MemberService memberService;
@@ -50,7 +50,7 @@ public class MemberRegisterController {
 			@ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class))),
 			@ApiResponse(responseCode = "500", description = "중복된 아이디", content = @Content(schema = @Schema(implementation = AlreadyExistsMemberIdException.class)))
 		})
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<ResponseRegisterMemberDTO> createRegister(@Validated
 		@Parameter(description = "회원가입 DTO", required = true, schema = @Schema(implementation = RequestRegisterMemberDTO.class))
 		@RequestBody RequestRegisterMemberDTO requestRegisterMemberDTO,
@@ -75,8 +75,8 @@ public class MemberRegisterController {
 	 * 회원 가입 아이디 중복체크 메서드
 	 */
 	@Operation(summary = "회원가입 시 아이디 중복 체크", description = "회원가입 시 아이디 중복 체크 기능")
-	@GetMapping("/members/{memberId}")
-	public ResponseEntity<Map<String, Boolean>> checkMemberIdDev(@PathVariable("memberId") String memberId) {
+	@GetMapping("/{member-id}/register")
+	public ResponseEntity<Map<String, Boolean>> checkMemberIdDev(@PathVariable("member-id") String memberId) {
 		boolean idDuplicateCheck = memberService.existsMemberByMemberId(memberId);
 		Map<String, Boolean> response = Collections.singletonMap("available", !idDuplicateCheck);
 

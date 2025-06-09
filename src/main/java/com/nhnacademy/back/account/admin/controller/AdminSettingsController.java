@@ -109,8 +109,8 @@ public class AdminSettingsController {
 			@ApiResponse(responseCode = "500", description = "회원 상태 수정 실패", content = @Content(schema = @Schema(implementation = UpdateMemberStateFailedException.class)))
 		})
 	@Admin
-	@PostMapping("/members/{memberId}")
-	public ResponseEntity<Void> updateAdminSettingsMemberState(@PathVariable("memberId") String memberId,
+	@PostMapping("/members/{member-id}")
+	public ResponseEntity<Void> updateAdminSettingsMemberState(@PathVariable("member-id") String memberId,
 		@Validated @Parameter(description = "회원 상태 요청 DTO", required = true, schema = @Schema(implementation = RequestAdminSettingsMemberStateDTO.class))
 		@RequestBody RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO,
 		BindingResult bindingResult) {
@@ -132,8 +132,8 @@ public class AdminSettingsController {
 			@ApiResponse(responseCode = "500", description = "회원 권한 변경 실패", content = @Content(schema = @Schema(implementation = UpdateMemberRoleFailedException.class)))
 		})
 	@Admin
-	@PutMapping("/members/{memberId}")
-	public ResponseEntity<Void> updateAdminSettingsMemberRole(@PathVariable("memberId") String memberId) {
+	@PutMapping("/members/{member-id}")
+	public ResponseEntity<Void> updateAdminSettingsMemberRole(@PathVariable("member-id") String memberId) {
 		memberService.updateMemberRole(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -149,8 +149,8 @@ public class AdminSettingsController {
 			@ApiResponse(responseCode = "500", description = "회원 탈퇴 실패", content = @Content(schema = @Schema(implementation = UpdateMemberStateFailedException.class)))
 		})
 	@Admin
-	@DeleteMapping("/members/{memberId}")
-	public ResponseEntity<Void> deleteAdminSettingsMember(@PathVariable("memberId") String memberId) {
+	@DeleteMapping("/members/{member-id}")
+	public ResponseEntity<Void> deleteAdminSettingsMember(@PathVariable("member-id") String memberId) {
 		memberService.withdrawMember(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();

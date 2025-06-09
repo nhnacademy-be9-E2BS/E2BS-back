@@ -17,14 +17,14 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "회원 상태 조회 API", description = "회원 정보 조회 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/members/{memberId}/memberstate")
+@RequestMapping("/api/members/{member-id}/memberstate")
 public class MemberStateController {
 
 	private final MemberService memberService;
 
 	@Operation(summary = "회원 상태 정보 조회", description = "회원 상태 정보 조회 기능")
 	@GetMapping
-	public ResponseEntity<ResponseMemberStateDTO> getMemberState(@PathVariable("memberId") String memberId) {
+	public ResponseEntity<ResponseMemberStateDTO> getMemberState(@PathVariable("member-id") String memberId) {
 		ResponseMemberStateDTO responseMemberStateDTO = memberService.getMemberState(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberStateDTO);
