@@ -95,6 +95,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 	}
 
 	@Override
+	@Transactional
 	public void updateProductSalePrice(Long productId, Long productSalePrice) {
 		ProductDocument productDocument = productSearchRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
@@ -141,6 +142,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 	}
 
 	@Override
+	@Transactional
 	public void updateProductDocumentTag(Long productId, String beforeName, String afterName) {
 		ProductDocument productDocument = productSearchRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
@@ -150,6 +152,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 	}
 
 	@Override
+	@Transactional
 	public void updateProductDocumentPublisher(Long productId, String newName) {
 		ProductDocument productDocument = productSearchRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
