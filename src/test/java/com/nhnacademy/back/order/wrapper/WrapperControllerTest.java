@@ -75,7 +75,7 @@ class WrapperControllerTest {
 		when(wrapperService.getWrappers(pageable)).thenReturn(wrappers);
 
 		// when & then
-		mockMvc.perform(get("/api/admin/wrappers")
+		mockMvc.perform(get("/api/auth/admin/wrappers")
 				.param("page", "0")
 				.param("size", "10")
 				.accept(MediaType.APPLICATION_JSON))
@@ -106,7 +106,7 @@ class WrapperControllerTest {
 		);
 
 		// when & then
-		mockMvc.perform(multipart("/api/admin/wrappers")
+		mockMvc.perform(multipart("/api/auth/admin/wrappers")
 				.file(metaPart)
 				.file(mockFile)
 				.contentType(MediaType.MULTIPART_FORM_DATA))
@@ -121,7 +121,7 @@ class WrapperControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/admin/wrappers/1")
+		mockMvc.perform(put("/api/auth/admin/wrappers/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());

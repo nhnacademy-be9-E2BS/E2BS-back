@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.category.controller.CategoryController;
 import com.nhnacademy.back.product.category.domain.dto.request.RequestCategoryDTO;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
+import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryIdsDTO;
 import com.nhnacademy.back.product.category.service.CategoryService;
 import com.nhnacademy.back.product.category.service.ProductCategoryService;
 
@@ -76,6 +77,30 @@ class CategoryControllerTest {
 	}
 
 	@Test
+	@DisplayName("product id 리스트로 각 product의 category id 리스트 조회")
+	void get_categories_by_product_id_test() throws Exception {
+		// given
+		List<ResponseCategoryIdsDTO> response = List.of(
+			new ResponseCategoryIdsDTO(1L, List.of(1L, 2L)),
+			new ResponseCategoryIdsDTO(2L, List.of(3L, 4L))
+		);
+		when(productCategoryService.getCategoriesByProductId(List.of(1L, 2L))).thenReturn(response);
+
+		// when & then
+		mockMvc.perform(get("/api/categories/productIds")
+				.param("productIds", "1", "2")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$[0].productId").value(1))
+			.andExpect(jsonPath("$[0].categoryIds[0]").value(1))
+			.andExpect(jsonPath("$[0].categoryIds[1]").value(2))
+			.andExpect(jsonPath("$[1].productId").value(2))
+			.andExpect(jsonPath("$[1].categoryIds[0]").value(3))
+			.andExpect(jsonPath("$[1].categoryIds[1]").value(4));
+	}
+
+	@Test
 	@DisplayName("Admin - 최상위 + 하위 카테고리 저장")
 	void create_category_tree_test() throws Exception {
 		// given
@@ -85,7 +110,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(requests);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/categories")
+		mockMvc.perform(post("/api/auth/admin/categories")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -99,7 +124,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(post("/api/admin/categories/1")
+		mockMvc.perform(post("/api/auth/admin/categories/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -113,7 +138,7 @@ class CategoryControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/admin/categories/1")
+		mockMvc.perform(put("/api/auth/admin/categories/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -123,7 +148,7 @@ class CategoryControllerTest {
 	@DisplayName("Admin - 카테고리 삭제")
 	void delete_category_test() throws Exception {
 		// when & then
-		mockMvc.perform(delete("/api/admin/categories/1"))
+		mockMvc.perform(delete("/api/auth/admin/categories/1"))
 			.andExpect(status().isOk());
 	}
 }

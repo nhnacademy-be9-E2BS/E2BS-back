@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.product.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -23,4 +24,6 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 
 	@Query("SELECT p FROM Product p LEFT JOIN FETCH p.productImage WHERE p.productId = :id")
 	Optional<Product> findByIdWithImages(@Param("id") Long id);
+
+	List<Product> findAllByPublisher_PublisherId(long publisherPublisherId);
 }

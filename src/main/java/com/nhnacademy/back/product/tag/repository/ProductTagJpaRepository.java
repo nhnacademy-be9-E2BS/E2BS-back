@@ -28,4 +28,6 @@ public interface ProductTagJpaRepository extends JpaRepository<ProductTag, Long>
 				Collectors.mapping(ProductTag::getTag, Collectors.toList())
 			));
 	}
+
+	List<ProductTag> findAllByTag_TagId(long tagTagId);
 }

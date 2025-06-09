@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/publishers")
+@RequestMapping("/api/auth/admin/publishers")
 public class PublisherController {
 	private final PublisherService publisherService;
 

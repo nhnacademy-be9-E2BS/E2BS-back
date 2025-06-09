@@ -237,8 +237,10 @@ public class ProductServiceImpl implements ProductService {
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
 			// - miniO 기존 파일 삭제
-			for (ProductImage productImage : product.getProductImage()) {
-				minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+			if (!product.getProductImage().getFirst().getProductImagePath().startsWith("http")) {
+				for (ProductImage productImage : product.getProductImage()) {
+					minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+				}
 			}
 
 			// - DB에서 삭제
@@ -357,9 +359,6 @@ public class ProductServiceImpl implements ProductService {
 			));
 	}
 
-	/**
-	 * 엘라스틱 서치 결과 도서 조회 (Page)
-	 */
 	@Override
 	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds) {
 		List<Long> idOrder = productIds.getContent();

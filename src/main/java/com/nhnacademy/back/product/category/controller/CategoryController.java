@@ -63,7 +63,7 @@ public class CategoryController {
 	 * 최상위 + 하위 카테고리 저장
 	 */
 	@Admin
-	@PostMapping("/api/admin/categories")
+	@PostMapping("/api/auth/admin/categories")
 	public ResponseEntity<Void> createCategoryTree(@RequestBody List<RequestCategoryDTO> request) {
 		categoryService.createCategoryTree(request);
 
@@ -74,7 +74,7 @@ public class CategoryController {
 	 * 이미 존재하는 카테고리에 자식 카테고리 저장
 	 */
 	@Admin
-	@PostMapping("/api/admin/categories/{categoryId}")
+	@PostMapping("/api/auth/admin/categories/{categoryId}")
 	public ResponseEntity<Void> createChildCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
 		categoryService.createChildCategory(categoryId, request);
@@ -86,7 +86,7 @@ public class CategoryController {
 	 * 카테고리 수정
 	 */
 	@Admin
-	@PutMapping("/api/admin/categories/{categoryId}")
+	@PutMapping("/api/auth/admin/categories/{categoryId}")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId,
 		@RequestBody RequestCategoryDTO request) {
 		categoryService.updateCategory(categoryId, request);
@@ -98,7 +98,7 @@ public class CategoryController {
 	 * 카테고리 삭제
 	 */
 	@Admin
-	@DeleteMapping("/api/admin/categories/{categoryId}")
+	@DeleteMapping("/api/auth/admin/categories/{categoryId}")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
 		categoryService.deleteCategory(categoryId);
 
