@@ -4,7 +4,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,10 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGues
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.order.deliveryfee.domain.dto.request.RequestDeliveryFeeDTO;
+import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
+import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
+import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -39,6 +45,9 @@ class CartServiceForGuestTest {
 
 	@Mock
 	private ProductJpaRepository productRepository;
+
+	@Mock
+	private DeliveryFeeJpaRepository deliveryFeeRepository;
 
 	@Mock
 	private RedisTemplate<String, Object> redisTemplate;
@@ -70,6 +79,7 @@ class CartServiceForGuestTest {
 	void createCartItemForGuest() {
 		// given
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, sessionId, 1L, 2);
+		DeliveryFee deliveryFee = new DeliveryFee(new RequestDeliveryFeeDTO(1000, 5000));
 
 		CartDTO cart = Mockito.mock(CartDTO.class);
 
@@ -79,6 +89,9 @@ class CartServiceForGuestTest {
 
 		CartItemDTO cartItem = Mockito.mock(CartItemDTO.class);
 		when(cart.getCartItems()).thenReturn(new ArrayList<>(List.of(cartItem)));
+
+		when(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()).thenReturn(deliveryFee);
+
 
 		// when
 		cartService.createCartItemForGuest(request);
@@ -93,7 +106,7 @@ class CartServiceForGuestTest {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", sessionId, 1L, 5);
 
-		CartItemDTO cartItem = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
+		CartItemDTO cartItem = new CartItemDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "/image1.jpg", 2, 1000);
 		CartDTO cart = new CartDTO(List.of(cartItem));
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
@@ -111,7 +124,7 @@ class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 항목 삭제 테스트")
 	void deleteCartItemForGuest_shouldRemoveItem() {
 		// given
-		CartItemDTO item = new CartItemDTO(1L, "Product", 1000, "img.jpg", 2);
+		CartItemDTO item = new CartItemDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "/image1.jpg", 2, 1000);
 		CartDTO cart = new CartDTO(new ArrayList<>(List.of(item)));
 		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(sessionId, 1L);
 
@@ -145,8 +158,8 @@ class CartServiceForGuestTest {
 	@DisplayName("게스트 장바구니 목록 조회 테스트")
 	void getCartItemsByGuest() {
 		// given
-		CartItemDTO item1 = new CartItemDTO(1L, "Product1", 1000, "img1.jpg", 1);
-		CartItemDTO item2 = new CartItemDTO(2L, "Product2", 2000, "img2.jpg", 2);
+		CartItemDTO item1 = new CartItemDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "/image1.jpg", 2, 1000);
+		CartItemDTO item2 = new CartItemDTO(2L, "Product 2", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "/image2.jpg", 3, 1500);
 		CartDTO cart = new CartDTO(List.of(item1, item2));
 
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
