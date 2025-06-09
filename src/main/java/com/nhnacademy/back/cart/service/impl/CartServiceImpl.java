@@ -1,5 +1,7 @@
 package com.nhnacademy.back.cart.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +31,8 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
+import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
+import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -43,6 +47,7 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
+	private final DeliveryFeeJpaRepository deliveryFeeRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -181,13 +186,29 @@ public class CartServiceImpl implements CartService {
 				}
 
 				//  DTO 가공
+				long productRegularPrice = product.getProductRegularPrice();
+				long productSalePrice = product.getProductSalePrice();
+				BigDecimal regularPrice = BigDecimal.valueOf(productRegularPrice);
+				BigDecimal salePrice = BigDecimal.valueOf(productSalePrice);
+
+				BigDecimal discountRate = BigDecimal.ZERO;
+				if (regularPrice.compareTo(BigDecimal.ZERO) > 0) {
+					discountRate = regularPrice.subtract(salePrice)         // 할인 금액
+						.divide(regularPrice, 2, RoundingMode.HALF_UP) // 정가로 나눠서 비율
+						.multiply(BigDecimal.valueOf(100))                  // % 변환
+						.setScale(0, RoundingMode.DOWN);            // 소수점 제거
+				}
+
 				long productTotalPrice = product.getProductSalePrice() * cartItem.getCartItemsQuantity();
 
 				return new ResponseCartItemsForMemberDTO(
 					cartItem.getCartItemsId(),
 					product.getProductId(),
 					product.getProductTitle(),
-					product.getProductSalePrice(),
+					productRegularPrice,
+					productSalePrice,
+					discountRate,
+					ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 					productImagePath,
 					cartItem.getCartItemsQuantity(),
 					productTotalPrice);
@@ -244,12 +265,30 @@ public class CartServiceImpl implements CartService {
 			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
 
+		long productRegularPrice = findProduct.getProductRegularPrice();
+		long productSalePrice = findProduct.getProductSalePrice();
+		BigDecimal regularPrice = BigDecimal.valueOf(productRegularPrice);
+		BigDecimal salePrice = BigDecimal.valueOf(productSalePrice);
+
+		// 할인률 계산: ((정가 - 할인가) / 정가) * 100
+		BigDecimal discountRate = BigDecimal.ZERO;
+		if (regularPrice.compareTo(BigDecimal.ZERO) > 0) {
+			discountRate = regularPrice.subtract(salePrice)         // 할인 금액
+				.divide(regularPrice, 2, RoundingMode.HALF_UP) // 정가로 나눠서 비율
+				.multiply(BigDecimal.valueOf(100))                  // % 변환
+				.setScale(0, RoundingMode.DOWN);            // 소수점 제거
+		}
+
 		CartItemDTO newItem = new CartItemDTO(
 			findProduct.getProductId(),
 			findProduct.getProductTitle(),
-			findProduct.getProductSalePrice(),
+			productRegularPrice,
+			productSalePrice,
+			discountRate,
+			ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 			productImagePath,
-			request.getQuantity()
+			request.getQuantity(),
+			productSalePrice * request.getQuantity()
 		);
 		cart.getCartItems().add(newItem);
 
@@ -336,18 +375,17 @@ public class CartServiceImpl implements CartService {
 
 		// DTO 가공
 		return cartItems.stream()
-			.map(cartItem -> {
-				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
-
-				return new ResponseCartItemsForGuestDTO(
-					cartItem.getProductId(),
-					cartItem.getProductTitle(),
-					cartItem.getProductSalePrice(),
-					cartItem.getProductImagePath(),
-					cartItem.getCartItemsQuantity(),
-					productTotalPrice
-				);
-			})
+			.map(cartItem -> new ResponseCartItemsForGuestDTO(
+				cartItem.getProductId(),
+				cartItem.getProductTitle(),
+				cartItem.getProductRegularPrice(),
+				cartItem.getProductSalePrice(),
+				cartItem.getDiscountRate(),
+				cartItem.getDeliveryFee(),
+				cartItem.getProductImagePath(),
+				cartItem.getCartItemsQuantity(),
+				cartItem.getProductTotalPrice()
+			))
 			.toList();
 	}
 
