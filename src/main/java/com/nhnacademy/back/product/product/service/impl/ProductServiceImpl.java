@@ -3,12 +3,9 @@ package com.nhnacademy.back.product.product.service.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -363,44 +360,16 @@ public class ProductServiceImpl implements ProductService {
 	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds) {
 		List<Long> idOrder = productIds.getContent();
 		List<Product> unorderedProducts = productJpaRepository.findAllById(idOrder);
-
+		List<ResponseProductReadDTO> responseProductReadDTOS = new ArrayList<>();
 		// 한 권이라도 존재하지 않으면 예외 발생
 		if (unorderedProducts.size() != idOrder.size()) {
 			throw new ProductNotFoundException();
 		}
 
-		Map<Long, Product> productMap = unorderedProducts.stream()
-			.collect(Collectors.toMap(Product::getProductId, Function.identity()));
-
-		List<ResponseProductReadDTO> responseProductReadDTOS = idOrder.stream()
-			.map(id -> {
-				Product product = productMap.get(id);
-				return new ResponseProductReadDTO(
-					product.getProductId(),
-					new ResponseProductStateDTO(
-						product.getProductState().getProductStateId(),
-						product.getProductState().getProductStateName().name()
-					),
-					new ResponsePublisherDTO(
-						product.getPublisher().getPublisherId(),
-						product.getPublisher().getPublisherName()
-					),
-					product.getProductTitle(),
-					product.getProductContent(),
-					product.getProductDescription(),
-					product.getProductPublishedAt(),
-					product.getProductIsbn(),
-					product.getProductRegularPrice(),
-					product.getProductSalePrice(),
-					product.isProductPackageable(),
-					product.getProductStock(),
-					productImageJpaRepository.findImageDTOsByProductId(product.getProductId()),
-					productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
-					productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
-					productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId())
-				);
-			})
-			.toList();
+		for (Product result : unorderedProducts) {
+			getProductByChangedImagePath(result);
+			responseProductReadDTOS.add(getProductByChangedImagePath(result));
+		}
 
 		return new PageImpl<>(responseProductReadDTOS, productIds.getPageable(), productIds.getTotalElements());
 	}
@@ -422,11 +391,11 @@ public class ProductServiceImpl implements ProductService {
 					.map(ResponseContributorDTO::getContributorName)
 					.orElse("미상");
 
-				String imagePath = product.getProductImage()
-					.stream()
-					.findFirst()
-					.map(ProductImage::getProductImagePath)
-					.orElse(null);
+
+				String imagePath = product.getProductImage().getFirst().getProductImagePath();
+				if (!imagePath.startsWith("http")) {
+					imagePath = minioUtils.getPresignedUrl(BUCKET_NAME, imagePath);
+				}
 
 				return new ResponseMainPageProductDTO(
 					product.getProductId(),
