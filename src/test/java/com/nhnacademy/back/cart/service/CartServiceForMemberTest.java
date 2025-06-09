@@ -115,7 +115,7 @@ class CartServiceForMemberTest {
 		when(cartRepository.findByCustomer_CustomerId(customerId)).thenReturn(Optional.of(cart));
 		when(cartItemsRepository.findById(cartItemId)).thenReturn(Optional.of(cartItem));
 
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("id123", null, null, 5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("id123", null, 1L, 5);
 
 		// when
 		cartService.updateCartItemForMember(cartItemId, request);

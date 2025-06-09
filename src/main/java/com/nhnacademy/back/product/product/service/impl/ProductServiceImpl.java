@@ -303,7 +303,7 @@ public class ProductServiceImpl implements ProductService {
 	 */
 	@Override
 	@Transactional
-	public void updateProductStock(long productId, RequestProductStockUpdateDTO request) {
+	public synchronized void updateProductStock(long productId, RequestProductStockUpdateDTO request) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
