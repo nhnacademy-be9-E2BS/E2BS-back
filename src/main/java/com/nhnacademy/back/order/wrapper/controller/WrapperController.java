@@ -32,7 +32,7 @@ public class WrapperController {
 	/**
 	 * Wrapper 리스트 조회 (판매 중)
 	 */
-	@GetMapping("/api/wrappers")
+	@GetMapping("/api/wrappers/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappersBySaleable(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseWrapperDTO> wrappers = wrapperService.getWrappersBySaleable(true, pageable);
