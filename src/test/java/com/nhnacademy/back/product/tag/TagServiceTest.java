@@ -3,6 +3,8 @@ package com.nhnacademy.back.product.tag;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +19,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
+import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
+import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 import com.nhnacademy.back.product.tag.service.impl.TagServiceImpl;
 
@@ -31,7 +40,10 @@ class TagServiceTest {
 	private TagServiceImpl tagService;
 	@Mock
 	private TagJpaRepository tagJpaRepository;
-
+	@Mock
+	private ProductTagJpaRepository productTagJpaRepository;
+	@Mock
+	private ProductSearchService productSearchService;
 
 	@Test
 	@DisplayName("create tag - success")
@@ -93,7 +105,15 @@ class TagServiceTest {
 		// given
 		RequestTagDTO request = new RequestTagDTO("update after tag");
 		Tag tag = new Tag("update before tag");
+		String beforeName = tag.getTagName();
+		Publisher publisher = new Publisher("update before publisher");
+		ProductState productState = new ProductState(ProductStateName.SALE);
+		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
+		ProductTag productTag = new ProductTag(product, tag);
+		List<ProductTag> productTags = List.of(productTag);
 		when(tagJpaRepository.findById(1L)).thenReturn(Optional.of(tag));
+		when(productTagJpaRepository.findAllByTag_TagId(1L)).thenReturn(productTags);
 
 		// when
 		tagService.updateTag(1L, request);
@@ -101,6 +121,8 @@ class TagServiceTest {
 		// then
 		assertThat(tag.getTagName()).isEqualTo("update after tag");
 		verify(tagJpaRepository, times(1)).save(tag);
+		verify(productTagJpaRepository, times(1)).findAllByTag_TagId(1L);
+		verify(productSearchService, times(1)).updateProductDocumentTag(1L, beforeName, request.getTagName());
 	}
 
 	@Test

@@ -40,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/books")
+@RequestMapping("/api/auth/admin/books")
 public class ProductAdminController {
 	private final ProductService productService;
 	private final ProductAPIService productApiService;

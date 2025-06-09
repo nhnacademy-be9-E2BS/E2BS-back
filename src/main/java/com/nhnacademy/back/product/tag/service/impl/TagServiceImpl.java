@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.tag.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,11 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
+import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
+import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 import com.nhnacademy.back.product.tag.service.TagService;
 
@@ -23,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class TagServiceImpl implements TagService {
 	private final TagJpaRepository tagJpaRepository;
+	private final ProductTagJpaRepository productTagJpaRepository;
+	private final ProductSearchService productSearchService;
 
 	/**
 	 *  Tag를 DB에 저장
@@ -68,6 +74,7 @@ public class TagServiceImpl implements TagService {
 		if (tag.isEmpty()) {
 			throw new TagNotFoundException("Tag Not Found, id: %d".formatted(tagId));
 		}
+		String beforeName = tag.get().getTagName();
 
 		if (tagJpaRepository.existsByTagName(request.getTagName())) {
 			throw new TagAlreadyExistsException("Tag Already Exists: %s".formatted(request.getTagName()));
@@ -75,6 +82,13 @@ public class TagServiceImpl implements TagService {
 
 		tag.get().setTag(request.getTagName());
 		tagJpaRepository.save(tag.get());
+
+		// 엘라스틱 서치에 업데이트
+		List<ProductTag> productTags = productTagJpaRepository.findAllByTag_TagId(tagId);
+		for (ProductTag productTag : productTags) {
+			productSearchService.updateProductDocumentTag(productTag.getProduct().getProductId(), beforeName,
+				request.getTagName());
+		}
 	}
 
 	/**

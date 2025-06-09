@@ -235,21 +235,4 @@ public class CategoryServiceImpl implements CategoryService {
 		);
 	}
 
-	/**
-	 * getCategoriesById(long categoryId) 메소드에서 해당 categoryId 노드를 찾기 위한 메소드
-	 */
-	private ResponseCategoryDTO findCategoryById(List<ResponseCategoryDTO> categories, long categoryId) {
-		for (ResponseCategoryDTO category : categories) {
-			if (category.getCategoryId() == categoryId) {
-				return category;
-			}
-
-			ResponseCategoryDTO found = findCategoryById(category.getChildren(), categoryId);
-			if (found != null) {
-				return found;
-			}
-		}
-		return null;
-	}
-
 }

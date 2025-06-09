@@ -44,4 +44,10 @@ public interface ProductSearchService {
 
 	// 리뷰 작성 시 (평점 다시 계산, 리뷰수 +1)
 	void updateProductDocumentReview(Long productId, Integer reviewRate);
+
+	// 태그 이름 수정 시
+	void updateProductDocumentTag(Long productId, String beforeName, String afterName);
+
+	// 출판사 이름 수정 시
+	void updateProductDocumentPublisher(Long productId, String newName);
 }
