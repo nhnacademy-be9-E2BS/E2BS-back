@@ -72,9 +72,10 @@ INSERT INTO payment (payment_key, total_payment_amount, payment_requested_at, pa
 VALUES ('PAY1234567890', 10000, NOW(), NOW(), 1, 'ORD20240506');
 
 -- OrderReturn
-INSERT INTO order_return (order_return_reason, return_category, order_id, order_return_created_at, order_return_amount)
-VALUES ('상품이 파손되어 도착했습니다.', 'CHANGE_MIND', 1, NOW(), 5000),
-       ('단순 변심으로 반품 요청합니다.', 'BREAK', 2, NOW(), 10000);
+INSERT INTO order_return (order_return_reason, return_category, order_code, order_return_created_at,
+                          order_return_amount)
+VALUES ('상품이 파손되어 도착했습니다.', 'CHANGE_MIND', 'ORD20240506', NOW(), 5000),
+       ('단순 변심으로 반품 요청합니다.', 'BREAK', 'ORD20240506', NOW(), 10000);
 
 -- Wrapper (nullable)
 INSERT INTO wrapper (wrapper_price, wrapper_name, wrapper_image, wrapper_saleable)

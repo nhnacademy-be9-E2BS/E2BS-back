@@ -82,6 +82,15 @@ public class ResponseTossPaymentConfirmDTO {
 	@Getter
 	@Setter
 	public static class VirtualAccount {
+		private String accountType;
+		private String accountNumber;
+		private String bankCode;
+		private String customerName;
+		private String dueDate;
+		private String refundStatus;
+		private boolean expired;
+		private String settlementStatus;
+		private Object refundReceiveAccount;
 	}
 
 	@Getter
@@ -92,6 +101,9 @@ public class ResponseTossPaymentConfirmDTO {
 	@Getter
 	@Setter
 	public static class MobilePhone {
+		private String customerMobilePhone;
+		private String settlementStatus;
+		private String receiptUrl;
 	}
 
 	@Getter
