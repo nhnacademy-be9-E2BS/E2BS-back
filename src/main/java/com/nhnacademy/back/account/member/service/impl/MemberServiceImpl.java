@@ -195,6 +195,7 @@ public class MemberServiceImpl implements MemberService {
 		int customerResult = customerJpaRepository.updateCustomerNameAndCustomerEmail(
 			requestMemberInfoDTO.getCustomerName(),
 			requestMemberInfoDTO.getCustomerEmail(),
+			requestMemberInfoDTO.getCustomerPassword(),
 			member.getCustomer().getCustomerId()
 		);
 

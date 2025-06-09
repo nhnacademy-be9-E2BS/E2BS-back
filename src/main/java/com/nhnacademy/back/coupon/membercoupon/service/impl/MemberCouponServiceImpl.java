@@ -47,37 +47,66 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		Long memberCustomerId = member.getCustomerId();
 
-		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(memberCustomerId,
+		Page<MemberCoupon> memberCoupons = memberCouponJpaRepository.findByMember_CustomerId(
+			memberCustomerId,
 			pageable);
 
-		return memberCoupons.map(memberCoupon -> {
-			Coupon coupon = memberCoupon.getCoupon();
+		return memberCoupons.map(this::convertToDto);
+	}
 
-			// null-safe 조회
-			CategoryCoupon categoryCoupon = categoryCouponJpaRepository.findById(coupon.getCouponId()).orElse(null);
-			ProductCoupon productCoupon = productCouponJpaRepository.findById(coupon.getCouponId()).orElse(null);
+	@Override
+	public Page<ResponseMemberCouponDTO> getUsableMemberCouponsByMemberId(String memberId, Pageable pageable) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		Long memberCustomerId = member.getCustomerId();
 
-			// 카테고리 ID, 이름 조회
-			Long categoryId = categoryCoupon != null ? categoryCoupon.getCategory().getCategoryId() : null;
-			String categoryName = categoryCoupon != null ? categoryCoupon.getCategory().getCategoryName() : null;
+		Page<MemberCoupon> memberCoupons =
+			memberCouponJpaRepository.findByMember_CustomerIdAndMemberCouponUsedIsFalseAndMemberCouponPeriodGreaterThanEqual(
+				memberCustomerId,
+				LocalDateTime.now(),
+				pageable);
 
-			// 상품 ID, 이름 조회
-			Long productId = productCoupon != null ? productCoupon.getProduct().getProductId() : null;
-			String productTitle = productCoupon != null ? productCoupon.getProduct().getProductTitle() : null;
+		return memberCoupons.map(this::convertToDto);
+	}
 
-			return new ResponseMemberCouponDTO(
-				coupon.getCouponId(),
-				coupon.getCouponName(),
-				coupon.getCouponPolicy().getCouponPolicyName(),
-				categoryId,
-				categoryName,
-				productId,
-				productTitle,
-				memberCoupon.getMemberCouponCreatedAt(),
-				memberCoupon.getMemberCouponPeriod(),
-				memberCoupon.isMemberCouponUsed()
-			);
-		});
+	@Override
+	public Page<ResponseMemberCouponDTO> getUnusableMemberCouponsByMemberId(String memberId, Pageable pageable) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		Long memberCustomerId = member.getCustomerId();
+
+		Page<MemberCoupon> memberCoupons =
+			memberCouponJpaRepository.findUsedOrExpiredByCustomerId(
+				memberCustomerId,
+				LocalDateTime.now(),
+				pageable);
+
+		return memberCoupons.map(this::convertToDto);
+	}
+
+	// 공통 DTO 변환 메소드
+	private ResponseMemberCouponDTO convertToDto(MemberCoupon memberCoupon) {
+		Coupon coupon = memberCoupon.getCoupon();
+
+		CategoryCoupon categoryCoupon = categoryCouponJpaRepository.findById(coupon.getCouponId()).orElse(null);
+		ProductCoupon productCoupon = productCouponJpaRepository.findById(coupon.getCouponId()).orElse(null);
+
+		Long categoryId = categoryCoupon != null ? categoryCoupon.getCategory().getCategoryId() : null;
+		String categoryName = categoryCoupon != null ? categoryCoupon.getCategory().getCategoryName() : null;
+
+		Long productId = productCoupon != null ? productCoupon.getProduct().getProductId() : null;
+		String productTitle = productCoupon != null ? productCoupon.getProduct().getProductTitle() : null;
+
+		return new ResponseMemberCouponDTO(
+			coupon.getCouponId(),
+			coupon.getCouponName(),
+			coupon.getCouponPolicy().getCouponPolicyName(),
+			categoryId,
+			categoryName,
+			productId,
+			productTitle,
+			memberCoupon.getMemberCouponCreatedAt(),
+			memberCoupon.getMemberCouponPeriod(),
+			memberCoupon.isMemberCouponUsed()
+		);
 	}
 
 	/**
@@ -119,8 +148,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 		}
 
-		List<MemberCoupon> memberCoupons = memberCouponJpaRepository.getMemberCouponsByMemberAndMemberCouponUsed(member,
-			false);
+		List<MemberCoupon> memberCoupons = memberCouponJpaRepository.getMemberCouponsByMemberAndMemberCouponUsedAndMemberCouponPeriodAfter(member,
+			false, LocalDateTime.now());
 		int couponCnt = 0;
 		if (Objects.nonNull(memberCoupons) && !memberCoupons.isEmpty()) {
 			couponCnt = memberCoupons.size();

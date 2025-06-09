@@ -19,10 +19,10 @@ VALUES ('WEB'),
 INSERT INTO member_rank (member_rank_name,
                          member_rank_tier_bonus_rate,
                          member_rank_require_amount)
-VALUES ('NORMAL', 0, 0),
-       ('ROYAL', 5, 100000),
-       ('GOLD', 10, 500000),
-       ('PLATINUM', 20, 900000);
+VALUES ('NORMAL', 1, 0),
+       ('ROYAL', 2, 100000),
+       ('GOLD', 3, 200000),
+       ('PLATINUM', 4, 300000);
 
 
 -- 테스트를 위한 임의 유저, 관리자 생성
@@ -99,7 +99,9 @@ INSERT INTO address (address_detail,
                      address_alias,
                      address_default,
                      address_created_at,
-                     customer_id)
+                     customer_id,
+                     address_receiver,
+                     address_receiver_phone)
 VALUES ('위워크 10층',
         '06130',
         '서울특별시 강남구 테헤란로',
@@ -107,7 +109,9 @@ VALUES ('위워크 10층',
         '회사',
         TRUE,
         CURRENT_TIMESTAMP,
-        1),
+        1,
+        '김도윤',
+        '010-9140-6307'),
        ('OO오피스텔 101호',
         '13560',
         '경기도 성남시 분당구 정자동',
@@ -115,7 +119,9 @@ VALUES ('위워크 10층',
         '집',
         FALSE,
         CURRENT_TIMESTAMP,
-        1);
+        1,
+        '최종성',
+        '010-1234-5678');
 
 -- Point History
 INSERT INTO point_history (point_amount,
@@ -175,7 +181,9 @@ VALUES (1, '국내도서', null),
 INSERT INTO product (product_packageable, product_published_at, product_stock, product_id, product_regular_price,
                      product_sale_price, product_state_id, publisher_id, product_isbn, product_title, product_content,
                      product_description)
-VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1', 'Spring 입문ㅇㅇ긴 문자인 경우 출력 테스트 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ', 'Spring 프레임워크 소개ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
+VALUES (1, '2024-01-15', 100, 1, 20000, 15000, 1, 1, '978-89-12345-01-1',
+        'Spring 입문ㅇㅇ긴 문자인 경우 출력 테스트 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
+        'Spring 프레임워크 소개ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
         '초보자를 위한 Spring 가이드입니다.'),
        (0, '2023-11-30', 50, 2, 18000, 14000, 2, 2, '978-89-12345-02-2', 'JPA 기초', 'JPA 사용법 정리',
         'Entity 설계부터 관계 매핑까지 JPA의 핵심을 담았습니다.'),
@@ -262,27 +270,26 @@ VALUES (1, 1, 1, 5),
 
 -- Like
 INSERT INTO `like` (like_id, product_id, customer_id, like_created_at)
-VALUES
-    (1, 1, 1, '2024-01-10T10:00:00'),
-    (2, 1, 2, '2024-01-12T11:30:00'),
-    (3, 1, 3, '2024-01-12T11:30:00'),
-    (4, 1, 4, '2024-01-12T11:30:00'),
-    (5, 2, 1, '2024-02-01T09:45:00'),
-    (6, 2, 2, '2024-02-05T15:20:00'),
-    (7, 2, 3, '2024-02-05T15:20:00'),
-    (8, 2, 4, '2024-02-05T15:20:00'),
-    (9, 3, 1, '2024-03-10T16:10:00'),
-    (10, 3, 2, '2024-03-12T17:00:00'),
-    (11, 4, 1, '2024-04-10T12:25:00'),
-    (12, 4, 2, '2024-04-15T13:30:00'),
-    (13, 5, 1, '2024-05-01T14:40:00'),
-    (14, 5, 2, '2024-05-03T10:50:00'),
-    (15, 6, 1, '2024-06-20T09:30:00'),
-    (16, 6, 2, '2024-06-21T14:00:00'),
-    (17, 7, 1, '2024-07-25T16:35:00'),
-    (18, 7, 2, '2024-07-27T17:10:00'),
-    (19, 8, 1, '2024-08-01T10:00:00'),
-    (20, 8, 2, '2024-08-02T11:45:00');
+VALUES (1, 1, 1, '2024-01-10T10:00:00'),
+       (2, 1, 2, '2024-01-12T11:30:00'),
+       (3, 1, 3, '2024-01-12T11:30:00'),
+       (4, 1, 4, '2024-01-12T11:30:00'),
+       (5, 2, 1, '2024-02-01T09:45:00'),
+       (6, 2, 2, '2024-02-05T15:20:00'),
+       (7, 2, 3, '2024-02-05T15:20:00'),
+       (8, 2, 4, '2024-02-05T15:20:00'),
+       (9, 3, 1, '2024-03-10T16:10:00'),
+       (10, 3, 2, '2024-03-12T17:00:00'),
+       (11, 4, 1, '2024-04-10T12:25:00'),
+       (12, 4, 2, '2024-04-15T13:30:00'),
+       (13, 5, 1, '2024-05-01T14:40:00'),
+       (14, 5, 2, '2024-05-03T10:50:00'),
+       (15, 6, 1, '2024-06-20T09:30:00'),
+       (16, 6, 2, '2024-06-21T14:00:00'),
+       (17, 7, 1, '2024-07-25T16:35:00'),
+       (18, 7, 2, '2024-07-27T17:10:00'),
+       (19, 8, 1, '2024-08-01T10:00:00'),
+       (20, 8, 2, '2024-08-02T11:45:00');
 
 -- Review
 INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
@@ -345,7 +352,8 @@ VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.0
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 5, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 6, 1),
        (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 7, 1),
-       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1);
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.000000', false, 1, 1),
+       (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2025-04-01 00:00:00.000000', false, 1, 1);
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
@@ -359,9 +367,11 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
                      order_reward_amount, order_pure_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, true, DATE '2025-06-01', null, TIMESTAMP '2025-05-25 00:00:00.000000', null, 1, 1, 5, 160, 6000),
-        ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-30 00:00:00.000000', TIMESTAMP '2025-05-29 00:00:00.000000', null, 1, 1, 2, 160, 6000);
+        1000, 5000, null, true, DATE '2025-06-01', null, TIMESTAMP '2025-05-25 00:00:00.000000', null, 1, 1, 5, 160,
+        6000),
+       ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
+        1000, 5000, null, true, DATE '2025-06-01', TIMESTAMP '2025-05-30 00:00:00.000000',
+        TIMESTAMP '2025-05-29 00:00:00.000000', null, 1, 1, 2, 160, 6000);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
@@ -377,7 +387,8 @@ VALUES (1, 1),
 INSERT INTO product_coupon (coupon_id, product_id)
 VALUES (2, 1);
 
-INSERT INTO point_policy (point_policy_id, point_policy_type, point_policy_name, point_policy_figure, point_policy_created_at, point_policy_is_active)
+INSERT INTO point_policy (point_policy_id, point_policy_type, point_policy_name, point_policy_figure,
+                          point_policy_created_at, point_policy_is_active)
 VALUES (1, 'REGISTER', '2025년 회원가입 정책', 5000, now(), true),
        (2, 'REVIEW', '일반 리뷰 정책', 500, now(), true),
        (3, 'REVIEW_IMG', '이미지 리뷰 정책', 800, now(), true),

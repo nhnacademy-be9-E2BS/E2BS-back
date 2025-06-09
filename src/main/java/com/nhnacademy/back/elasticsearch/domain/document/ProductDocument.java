@@ -120,4 +120,18 @@ public class ProductDocument {
 	public void updateSearches() {
 		this.productSearches++;
 	}
+
+	public void updateTagName(String beforeName, String afterName) {
+		for (String tagName : this.productTags) {
+			if (tagName.equals(beforeName)) {
+				this.productTags.remove(tagName);
+				break;
+			}
+		}
+		this.productTags.add(afterName);
+	}
+
+	public void updatePublisherName(String newName) {
+		this.productPublisherName = newName;
+	}
 }

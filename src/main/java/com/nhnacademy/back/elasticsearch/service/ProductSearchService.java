@@ -1,5 +1,7 @@
 package com.nhnacademy.back.elasticsearch.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,6 +18,18 @@ public interface ProductSearchService {
 	// 카테고리 리스트 조회 & 조회 후 정렬 시
 	Page<Long> getProductIdsByCategoryId(Pageable pageable, Long categoryId, ProductSortType sortType);
 
+	// 메인 페이지 인기 도서
+	List<Long> getBestProductIds();
+
+	// 메인 페이지 신상 도서
+	List<Long> getNewProductIds();
+
+	// 인기 도서 카테고리 조회
+	Page<Long> getBestProductIdsHeader(Pageable pageable);
+
+	// 신상 도서 카테고리 조회
+	Page<Long> getNewProductIdsHeader(Pageable pageable);
+
 	// 도서 수정 시
 	void updateProductDocument(RequestProductDocumentDTO request);
 
@@ -30,4 +44,10 @@ public interface ProductSearchService {
 
 	// 리뷰 작성 시 (평점 다시 계산, 리뷰수 +1)
 	void updateProductDocumentReview(Long productId, Integer reviewRate);
+
+	// 태그 이름 수정 시
+	void updateProductDocumentTag(Long productId, String beforeName, String afterName);
+
+	// 출판사 이름 수정 시
+	void updateProductDocumentPublisher(Long productId, String newName);
 }

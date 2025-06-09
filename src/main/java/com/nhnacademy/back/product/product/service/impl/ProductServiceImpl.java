@@ -1,13 +1,12 @@
 package com.nhnacademy.back.product.product.service.impl;
 
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,13 +21,13 @@ import org.thymeleaf.util.StringUtils;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
-import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.category.repository.ProductCategoryJpaRepository;
+import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
 import com.nhnacademy.back.product.contributor.domain.entity.ProductContributor;
 import com.nhnacademy.back.product.contributor.exception.ContributorNotFoundException;
@@ -40,6 +39,7 @@ import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
@@ -222,7 +222,6 @@ public class ProductServiceImpl implements ProductService {
 		Publisher publisher = publisherJpaRepository.findById(request.getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("출판사 조회 실패"));
 
-
 		List<MultipartFile> productImageFiles = request.getProductImage();
 		List<Long> tagIds = request.getTagIds();
 		List<Long> contributorIds = request.getContributorIds();
@@ -238,13 +237,14 @@ public class ProductServiceImpl implements ProductService {
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
 			// - miniO 기존 파일 삭제
-			for (ProductImage productImage : product.getProductImage()) {
-				minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+			if (!product.getProductImage().getFirst().getProductImagePath().startsWith("http")) {
+				for (ProductImage productImage : product.getProductImage()) {
+					minioUtils.deleteObject(BUCKET_NAME, productImage.getProductImagePath());
+				}
 			}
 
 			// - DB에서 삭제
 			productImageJpaRepository.deleteAll(productImages);
-
 
 			List<ProductImage> newProductImages = new ArrayList<>();
 			for (MultipartFile productImageFile : productImageFiles) {
@@ -405,6 +405,43 @@ public class ProductServiceImpl implements ProductService {
 		return new PageImpl<>(responseProductReadDTOS, productIds.getPageable(), productIds.getTotalElements());
 	}
 
+	/**
+	 * 엘라스틱 서치 - 메인 페이지 도서 조회 (베스트, 신상)
+	 */
+	@Override
+	public List<ResponseMainPageProductDTO> getProductsToMain(List<Long> productIds) {
+		return productIds.stream()
+			.map(productId -> {
+				Product product = productJpaRepository.findByIdWithImages(productId)
+					.orElseThrow(ProductNotFoundException::new);
+
+				String contributorName = productContributorJpaRepository
+					.findContributorDTOsByProductId(productId)
+					.stream()
+					.findFirst()
+					.map(ResponseContributorDTO::getContributorName)
+					.orElse("미상");
+
+				String imagePath = product.getProductImage()
+					.stream()
+					.findFirst()
+					.map(ProductImage::getProductImagePath)
+					.orElse(null);
+
+				return new ResponseMainPageProductDTO(
+					product.getProductId(),
+					product.getProductTitle(),
+					contributorName,
+					imagePath,
+					product.getProductRegularPrice(),
+					product.getProductSalePrice(),
+					product.getProductDescription(),
+					product.getPublisher().getPublisherName()
+				);
+			})
+			.toList();
+	}
+
 	private void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate) {
 		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
 		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
@@ -459,7 +496,8 @@ public class ProductServiceImpl implements ProductService {
 		// 알라딘 api 이미지인 경우
 		ProductImage firstProductImage = product.getProductImage().getFirst();
 		if (firstProductImage.getProductImagePath().startsWith("http")) {
-			changedResponseProductImageDTOs.add(new ResponseProductImageDTO(firstProductImage.getProductImageId(), firstProductImage.getProductImagePath()));
+			changedResponseProductImageDTOs.add(new ResponseProductImageDTO(firstProductImage.getProductImageId(),
+				firstProductImage.getProductImagePath()));
 		} else {
 			for (String productImage : productImagePaths) {
 				if (!StringUtils.isEmpty(productImage)) {

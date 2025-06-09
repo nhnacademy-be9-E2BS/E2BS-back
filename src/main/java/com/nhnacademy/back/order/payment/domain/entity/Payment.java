@@ -2,7 +2,7 @@ package com.nhnacademy.back.order.payment.domain.entity;
 
 import java.time.LocalDateTime;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.paymentmethod.domain.entity.PaymentMethod;
 
 import jakarta.persistence.Column;
@@ -45,7 +45,8 @@ public class Payment {
 	@JoinColumn(name = "order_code")
 	private Order order;
 
-	public Payment(Order order, PaymentMethod paymentMethod, String paymentKey, long totalPaymentAmount, LocalDateTime paymentRequestedAt, LocalDateTime paymentApprovedAt) {
+	public Payment(Order order, PaymentMethod paymentMethod, String paymentKey, long totalPaymentAmount,
+		LocalDateTime paymentRequestedAt, LocalDateTime paymentApprovedAt) {
 		this.order = order;
 		this.paymentMethod = paymentMethod;
 		this.paymentKey = paymentKey;

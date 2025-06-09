@@ -44,7 +44,7 @@ public class WrapperController {
 	 * Wrapper 리스트 조회 (모두)
 	 */
 	@Admin
-	@GetMapping("/api/admin/wrappers")
+	@GetMapping("/api/auth/admin/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappers(
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseWrapperDTO> wrappers = wrapperService.getWrappers(pageable);
@@ -55,7 +55,7 @@ public class WrapperController {
 	 * Wrapper 저장
 	 */
 	@Admin
-	@PostMapping(value = "/api/admin/wrappers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/api/auth/admin/wrappers", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Void> createWrapper(@RequestPart("requestMeta") RequestRegisterWrapperMetaDTO requestMeta,
 		@RequestPart("wrapperImage") MultipartFile wrapperImage) {
 		RequestRegisterWrapperDTO request = new RequestRegisterWrapperDTO(requestMeta.getWrapperPrice(),
@@ -69,7 +69,7 @@ public class WrapperController {
 	 * Wrapper 수정
 	 */
 	@Admin
-	@PutMapping("/api/admin/wrappers/{wrapperId}")
+	@PutMapping("/api/auth/admin/wrappers/{wrapperId}")
 	public ResponseEntity<Void> updateWrapper(@PathVariable Long wrapperId,
 		@RequestBody RequestModifyWrapperDTO request) {
 		wrapperService.updateWrapper(wrapperId, request);

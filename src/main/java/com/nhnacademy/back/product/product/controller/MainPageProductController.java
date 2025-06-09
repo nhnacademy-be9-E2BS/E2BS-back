@@ -11,7 +11,7 @@ import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageP
 import com.nhnacademy.back.product.product.service.MainPageProductService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/category")
 public class MainPageProductController {
 	private final MainPageProductService mainPageProductService;
 
@@ -21,10 +21,12 @@ public class MainPageProductController {
 
 
 	@GetMapping("/bestseller")
-	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller() {
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getBestSeller()  {
+
 		List<ResponseMainPageProductDTO> products = mainPageProductService.getBestSellerProducts();
 		return ResponseEntity.ok(products);
 	}
+
 
 	@GetMapping("/blogbest")
 	public ResponseEntity<List<ResponseMainPageProductDTO>> getBlogBest() {
@@ -39,10 +41,19 @@ public class MainPageProductController {
 	}
 
 	@GetMapping("/newspecialitems")
-	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSepcialItems() {
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getNewSpecialItems() {
 		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemNewSpecialProducts();
 		return ResponseEntity.ok(products);
 	}
+
+	@GetMapping("/itemeditorchoice")
+	public ResponseEntity<List<ResponseMainPageProductDTO>> getItemEditorChoiceItems() {
+		List<ResponseMainPageProductDTO> products = mainPageProductService.getItemEditorChoiceProducts();
+		return ResponseEntity.ok(products);
+	}
+
+
+
 
 
 

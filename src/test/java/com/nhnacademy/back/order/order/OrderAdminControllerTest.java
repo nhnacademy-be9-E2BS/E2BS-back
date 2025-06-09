@@ -20,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.order.order.controller.OrderAdminController;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 
@@ -36,7 +37,7 @@ class OrderAdminControllerTest {
 
 	@MockitoBean
 	private OrderReturnService orderReturnService;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -46,7 +47,7 @@ class OrderAdminControllerTest {
 		// given
 		List<ResponseOrderDTO> content = List.of(new ResponseOrderDTO());
 		Page<ResponseOrderDTO> page = new PageImpl<>(content);
-		when(orderAdminService.getOrders(any(Pageable.class))).thenReturn(page);
+		when(orderAdminService.getOrders(any(Pageable.class), any(), any(), any(), any(), any())).thenReturn(page);
 
 		// when & then
 		mockMvc.perform(get("/api/auth/admin/orders")
@@ -54,25 +55,7 @@ class OrderAdminControllerTest {
 				.param("size", "10"))
 			.andExpect(status().isOk());
 
-		verify(orderAdminService).getOrders(any(Pageable.class));
-	}
-
-	@Test
-	@DisplayName("전체 주문 목록 조회(필터링 있음)")
-	void testGetOrdersWithStateId() throws Exception {
-		// given
-		List<ResponseOrderDTO> content = List.of(new ResponseOrderDTO());
-		Page<ResponseOrderDTO> page = new PageImpl<>(content);
-		when(orderAdminService.getOrders(any(Pageable.class), eq(1L))).thenReturn(page);
-
-		// when & then
-		mockMvc.perform(get("/api/auth/admin/orders")
-				.param("page", "0")
-				.param("size", "10")
-				.param("stateId", "1"))
-			.andExpect(status().isOk());
-
-		verify(orderAdminService).getOrders(any(Pageable.class), eq(1L));
+		verify(orderAdminService).getOrders(any(Pageable.class), any(), any(), any(), any(), any());
 	}
 
 	@Test
@@ -87,5 +70,20 @@ class OrderAdminControllerTest {
 			.andExpect(status().isOk());
 
 		verify(orderAdminService).startDelivery(orderCode);
+	}
+
+	@Test
+	@DisplayName("반품 주문 목록 조회")
+	void testGetOrderReturns() throws Exception {
+		// given
+
+		Page<ResponseOrderReturnDTO> pageResponse = new PageImpl<>(List.of(new ResponseOrderReturnDTO()));
+		when(orderReturnService.getOrderReturnsAll(any())).thenReturn(ResponseEntity.ok(pageResponse));
+
+		// when & then
+		mockMvc.perform(get("/api/auth/admin/orders/return"))
+			.andExpect(status().isOk());
+
+		verify(orderReturnService).getOrderReturnsAll(any());
 	}
 }

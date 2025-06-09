@@ -16,4 +16,6 @@ public interface AddressService {
 	void updateAddress(RequestMemberAddressSaveDTO request, String memberId, long addressId);
 
 	void deleteAddress(String memberId, long addressId);
+
+	void setDefaultAddress(String memberId, long addressId);
 }

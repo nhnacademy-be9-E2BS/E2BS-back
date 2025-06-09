@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 
@@ -38,4 +39,7 @@ public interface ProductService {
 
 	//검색 전용 - 페이징 처리 된 id들을 받아서 도서 페이지 조회
 	Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds);
+
+	//메인페이지 전용 - id 리스트를 받아서 도서 조회
+	List<ResponseMainPageProductDTO> getProductsToMain(List<Long> productIds);
 }

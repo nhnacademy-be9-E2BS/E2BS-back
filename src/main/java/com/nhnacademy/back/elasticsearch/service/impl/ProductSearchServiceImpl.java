@@ -1,5 +1,6 @@
 package com.nhnacademy.back.elasticsearch.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -64,6 +65,26 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 	}
 
 	@Override
+	public List<Long> getBestProductIds() {
+		return customProductSearchRepository.bestSellerProductIdsInMain();
+	}
+
+	@Override
+	public List<Long> getNewProductIds() {
+		return customProductSearchRepository.newestSellerProductIdsInMain();
+	}
+
+	@Override
+	public Page<Long> getBestProductIdsHeader(Pageable pageable) {
+		return customProductSearchRepository.bestSellerProductIds(pageable);
+	}
+
+	@Override
+	public Page<Long> getNewProductIdsHeader(Pageable pageable) {
+		return customProductSearchRepository.newestSellerProductIds(pageable);
+	}
+
+	@Override
 	@Transactional
 	public void updateProductDocument(RequestProductDocumentDTO request) {
 		ProductDocument productDocument = productSearchRepository.findById(request.getProductId())
@@ -74,6 +95,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 	}
 
 	@Override
+	@Transactional
 	public void updateProductSalePrice(Long productId, Long productSalePrice) {
 		ProductDocument productDocument = productSearchRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
@@ -116,6 +138,26 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 			Double newReviewRate = (currentReviewRate * currentReviewCount + reviewRate) / (currentReviewCount + 1);
 			productDocument.updateReview(newReviewRate);
 		}
+		productSearchRepository.save(productDocument);
+	}
+
+	@Override
+	@Transactional
+	public void updateProductDocumentTag(Long productId, String beforeName, String afterName) {
+		ProductDocument productDocument = productSearchRepository.findById(productId)
+			.orElseThrow(ProductNotFoundException::new);
+
+		productDocument.updateTagName(beforeName, afterName);
+		productSearchRepository.save(productDocument);
+	}
+
+	@Override
+	@Transactional
+	public void updateProductDocumentPublisher(Long productId, String newName) {
+		ProductDocument productDocument = productSearchRepository.findById(productId)
+			.orElseThrow(ProductNotFoundException::new);
+
+		productDocument.updatePublisherName(newName);
 		productSearchRepository.save(productDocument);
 	}
 }

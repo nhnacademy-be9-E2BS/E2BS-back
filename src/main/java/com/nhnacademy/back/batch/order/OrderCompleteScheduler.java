@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.nhnacademy.back.order.order.domain.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderStateName;
@@ -30,9 +30,8 @@ public class OrderCompleteScheduler {
 		OrderState delivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).orElse(null);
 		OrderState complete = orderStateJpaRepository.findByOrderStateName(OrderStateName.COMPLETE).orElse(null);
 
-		LocalDate cutoff = LocalDate.now().minusDays(1);
 		List<Order> shippingOrders = orderJpaRepository.findAllByOrderState_OrderStateIdAndOrderShipmentDateBefore(
-			Objects.requireNonNull(delivery).getOrderStateId(), cutoff
+			Objects.requireNonNull(delivery).getOrderStateId(), LocalDate.now()
 		);
 
 		for (Order order : shippingOrders) {

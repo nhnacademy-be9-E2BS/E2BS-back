@@ -3,6 +3,8 @@ package com.nhnacademy.back.product.publisher;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.dto.request.RequestPublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
@@ -24,6 +29,8 @@ import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsExc
 import com.nhnacademy.back.product.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.back.product.publisher.repository.PublisherJpaRepository;
 import com.nhnacademy.back.product.publisher.service.impl.PublisherServiceImpl;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 @ExtendWith(MockitoExtension.class)
 class PublisherServiceTest {
@@ -31,6 +38,10 @@ class PublisherServiceTest {
 	private PublisherServiceImpl publisherService;
 	@Mock
 	private PublisherJpaRepository publisherJpaRepository;
+	@Mock
+	private ProductJpaRepository productJpaRepository;
+	@Mock
+	private ProductSearchService productSearchService;
 
 	@Test
 	@DisplayName("create publisher - success")
@@ -90,7 +101,12 @@ class PublisherServiceTest {
 		// given
 		RequestPublisherDTO request = new RequestPublisherDTO("update after publisher");
 		Publisher publisher = new Publisher("update before publisher");
+		ProductState productState = new ProductState(ProductStateName.SALE);
+		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
+		List<Product> products = List.of(product);
 		when(publisherJpaRepository.findById(1L)).thenReturn(Optional.of(publisher));
+		when(productJpaRepository.findAllByPublisher_PublisherId(1L)).thenReturn(products);
 
 		// when
 		publisherService.updatePublisher(1L, request);
@@ -98,6 +114,8 @@ class PublisherServiceTest {
 		// then
 		assertThat(publisher.getPublisherName()).isEqualTo("update after publisher");
 		verify(publisherJpaRepository, times(1)).save(publisher);
+		verify(productJpaRepository, times(1)).findAllByPublisher_PublisherId(1L);
+		verify(productSearchService, times(1)).updateProductDocumentPublisher(1L, request.getPublisherName());
 	}
 
 	@Test

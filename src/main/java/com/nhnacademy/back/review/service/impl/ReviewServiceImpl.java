@@ -1,6 +1,7 @@
 package com.nhnacademy.back.review.service.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,14 +23,17 @@ import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.event.event.ReviewImgPointEvent;
 import com.nhnacademy.back.event.event.ReviewPointEvent;
-import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
 import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -54,7 +58,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ProductSearchService productSearchService;
 
 	private final MinioUtils minioUtils;
-	private static final String BUCKET_NAME = "e2bs-reviews-image";
+	private static final String REVIEW_BUCKET = "e2bs-reviews-image";
+	private static final String PRODUCT_BUCKET = "e2bs-products-image";
 
 	private final ApplicationEventPublisher eventPublisher;
 
@@ -87,8 +92,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
 
-		// 현재 회원이 주문한 상품이면서 리뷰를 아직 작성하지 않았는지 검증
-		if (!orderDetailRepository.existsOrderDetailByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
+		// 현재 회원이 주문한 상품이면서 (주문 배송이 완료된 상태이면서는 추후에) 리뷰를 아직 작성하지 않았는지 검증
+		if (!reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())) {
 			throw new OrderDetailNotFoundException();
 		}
 
@@ -99,8 +104,8 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		// 리뷰가 아직 영속성 컨텍스트에 저장 전이므로 다른 필드를 통해 먼저 리뷰가 null 인 주문 상세를 찾아야함
-		OrderDetail findOrderDetail = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId())
-			.orElseThrow(OrderDetailNotFoundException::new);
+		List<OrderDetail> findOrderDetails = orderDetailRepository.findByCustomerIdAndProductId(findCustomer.getCustomerId(), findProduct.getProductId());
+		OrderDetail findOrderDetail = findOrderDetails.getFirst();
 
 		// 리뷰 저장
 		Review reviewEntity = Review.createReviewEntity(findProduct, findCustomer, request, imagePath);
@@ -130,7 +135,7 @@ public class ReviewServiceImpl implements ReviewService {
 		String originalFilename = reviewImageFile.getOriginalFilename();
 		UUID uuid = UUID.randomUUID();
 		String objectName = uuid + "_" + originalFilename;
-		minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+		minioUtils.uploadObject(REVIEW_BUCKET, objectName, reviewImageFile);
 		return objectName;
 	}
 
@@ -147,16 +152,18 @@ public class ReviewServiceImpl implements ReviewService {
 
 		String updateImage = "";
 		MultipartFile reviewImageFile = request.getReviewImage();
-		if (Objects.nonNull(reviewImageFile) && !reviewImageFile.isEmpty()) {
+		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
 			// 기존 파일 삭제
-			minioUtils.deleteObject(BUCKET_NAME, findReview.getReviewImage());
+			if (!StringUtils.isEmpty(findReview.getReviewImage())) {
+				minioUtils.deleteObject(REVIEW_BUCKET, findReview.getReviewImage());
+			}
 
 			// 새로 업로드할 파일 등록
 			String originalFilename = reviewImageFile.getOriginalFilename();
 
 			UUID uuid = UUID.randomUUID();
 			String objectName = uuid + "_" + originalFilename;
-			minioUtils.uploadObject(BUCKET_NAME, objectName, reviewImageFile);
+			minioUtils.uploadObject(REVIEW_BUCKET, objectName, reviewImageFile);
 
 			// 가공된 파일명 적용
 			updateImage = objectName;
@@ -165,10 +172,12 @@ public class ReviewServiceImpl implements ReviewService {
 		// 변경 감지로 DB의 값 변경
 		findReview.changeReview(request, updateImage);
 
-		// 변경 이미지에 대한 url 가공
-		String updateImageUrl = minioUtils.getPresignedUrl(BUCKET_NAME, updateImage);
+		// 반환할 때 JS로 적용할 이미지 url 필요하여 가공
+		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
+			updateImage = minioUtils.getPresignedUrl(REVIEW_BUCKET, updateImage);
+		}
 
-		return new ResponseUpdateReviewDTO(updateReviewContent, updateImageUrl);
+		return new ResponseUpdateReviewDTO(updateReviewContent, updateImage);
 	}
 
 	/**
@@ -177,17 +186,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public Page<ResponseReviewPageDTO> getReviewsByProduct(long productId, Pageable pageable) {
 		Page<Review> getReviewsByProductId = reviewRepository.findAllByProduct_ProductId(productId, pageable);
-		return getResponseReviewPageDTOS(getReviewsByProductId);
-	}
-
-	/**
-	 * 페이징 목록 DTO 가공 메소드
-	 */
-	private Page<ResponseReviewPageDTO> getResponseReviewPageDTOS(Page<Review> getReviewsBy) {
-		return getReviewsBy.map(review -> {
+		return getReviewsByProductId.map(review -> {
 			String reviewImagePath = "";
 			if (!StringUtils.isEmpty(review.getReviewImage())) {
-				reviewImagePath = minioUtils.getPresignedUrl(BUCKET_NAME, review.getReviewImage());
+				reviewImagePath = minioUtils.getPresignedUrl(REVIEW_BUCKET, review.getReviewImage());
 			}
 
 			return new ResponseReviewPageDTO(
@@ -220,6 +222,65 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		return new ResponseReviewInfoDTO(totalGradeAvg, totalCount, starCounts);
+	}
+
+	/**
+	 * 회원이 작성한 리뷰 페이징 목록 조회
+	 */
+	@Override
+	public Page<ResponseMemberReviewDTO> getReviewsByMember(String memberId, Pageable pageable) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+		}
+
+		Page<Review> getReviewsByCustomerId = reviewRepository.findAllByCustomer_CustomerId(findMember.getCustomerId(), pageable);
+
+		return getReviewsByCustomerId.map(review -> {
+			String productThumbnailImagePath = "";
+			if (Objects.nonNull(review.getProduct().getProductImage())) {
+				ProductImage thumbnailImage = review.getProduct().getProductImage().getFirst();
+				if (thumbnailImage.getProductImagePath().startsWith("http")) {
+					productThumbnailImagePath = thumbnailImage.getProductImagePath();
+				} else {
+					productThumbnailImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, thumbnailImage.getProductImagePath());
+				}
+			}
+
+			String reviewImagePath = "";
+			if (!StringUtils.isEmpty(review.getReviewImage())) {
+				reviewImagePath = minioUtils.getPresignedUrl(REVIEW_BUCKET, review.getReviewImage());
+			}
+
+			return new ResponseMemberReviewDTO(
+				review.getReviewId(),
+				review.getProduct().getProductId(),
+				productThumbnailImagePath,
+				review.getProduct().getProductTitle(),
+				review.getReviewContent(),
+				review.getReviewGrade(),
+				reviewImagePath,
+				review.getReviewCreatedAt()
+			);
+		});
+	}
+
+	@Override
+	public boolean existsReviewedOrderCode(String orderCode) {
+		return reviewRepository.existsReviewedOrderCode(orderCode);
+	}
+
+	@Override
+	public ResponseReviewDTO findByOrderDetailId(long orderDetailId) {
+		Review findReview = reviewRepository.findByOrderDetailId(orderDetailId)
+			.orElseThrow(ReviewNotFoundException::new);
+
+		String imageUrl = "";
+		if (!StringUtils.isEmpty(findReview.getReviewImage())) {
+			imageUrl = minioUtils.getPresignedUrl(REVIEW_BUCKET, findReview.getReviewImage());
+		}
+
+		return new ResponseReviewDTO(findReview.getProduct().getProductId(), findReview.getCustomer().getCustomerId(), findReview.getReviewId(), findReview.getReviewContent(), findReview.getReviewGrade(), imageUrl);
 	}
 
 }

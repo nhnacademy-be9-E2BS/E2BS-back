@@ -25,4 +25,7 @@ public class RequestMemberInfoDTO {
 	@NotNull
 	private String memberPhone;
 
+	private String customerPassword;
+	private String customerPasswordCheck;
+
 }

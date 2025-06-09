@@ -13,8 +13,11 @@ import com.nhnacademy.back.account.memberrank.domain.dto.response.ResponseMember
 import com.nhnacademy.back.account.memberrank.service.MemberRankService;
 import com.nhnacademy.back.common.annotation.Member;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "회원 등급 조회 API", description = "회원 등급 조회 기능")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth/mypage/{memberId}/rank")
@@ -22,6 +25,7 @@ public class MemberRankController {
 
 	private final MemberRankService memberRankService;
 
+	@Operation(summary = "회원 등급 조회", description = "회원 등급 조회 기능 제공")
 	@Member
 	@GetMapping
 	public ResponseEntity<List<ResponseMemberRankDTO>> getMemberRankService(@PathVariable("memberId") String memberId) {

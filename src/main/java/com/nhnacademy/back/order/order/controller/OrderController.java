@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,34 +13,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
-import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/auth/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
-
 	private final OrderService orderService;
 	private final PaymentService paymentService;
-	private final OrderReturnService orderReturnService;
 
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
-	@Member
 	@PostMapping("/create/tossPay")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -52,26 +44,11 @@ public class OrderController {
 	}
 
 	/**
-	 * 포인트 주문에 대한 처리
-	 */
-	@Member
-	@PostMapping("/create/point")
-	public ResponseEntity<ResponseOrderResultDTO> createPointOrder(
-		@Validated @RequestBody RequestOrderWrapperDTO request,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			throw new ValidationFailedException(bindingResult);
-		}
-		return orderService.createPointOrder(request);
-	}
-
-	/**
 	 * 프론트에서 온 결제 완료 응답으로 결제 승인 요청
 	 * 포인트 차감, 쿠폰 사용 여부 변경, 포인트 적립 등을 추가로 호출해야 함
 	 * 이는 이후 다른 부분 구현 완료 시 진행할 예정
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
-	@Member
 	@PostMapping("/confirm")
 	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
 		@RequestParam long amount) {
@@ -89,7 +66,6 @@ public class OrderController {
 	/**
 	 * 특정 주문서를 삭제하는 기능
 	 */
-	@Member
 	@PostMapping("/cancel")
 	public ResponseEntity<Void> deleteOrder(@RequestParam String orderId) {
 		return orderService.deleteOrder(orderId);
@@ -105,37 +81,11 @@ public class OrderController {
 	}
 
 	/**
-	 * 회원의 주문 목록 조회
+	 * 비회원용 주문 목록 조회
 	 */
-	@Member
-	@GetMapping
-	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable, @RequestParam String memberId) {
-		return ResponseEntity.ok(orderService.getOrdersByMemberId(pageable, memberId));
-	}
-
-	/**
-	 * 회원의 주문 취소 처리
-	 */
-	@Member
-	@DeleteMapping("/{orderCode}")
-	public ResponseEntity<Void> cancelOrder(@PathVariable String orderCode) {
-		return orderService.cancelOrder(orderCode);
-	}
-
-	@PostMapping("/return")
-	public ResponseEntity<Void> returnOrder(@RequestBody RequestOrderReturnDTO request) {
-		return orderService.returnOrder(request);
-	}
-
-	@GetMapping("/return")
-	public ResponseEntity<Page<ResponseOrderReturnDTO>> getReturnOrders(Pageable pageable,
-		@RequestParam String memberId) {
-		return orderReturnService.getOrderReturnsByMemberId(memberId, pageable);
-	}
-
-	@GetMapping("/return/{orderCode}")
-	public ResponseEntity<ResponseOrderReturnDTO> getReturnOrderByOrderCode(@PathVariable String orderCode) {
-		return orderReturnService.getOrderReturnByOrderCode(orderCode);
+	@GetMapping("/customers/orders")
+	ResponseEntity<Page<ResponseOrderDTO>> getOrdersByCustomerId(Pageable pageable, @RequestParam long customerId) {
+		return ResponseEntity.ok(orderService.getOrdersByCustomerId(pageable, customerId));
 	}
 
 }

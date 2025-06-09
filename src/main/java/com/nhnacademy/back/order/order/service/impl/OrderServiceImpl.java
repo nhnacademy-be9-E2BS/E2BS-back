@@ -4,10 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -18,29 +22,37 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
+import com.nhnacademy.back.event.event.OrderCancelPointEvent;
+import com.nhnacademy.back.event.event.OrderCancelPointPaymentEvent;
+import com.nhnacademy.back.event.event.OrderPointEvent;
+import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderReturnDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestTossCancelDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDetailDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
-import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
 import com.nhnacademy.back.order.order.exception.OrderNotFoundException;
 import com.nhnacademy.back.order.order.exception.OrderProcessException;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestTossCancelDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberRecentOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderProductDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderService;
@@ -95,6 +107,8 @@ public class OrderServiceImpl implements OrderService {
 
 	private final TossAdaptor tossAdaptor;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	/**
 	 * 주문서를 저장하는 서비스
 	 * 재고 차감은 이후 추후 추가 예정
@@ -118,8 +132,15 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderJpaRepository.findById(Objects.requireNonNull(response.getBody()).getOrderId())
 			.orElseThrow(OrderNotFoundException::new);
+
 		// 포인트 차감
+		eventPublisher.publishEvent(
+			new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+
 		// 포인트 적립
+		eventPublisher.publishEvent(
+			new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+
 		// 쿠폰 사용 처리
 		if (order.getMemberCoupon() != null) {
 			memberCouponService.updateMemberCouponById(order.getMemberCoupon().getMemberCouponId());
@@ -214,7 +235,13 @@ public class OrderServiceImpl implements OrderService {
 		if (response.getStatusCode().is2xxSuccessful()) {
 			Order order = orderJpaRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
 			// 포인트 차감
+			eventPublisher.publishEvent(
+				new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
+
 			// 포인트 적립
+			eventPublisher.publishEvent(
+				new OrderPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
+
 			// 쿠폰 사용 처리
 			if (order.getMemberCoupon() != null) {
 				memberCouponService.updateMemberCouponById(order.getMemberCoupon().getMemberCouponId());
@@ -270,9 +297,33 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId) {
+	public Page<ResponseOrderDTO> getOrdersByMemberId(Pageable pageable, String memberId, String stateName,
+		LocalDate startDate, LocalDate endDate, String orderCode) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		long customerId = member.getCustomerId();
+
+		if (stateName != null && !stateName.isEmpty()) { // 주문 상태 검색
+			OrderState orderState = orderStateJpaRepository.findByOrderStateName(OrderStateName.valueOf(stateName))
+				.orElse(null);
+			return orderJpaRepository
+				.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, customerId, orderState)
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (startDate != null && endDate != null) { // 날짜 검색인 경우
+			return orderJpaRepository
+				.findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable, customerId, startDate.atStartOfDay(),
+					endDate.atTime(LocalTime.MAX))
+				.map(ResponseOrderDTO::fromEntity);
+		} else if (orderCode != null && !orderCode.isEmpty()) { // 주문 코드로 검색
+			return orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(customerId, orderCode, pageable)
+				.map(ResponseOrderDTO::fromEntity);
+		} else { // 전체 조회
+			return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
+				.map(ResponseOrderDTO::fromEntity);
+		}
+	}
+
+	@Override
+	public Page<ResponseOrderDTO> getOrdersByCustomerId(Pageable pageable, long customerId) {
 		return orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, customerId)
 			.map(ResponseOrderDTO::fromEntity);
 	}
@@ -304,6 +355,7 @@ public class OrderServiceImpl implements OrderService {
 		long usedPoint = order.getOrderPointAmount();
 		log.info("usedPoint:{}", usedPoint);
 		// 사용한 포인트 수치만큼 복구 요청
+		eventPublisher.publishEvent(new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), usedPoint));
 
 		MemberCoupon memberCoupon = order.getMemberCoupon();
 		if (memberCoupon != null) {
@@ -319,6 +371,8 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		//적립된 포인트 회수 요청
+		eventPublisher.publishEvent(
+			new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
@@ -358,15 +412,17 @@ public class OrderServiceImpl implements OrderService {
 			throw new OrderProcessException("반품 금액이 0원 이하입니다.");
 		}
 		// 포인트 환불
+		eventPublisher.publishEvent(
+			new OrderCancelPointPaymentEvent(order.getCustomer().getCustomerId(), returnAmount));
 		// 적립 금액 회수
+		eventPublisher.publishEvent(
+			new OrderCancelPointEvent(order.getCustomer().getCustomerId(), order.getOrderRewardAmount()));
 
 		// 사용한 쿠폰이 있을 시 쿠폰 복구
 		MemberCoupon memberCoupon = order.getMemberCoupon();
 		if (memberCoupon != null) {
 			memberCouponService.reIssueCouponById(memberCoupon.getMemberCouponId());
 		}
-
-		//재고 복구?
 
 		OrderReturn orderReturn = new OrderReturn(returnDTO, order, returnAmount);
 		orderReturnJpaRepository.save(orderReturn);
@@ -416,6 +472,52 @@ public class OrderServiceImpl implements OrderService {
 		Long totalDailySales = orderDetailJpaRepository.getTotalDailySales(start, end);
 
 		return totalDailySales != null ? totalDailySales : 0L;
+	}
+
+	@Override
+	public ResponseMemberOrderDTO getMemberOrdersCnt(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("회원을 찾지 못했습니다.");
+		}
+
+		Integer orderCnt = orderJpaRepository.countOrdersByCustomer(member.getCustomer());
+
+		return new ResponseMemberOrderDTO(memberId, (orderCnt != null ? orderCnt : 0));
+	}
+
+	public List<ResponseMemberRecentOrderDTO> getMemberRecentOrders(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException("회원을 찾지 못했습니다.");
+		}
+
+		Optional<OrderState> orderStateWait = orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT);
+		Optional<OrderState> orderStateDelivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY);
+		List<OrderState> orderStates = Arrays.asList(orderStateWait.get(), orderStateDelivery.get());
+
+		List<Order> orders = orderJpaRepository.findOrdersByCustomerAndOrderState(
+			member.getCustomer(), orderStates
+		);
+
+		return orders.stream().map(order -> {
+			String orderCode = order.getOrderCode();
+			List<OrderDetail> orderDetail = orderDetailJpaRepository.findByOrderOrderCode(orderCode);
+
+			List<ResponseOrderProductDTO> products = orderDetail.stream()
+				.map(detail -> new ResponseOrderProductDTO(
+					detail.getProduct().getProductTitle(),
+					detail.getOrderQuantity(),
+					detail.getOrderDetailPerPrice()
+				)).toList();
+
+			return new ResponseMemberRecentOrderDTO(
+				order.getOrderCreatedAt(),
+				order.getOrderCode(),
+				products,
+				order.getOrderState().getOrderStateName().name()
+			);
+		}).collect(Collectors.toList());
 	}
 
 }

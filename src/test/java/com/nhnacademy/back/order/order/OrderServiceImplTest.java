@@ -4,6 +4,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,20 +36,22 @@ import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderDetailDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.request.RequestTossConfirmDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDetailDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderResultDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseTossPaymentConfirmDTO;
-import com.nhnacademy.back.order.order.domain.entity.Order;
-import com.nhnacademy.back.order.order.domain.entity.OrderDetail;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.entity.Order;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.impl.OrderServiceImpl;
+import com.nhnacademy.back.order.orderreturn.repository.OrderReturnJpaRepository;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderState;
 import com.nhnacademy.back.order.orderstate.domain.entity.OrderStateName;
 import com.nhnacademy.back.order.orderstate.repository.OrderStateJpaRepository;
@@ -85,6 +90,8 @@ class OrderServiceImplTest {
 	@Mock
 	private MemberJpaRepository memberJpaRepository;
 	@Mock
+	private OrderReturnJpaRepository orderReturnJpaRepository;
+	@Mock
 	private TossAdaptor tossAdaptor;
 	@Mock
 	private ProductService productService;
@@ -92,6 +99,8 @@ class OrderServiceImplTest {
 	private PointHistoryService pointHistoryService;
 	@Mock
 	private MemberCouponService memberCouponService;
+	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@BeforeEach
 	void setUp() {
@@ -152,8 +161,6 @@ class OrderServiceImplTest {
 	@DisplayName("포인트 주문 시 결제 성공")
 	void testCreatePointOrder_Success() {
 		// given
-
-		// given
 		RequestOrderDTO orderDTO = new RequestOrderDTO();
 		orderDTO.setCustomerId(1L);
 		orderDTO.setDeliveryFeeId(1L);
@@ -193,6 +200,8 @@ class OrderServiceImplTest {
 		Order order = mock(Order.class);
 
 		when(orderJpaRepository.findById(anyString())).thenReturn(Optional.of(order));
+		when(order.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(1L);
 		doNothing().when(order).updatePaymentStatus(true);
 
 		// when
@@ -216,6 +225,7 @@ class OrderServiceImplTest {
 		long amount = 15000L;
 
 		Order order = mock(Order.class);
+		Customer customer = mock(Customer.class);
 		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
 		ResponseEntity<ResponseTossPaymentConfirmDTO> responseEntity = ResponseEntity.ok(confirmDTO);
 
@@ -224,6 +234,8 @@ class OrderServiceImplTest {
 		when(orderJpaRepository.findById(orderId)).thenReturn(Optional.of(order));
 		when(order.getMemberCoupon()).thenReturn(null);
 
+		when(order.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(1L);
 		// when
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response =
 			orderService.confirmOrder(orderId, paymentKey, amount);
@@ -324,7 +336,7 @@ class OrderServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("특정 회원 주문 내역 상세 조회")
+	@DisplayName("특정 회원 주문 내역 조회")
 	void testGetOrdersByMemberId() {
 		// given
 		Member member = mock(Member.class);
@@ -340,7 +352,8 @@ class OrderServiceImplTest {
 			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
 
 			// when
-			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString());
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null, null,
+				null);
 
 			// then
 			assertThat(result).isNotNull();
@@ -348,6 +361,94 @@ class OrderServiceImplTest {
 			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
 		}
 	}
+	//
+	// @Test
+	// @DisplayName("특정 회원 주문 내역 조회(주문 상태 검색)")
+	// void testGetOrdersByMemberIdWithOrderState() {
+	// 	// given
+	// 	Member member = mock(Member.class);
+	// 	Pageable pageable = PageRequest.of(0, 10);
+	// 	Order order = mock(Order.class);
+	// 	OrderState orderState = mock(OrderState.class);
+	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
+	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+	// 	when(member.getCustomerId()).thenReturn(1L);
+	// 	when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+	// 		orderState)).thenReturn(orderPage);
+	// 	when(orderStateJpaRepository.findByOrderStateName(any())).thenReturn(Optional.ofNullable(orderState));
+	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+	//
+	// 		// when
+	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), "WAIT", null, null,
+	// 			null);
+	//
+	// 		// then
+	// 		assertThat(result).isNotNull();
+	// 		assertEquals(1, result.getContent().size());
+	// 		verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+	// 			orderState);
+	// 	}
+	// }
+
+	@Test
+	@DisplayName("특정 회원 주문 내역 조회(주문 날짜 검색)")
+	void testGetOrdersByMemberIdWithDate() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		LocalDate startDate = LocalDate.now();
+		LocalDate endDate = startDate.plusDays(1);
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable,
+			1L, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX))).thenReturn(orderPage);
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, startDate,
+				endDate, null);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(
+				pageable, 1L, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+		}
+	}
+
+	// @Test
+	// @DisplayName("특정 회원 주문 내역 조회(주문 코드 검색)")
+	// void testGetOrdersByMemberIdWithOrderCode() {
+	// 	// given
+	// 	Member member = mock(Member.class);
+	// 	Pageable pageable = PageRequest.of(0, 10);
+	// 	Order order = mock(Order.class);
+	// 	String orderCode = "TEST-ORDER-CODE";
+	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
+	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+	// 	when(member.getCustomerId()).thenReturn(1L);
+	// 	when(orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable)).thenReturn(
+	// 		orderPage);
+	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+	//
+	// 		// when
+	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null,
+	// 			null, orderCode);
+	//
+	// 		// then
+	// 		assertThat(result).isNotNull();
+	// 		assertEquals(1, result.getContent().size());
+	// 		verify(orderJpaRepository).searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable);
+	// 	}
+	// }
 
 	@Test
 	@DisplayName("배송 대기 상태인 상품의 주문 취소(외부 결제 X)")
@@ -356,6 +457,7 @@ class OrderServiceImplTest {
 		Order order = mock(Order.class);
 		OrderState orderState = mock(OrderState.class);
 		OrderState cancelOrderState = mock(OrderState.class);
+		Customer customer = mock(Customer.class);
 
 		when(orderJpaRepository.findById(orderCode)).thenReturn(Optional.of(order));
 		when(order.getOrderState()).thenReturn(orderState);
@@ -367,6 +469,8 @@ class OrderServiceImplTest {
 		when(order.getMemberCoupon()).thenReturn(null);
 		when(paymentJpaRepository.findByOrderOrderCode(orderCode)).thenReturn(Optional.empty());
 
+		when(order.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(1L);
 		ResponseEntity<Void> response = orderService.cancelOrder(orderCode);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -379,6 +483,7 @@ class OrderServiceImplTest {
 	void testCancelOrderWithPaymentMethod() {
 		String orderCode = "TEST-ORDER-CODE";
 		Order order = mock(Order.class);
+		Customer customer = mock(Customer.class);
 		OrderState orderState = mock(OrderState.class);
 		OrderState cancelOrderState = mock(OrderState.class);
 		Payment payment = mock(Payment.class);
@@ -397,10 +502,54 @@ class OrderServiceImplTest {
 		when(tossAdaptor.cancelOrder(any(), any(), any())).thenReturn(
 			ResponseEntity.ok(new ResponseTossPaymentConfirmDTO()));
 
+		when(order.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(1L);
 		ResponseEntity<Void> response = orderService.cancelOrder(orderCode);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		verify(order).updateOrderState(cancelOrderState);
 
+	}
+
+	@Test
+	@DisplayName("비회원 주문 내역 조회")
+	void testGetOrdersByCustomerId() {
+		Order order = mock(Order.class);
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		Pageable pageable = PageRequest.of(0, 10);
+		when(orderJpaRepository.findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L)).thenReturn(
+			orderPage);
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByCustomerId(pageable, 1L);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
+		}
+	}
+
+	@Test
+	@DisplayName("반품 요청 처리")
+	void testReturnOrder() {
+		Order order = mock(Order.class);
+		Customer customer = mock(Customer.class);
+		RequestOrderReturnDTO returnDTO = new RequestOrderReturnDTO("TEST-ORDER-CODE", "BREAK", "BREAK");
+		OrderState orderState = mock(OrderState.class);
+		when(orderJpaRepository.findById("TEST-ORDER-CODE")).thenReturn(Optional.of(order));
+		when(order.getOrderState()).thenReturn(orderState);
+		when(orderState.getOrderStateName()).thenReturn(OrderStateName.COMPLETE);
+		when(order.getOrderPaymentAmount()).thenReturn(1000L);
+		when(order.getOrderPointAmount()).thenReturn(1000L);
+		when(order.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(1L);
+
+		ResponseEntity<Void> response = orderService.returnOrder(returnDTO);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 }

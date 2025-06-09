@@ -1,8 +1,10 @@
 package com.nhnacademy.back.order.order.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.domain.dto.response.ResponseOrderReturnDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderReturnDTO;
 import com.nhnacademy.back.order.order.service.OrderAdminService;
 import com.nhnacademy.back.order.orderreturn.service.OrderReturnService;
 
@@ -31,13 +33,28 @@ public class OrderAdminController {
 	 */
 	@Admin
 	@GetMapping
-	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(@RequestParam(required = false) Long stateId,
-		@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		if (stateId == null) {
-			return ResponseEntity.ok(orderAdminService.getOrders(pageable));
-		} else {
-			return ResponseEntity.ok(orderAdminService.getOrders(pageable, stateId));
+	public ResponseEntity<Page<ResponseOrderDTO>> getOrders(Pageable pageable,
+		@RequestParam(required = false) String stateName,
+		@RequestParam(required = false) String startDate,
+		@RequestParam(required = false) String endDate,
+		@RequestParam(required = false) String orderCode,
+		@RequestParam(required = false) String memberId) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		// prod 환경에서만 LocalDate가 이상하게 주고 받아 직접 문자열을 전송한다.
+		LocalDate start = null;
+		LocalDate end = null;
+
+		if (startDate != null && !startDate.isEmpty()) {
+			start = LocalDate.parse(startDate, formatter);
 		}
+		if (endDate != null && !endDate.isEmpty()) {
+			end = LocalDate.parse(endDate, formatter);
+		}
+
+		return ResponseEntity.ok(
+			orderAdminService.getOrders(pageable, stateName, start, end, orderCode, memberId));
+
 	}
 
 	/**

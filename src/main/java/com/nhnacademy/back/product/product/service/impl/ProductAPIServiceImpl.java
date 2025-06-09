@@ -57,10 +57,12 @@ import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ProductAPIServiceImpl implements ProductAPIService {
 
 	private final ProductJpaRepository productJpaRepository;
@@ -164,6 +166,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 	@Override
 	@Transactional
 	public void createProduct(RequestProductApiCreateDTO request) {
+
 		Publisher publisher = publisherJpaRepository.findByPublisherName(request.getPublisherName());
 
 		if (publisher == null) {
@@ -248,6 +251,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
 	}
 
+	//베스트셀러, 블로그베스트, 신간 이런 카테고리 가져오는거
 	@Override
 	@Transactional
 	public void createProductByQuery(RequestProductApiCreateByQueryDTO request) {
@@ -296,12 +300,34 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productContributorJpaRepository.save(productContributor);
 		}
 
-		Category queryTypeCategory = categoryJpaRepository.findCategoryByCategoryName(request.getQueryType());
-		if (queryTypeCategory == null) {
-			queryTypeCategory = new Category(request.getQueryType(), null);
-			categoryJpaRepository.save(queryTypeCategory);
+		String categoryName = request.getQueryType(); //파라미터로 들어온 카테고리 이름
+		if (categoryName == null) {
+			throw new IllegalArgumentException("QueryType is null");
 		}
-		productCategoryJpaRepository.save(new ProductCategory(product, queryTypeCategory));
+
+		// String categoryKorName = switch (categoryName.trim().toLowerCase()) { //카테고리 한국어로 변경
+		// 	case "itemnewall" -> "신간";
+		// 	case "blogbest" -> "블로그베스트";
+		// 	case "bestseller" -> "베스트셀러";
+		// 	case "itemnewspecial" -> "신간스페셜";
+		// 	default -> throw new IllegalArgumentException("Unknown queryType: " + categoryName);
+		// };
+		//
+		// Category parent = categoryJpaRepository.findCategoryByCategoryName("베스트"); //상위 카테고리 설정
+		// if (parent == null) {
+		// 	parent = new Category("베스트", null);
+		// 	parent = categoryJpaRepository.save(parent);
+		// }
+		//
+		// //카테고리가 존재하는지 확인
+		// Category queryTypeCategory = categoryJpaRepository.findCategoryByCategoryName(categoryKorName);
+		// if (queryTypeCategory == null) { //없으면 생성
+		// 	queryTypeCategory = new Category(categoryKorName, parent);
+		// 	categoryJpaRepository.save(queryTypeCategory);
+		// }
+		//
+		// productCategoryJpaRepository.save(new ProductCategory(product, parent));
+		// productCategoryJpaRepository.save(new ProductCategory(product, queryTypeCategory));
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
