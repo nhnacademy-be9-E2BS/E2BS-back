@@ -2,8 +2,6 @@ package com.nhnacademy.back.cart.domain.dto.response;
 
 import java.math.BigDecimal;
 
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,9 +27,6 @@ public class ResponseCartItemsForGuestDTO {
 
 	@Schema(description = "상품 할인률", example = "10")
 	private BigDecimal discountRate;
-
-	@Schema(description = "배송비 정책 정보")
-	private ResponseDeliveryFeeDTO deliveryFee;
 
 	@Schema(description = "상품 이미지 경로", example = "/images/products/java.jpg")
 	private String productImagePath;

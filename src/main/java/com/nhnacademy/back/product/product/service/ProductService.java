@@ -17,7 +17,7 @@ public interface ProductService {
 	void createProduct(RequestProductDTO request);
 
 	//공통 - 도서 한권 상세 조회
-	ResponseProductReadDTO getProduct(long productId);
+	ResponseProductReadDTO getProduct(long productId, String memberId);
 
 	//공통 - 도서 여러권 페이지로 조회
 	Page<ResponseProductReadDTO> getProducts(Pageable pageable, long categoryId);
@@ -38,7 +38,7 @@ public interface ProductService {
 	Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable);
 
 	//검색 전용 - 페이징 처리 된 id들을 받아서 도서 페이지 조회
-	Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds);
+	Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds, String memberId);
 
 	//메인페이지 전용 - id 리스트를 받아서 도서 조회
 	List<ResponseMainPageProductDTO> getProductsToMain(List<Long> productIds);

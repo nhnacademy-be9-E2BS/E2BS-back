@@ -37,8 +37,9 @@ public class ProductController {
 		})
 	@GetMapping("/{book-id}")
 	public ResponseEntity<ResponseProductReadDTO> getProduct(
-		@Parameter(description = "조회할 도서 ID", example = "1", required = true) @PathVariable("book-id") long bookId) {
-		ResponseProductReadDTO response = productService.getProduct(bookId);
+		@Parameter(description = "조회할 도서 ID", example = "1", required = true) @PathVariable("book-id") long bookId,
+	    @Parameter(description = "회원 아이디", required = true) @RequestParam String memberId) {
+		ResponseProductReadDTO response = productService.getProduct(bookId, memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

@@ -49,9 +49,10 @@ public class ProductSearchController {
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProductsBySearch(
 		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable,
 		@Parameter(description = "검색 키워드", required = true, in = ParameterIn.QUERY) @RequestParam String keyword,
+		@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		@Parameter(description = "정렬 기준", in = ParameterIn.QUERY) @RequestParam(required = false) ProductSortType sort) {
 		Page<Long> productIds = productSearchService.getProductIdsBySearch(pageable, keyword, sort);
-		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);
+		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds, memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -68,9 +69,10 @@ public class ProductSearchController {
 	public ResponseEntity<Page<ResponseProductReadDTO>> getProductsByCategory(
 		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable,
 		@Parameter(description = "조회할 카테고리 ID", required = true, in = ParameterIn.QUERY) @PathVariable("category-id") Long categoryId,
+		@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		@Parameter(description = "정렬 기준", in = ParameterIn.QUERY) @RequestParam(required = false) ProductSortType sort) {
 		Page<Long> productIds = productSearchService.getProductIdsByCategoryId(pageable, categoryId, sort);
-		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);
+		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds, memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -114,9 +116,10 @@ public class ProductSearchController {
 		})
 	@GetMapping("/best")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getBestProducts(
+		@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<Long> productIds = productSearchService.getBestProductIdsHeader(pageable);
-		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);
+		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds, memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -130,9 +133,10 @@ public class ProductSearchController {
 		})
 	@GetMapping("/newest")
 	public ResponseEntity<Page<ResponseProductReadDTO>> getNewestProducts(
+		@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<Long> productIds = productSearchService.getNewProductIdsHeader(pageable);
-		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds);
+		Page<ResponseProductReadDTO> response = productService.getProductsToElasticSearch(productIds, memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
