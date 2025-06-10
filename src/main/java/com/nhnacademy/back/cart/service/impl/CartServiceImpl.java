@@ -34,8 +34,8 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
@@ -50,7 +50,6 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
-	private final DeliveryFeeJpaRepository deliveryFeeRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -73,6 +72,10 @@ public class CartServiceImpl implements CartService {
 			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		Cart cart;
 		// 장바구니가 없으면 장바구니 생성
@@ -470,7 +473,7 @@ public class CartServiceImpl implements CartService {
 			for (CartItems cartItem : copiedCartItems) {
 				for (int i = 0; i < productIds.size(); i++) {
 					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
-						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i);
+						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
 
 						if (newQuantity > 0) {
 							cartItem.changeCartItemsQuantity(newQuantity);
