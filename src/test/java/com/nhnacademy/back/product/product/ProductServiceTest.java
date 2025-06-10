@@ -21,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
@@ -36,9 +38,11 @@ import com.nhnacademy.back.product.contributor.repository.ContributorJpaReposito
 import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaRepository;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
+import com.nhnacademy.back.product.like.repository.LikeJpaRepository;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
@@ -58,11 +62,14 @@ import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
 import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
+import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 	@InjectMocks
 	private ProductServiceImpl productService;
+	@Mock
+	private MemberJpaRepository memberJpaRepository;
 	@Mock
 	private ProductJpaRepository productJpaRepository;
 	@Mock
@@ -85,6 +92,10 @@ class ProductServiceTest {
 	private CategoryJpaRepository categoryJpaRepository;
 	@Mock
 	private ProductSearchService productSearchService;
+	@Mock
+	private ReviewJpaRepository reviewJpaRepository;
+	@Mock
+	private LikeJpaRepository likeJpaRepository;
 	@Mock
 	private MinioUtils minioUtils;
 
@@ -311,6 +322,7 @@ class ProductServiceTest {
 	void get_product_success_test() {
 		// given
 		long productId = 1L;
+		String memberId = "";
 		Product product = new Product(
 			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
 			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
@@ -323,7 +335,7 @@ class ProductServiceTest {
 		when(productContributorJpaRepository.findContributorDTOsByProductId(productId)).thenReturn(List.of());
 
 		// when
-		ResponseProductReadDTO response = productService.getProduct(productId);
+		ResponseProductReadDTO response = productService.getProduct(productId, memberId);
 
 		// then
 		assertEquals("Product1", response.getProductTitle());
@@ -335,10 +347,11 @@ class ProductServiceTest {
 	void get_product_fail_test() {
 		// given
 		long productId = 1L;
+		String memberId = "";
 		when(productJpaRepository.findById(productId)).thenReturn(Optional.empty());
 
 		// when & then
-		assertThatThrownBy(() -> productService.getProduct(productId))
+		assertThatThrownBy(() -> productService.getProduct(productId, memberId))
 			.isInstanceOf(ProductNotFoundException.class);
 	}
 
@@ -768,6 +781,129 @@ class ProductServiceTest {
 
 		// when & then
 		assertThatThrownBy(() -> productService.updateProductSalePrice(productId, request))
+			.isInstanceOf(ProductNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("get products to elastic search - success")
+	void get_products_to_elastic_search_success_test() {
+		// given
+		Page<Long> productIds = new PageImpl<>(List.of(1L, 2L));
+		String memberId = "";
+
+		Product product1 = new Product(
+			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
+			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
+			true, 100, new ArrayList<>());
+		product1.getProductImage().add(new ProductImage(product1, "http://example.com/image1.jpg"));
+		Product product2 = new Product(
+			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
+			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
+			true, 100, new ArrayList<>());
+		product2.getProductImage().add(new ProductImage(product2, "http://example.com/image2.jpg"));
+		List<Product> products = List.of(product1, product2);
+
+		when(productJpaRepository.findAllById(any())).thenReturn(products);
+		when(productTagJpaRepository.findTagDTOsByProductId(anyLong())).thenReturn(List.of());
+		when(productCategoryJpaRepository.findCategoryDTOsByProductId(anyLong())).thenReturn(List.of());
+		when(productContributorJpaRepository.findContributorDTOsByProductId(anyLong())).thenReturn(List.of());
+
+		// when
+		Page<ResponseProductReadDTO> result = productService.getProductsToElasticSearch(productIds, memberId);
+
+		// then
+		assertThat(result.getContent()).hasSize(2);
+		assertThat(result.getContent().get(0).getProductTitle()).isEqualTo("Product1");
+		assertThat(result.getContent().get(1).getProductTitle()).isEqualTo("Product2");
+	}
+
+	@Test
+	@DisplayName("get products to elastic search - fail1")
+	void get_products_to_elastic_search_fail1_test() {
+		// given
+		Page<Long> productIds = new PageImpl<>(List.of(1L, 2L));
+		String memberId = "";
+
+		Product product1 = new Product(
+			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
+			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
+			true, 100, new ArrayList<>());
+		product1.getProductImage().add(new ProductImage(product1, "http://example.com/image1.jpg"));
+		List<Product> products = List.of(product1);
+
+		when(productJpaRepository.findAllById(any())).thenReturn(products);
+
+		// when & then
+		assertThatThrownBy(() -> productService.getProductsToElasticSearch(productIds, memberId))
+			.isInstanceOf(ProductNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("get products to elastic search - fail2")
+	void get_products_to_elastic_search_fail2_test() {
+		// given
+		Page<Long> productIds = new PageImpl<>(List.of(1L, 2L));
+		String memberId = "member";
+
+		Product product1 = new Product(
+			1L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product1", "Product1 content",
+			"Product1 description", LocalDate.now(), "978-89-12345-01-1", 10000, 8000,
+			true, 100, new ArrayList<>());
+		product1.getProductImage().add(new ProductImage(product1, "http://example.com/image1.jpg"));
+		Product product2 = new Product(
+			2L, new ProductState(ProductStateName.SALE), new Publisher("publisher"), "Product2", "Product2 content",
+			"Product1 description", LocalDate.now(), "978-89-12345-01-2", 7000, 6000,
+			true, 100, new ArrayList<>());
+		product2.getProductImage().add(new ProductImage(product2, "http://example.com/image2.jpg"));
+		List<Product> products = List.of(product1, product2);
+
+		when(productJpaRepository.findAllById(any())).thenReturn(products);
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(null);
+
+		// when & then
+		assertThatThrownBy(() -> productService.getProductsToElasticSearch(productIds, memberId))
+			.isInstanceOf(NotFoundMemberException.class);
+	}
+
+	@Test
+	@DisplayName("get products to main - success")
+	void get_products_to_main_success_test() {
+		// given
+		List<Long> productIds = List.of(1L);
+
+		ProductState productState = new ProductState(ProductStateName.SALE);
+		Publisher publisher = new Publisher("Publisher");
+		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
+		product.getProductImage().add(new ProductImage(product, "http://example.com/image.jpg"));
+
+		when(productJpaRepository.findByIdWithImages(anyLong())).thenReturn(Optional.of(product));
+		when(productContributorJpaRepository.findContributorDTOsByProductId(anyLong())).thenReturn(List.of());
+
+		// when
+		List<ResponseMainPageProductDTO> result = productService.getProductsToMain(productIds);
+
+		// then
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst().getProductTitle()).isEqualTo("title");
+	}
+
+	@Test
+	@DisplayName("get products to main - fail")
+	void get_products_to_main_fail_test() {
+		// given
+		List<Long> productIds = List.of(1L);
+
+		ProductState productState = new ProductState(ProductStateName.SALE);
+		Publisher publisher = new Publisher("Publisher");
+		Product product = new Product(1L, productState, publisher, "title", "content", "description", LocalDate.now(),
+			"978-89-12345-01-1", 10000L, 8000L, true, 100, new ArrayList<>());
+		product.getProductImage().add(new ProductImage(product, "http://example.com/image.jpg"));
+
+		when(productJpaRepository.findByIdWithImages(anyLong())).thenReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> productService.getProductsToMain(productIds))
 			.isInstanceOf(ProductNotFoundException.class);
 	}
 }

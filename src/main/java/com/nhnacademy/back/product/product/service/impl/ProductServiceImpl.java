@@ -181,7 +181,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	/**
-	 * 도서 목록을 페이지 단위로 조회
+	 * 도서 목록을 페이지 단위로 조회 (현재는 관리자 전용으로 사용)
 	 * categoryId = 0이면 전체 조회, 0이 아니면 해당 카테고리에서 조회
 	 */
 	@Override
@@ -237,7 +237,8 @@ public class ProductServiceImpl implements ProductService {
 		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
 		// - 이미지가 들어왔다면
-		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
+		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(
+			productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
 			// - 기존 리스트 조회
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
@@ -362,7 +363,6 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		for (Product result : unorderedProducts) {
-			getProductByChangedImagePath(result, memberId);
 			responseProductReadDTOS.add(getProductByChangedImagePath(result, memberId));
 		}
 
@@ -482,7 +482,8 @@ public class ProductServiceImpl implements ProductService {
 				throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 			}
 
-			if (likeJpaRepository.existsByProduct_ProductIdAndCustomer_CustomerId(product.getProductId(), findMember.getCustomerId())) {
+			if (likeJpaRepository.existsByProduct_ProductIdAndCustomer_CustomerId(product.getProductId(),
+				findMember.getCustomerId())) {
 				liked = true;
 			}
 		}
