@@ -41,7 +41,6 @@ import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
-import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductCouponDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
@@ -182,7 +181,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	/**
-	 * 도서 목록을 페이지 단위로 조회
+	 * 도서 목록을 페이지 단위로 조회 (현재는 관리자 전용으로 사용)
 	 * categoryId = 0이면 전체 조회, 0이 아니면 해당 카테고리에서 조회
 	 */
 	@Override
@@ -238,7 +237,8 @@ public class ProductServiceImpl implements ProductService {
 		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
 		// - 이미지가 들어왔다면
-		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
+		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(
+			productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
 			// - 기존 리스트 조회
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
@@ -350,21 +350,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	/**
-	 * 쿠폰 적용 가능한 도서 목록 조회 (재고 있고 판매 상태인 도서)
+	 * 엘라스틱 서치의 결과로 나온 Product ID 리스트로 도서 조회
 	 */
-	@Override
-	@Transactional
-	public Page<ResponseProductCouponDTO> getProductsToCoupon(Pageable pageable) {
-		Page<Product> saleProducts = productJpaRepository.findAllByProductStateName(ProductStateName.SALE, pageable);
-
-		return saleProducts.map(product ->
-			new ResponseProductCouponDTO(
-				product.getProductId(),
-				product.getProductTitle(),
-				product.getPublisher().getPublisherName()
-			));
-	}
-
 	@Override
 	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds, String memberId) {
 		List<Long> idOrder = productIds.getContent();
@@ -376,7 +363,6 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		for (Product result : unorderedProducts) {
-			getProductByChangedImagePath(result, memberId);
 			responseProductReadDTOS.add(getProductByChangedImagePath(result, memberId));
 		}
 
@@ -400,7 +386,6 @@ public class ProductServiceImpl implements ProductService {
 					.map(ResponseContributorDTO::getContributorName)
 					.orElse("미상");
 
-
 				String imagePath = product.getProductImage().getFirst().getProductImagePath();
 				if (!imagePath.startsWith("http")) {
 					imagePath = minioUtils.getPresignedUrl(BUCKET_NAME, imagePath);
@@ -420,6 +405,9 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
+	/**
+	 * 카테고리 - 도서 관계 테이블 저장 로직
+	 */
 	private void createProductCategory(long productId, List<Long> categoryIds, boolean isUpdate) {
 		// 저장하려는 카테고리의 개수가 10개 초과 또는 0개 이하인 경우 예외 발생
 		if (categoryIds.size() > 10 || categoryIds.isEmpty()) {
@@ -494,7 +482,8 @@ public class ProductServiceImpl implements ProductService {
 				throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 			}
 
-			if (likeJpaRepository.existsByProduct_ProductIdAndCustomer_CustomerId(product.getProductId(), findMember.getCustomerId())) {
+			if (likeJpaRepository.existsByProduct_ProductIdAndCustomer_CustomerId(product.getProductId(),
+				findMember.getCustomerId())) {
 				liked = true;
 			}
 		}
