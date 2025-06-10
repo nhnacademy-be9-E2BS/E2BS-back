@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "주문한 상품 항목을 장바구니 항목에 삭제 요청 DTO")
 public class RequestDeleteCartOrderDTO {
 
 	@Schema(description = "회원 아이디", example = "member123")
