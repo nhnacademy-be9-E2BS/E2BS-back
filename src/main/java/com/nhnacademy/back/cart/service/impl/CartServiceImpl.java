@@ -34,7 +34,6 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -212,7 +211,6 @@ public class CartServiceImpl implements CartService {
 					productRegularPrice,
 					productSalePrice,
 					discountRate,
-					ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 					productImagePath,
 					cartItem.getCartItemsQuantity(),
 					productTotalPrice);
@@ -289,10 +287,8 @@ public class CartServiceImpl implements CartService {
 			productRegularPrice,
 			productSalePrice,
 			discountRate,
-			ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 			productImagePath,
-			request.getQuantity(),
-			productSalePrice * request.getQuantity()
+			request.getQuantity()
 		);
 		cart.getCartItems().add(newItem);
 
@@ -379,17 +375,18 @@ public class CartServiceImpl implements CartService {
 
 		// DTO 가공
 		return cartItems.stream()
-			.map(cartItem -> new ResponseCartItemsForGuestDTO(
+			.map(cartItem -> {
+				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
+				return new ResponseCartItemsForGuestDTO(
 				cartItem.getProductId(),
 				cartItem.getProductTitle(),
 				cartItem.getProductRegularPrice(),
 				cartItem.getProductSalePrice(),
 				cartItem.getDiscountRate(),
-				cartItem.getDeliveryFee(),
 				cartItem.getProductImagePath(),
 				cartItem.getCartItemsQuantity(),
-				cartItem.getProductTotalPrice()
-			))
+				productTotalPrice);
+			})
 			.toList();
 	}
 

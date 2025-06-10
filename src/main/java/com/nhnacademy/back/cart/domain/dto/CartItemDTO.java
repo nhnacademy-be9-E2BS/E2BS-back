@@ -31,16 +31,10 @@ public class CartItemDTO implements Serializable {
 	@Schema(description = "상품 할인률", example = "10")
 	private BigDecimal discountRate;
 
-	@Schema(description = "배송비 정책 정보")
-	private ResponseDeliveryFeeDTO deliveryFee;
-
 	@Schema(description = "상품 이미지 경로", example = "/images/products/java.jpg")
 	private String productImagePath;
 
 	@Schema(description = "장바구니에 담긴 수량", example = "2")
 	private int cartItemsQuantity;
-
-	@Schema(description = "상품 총 가격 (수량 × 단가)", example = "30000")
-	private long productTotalPrice;
 
 }
