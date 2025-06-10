@@ -41,6 +41,7 @@ import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedEx
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
 import com.nhnacademy.back.product.category.exception.ProductCategoryCreateNotAllowException;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
+import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
 import com.nhnacademy.back.product.publisher.exception.PublisherAlreadyExistsException;
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
 		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class,
 		DeleteAddressFailedException.class,
 		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class, CustomerEmailNotExistsException.class,
-		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class, OrderProcessException.class})
+		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class, OrderProcessException.class, ProductNotForSaleException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
 		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 			LocalDateTime.now());
