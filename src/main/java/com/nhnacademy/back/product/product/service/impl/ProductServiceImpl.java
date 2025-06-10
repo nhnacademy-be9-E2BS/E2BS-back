@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
@@ -33,6 +36,7 @@ import com.nhnacademy.back.product.contributor.repository.ProductContributorJpaR
 import com.nhnacademy.back.product.image.domain.dto.response.ResponseProductImageDTO;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.image.repository.ProductImageJpaRepository;
+import com.nhnacademy.back.product.like.repository.LikeJpaRepository;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
@@ -58,6 +62,7 @@ import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
 import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
+import com.nhnacademy.back.review.repository.ReviewJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -65,6 +70,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
+	private final MemberJpaRepository memberJpaRepository;
 	private final ProductJpaRepository productJpaRepository;
 	private final ProductImageJpaRepository productImageJpaRepository;
 	private final PublisherJpaRepository publisherJpaRepository;
@@ -77,6 +83,9 @@ public class ProductServiceImpl implements ProductService {
 	private final CategoryJpaRepository categoryJpaRepository;
 
 	private final ProductSearchService productSearchService;
+
+	private final ReviewJpaRepository reviewJpaRepository;
+	private final LikeJpaRepository likeJpaRepository;
 
 	private final MinioUtils minioUtils;
 	private final String BUCKET_NAME = "e2bs-products-image";
@@ -161,14 +170,14 @@ public class ProductServiceImpl implements ProductService {
 	 * 도서 한 권을 DB에서 조회
 	 */
 	@Override
-	public ResponseProductReadDTO getProduct(long productId) {
+	public ResponseProductReadDTO getProduct(long productId, String memberId) {
 		Product product = productJpaRepository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 
 		// 엘라스틱 서치에서 조회수 update
 		productSearchService.updateProductDocumentHits(productId);
 
-		return getProductByChangedImagePath(product);
+		return getProductByChangedImagePath(product, memberId);
 	}
 
 	/**
@@ -184,7 +193,7 @@ public class ProductServiceImpl implements ProductService {
 			productPage = productJpaRepository.findAllByCategoryId(categoryId, pageable);
 		}
 
-		return productPage.map(this::getProductByChangedImagePath);
+		return productPage.map((Product product) -> getProductByChangedImagePath(product, ""));
 	}
 
 	/**
@@ -200,7 +209,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		return products.stream()
-			.map(this::getProductByChangedImagePath).toList();
+			.map((Product product) -> getProductByChangedImagePath(product, "")).toList();
 	}
 
 	/**
@@ -228,8 +237,7 @@ public class ProductServiceImpl implements ProductService {
 		// 이미지 삭제 후 저장
 		// 자식 추가 (ProductImage)
 		// - 이미지가 들어왔다면
-		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(
-			productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
+		if (Objects.nonNull(productImageFiles) && !Objects.requireNonNull(productImageFiles.getFirst().getOriginalFilename()).isBlank()) {
 			// - 기존 리스트 조회
 			List<ProductImage> productImages = productImageJpaRepository.getAllByProduct_ProductId(productId);
 
@@ -344,7 +352,7 @@ public class ProductServiceImpl implements ProductService {
 	 * 엘라스틱 서치의 결과로 나온 Product ID 리스트로 도서 조회
 	 */
 	@Override
-	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds) {
+	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds, String memberId) {
 		List<Long> idOrder = productIds.getContent();
 		List<Product> unorderedProducts = productJpaRepository.findAllById(idOrder);
 		List<ResponseProductReadDTO> responseProductReadDTOS = new ArrayList<>();
@@ -354,8 +362,8 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		for (Product result : unorderedProducts) {
-			getProductByChangedImagePath(result);
-			responseProductReadDTOS.add(getProductByChangedImagePath(result));
+			getProductByChangedImagePath(result, memberId);
+			responseProductReadDTOS.add(getProductByChangedImagePath(result, memberId));
 		}
 
 		return new PageImpl<>(responseProductReadDTOS, productIds.getPageable(), productIds.getTotalElements());
@@ -446,7 +454,7 @@ public class ProductServiceImpl implements ProductService {
 	/**
 	 * 이미지 경로 가공 메소드
 	 */
-	private ResponseProductReadDTO getProductByChangedImagePath(Product product) {
+	private ResponseProductReadDTO getProductByChangedImagePath(Product product, String memberId) {
 		String productImagePath = "";
 		List<String> productImagePaths = productImageJpaRepository.findAllByProduct_ProductId(product.getProductId());
 		List<ResponseProductImageDTO> changedResponseProductImageDTOs = new ArrayList<>();
@@ -467,6 +475,24 @@ public class ProductServiceImpl implements ProductService {
 			}
 		}
 
+		boolean liked = false;
+		if (!StringUtils.isEmpty(memberId)) {
+			Member findMember = memberJpaRepository.getMemberByMemberId(memberId);
+			if (Objects.isNull(findMember)) {
+				throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
+			}
+
+			if (likeJpaRepository.existsByProduct_ProductIdAndCustomer_CustomerId(product.getProductId(), findMember.getCustomerId())) {
+				liked = true;
+			}
+		}
+
+		double reviewAvg = reviewJpaRepository.totalAvgReviewsByProductId(product.getProductId());
+		reviewAvg = Math.round(reviewAvg * 10) / 10.0;
+
+		Integer reviewCount = reviewJpaRepository.countAllByProduct_ProductId(product.getProductId());
+		long likeCount = likeJpaRepository.countAllByProduct_ProductId(product.getProductId());
+
 		return new ResponseProductReadDTO(
 			product.getProductId(),
 			new ResponseProductStateDTO(product.getProductState().getProductStateId(),
@@ -485,8 +511,11 @@ public class ProductServiceImpl implements ProductService {
 			changedResponseProductImageDTOs,
 			productTagJpaRepository.findTagDTOsByProductId(product.getProductId()),
 			productCategoryJpaRepository.findCategoryDTOsByProductId(product.getProductId()),
-			productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId()
-			)
+			productContributorJpaRepository.findContributorDTOsByProductId(product.getProductId()),
+			reviewAvg,
+			reviewCount,
+			liked,
+			likeCount
 		);
 	}
 
