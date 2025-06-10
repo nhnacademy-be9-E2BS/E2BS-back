@@ -214,7 +214,6 @@ public class CartServiceImpl implements CartService {
 					productRegularPrice,
 					productSalePrice,
 					discountRate,
-					ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 					productImagePath,
 					cartItem.getCartItemsQuantity(),
 					productTotalPrice);
