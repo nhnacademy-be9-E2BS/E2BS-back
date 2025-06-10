@@ -244,6 +244,10 @@ public class CartServiceImpl implements CartService {
 		// 상품 존재 검증
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		// Redis에서 장바구니 가져오기 (없으면 생성)
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
