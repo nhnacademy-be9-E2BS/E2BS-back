@@ -30,9 +30,9 @@ public class PointHistoryController {
 	)
 	@ApiResponse(responseCode = "200", description = "포인트 내역 조회 성공")
 	@Member
-	@GetMapping("/api/auth/mypage/{memberId}/pointHistory")
+	@GetMapping("/api/auth/mypage/{member-id}/pointHistory")
 	public ResponseEntity<Page<ResponsePointHistoryDTO>> getPointList(
-		@Parameter(description = "회원 ID", example = "user") @PathVariable("memberId") String memberId,
+		@Parameter(description = "회원 ID", example = "user") @PathVariable("member-id") String memberId,
 		Pageable pageable) {
 
 		Page<ResponsePointHistoryDTO> response = pointHistoryService.getPointHistoryByMemberId(memberId, pageable);
