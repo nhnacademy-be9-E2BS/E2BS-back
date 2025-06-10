@@ -34,7 +34,6 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -479,7 +478,7 @@ public class CartServiceImpl implements CartService {
 			for (CartItems cartItem : copiedCartItems) {
 				for (int i = 0; i < productIds.size(); i++) {
 					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
-						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i);
+						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
 
 						if (newQuantity > 0) {
 							cartItem.changeCartItemsQuantity(newQuantity);
