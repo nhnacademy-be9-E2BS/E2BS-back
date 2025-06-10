@@ -490,7 +490,7 @@ public class ProductServiceImpl implements ProductService {
 		boolean liked = false;
 		if (!StringUtils.isEmpty(memberId)) {
 			Member findMember = memberJpaRepository.getMemberByMemberId(memberId);
-			if (Objects.nonNull(findMember)) {
+			if (Objects.isNull(findMember)) {
 				throw new NotFoundMemberException("아이디에 해당하는 회원을 찾지 못했습니다.");
 			}
 
