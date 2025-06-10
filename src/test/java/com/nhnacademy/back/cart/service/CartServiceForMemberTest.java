@@ -74,7 +74,7 @@ class CartServiceForMemberTest {
 
 		cart = new Cart(customer);
 
-		product = new Product(productId, new ProductState(ProductStateName.SALE), new Publisher("a"),
+		product = new Product(productId, new ProductState(1L, ProductStateName.SALE), new Publisher("a"),
 			"title1", "content1", "description", LocalDate.now(), "isbn",
 			10000, 8000, false, 1, null);
 	}
