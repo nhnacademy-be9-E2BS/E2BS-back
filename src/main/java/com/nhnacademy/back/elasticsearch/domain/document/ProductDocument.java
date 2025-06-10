@@ -93,6 +93,10 @@ public class ProductDocument {
 		this.productSearches = 0L;
 	}
 
+	public ProductDocument(Long productId) {
+		this.productId = productId;
+	}
+
 	public void updateProductDocument(RequestProductDocumentDTO request) {
 		this.productTitle = request.getProductTitle();
 		this.productDescription = request.getProductDescription();
