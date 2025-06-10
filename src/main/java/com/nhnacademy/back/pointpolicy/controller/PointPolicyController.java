@@ -82,9 +82,9 @@ public class PointPolicyController {
 		@ApiResponse(responseCode = "404", description = "정책 ID 없음")
 	})
 	@Admin
-	@PutMapping("/api/admin/pointPolicies/{pointPolicyId}/activate")
+	@PutMapping("/api/admin/pointPolicies/{point-policy-id}/activate")
 	public ResponseEntity<Void> activatePointPolicy(
-		@Parameter(description = "활성화할 포인트 정책 ID", example = "1") @PathVariable Long pointPolicyId) {
+		@Parameter(description = "활성화할 포인트 정책 ID", example = "1") @PathVariable("point-policy-id") Long pointPolicyId) {
 
 		pointPolicyService.activatePointPolicy(pointPolicyId);
 		return ResponseEntity.noContent().build();
@@ -97,9 +97,9 @@ public class PointPolicyController {
 		@ApiResponse(responseCode = "404", description = "정책 ID 없음")
 	})
 	@Admin
-	@PutMapping("/api/admin/pointPolicies/{pointPolicyId}")
+	@PutMapping("/api/admin/pointPolicies/{point-policy-id}")
 	public ResponseEntity<Void> updatePointPolicy(
-		@Parameter(description = "수정할 포인트 정책 ID", example = "1") @PathVariable Long pointPolicyId,
+		@Parameter(description = "수정할 포인트 정책 ID", example = "1") @PathVariable("point-policy-id") Long pointPolicyId,
 		@RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(
 			description = "포인트 정책 수정 요청 DTO",
 			required = true,

@@ -69,9 +69,9 @@ public class CouponPolicyController {
 		}
 	)
 	@Admin
-	@GetMapping("/{couponPolicyId}")
+	@GetMapping("/{coupon-policy-id}")
 	public ResponseEntity<ResponseCouponPolicyDTO> getCouponPolicyById(
-		@Parameter(description = "쿠폰 정책 ID", example = "1") @PathVariable Long couponPolicyId) {
+		@Parameter(description = "쿠폰 정책 ID", example = "1") @PathVariable("coupon-policy-id") Long couponPolicyId) {
 		ResponseCouponPolicyDTO responseCouponPolicyDTO = couponPolicyService.getCouponPolicyById(couponPolicyId);
 		return ResponseEntity.status(HttpStatus.OK).body(responseCouponPolicyDTO);
 	}

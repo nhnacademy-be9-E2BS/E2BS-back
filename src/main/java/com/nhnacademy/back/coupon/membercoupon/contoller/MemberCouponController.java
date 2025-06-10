@@ -61,9 +61,9 @@ public class MemberCouponController {
 		responses = @ApiResponse(responseCode = "200", description = "조회 성공")
 	)
 	@Member
-	@GetMapping("/api/auth/mypage/{memberId}/coupons")
+	@GetMapping("/api/auth/mypage/{member-id}/coupons")
 	public ResponseEntity<Page<ResponseMemberCouponDTO>> getMemberCouponsByMemberId(
-		@Parameter(description = "회원 ID", example = "user") @PathVariable String memberId,
+		@Parameter(description = "회원 ID", example = "user") @PathVariable("member-id") String memberId,
 		@Parameter(hidden = true) Pageable pageable) {
 
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getMemberCouponsByMemberId(memberId, pageable);
@@ -79,9 +79,9 @@ public class MemberCouponController {
 		responses = @ApiResponse(responseCode = "200", description = "조회 성공")
 	)
 	@Member
-	@GetMapping("/api/auth/mypage/{memberId}/couponsUsable")
+	@GetMapping("/api/auth/mypage/{member-id}/couponsUsable")
 	public ResponseEntity<Page<ResponseMemberCouponDTO>> getUsableMemberCouponsByMemberId(
-		@Parameter(description = "회원 ID", example = "user") @PathVariable String memberId,
+		@Parameter(description = "회원 ID", example = "user") @PathVariable("member-id") String memberId,
 		@Parameter(hidden = true) Pageable pageable) {
 
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getUsableMemberCouponsByMemberId(memberId, pageable);
@@ -97,9 +97,9 @@ public class MemberCouponController {
 		responses = @ApiResponse(responseCode = "200", description = "조회 성공")
 	)
 	@Member
-	@GetMapping("/api/auth/mypage/{memberId}/couponsUnusable")
+	@GetMapping("/api/auth/mypage/{member-id}/couponsUnusable")
 	public ResponseEntity<Page<ResponseMemberCouponDTO>> getUnusableMemberCouponsByMemberId(
-		@Parameter(description = "회원 ID", example = "user") @PathVariable String memberId,
+		@Parameter(description = "회원 ID", example = "user") @PathVariable("member-id") String memberId,
 		@Parameter(hidden = true) Pageable pageable) {
 
 		Page<ResponseMemberCouponDTO> response = memberCouponService.getUnusableMemberCouponsByMemberId(memberId, pageable);
