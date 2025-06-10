@@ -27,7 +27,6 @@ import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategory
 import com.nhnacademy.back.product.product.controller.ProductAdminController;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductMetaDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
 import com.nhnacademy.back.product.product.service.ProductService;
@@ -144,20 +143,6 @@ class ProductAdminControllerTest {
 					return request;
 				})
 				.contentType(MediaType.MULTIPART_FORM_DATA))
-			.andExpect(status().isOk());
-	}
-
-	@Test
-	@DisplayName("도서 재고 수정")
-	void update_productStock_test() throws Exception {
-		// given
-		RequestProductStockUpdateDTO request = new RequestProductStockUpdateDTO(300);
-		String jsonRequest = objectMapper.writeValueAsString(request);
-
-		// when & then
-		mockMvc.perform(put("/api/auth/admin/books/1/stock")
-				.content(jsonRequest)
-				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
 
