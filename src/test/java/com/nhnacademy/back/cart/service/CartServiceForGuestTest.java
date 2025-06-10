@@ -62,7 +62,7 @@ class CartServiceForGuestTest {
 	void setUp() {
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
+		product = new Product(1L, new ProductState(1L, ProductStateName.SALE), new Publisher("a"),
 			"title1", "content1", "description", LocalDate.now(), "isbn",
 			10000, 8000, false, 1, null);
 	}
