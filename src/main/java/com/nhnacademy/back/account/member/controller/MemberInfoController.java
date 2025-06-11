@@ -49,7 +49,7 @@ public class MemberInfoController {
 	public ResponseEntity<ResponseMemberInfoDTO> getMember(@PathVariable("member-id") String memberId) {
 		ResponseMemberInfoDTO responseMemberInfoDTO = memberService.getMemberInfo(new RequestMemberIdDTO(memberId));
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberInfoDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberInfoDTO);
 	}
 
 	@Operation(summary = "회원 정보 변경", description = "회원 정보 변경 기능",
@@ -70,7 +70,7 @@ public class MemberInfoController {
 		}
 		memberService.updateMemberInfo(requestMemberInfoDTO);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@Operation(summary = "회원 탈퇴", description = "회원 탈퇴 기능",

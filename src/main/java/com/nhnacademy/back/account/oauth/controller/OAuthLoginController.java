@@ -2,24 +2,15 @@ package com.nhnacademy.back.account.oauth.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.back.account.oauth.model.dto.request.RequestOAuthLoginDTO;
 import com.nhnacademy.back.account.oauth.model.dto.response.ResponseCheckOAuthIdDTO;
 import com.nhnacademy.back.account.oauth.service.OAuthService;
-import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -41,22 +32,22 @@ public class OAuthLoginController {
 			oAuthService.checkOAuthId(memberId)
 		);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseCheckOAuthIdDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseCheckOAuthIdDTO);
 	}
 
-	@Operation(summary = "PAYCO 로그인 기능", description = "PAYCO 로그인 기능 제공",
-		responses = {
-			@ApiResponse(responseCode = "200", description = "PAYCO 로그인 기능 성공 응답"),
-			@ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-		})
-	@PostMapping
-	public ResponseEntity<Void> loginOAuth(@Validated @RequestBody RequestOAuthLoginDTO requestOAuthLoginDTO,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			throw new ValidationFailedException(bindingResult);
-		}
-
-		return ResponseEntity.status(HttpStatus.CREATED).build();
-	}
+	// @Operation(summary = "PAYCO 로그인 기능", description = "PAYCO 로그인 기능 제공",
+	// 	responses = {
+	// 		@ApiResponse(responseCode = "200", description = "PAYCO 로그인 기능 성공 응답"),
+	// 		@ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+	// 	})
+	// @PostMapping
+	// public ResponseEntity<Void> loginOAuth(@Validated @RequestBody RequestOAuthLoginDTO requestOAuthLoginDTO,
+	// 	BindingResult bindingResult) {
+	// 	if (bindingResult.hasErrors()) {
+	// 		throw new ValidationFailedException(bindingResult);
+	// 	}
+	//
+	// 	return ResponseEntity.status(HttpStatus.CREATED).build();
+	// }
 
 }

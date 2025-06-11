@@ -32,7 +32,7 @@ public class MemberRankController {
 		@PathVariable("member-id") String memberId) {
 		List<ResponseMemberRankDTO> response = memberRankService.getMemberRanks();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 }

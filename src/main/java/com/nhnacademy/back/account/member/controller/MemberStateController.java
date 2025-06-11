@@ -27,7 +27,7 @@ public class MemberStateController {
 	public ResponseEntity<ResponseMemberStateDTO> getMemberState(@PathVariable("member-id") String memberId) {
 		ResponseMemberStateDTO responseMemberStateDTO = memberService.getMemberState(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberStateDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberStateDTO);
 	}
 
 }

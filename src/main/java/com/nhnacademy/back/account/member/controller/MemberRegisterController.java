@@ -18,7 +18,6 @@ import com.nhnacademy.back.account.member.domain.dto.request.RequestRegisterMemb
 import com.nhnacademy.back.account.member.domain.dto.response.ResponseRegisterMemberDTO;
 import com.nhnacademy.back.account.member.exception.AlreadyExistsMemberIdException;
 import com.nhnacademy.back.account.member.service.MemberService;
-import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.batch.service.RabbitService;
 import com.nhnacademy.back.common.config.RabbitConfig;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
@@ -38,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberRegisterController {
 
 	private final MemberService memberService;
-	private final PointHistoryService pointHistoryService;
 	private final RabbitService rabbitService;
 
 	/**

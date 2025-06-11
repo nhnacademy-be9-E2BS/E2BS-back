@@ -58,7 +58,7 @@ public class AdminSettingsController {
 	public ResponseEntity<ResponseAdminSettingsDTO> getAdminSettings() {
 		ResponseAdminSettingsDTO response = adminSettingsService.getAdminSettings();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class AdminSettingsController {
 	public ResponseEntity<ResponseAdminSettingsDailySummaryDTO> getAdminSettingsDailySummaries() {
 		ResponseAdminSettingsDailySummaryDTO responseAdminSettingsDailySummaryDTO = adminSettingsService.getAdminSettingsDailySummaries();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseAdminSettingsDailySummaryDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseAdminSettingsDailySummaryDTO);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class AdminSettingsController {
 	public ResponseEntity<ResponseAdminSettingsMonthlySummaryDTO> getAdminSettingsMonthlySummary() {
 		ResponseAdminSettingsMonthlySummaryDTO responseAdminSettingsMonthlySummaryDTO = adminSettingsService.getAdminSettingsMonthlySummary();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseAdminSettingsMonthlySummaryDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseAdminSettingsMonthlySummaryDTO);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class AdminSettingsController {
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseAdminSettingsMembersDTO> response = adminSettingsService.getAdminSettingsMembers(pageable);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class AdminSettingsController {
 	public ResponseEntity<Void> updateAdminSettingsMemberRole(@PathVariable("member-id") String memberId) {
 		memberService.updateMemberRole(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class AdminSettingsController {
 	public ResponseEntity<Void> deleteAdminSettingsMember(@PathVariable("member-id") String memberId) {
 		memberService.withdrawMember(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@Operation(summary = "관리자 페이지 비회원 목록 조회", description = "관리자 페이지 비회원 목록 조회 기능")
@@ -163,7 +163,7 @@ public class AdminSettingsController {
 		@PageableDefault(page = 0, size = 10) Pageable pageable) {
 		Page<ResponseAdminSettingsNonMembersDTO> response = customerService.getAdminSettingsNonMembers(pageable);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 }

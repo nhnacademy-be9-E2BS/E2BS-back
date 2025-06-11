@@ -54,7 +54,7 @@ public class MemberDormantMemberStateController {
 	public ResponseEntity<ResponseMemberEmailDTO> getMemberEmail(@PathVariable("member-id") String memberId) {
 		ResponseMemberEmailDTO responseMemberEmailDTO = memberService.getMemberEmail(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberEmailDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberEmailDTO);
 	}
 
 }
