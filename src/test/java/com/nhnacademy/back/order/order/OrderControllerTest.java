@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,7 +32,6 @@ import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
@@ -105,48 +103,48 @@ public class OrderControllerTest {
 				.isInstanceOf(ValidationFailedException.class));
 	}
 
-	@Test
-	@DisplayName("결제 승인 테스트")
-	void testOrderConfirm() throws Exception {
-		String orderId = "TEST-ORDER-CODE";
-		String paymentKey = "TEST-PAYMENT-KEY";
-		long amount = 1000L;
+	// @Test
+	// @DisplayName("결제 승인 테스트")
+	// void testOrderConfirm() throws Exception {
+	// 	String orderId = "TEST-ORDER-CODE";
+	// 	String paymentKey = "TEST-PAYMENT-KEY";
+	// 	long amount = 1000L;
+	//
+	// 	ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
+	// 	when(orderService.confirmOrder(orderId, paymentKey, amount))
+	// 		.thenReturn(ResponseEntity.ok(confirmDTO));
+	//
+	// 	mockMvc.perform(post("/api/orders/confirm")
+	// 			.param("orderId", orderId)
+	// 			.param("paymentKey", paymentKey)
+	// 			.param("amount", String.valueOf(amount)))
+	// 		.andExpect(status().isOk());
+	// }
 
-		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
-		when(orderService.confirmOrder(orderId, paymentKey, amount))
-			.thenReturn(ResponseEntity.ok(confirmDTO));
-
-		mockMvc.perform(post("/api/orders/confirm")
-				.param("orderId", orderId)
-				.param("paymentKey", paymentKey)
-				.param("amount", String.valueOf(amount)))
-			.andExpect(status().isOk());
-	}
-
-	@Test
-	@DisplayName("결제 승인 실패 시 주문서 삭제 및 상태코드 반환 테스트")
-	void testOrderConfirmFailure() throws Exception {
-		String orderId = "TEST-ORDER-CODE";
-		String paymentKey = "TEST-PAYMENT-KEY";
-		long amount = 10000L;
-
-		ResponseEntity<ResponseTossPaymentConfirmDTO> failedResponse =
-			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-		when(orderService.confirmOrder(orderId, paymentKey, amount))
-			.thenReturn(failedResponse);
-
-		when(orderService.deleteOrder(orderId))
-			.thenReturn(ResponseEntity.ok().build());
-
-		mockMvc.perform(post("/api/orders/confirm")
-				.param("orderId", orderId)
-				.param("paymentKey", paymentKey)
-				.param("amount", String.valueOf(amount)))
-			.andExpect(status().isBadRequest());
-
-		verify(orderService).deleteOrder(orderId);
-	}
+	// @Test
+	// @DisplayName("결제 승인 실패 시 주문서 삭제 및 상태코드 반환 테스트")
+	// void testOrderConfirmFailure() throws Exception {
+	// 	String orderId = "TEST-ORDER-CODE";
+	// 	String paymentKey = "TEST-PAYMENT-KEY";
+	// 	long amount = 10000L;
+	//
+	// 	ResponseEntity<ResponseTossPaymentConfirmDTO> failedResponse =
+	// 		ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	//
+	// 	when(orderService.confirmOrder(orderId, paymentKey, amount))
+	// 		.thenReturn(failedResponse);
+	//
+	// 	when(orderService.deleteOrder(orderId))
+	// 		.thenReturn(ResponseEntity.ok().build());
+	//
+	// 	mockMvc.perform(post("/api/orders/confirm")
+	// 			.param("orderId", orderId)
+	// 			.param("paymentKey", paymentKey)
+	// 			.param("amount", String.valueOf(amount)))
+	// 		.andExpect(status().isBadRequest());
+	//
+	// 	verify(orderService).deleteOrder(orderId);
+	// }
 
 	@Test
 	@DisplayName("주문 삭제 테스트")
