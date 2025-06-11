@@ -19,7 +19,9 @@ import com.nhnacademy.back.coupon.membercoupon.domain.entity.MemberCoupon;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BirthdayCouponConsumer {
@@ -30,22 +32,33 @@ public class BirthdayCouponConsumer {
 
 	@RabbitListener(queues = RabbitConfig.BIRTHDAY_QUEUE)
 	public void issueCoupon(Long memberId) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(CustomerNotFoundException::new);
+		try {
+			Member member = memberRepository.findById(memberId)
+				.orElseThrow(CustomerNotFoundException::new);
 
-		String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("M월"));
-		String birthCouponName = currentMonth + " 생일 쿠폰";
+			String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("M월"));
+			String birthCouponName = currentMonth + " 생일 쿠폰";
 
-		Coupon birthdayCoupon = couponRepository
-			.findFirstByCouponNameAndCouponIsActiveOrderByCouponIdDesc(birthCouponName, true)
-			.orElseThrow(() -> new CouponNotFoundException("활성화된 생일 쿠폰이 존재하지 않습니다."));
+			Coupon birthdayCoupon = couponRepository
+				.findFirstByCouponNameAndCouponIsActiveOrderByCouponIdDesc(birthCouponName, true)
+				.orElseThrow(() -> new CouponNotFoundException("활성화된 생일 쿠폰이 존재하지 않습니다."));
 
-		MemberCoupon memberCoupon = new MemberCoupon(
-			member,
-			birthdayCoupon,
-			LocalDateTime.now(),
-			LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()), LocalTime.MAX)
-		);
-		memberCouponRepository.save(memberCoupon);
+			MemberCoupon memberCoupon = new MemberCoupon(
+				member,
+				birthdayCoupon,
+				LocalDateTime.now(),
+				LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()), LocalTime.MAX)
+			);
+			memberCouponRepository.save(memberCoupon);
+
+			log.info("생일 쿠폰 발급 성공 - memberId: {}", memberId);
+
+		} catch (CustomerNotFoundException | CouponNotFoundException e) {
+			log.error("생일 쿠폰 발급 실패 - {}", e.getMessage());
+			throw e;
+		} catch (Exception e) {
+			log.error("생일 쿠폰 발급 실패", e);
+			throw e;
+		}
 	}
 }

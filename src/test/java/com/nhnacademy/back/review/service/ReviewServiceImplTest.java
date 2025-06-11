@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -29,17 +28,23 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
+import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.publisher.domain.entity.Publisher;
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -90,7 +95,11 @@ class ReviewServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		customer = new Customer(customerId, "abc@gmail.com", "pwd12345", "홍길동");
-		member = Mockito.mock(Member.class);
+		member = Member.builder()
+			.customer(customer)
+			.customerId(customerId)
+			.memberId("memberId1")
+			.build();
 
 		product = new Product(1L, new ProductState(ProductStateName.SALE), new Publisher("a"),
 			"Product A", "content", "description", LocalDate.now(), "isbn",
@@ -98,46 +107,103 @@ class ReviewServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 생성 테스트")
-	void createReview() {
+	@DisplayName("회원 리뷰 생성 테스트")
+	void createReview_Member() {
 		// given
-		// MockMultipartFile mockFile = new MockMultipartFile("reviewImage", "test-image.jpg", "image/jpeg",
-		// 	"dummy image content".getBytes());
-		// RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, customerId, "", "좋네요", 5, mockFile);
-		//
-		// List<OrderDetail> orderDetails = List.of(any(OrderDetail.class));
-		//
-		// when(memberRepository.getMemberByMemberId(anyString())).thenReturn(member);
-		// when(member.getCustomerId()).thenReturn(customerId);
-		// when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-		// when(productRepository.findById(customerId)).thenReturn(Optional.of(product));
-		// when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
-		// doNothing().when(minioUtils).uploadObject(anyString(), anyString(), any(MultipartFile.class));
-		// when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(orderDetails);
-		// when(orderDetails.getFirst()).thenReturn(any(OrderDetail.class));
-		//
-		// // when
-		// reviewService.createReview(request);
-		//
-		// // then
-		// verify(reviewRepository, times(1)).save(any(Review.class));
-		// verify(productSearchService, times(1)).updateProductDocumentReview(anyLong(), anyInt());
+		OrderDetail orderDetail = mock(OrderDetail.class);
+
+		MultipartFile imageFile = new MockMultipartFile("file", "image.jpg", "image/jpeg", "data".getBytes());
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), null, member.getMemberId(), "내용", 4, imageFile);
+
+		when(memberRepository.getMemberByMemberId(member.getMemberId())).thenReturn(member);
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(List.of(orderDetail));
+		doNothing().when(minioUtils).uploadObject(any(), any(), any());
+		when(reviewRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+		// when
+		reviewService.createReview(request);
+
+		// then
+		verify(productSearchService).updateProductDocumentReview(product.getProductId(), request.getReviewGrade());
 	}
 
 	@Test
-	@DisplayName("리뷰 생성 테스트 - 실패(고객을 찾지 못한 경우)")
-	void createReview_Fail_CustomerNotFound() {
+	@DisplayName("회원 리뷰 생성 테스트 - 실패(회원 ID로 회원을 찾지 못한 경우)")
+	void createReview_Fail_MemberNotFoundException() {
 		// given
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, customerId, "", "좋네요", 5, null);
+		when(memberRepository.getMemberByMemberId("unknown")).thenReturn(null);
 
-		when(memberRepository.getMemberByMemberId(anyString())).thenReturn(member);
-		when(member.getCustomerId()).thenReturn(customerId);
-		when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, null, "unknown", "내용", 5, null);
 
 		// when & then
-		assertThatThrownBy(() -> reviewService.createReview(request))
-			.isInstanceOf(CustomerNotFoundException.class);
+		assertThrows(NotFoundMemberException.class, () -> reviewService.createReview(request));
 	}
+	
+	@Test
+	@DisplayName("비회원 리뷰 생성 테스트")
+	void createReview_Customer() {
+		// given
+		OrderDetail orderDetail = mock(OrderDetail.class);
+
+		MultipartFile imageFile = new MockMultipartFile("file", "image.jpg", "image/jpeg", "data".getBytes());
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 4, imageFile);
+
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(List.of(orderDetail));
+		when(reviewRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+		// when
+		reviewService.createReview(request);
+
+		// then
+		verify(eventPublisher, never()).publishEvent(any()); // 비회원은 이벤트 없음
+		verify(productSearchService).updateProductDocumentReview(product.getProductId(), 4);
+	}
+
+	@Test
+	@DisplayName("비회원 리뷰 생성 테스트 - 실패(고객을 찾지 못한 경우)")
+	void createReview_Fail_CustomerNotFoundException() {
+		// given
+		when(customerRepository.findById(999L)).thenReturn(Optional.empty());
+
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(1L, 999L, null, "내용", 5, null);
+
+		// when & then
+		assertThrows(CustomerNotFoundException.class, () -> reviewService.createReview(request));
+	}
+
+	@Test
+	@DisplayName("리뷰 생성 테스트 - 실패(상품이 존재하지 않을 경우)")
+	void createReview_fail_productNotFound() {
+		// given
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+		when(productRepository.findById(100L)).thenReturn(Optional.empty());
+
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(100L, customerId, null, "내용", 5, null);
+
+		// when & then
+		assertThrows(ProductNotFoundException.class, () -> reviewService.createReview(request));
+	}
+
+	@Test
+	@DisplayName("리뷰 생성 테스트 - 실패(작성 가능한 주문 상세가 없는 경우)")
+	void createReview_fail_orderDetailNotFound() {
+		// given
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(false);
+
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 5, null);
+
+		// when & then
+		assertThrows(OrderDetailNotFoundException.class, () -> reviewService.createReview(request));
+	}
+
 
 	@Test
 	@DisplayName("리뷰 수정 테스트")
@@ -160,7 +226,7 @@ class ReviewServiceImplTest {
 		assertEquals("수정된 내용", result.getReviewContent());
 		assertEquals("storageUrl", result.getReviewImageUrl());
 	}
-
+	
 	@Test
 	@DisplayName("리뷰 수정 테스트 - 실패(리뷰를 찾지 못한 경우)")
 	void updateReview_Fail_ReviewNotFound() {
@@ -195,7 +261,7 @@ class ReviewServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 정보 조회")
+	@DisplayName("리뷰 정보 조회 테스트")
 	void getReviewInfo() {
 		// given
 		when(reviewRepository.totalAvgReviewsByProductId(1L)).thenReturn(4.24);
@@ -210,4 +276,93 @@ class ReviewServiceImplTest {
 		assertEquals(10, result.getTotalCount());
 		assertEquals(5, result.getStarCounts().size());
 	}
+
+	@Test
+	@DisplayName("회원 리뷰 목록 조회 테스트")
+	void getReviewsByMember() {
+		// given
+		Review review = Review.builder()
+			.reviewId(1L)
+			.reviewContent("좋아요")
+			.reviewGrade(5)
+			.reviewImage("review.jpg")
+			.product(product)
+			.customer(Customer.builder().customerId(customerId).build())
+			.reviewCreatedAt(LocalDateTime.now())
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 5);
+		Page<Review> reviewPage = new PageImpl<>(List.of(review));
+
+		when(memberRepository.getMemberByMemberId(member.getMemberId())).thenReturn(member);
+		when(reviewRepository.findAllByCustomer_CustomerId(customerId, pageable)).thenReturn(reviewPage);
+		when(minioUtils.getPresignedUrl(any(), any())).thenReturn("http://mocked.url");
+
+		// when
+		Page<ResponseMemberReviewDTO> result = reviewService.getReviewsByMember(member.getMemberId(), pageable);
+
+		// then
+		assertEquals(1, result.getTotalElements());
+		verify(minioUtils, times(1)).getPresignedUrl(any(), any());
+	}
+
+	@Test
+	@DisplayName("회원 리뷰 목록 조회 테스트 - 실패(존재하지 않는 회원)")
+	void getReviewsByMember_Fail_NotFoundException() {
+		// given
+		when(memberRepository.getMemberByMemberId("wrongId")).thenReturn(null);
+
+		// when & then
+		assertThrows(NotFoundMemberException.class,
+			() -> reviewService.getReviewsByMember("wrongId", Pageable.unpaged()));
+	}
+
+	@Test
+	@DisplayName("리뷰 존재 여부 확인 테스트")
+	void existsReviewedOrderCode() {
+		// given
+		when(reviewRepository.existsReviewedOrderCode("ORD123")).thenReturn(true);
+
+		// when
+		boolean result = reviewService.existsReviewedOrderCode("ORD123");
+
+		// then
+		assertTrue(result);
+	}
+
+	@Test
+	@DisplayName("주문 상세 ID로 리뷰 조회 테스트")
+	void findByOrderDetailId() {
+		// given
+		Review review = Review.builder()
+			.reviewId(1L)
+			.reviewContent("좋음")
+			.reviewGrade(4)
+			.reviewImage("img.jpg")
+			.product(Product.builder().productId(1L).build())
+			.customer(Customer.builder().customerId(1L).build())
+			.build();
+
+		when(reviewRepository.findByOrderDetailId(100L)).thenReturn(Optional.of(review));
+		when(minioUtils.getPresignedUrl(any(), any())).thenReturn("http://signed.url");
+
+		// when
+		ResponseReviewDTO result = reviewService.findByOrderDetailId(100L);
+
+		// then
+		assertEquals(1L, result.getReviewId());
+		assertEquals("http://signed.url", result.getReviewImage());
+	}
+
+	@Test
+	@DisplayName("주문 상세 ID로 리뷰 조회 테스트 - 실패(리뷰 없음)")
+	void findByOrderDetailId_Fail_NotFoundException() {
+		// given
+		when(reviewRepository.findByOrderDetailId(anyLong())).thenReturn(Optional.empty());
+
+		// when & then
+		assertThrows(ReviewNotFoundException.class,
+			() -> reviewService.findByOrderDetailId(999L));
+	}
+	
 }

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,6 +27,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestCreateReviewMetaDTO;
 import com.nhnacademy.back.review.domain.dto.request.RequestUpdateReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseMemberReviewDTO;
+import com.nhnacademy.back.review.domain.dto.response.ResponseReviewDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewInfoDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseReviewPageDTO;
 import com.nhnacademy.back.review.domain.dto.response.ResponseUpdateReviewDTO;
@@ -137,6 +141,51 @@ class ReviewRestControllerTest {
 
 		// when & then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/products/{productId}/reviews/info", 1L))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("GET /api/members/member1/reviews - 회원 리뷰 목록 조회 테스트")
+	void getReviewsByMember() throws Exception {
+		// given
+		ResponseMemberReviewDTO dto = new ResponseMemberReviewDTO();
+		Page<ResponseMemberReviewDTO> page = new PageImpl<>(Collections.singletonList(dto));
+
+		when(reviewService.getReviewsByMember(eq("member1"), any(PageRequest.class)))
+			.thenReturn(page);
+
+		// when & then
+		mockMvc.perform(get("/api/members/{memberId}/reviews", "member1")
+				.param("page", "0")
+				.param("size", "10")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("GET /api/orders/{orderCode}/reviewed - 주문 코드 리뷰 여부 확인 테스트")
+	void isReviewedByOrder() throws Exception {
+		// given
+		when(reviewService.existsReviewedOrderCode("ORD123"))
+			.thenReturn(true);
+
+		// when & then
+		mockMvc.perform(get("/api/orders/{orderCode}/reviewed", "ORD123")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").value(true));
+	}
+
+	@Test
+	@DisplayName("GET /api/reviews/{reviewId} - 주문 상세 ID로 리뷰 조회 테스트")
+	void findReviewByOrderDetailId() throws Exception {
+		// given
+		ResponseReviewDTO dto = new ResponseReviewDTO();
+		when(reviewService.findByOrderDetailId(1L)).thenReturn(dto);
+
+		// when & then
+		mockMvc.perform(get("/api/reviews/{reviewId}", 1L)
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
 

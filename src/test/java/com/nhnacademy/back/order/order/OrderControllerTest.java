@@ -30,10 +30,11 @@ import com.nhnacademy.back.order.order.controller.OrderController;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
@@ -86,7 +87,7 @@ public class OrderControllerTest {
 		when(orderService.createOrder(any()))
 			.thenReturn(ResponseEntity.ok(responseDTO));
 
-		mockMvc.perform(post("/api/orders/create/tossPay")
+		mockMvc.perform(post("/api/orders/create/payment")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
@@ -97,7 +98,7 @@ public class OrderControllerTest {
 	void testCreateOrderFail() throws Exception {
 		RequestOrderWrapperDTO request = new RequestOrderWrapperDTO();
 
-		mockMvc.perform(post("/api/orders/create/tossPay")
+		mockMvc.perform(post("/api/orders/create/payment")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest())
@@ -112,14 +113,13 @@ public class OrderControllerTest {
 		String paymentKey = "TEST-PAYMENT-KEY";
 		long amount = 1000L;
 
-		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
-		when(orderService.confirmOrder(orderId, paymentKey, amount))
-			.thenReturn(ResponseEntity.ok(confirmDTO));
+		RequestPaymentApproveDTO approveDTO = new RequestPaymentApproveDTO(orderId, paymentKey, amount, "TOSS");
+		ResponseEntity<ResponsePaymentConfirmDTO> response = ResponseEntity.ok(new ResponsePaymentConfirmDTO());
+		when(orderService.confirmOrder(any())).thenReturn(response);
 
 		mockMvc.perform(post("/api/orders/confirm")
-				.param("orderId", orderId)
-				.param("paymentKey", paymentKey)
-				.param("amount", String.valueOf(amount)))
+				.content(objectMapper.writeValueAsString(approveDTO))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
 
@@ -129,20 +129,19 @@ public class OrderControllerTest {
 		String orderId = "TEST-ORDER-CODE";
 		String paymentKey = "TEST-PAYMENT-KEY";
 		long amount = 10000L;
+		RequestPaymentApproveDTO approveDTO = new RequestPaymentApproveDTO(orderId, paymentKey, amount, "TOSS");
 
-		ResponseEntity<ResponseTossPaymentConfirmDTO> failedResponse =
+		ResponseEntity<ResponsePaymentConfirmDTO> failedResponse =
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-		when(orderService.confirmOrder(orderId, paymentKey, amount))
-			.thenReturn(failedResponse);
+		when(orderService.confirmOrder(any())).thenReturn(failedResponse);
 
 		when(orderService.deleteOrder(orderId))
 			.thenReturn(ResponseEntity.ok().build());
 
 		mockMvc.perform(post("/api/orders/confirm")
-				.param("orderId", orderId)
-				.param("paymentKey", paymentKey)
-				.param("amount", String.valueOf(amount)))
+				.content(objectMapper.writeValueAsString(approveDTO))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest());
 
 		verify(orderService).deleteOrder(orderId);

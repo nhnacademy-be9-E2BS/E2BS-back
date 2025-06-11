@@ -45,13 +45,14 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 	/// 성능과 명확성을 위해 count(od) > 0 보다는 exists 를 사용
 	/// exists 는 하나만 찾으면 멈추기 때문에 일반적으로 더 빠름
 	/// 주문 상태가 완료 된 경우 쿼리, 이 쿼리로 적용할 시 추가로 서비스단에 OrderDetail 을 가져오는 메소드도 수정해야함
-	// @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
-	// 	"FROM OrderDetail od " +
-	// 	"JOIN od.order o " +
-	// 	"WHERE o.orderState.orderStateId = 2 " +
-	// 	"AND o.customer.customerId = :customerId " +
-	// 	"AND od.product.productId = :productId " +
-	// 	"AND od.review IS NULL")
+	// @Query("select exists (" +
+	// 	"  select 1 from OrderDetail od " +
+	// 	"  join od.order o " +
+	// 	"  where o.orderState.orderStateId = 2" +
+	// 	"  and o.customer.customerId = :customerId " +
+	// 	"  and od.product.productId = :productId " +
+	// 	"  and od.review is null" +
+	// 	")")
 	@Query("select exists (" +
 		   "  select 1 from OrderDetail od " +
 		   "  join od.order o " +
@@ -72,7 +73,9 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		   ")")
 	boolean existsReviewedOrderCode(String orderCode);
 
-
+	/**
+	 * 주문 상세 아이디로 리뷰 조회
+	 */
 	@Query("select r " +
 		   "from Review r " +
 		   "left join OrderDetail od " +

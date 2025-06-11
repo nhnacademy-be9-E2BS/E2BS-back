@@ -34,9 +34,8 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
-import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
@@ -51,7 +50,6 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
-	private final DeliveryFeeJpaRepository deliveryFeeRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -74,6 +72,10 @@ public class CartServiceImpl implements CartService {
 			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		Cart cart;
 		// 장바구니가 없으면 장바구니 생성
@@ -212,7 +214,6 @@ public class CartServiceImpl implements CartService {
 					productRegularPrice,
 					productSalePrice,
 					discountRate,
-					ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 					productImagePath,
 					cartItem.getCartItemsQuantity(),
 					productTotalPrice);
@@ -243,6 +244,10 @@ public class CartServiceImpl implements CartService {
 		// 상품 존재 검증
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		// Redis에서 장바구니 가져오기 (없으면 생성)
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
@@ -289,10 +294,8 @@ public class CartServiceImpl implements CartService {
 			productRegularPrice,
 			productSalePrice,
 			discountRate,
-			ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 			productImagePath,
-			request.getQuantity(),
-			productSalePrice * request.getQuantity()
+			request.getQuantity()
 		);
 		cart.getCartItems().add(newItem);
 
@@ -379,17 +382,18 @@ public class CartServiceImpl implements CartService {
 
 		// DTO 가공
 		return cartItems.stream()
-			.map(cartItem -> new ResponseCartItemsForGuestDTO(
+			.map(cartItem -> {
+				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
+				return new ResponseCartItemsForGuestDTO(
 				cartItem.getProductId(),
 				cartItem.getProductTitle(),
 				cartItem.getProductRegularPrice(),
 				cartItem.getProductSalePrice(),
 				cartItem.getDiscountRate(),
-				cartItem.getDeliveryFee(),
 				cartItem.getProductImagePath(),
 				cartItem.getCartItemsQuantity(),
-				cartItem.getProductTotalPrice()
-			))
+				productTotalPrice);
+			})
 			.toList();
 	}
 
@@ -473,7 +477,7 @@ public class CartServiceImpl implements CartService {
 			for (CartItems cartItem : copiedCartItems) {
 				for (int i = 0; i < productIds.size(); i++) {
 					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
-						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i);
+						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
 
 						if (newQuantity > 0) {
 							cartItem.changeCartItemsQuantity(newQuantity);
