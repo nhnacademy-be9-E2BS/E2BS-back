@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
@@ -39,7 +40,7 @@ public class OrderController {
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
 	@Operation(summary = "외부 API 결제 주문서 저장", description = "사용자가 외부 API 결제를 진행할 시 미리 DB에 주문 내역을 저장하는 기능")
-	@PostMapping("/create/tossPay")
+	@PostMapping("/create/payment")
 	public ResponseEntity<ResponseOrderResultDTO> createOrder(
 		@Parameter(description = "주문 상품 정보") @Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
@@ -57,17 +58,15 @@ public class OrderController {
 	 */
 	@Operation(summary = "외부 API 결제 승인 요청", description = "사용자가 결제 완료 시 결제 승인을 요청하는 기능")
 	@PostMapping("/confirm")
-	public ResponseEntity<Void> orderConfirm(
-		@Parameter(description = "주문 코드") @RequestParam String orderId,
-		@Parameter(description = "결제 키") @RequestParam String paymentKey,
-		@Parameter(description = "결제 금액") @RequestParam long amount) {
+	public ResponseEntity<Void> orderConfirm(@RequestBody RequestPaymentApproveDTO approveRequest) {
 		// 승인 하고 이후에 결과에 따른 롤백처리 필요 할 수 있음
-		ResponseEntity<ResponseTossPaymentConfirmDTO> response = orderService.confirmOrder(orderId, paymentKey, amount);
+
+		ResponseEntity<ResponsePaymentConfirmDTO> response = orderService.confirmOrder(approveRequest);
 		if (response.getStatusCode().is2xxSuccessful()) {
 			//결제 승인 완료 시 포인트 차감, 쿠폰 사용, 포인트 적립 호출, 결제 정보 저장
 			paymentService.createPayment(response.getBody());
 		} else { // 승인 실패 시 롤백
-			orderService.deleteOrder(orderId);
+			orderService.deleteOrder(approveRequest.getOrderId());
 		}
 		return ResponseEntity.status(response.getStatusCode()).build();
 	}
@@ -87,7 +86,8 @@ public class OrderController {
 	 */
 	@Operation(summary = "특정 주문 내역 조회", description = "사용자가 특정 주문 코드의 주문 내역을 확인 가능하도록 반환하는 기능")
 	@GetMapping("/{order-code}")
-	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(@Parameter(description = "주문 코드") @PathVariable(name = "order-code") String orderCode) {
+	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(
+		@Parameter(description = "주문 코드") @PathVariable(name = "order-code") String orderCode) {
 		return ResponseEntity.ok(orderService.getOrderByOrderCode(orderCode));
 	}
 
