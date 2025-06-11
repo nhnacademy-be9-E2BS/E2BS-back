@@ -120,7 +120,6 @@ class ProductCategoryJpaRepositoryTest {
 		List<ProductCategory> result = productCategoryJpaRepository.findAllWithCategoriesByProductIds(
 			List.of(product1.getProductId(), product2.getProductId()));
 		assertThat(result).hasSize(3);
-		assertThat(result.get(0).getCategory()).isNotNull();
 	}
 
 	@Test

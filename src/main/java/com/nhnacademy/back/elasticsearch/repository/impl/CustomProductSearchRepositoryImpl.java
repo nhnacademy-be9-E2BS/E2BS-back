@@ -2,7 +2,6 @@ package com.nhnacademy.back.elasticsearch.repository.impl;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +27,11 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 	private final ElasticsearchOperations elasticsearchOperations;
 
+	private final static String productReviewCount = "productReviewCount";
+	private final static String productHits = "productHits";
+	private final static String productSearches = "productSearches";
+	private final static String productPublishedAt = "productPublishedAt";
+
 	/**
 	 * 검색어로 검색 후 정렬
 	 */
@@ -41,7 +45,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 			.or(new Criteria("productTags").matches(keyword).boost(5.0f));
 
 		if (sortType == ProductSortType.RATING) {
-			criteria = criteria.and("productReviewCount").greaterThanEqual(100);
+			criteria = criteria.and(productReviewCount).greaterThanEqual(100);
 		}
 
 		return executeSearchWithCriteria(criteria, pageable, sortType);
@@ -55,7 +59,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 		Criteria criteria = Criteria.where("productCategoryIds").in(categoryId);
 
 		if (sortType == ProductSortType.RATING) {
-			criteria = criteria.and("productReviewCount").greaterThanEqual(100);
+			criteria = criteria.and(productReviewCount).greaterThanEqual(100);
 		}
 
 		return executeSearchWithCriteria(criteria, pageable, sortType);
@@ -70,8 +74,8 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		Query query = new CriteriaQuery(criteria);
 		query.addSort(Sort.by(
-			Sort.Order.desc("productHits"),
-			Sort.Order.desc("productSearches")
+			Sort.Order.desc(productHits),
+			Sort.Order.desc(productSearches)
 		));
 		query.setPageable(PageRequest.of(0, 12));
 
@@ -79,7 +83,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		return searchHits.getSearchHits().stream()
 			.map(hit -> hit.getContent().getProductId())
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
@@ -90,14 +94,14 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 		Criteria criteria = new Criteria();
 
 		Query query = new CriteriaQuery(criteria);
-		query.addSort(Sort.by(Sort.Order.desc("productPublishedAt")));
+		query.addSort(Sort.by(Sort.Order.desc(productPublishedAt)));
 		query.setPageable(PageRequest.of(0, 12));
 
 		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
 
 		return searchHits.getSearchHits().stream()
 			.map(hit -> hit.getContent().getProductId())
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
@@ -113,8 +117,8 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		Query query = new CriteriaQuery(criteria);
 		query.addSort(Sort.by(
-			Sort.Order.desc("productHits"),
-			Sort.Order.desc("productSearches")
+			Sort.Order.desc(productHits),
+			Sort.Order.desc(productSearches)
 		));
 		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
 
@@ -122,7 +126,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		List<Long> productIds = searchHits.getSearchHits().stream()
 			.map(hit -> hit.getContent().getProductId())
-			.collect(Collectors.toList());
+			.toList();
 
 		return new PageImpl<>(productIds, pageable, searchHits.getTotalHits());
 	}
@@ -133,17 +137,17 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 	@Override
 	public Page<Long> newestSellerProductIds(Pageable pageable) {
 		LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
-		Criteria criteria = new Criteria("productPublishedAt").greaterThanEqual(threeMonthsAgo);
+		Criteria criteria = new Criteria(productPublishedAt).greaterThanEqual(threeMonthsAgo);
 
 		Query query = new CriteriaQuery(criteria);
-		query.addSort(Sort.by(Sort.Order.desc("productPublishedAt")));
+		query.addSort(Sort.by(Sort.Order.desc(productPublishedAt)));
 		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
 
 		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
 
 		List<Long> productIds = searchHits.getSearchHits().stream()
 			.map(hit -> hit.getContent().getProductId())
-			.collect(Collectors.toList());
+			.toList();
 
 		return new PageImpl<>(productIds, pageable, searchHits.getTotalHits());
 	}
@@ -179,8 +183,8 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		return switch (sortType) {
 			case POPULARITY -> Sort.by(
-				Sort.Order.desc("productHits"),
-				Sort.Order.desc("productSearches")
+				Sort.Order.desc(productHits),
+				Sort.Order.desc(productSearches)
 			);
 			case LATEST -> Sort.by(Sort.Order.desc("productPublishedAt"));
 			case LOW_PRICE -> Sort.by(Sort.Order.asc("productSalePrice"));
