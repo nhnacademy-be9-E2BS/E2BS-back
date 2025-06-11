@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
@@ -35,16 +33,20 @@ import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
+import com.nhnacademy.back.order.order.adaptor.PaymentAdaptorFactory;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
+import com.nhnacademy.back.order.order.adaptor.TossPaymentAdaptor;
+import com.nhnacademy.back.order.order.adaptor.mapper.TossResponseMapper;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
 import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.model.entity.OrderDetail;
@@ -64,6 +66,8 @@ import com.nhnacademy.back.order.wrapper.repository.WrapperJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.product.service.ProductService;
+import com.nhnacademy.back.product.state.domain.entity.ProductState;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -101,11 +105,10 @@ class OrderServiceImplTest {
 	private MemberCouponService memberCouponService;
 	@Mock
 	private ApplicationEventPublisher applicationEventPublisher;
-
-	@BeforeEach
-	void setUp() {
-		ReflectionTestUtils.setField(orderService, "secretKey", "dummy-secret");
-	}
+	@Mock
+	private PaymentAdaptorFactory paymentAdaptorFactory;
+	@Mock
+	private TossPaymentAdaptor tossPaymentAdaptor;
 
 	@Test
 	@DisplayName("토스 결제 주문 생성 성공")
@@ -139,6 +142,7 @@ class OrderServiceImplTest {
 		Product product = mock(Product.class);
 		OrderState orderState = mock(OrderState.class);
 		Wrapper wrapper = mock(Wrapper.class);
+		ProductState productState = mock(ProductState.class);
 
 		when(customerJpaRepository.findById(anyLong())).thenReturn(Optional.of(customer));
 		when(deliveryFeeJpaRepository.findById(anyLong())).thenReturn(Optional.of(deliveryFee));
@@ -146,6 +150,8 @@ class OrderServiceImplTest {
 		when(orderStateJpaRepository.findByOrderStateName(any(OrderStateName.class))).thenReturn(
 			Optional.of(orderState));
 		when(wrapperJpaRepository.findById(anyLong())).thenReturn(Optional.of(wrapper));
+		when(product.getProductState()).thenReturn(productState);
+		when(productState.getProductStateName()).thenReturn(ProductStateName.SALE);
 
 		// when
 		ResponseEntity<ResponseOrderResultDTO> response = orderService.createOrder(wrapperDTO);
@@ -198,11 +204,14 @@ class OrderServiceImplTest {
 		when(wrapperJpaRepository.findById(anyLong())).thenReturn(Optional.of(wrapper));
 
 		Order order = mock(Order.class);
+		ProductState productState = mock(ProductState.class);
 
 		when(orderJpaRepository.findById(anyString())).thenReturn(Optional.of(order));
 		when(order.getCustomer()).thenReturn(customer);
 		when(customer.getCustomerId()).thenReturn(1L);
 		doNothing().when(order).updatePaymentStatus(true);
+		when(product.getProductState()).thenReturn(productState);
+		when(productState.getProductStateName()).thenReturn(ProductStateName.SALE);
 
 		// when
 		ResponseEntity<ResponseOrderResultDTO> response = orderService.createPointOrder(wrapperDTO);
@@ -223,22 +232,23 @@ class OrderServiceImplTest {
 		String orderId = "TEST-ORDER-CODE";
 		String paymentKey = "TEST-PAYMENT-KEY";
 		long amount = 15000L;
-
+		RequestPaymentApproveDTO approveDTO = new RequestPaymentApproveDTO(orderId, paymentKey, amount, "TOSS");
 		Order order = mock(Order.class);
 		Customer customer = mock(Customer.class);
-		ResponseTossPaymentConfirmDTO confirmDTO = new ResponseTossPaymentConfirmDTO();
-		ResponseEntity<ResponseTossPaymentConfirmDTO> responseEntity = ResponseEntity.ok(confirmDTO);
+		ResponseEntity<ResponsePaymentConfirmDTO> responseEntity = ResponseEntity.ok(new ResponsePaymentConfirmDTO());
 
-		when(tossAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
+		when(tossPaymentAdaptor.confirmOrder(any()))
 			.thenReturn(responseEntity);
 		when(orderJpaRepository.findById(orderId)).thenReturn(Optional.of(order));
 		when(order.getMemberCoupon()).thenReturn(null);
 
 		when(order.getCustomer()).thenReturn(customer);
 		when(customer.getCustomerId()).thenReturn(1L);
+
+		when(paymentAdaptorFactory.getAdapter(any())).thenReturn(tossPaymentAdaptor);
 		// when
-		ResponseEntity<ResponseTossPaymentConfirmDTO> response =
-			orderService.confirmOrder(orderId, paymentKey, amount);
+		ResponseEntity<ResponsePaymentConfirmDTO> response =
+			orderService.confirmOrder(approveDTO);
 
 		// then
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -252,16 +262,17 @@ class OrderServiceImplTest {
 		String orderId = "TEST-ORDER-CODE";
 		String paymentKey = "TEST-PAYMENT-KEY";
 		long amount = 15000L;
+		RequestPaymentApproveDTO approveDTO = new RequestPaymentApproveDTO(orderId, paymentKey, amount, "TOSS");
 
-		ResponseEntity<ResponseTossPaymentConfirmDTO> responseEntity =
+		ResponseEntity<ResponsePaymentConfirmDTO> responseEntity =
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-		when(tossAdaptor.confirmOrder(any(RequestTossConfirmDTO.class), anyString()))
-			.thenReturn(responseEntity);
+		when(paymentAdaptorFactory.getAdapter(any())).thenReturn(tossPaymentAdaptor);
+		when(tossPaymentAdaptor.confirmOrder(any())).thenReturn(responseEntity);
 
 		// when
-		ResponseEntity<ResponseTossPaymentConfirmDTO> response =
-			orderService.confirmOrder(orderId, paymentKey, amount);
+		ResponseEntity<ResponsePaymentConfirmDTO> response =
+			orderService.confirmOrder(approveDTO);
 
 		// then
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -487,6 +498,7 @@ class OrderServiceImplTest {
 		OrderState orderState = mock(OrderState.class);
 		OrderState cancelOrderState = mock(OrderState.class);
 		Payment payment = mock(Payment.class);
+		PaymentMethod paymentMethod = mock(PaymentMethod.class);
 
 		when(orderJpaRepository.findById(orderCode)).thenReturn(Optional.of(order));
 		when(order.getOrderState()).thenReturn(orderState);
@@ -498,7 +510,11 @@ class OrderServiceImplTest {
 		when(order.getMemberCoupon()).thenReturn(null);
 		when(paymentJpaRepository.findByOrderOrderCode(orderCode)).thenReturn(Optional.of(payment));
 		when(payment.getPaymentKey()).thenReturn("TEST-PAYMENT-KEY");
+		when(payment.getPaymentMethod()).thenReturn(paymentMethod);
 		when(payment.getTotalPaymentAmount()).thenReturn(1000L);
+		when(paymentMethod.getPaymentMethodName()).thenReturn(PaymentMethodName.TOSS);
+		when(paymentAdaptorFactory.getAdapter(any())).thenReturn(
+			new TossPaymentAdaptor(tossAdaptor, new TossResponseMapper()));
 		when(tossAdaptor.cancelOrder(any(), any(), any())).thenReturn(
 			ResponseEntity.ok(new ResponseTossPaymentConfirmDTO()));
 

@@ -88,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
 	private final LikeJpaRepository likeJpaRepository;
 
 	private final MinioUtils minioUtils;
-	private final String BUCKET_NAME = "e2bs-products-image";
+	private final static String BUCKET_NAME = "e2bs-products-image";
 
 	/**
 	 * 도서를 DB에 저장

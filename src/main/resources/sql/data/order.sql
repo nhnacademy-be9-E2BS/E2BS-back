@@ -2,7 +2,7 @@
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_name)
-VALUES ('TOSS');
+VALUES ('TOSS'), ('OTHER');
 
 -- OrderState
 INSERT INTO order_state (order_state_name)
