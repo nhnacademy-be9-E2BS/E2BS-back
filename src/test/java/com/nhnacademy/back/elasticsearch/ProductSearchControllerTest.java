@@ -50,11 +50,11 @@ class ProductSearchControllerTest {
 		ResponseProductReadDTO responseA = new ResponseProductReadDTO(1L, productStateDTO, publisherDTO, "title A",
 			"content A", "description A",
 			LocalDate.now(), "978-89-12345-01-1", 10000, 8000, true, 1000, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 3.0, 2, false, 10);
 		ResponseProductReadDTO responseB = new ResponseProductReadDTO(2L, productStateDTO, publisherDTO, "title B",
 			"content B", "description B",
 			LocalDate.now(), "978-89-12345-01-2", 9000, 7000, false, 500, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 4.3, 7, false, 10);
 		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB);
 
 		Pageable pageable = PageRequest.of(0, 10);
@@ -64,14 +64,16 @@ class ProductSearchControllerTest {
 
 		String keyword = "title";
 		ProductSortType sortType = ProductSortType.NO_SORT;
+		String memberId = "";
 
 		when(productSearchService.getProductIdsBySearch(pageable, keyword, sortType)).thenReturn(longPage);
-		when(productService.getProductsToElasticSearch(longPage)).thenReturn(products);
+		when(productService.getProductsToElasticSearch(longPage, memberId)).thenReturn(products);
 
 		// when & then
 		mockMvc.perform(get("/api/books/elasticsearch/search")
 				.param("page", "0")
 				.param("size", "10")
+				.param("memberId", "")
 				.param("keyword", keyword)
 				.param("sort", sortType.toString())
 				.accept(MediaType.APPLICATION_JSON))
@@ -88,11 +90,11 @@ class ProductSearchControllerTest {
 		ResponseProductReadDTO responseA = new ResponseProductReadDTO(1L, productStateDTO, publisherDTO, "title A",
 			"content A", "description A",
 			LocalDate.now(), "978-89-12345-01-1", 10000, 8000, true, 1000, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 3.0, 2, false, 10);
 		ResponseProductReadDTO responseB = new ResponseProductReadDTO(2L, productStateDTO, publisherDTO, "title B",
 			"content B", "description B",
 			LocalDate.now(), "978-89-12345-01-2", 9000, 7000, false, 500, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 4.3, 7, false, 10);
 		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB);
 
 		Pageable pageable = PageRequest.of(0, 10);
@@ -102,15 +104,17 @@ class ProductSearchControllerTest {
 
 		Long categoryId = 1L;
 		ProductSortType sortType = ProductSortType.NO_SORT;
+		String memberId = "";
 
 		when(productSearchService.getProductIdsByCategoryId(pageable, categoryId, sortType)).thenReturn(longPage);
-		when(productService.getProductsToElasticSearch(longPage)).thenReturn(products);
+		when(productService.getProductsToElasticSearch(longPage, memberId)).thenReturn(products);
 
 		// when & then
 		mockMvc.perform(get("/api/books/elasticsearch/category/1")
 				.param("sort", sortType.name())
 				.param("page", "0")
 				.param("size", "10")
+				.param("memberId", "")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
@@ -175,25 +179,27 @@ class ProductSearchControllerTest {
 		ResponseProductReadDTO responseA = new ResponseProductReadDTO(1L, productStateDTO, publisherDTO, "title A",
 			"content A", "description A",
 			LocalDate.now(), "978-89-12345-01-1", 10000, 8000, true, 1000, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 3.0, 2, false, 10);
 		ResponseProductReadDTO responseB = new ResponseProductReadDTO(2L, productStateDTO, publisherDTO, "title B",
 			"content B", "description B",
 			LocalDate.now(), "978-89-12345-01-2", 9000, 7000, false, 500, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 4.3, 7, false, 10);
 		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB);
 
 		Pageable pageable = PageRequest.of(0, 10);
 		List<Long> productIdList = List.of(1L, 2L);
+		String memberId = "";
 		Page<Long> longPage = new PageImpl<>(productIdList, pageable, productIdList.size());
 		Page<ResponseProductReadDTO> products = new PageImpl<>(dtos, pageable, dtos.size());
 
 		when(productSearchService.getBestProductIdsHeader(pageable)).thenReturn(longPage);
-		when(productService.getProductsToElasticSearch(longPage)).thenReturn(products);
+		when(productService.getProductsToElasticSearch(longPage, memberId)).thenReturn(products);
 
 		// when & then
 		mockMvc.perform(get("/api/books/elasticsearch/best")
 				.param("page", "0")
 				.param("size", "10")
+				.param("memberId", "")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.content[0].productId").value(1L))
 			.andExpect(jsonPath("$.content[0].productTitle").value("title A"))
@@ -211,25 +217,27 @@ class ProductSearchControllerTest {
 		ResponseProductReadDTO responseA = new ResponseProductReadDTO(1L, productStateDTO, publisherDTO, "title A",
 			"content A", "description A",
 			LocalDate.now(), "978-89-12345-01-1", 10000, 8000, true, 1000, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 3.0, 2, false, 10);
 		ResponseProductReadDTO responseB = new ResponseProductReadDTO(2L, productStateDTO, publisherDTO, "title B",
 			"content B", "description B",
 			LocalDate.now(), "978-89-12345-01-2", 9000, 7000, false, 500, new ArrayList<>(), new ArrayList<>(),
-			List.of(categoryADTO), new ArrayList<>());
+			List.of(categoryADTO), new ArrayList<>(), 4.3, 7, false, 10);
 		List<ResponseProductReadDTO> dtos = List.of(responseA, responseB);
 
 		Pageable pageable = PageRequest.of(0, 10);
 		List<Long> productIdList = List.of(1L, 2L);
+		String memberId = "";
 		Page<Long> longPage = new PageImpl<>(productIdList, pageable, productIdList.size());
 		Page<ResponseProductReadDTO> products = new PageImpl<>(dtos, pageable, dtos.size());
 
 		when(productSearchService.getNewProductIdsHeader(pageable)).thenReturn(longPage);
-		when(productService.getProductsToElasticSearch(longPage)).thenReturn(products);
+		when(productService.getProductsToElasticSearch(longPage, memberId)).thenReturn(products);
 
 		// when & then
 		mockMvc.perform(get("/api/books/elasticsearch/newest")
 				.param("page", "0")
 				.param("size", "10")
+				.param("memberId", "")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.content[0].productId").value(1L))
 			.andExpect(jsonPath("$.content[0].productTitle").value("title A"))

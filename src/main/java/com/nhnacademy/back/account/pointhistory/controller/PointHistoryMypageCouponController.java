@@ -15,12 +15,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/mypage/{memberId}/points")
+@RequestMapping("/api/auth/mypage/{member-id}/points")
 @Tag(name = "마이페이지 포인트 총합", description = "마이페이지 회원 포인트 총합 조회 API")
 public class PointHistoryMypageCouponController {
 
@@ -35,7 +34,7 @@ public class PointHistoryMypageCouponController {
 	@GetMapping
 	public ResponseEntity<ResponseMemberPointDTO> getPoints(
 		@Parameter(description = "회원 ID", example = "user")
-		@PathVariable("memberId") String memberId) {
+		@PathVariable("member-id") String memberId) {
 
 		ResponseMemberPointDTO responseMemberPointDTO = pointHistoryService.getMemberPoints(memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberPointDTO);

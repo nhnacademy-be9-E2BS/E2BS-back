@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +21,6 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGues
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
 
 @WebMvcTest(controllers = CartRestController.class)
 class CartRestControllerForGuestTest {
@@ -102,7 +100,7 @@ class CartRestControllerForGuestTest {
 		// given
 		String sessionId = "session123";
 		List<ResponseCartItemsForGuestDTO> cartItems = List.of(
-			new ResponseCartItemsForGuestDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "/image1.jpg", 2, 1000)
+			new ResponseCartItemsForGuestDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), "/image1.jpg", 2, 1000)
 		);
 
 		when(cartService.getCartItemsByGuest(sessionId)).thenReturn(cartItems);

@@ -357,7 +357,8 @@ VALUES (TIMESTAMP '2025-01-01 00:00:00.000000', TIMESTAMP '2026-01-01 00:00:00.0
 
 -- PaymentMethod
 INSERT INTO payment_method (payment_method_id, payment_method_name)
-VALUES (1, 'TOSS');
+VALUES (1, 'TOSS'),
+       (2, 'OTHER');
 
 
 -- Order

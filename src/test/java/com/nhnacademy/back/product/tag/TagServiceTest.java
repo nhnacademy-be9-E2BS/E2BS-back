@@ -56,7 +56,6 @@ class TagServiceTest {
 
 		//then
 		verify(tagJpaRepository, times(1)).save(any(Tag.class));
-
 	}
 
 	@Test
@@ -64,14 +63,9 @@ class TagServiceTest {
 	void createTagFail() {
 		//given
 		RequestTagDTO request = new RequestTagDTO("Tag A");
-		when(tagJpaRepository.existsByTagName("Tag A"))
-			.thenReturn(false)
-			.thenReturn(true);
+		when(tagJpaRepository.existsByTagName("Tag A")).thenReturn(true);
 
-		//when
-		tagService.createTag(request);
-
-		//then
+		//when & then
 		assertThatThrownBy(() -> tagService.createTag(request))
 			.isInstanceOf(TagAlreadyExistsException.class);
 	}
@@ -96,7 +90,6 @@ class TagServiceTest {
 		assertThat(result.getContent()).hasSize(2);
 		assertThat(result.getContent().get(0).getTagName()).isEqualTo("Tag A");
 		assertThat(result.getContent().get(1).getTagName()).isEqualTo("Tag B");
-
 	}
 
 	@Test
@@ -114,6 +107,7 @@ class TagServiceTest {
 		List<ProductTag> productTags = List.of(productTag);
 		when(tagJpaRepository.findById(1L)).thenReturn(Optional.of(tag));
 		when(productTagJpaRepository.findAllByTag_TagId(1L)).thenReturn(productTags);
+		when(tagJpaRepository.existsByTagName(request.getTagName())).thenReturn(false);
 
 		// when
 		tagService.updateTag(1L, request);
@@ -158,4 +152,27 @@ class TagServiceTest {
 			.isInstanceOf(TagAlreadyExistsException.class);
 	}
 
+	@Test
+	@DisplayName("delete tag - success")
+	void deleteTagSuccessTest() {
+		// given
+		RequestTagDTO request = new RequestTagDTO("delete tag");
+
+		// when
+		tagService.deleteTag(1L, request);
+
+		// then
+		verify(tagJpaRepository, times(1)).deleteTagByTagId(1L);
+	}
+
+	@Test
+	@DisplayName("delete tag - fail")
+	void deleteTagFailTest() {
+		// given
+		RequestTagDTO request = new RequestTagDTO("delete tag");
+
+		// when & then
+		tagService.deleteTag(100L, request);
+		verify(tagJpaRepository, times(1)).deleteTagByTagId(100L);
+	}
 }

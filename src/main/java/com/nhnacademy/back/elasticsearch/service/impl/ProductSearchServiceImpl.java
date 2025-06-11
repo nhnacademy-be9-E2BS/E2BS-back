@@ -48,7 +48,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
 		// 검색 횟수 update
 		for (Long productId : productIds.getContent()) {
-			updateProductDocumentSearches(productId);
+			this.updateProductDocumentSearches(productId);
 		}
 
 		return productIds;

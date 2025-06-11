@@ -2,6 +2,8 @@ package com.nhnacademy.back.cart.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
@@ -31,12 +34,12 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
-import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
+import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
 @Transactional(readOnly = true)
@@ -47,7 +50,6 @@ public class CartServiceImpl implements CartService {
 	private final CustomerJpaRepository customerRepository;
 	private final MemberJpaRepository memberRepository;
 	private final ProductJpaRepository productRepository;
-	private final DeliveryFeeJpaRepository deliveryFeeRepository;
 	private final CartJpaRepository cartRepository;
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -70,6 +72,10 @@ public class CartServiceImpl implements CartService {
 			.orElseThrow(CustomerNotFoundException::new);
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		Cart cart;
 		// 장바구니가 없으면 장바구니 생성
@@ -208,7 +214,6 @@ public class CartServiceImpl implements CartService {
 					productRegularPrice,
 					productSalePrice,
 					discountRate,
-					ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 					productImagePath,
 					cartItem.getCartItemsQuantity(),
 					productTotalPrice);
@@ -239,6 +244,10 @@ public class CartServiceImpl implements CartService {
 		// 상품 존재 검증
 		Product findProduct = productRepository.findById(request.getProductId())
 			.orElseThrow(ProductNotFoundException::new);
+		// 상품 상태 검증
+		if (findProduct.getProductState().getProductStateId() != 1) {
+			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
 
 		// Redis에서 장바구니 가져오기 (없으면 생성)
 		Object o = redisTemplate.opsForValue().get(request.getSessionId());
@@ -285,10 +294,8 @@ public class CartServiceImpl implements CartService {
 			productRegularPrice,
 			productSalePrice,
 			discountRate,
-			ResponseDeliveryFeeDTO.fromEntity(deliveryFeeRepository.findTopByOrderByDeliveryFeeDateDesc()),
 			productImagePath,
-			request.getQuantity(),
-			productSalePrice * request.getQuantity()
+			request.getQuantity()
 		);
 		cart.getCartItems().add(newItem);
 
@@ -375,17 +382,18 @@ public class CartServiceImpl implements CartService {
 
 		// DTO 가공
 		return cartItems.stream()
-			.map(cartItem -> new ResponseCartItemsForGuestDTO(
+			.map(cartItem -> {
+				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
+				return new ResponseCartItemsForGuestDTO(
 				cartItem.getProductId(),
 				cartItem.getProductTitle(),
 				cartItem.getProductRegularPrice(),
 				cartItem.getProductSalePrice(),
 				cartItem.getDiscountRate(),
-				cartItem.getDeliveryFee(),
 				cartItem.getProductImagePath(),
 				cartItem.getCartItemsQuantity(),
-				cartItem.getProductTotalPrice()
-			))
+				productTotalPrice);
+			})
 			.toList();
 	}
 
@@ -443,4 +451,66 @@ public class CartServiceImpl implements CartService {
 		return cart.getCartItems().size();
 	}
 
+	/**
+	 * 주문 완료한 상품 항목 장바구니에 수량 변경 또는 삭제 업데이트
+	 */
+	@Transactional
+	@Override
+	public Integer deleteOrderCompleteCartItems(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+		List<Long> productIds = requestOrderCartDeleteDTO.getProductIds();
+		List<Integer> cartQuantities = requestOrderCartDeleteDTO.getCartQuantities();
+
+		// 회원인 경우는 DB에 이미 수량이 더 존재할 수 있으므로 수량 업데이트
+		if (!StringUtils.isEmpty(requestOrderCartDeleteDTO.getMemberId())) {
+			Member findMember = memberRepository.getMemberByMemberId(requestOrderCartDeleteDTO.getMemberId());
+			if (Objects.isNull(findMember)) {
+				throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			}
+
+			Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+				.orElseThrow(CartNotFoundException::new);
+
+			List<CartItems> cartItems = findCart.getCartItems();
+
+			// 현재 cartItems 리스트를 순회 중인데 동시에 remove 도 일어나므로 ConcurrentModificationException 발생 방지를 위해 리스트 복사
+			List<CartItems> copiedCartItems = new ArrayList<>(cartItems);
+			for (CartItems cartItem : copiedCartItems) {
+				for (int i = 0; i < productIds.size(); i++) {
+					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
+						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
+
+						if (newQuantity > 0) {
+							cartItem.changeCartItemsQuantity(newQuantity);
+						} else {
+							cartItemsRepository.delete(cartItem);
+							cartItems.remove(cartItem); // 관계 정리
+						}
+						break;
+					}
+				}
+			}
+
+			return getCartItemsCountsForMember(findMember.getMemberId());
+		} else { // 비회원인 경우는 삭제만 처리하면 됨
+			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
+			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
+
+			List<CartItemDTO> cartItems = cart.getCartItems();
+			Iterator<CartItemDTO> iterator = cartItems.iterator();
+
+			// for 루프 도중 remove()를 하기 위해서는 Iterator 활용
+			while (iterator.hasNext()) {
+				CartItemDTO cartItem = iterator.next();
+				for (Long productId : productIds) {
+					if (cartItem.getProductId() == productId) {
+						deleteCartItemForGuest(new RequestDeleteCartItemsForGuestDTO(requestOrderCartDeleteDTO.getSessionId(), productId));
+						iterator.remove(); // 안전하게 삭제
+						break;
+					}
+				}
+			}
+
+			return cartItems.size();
+		}
+	}
 }

@@ -50,7 +50,7 @@ class WrapperControllerTest {
 		when(wrapperService.getWrappersBySaleable(true, pageable)).thenReturn(wrappers);
 
 		// when & then
-		mockMvc.perform(get("/api/wrappers/wrappers")
+		mockMvc.perform(get("/api/wrappers")
 				.param("page", "0")
 				.param("size", "10")
 				.accept(MediaType.APPLICATION_JSON))
@@ -124,6 +124,6 @@ class WrapperControllerTest {
 		mockMvc.perform(put("/api/auth/admin/wrappers/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isCreated());
+			.andExpect(status().isOk());
 	}
 }
