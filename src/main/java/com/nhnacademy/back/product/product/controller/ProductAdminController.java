@@ -28,7 +28,6 @@ import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiS
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductMetaDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
-import com.nhnacademy.back.product.product.domain.dto.request.RequestProductStockUpdateDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.UnifiedProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
@@ -116,25 +115,6 @@ public class ProductAdminController {
 			productImage, requestMeta.getTagIds(), requestMeta.getCategoryIds(), requestMeta.getContributorIds());
 
 		productService.updateProduct(bookId, request);
-		return ResponseEntity.status(HttpStatus.OK).build();
-	}
-
-	/**
-	 *  productId와 바꿀 재고를 받아와 업데이트
-	 *  200 상태코드 반환
-	 */
-	@Operation(summary = "도서 재고 수정",
-		description = "주문 완료 및 주문 취소 시 도서의 재고를 수정합니다.",
-		responses = {
-			@ApiResponse(responseCode = "200", description = "조회 성공"),
-			@ApiResponse(responseCode = "400", description = "유효성 검사 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-		})
-	@Admin
-	@PutMapping("/{book-id}/stock")
-	public ResponseEntity<Void> updateProductStock(
-		@Parameter(description = "수정할 도서 ID", example = "1", required = true) @PathVariable("book-id") Long bookId,
-		@Parameter(description = "도서 재고 수정 DTO", required = true, schema = @Schema(implementation = RequestProductStockUpdateDTO.class)) @RequestBody RequestProductStockUpdateDTO request) {
-		productService.updateProductStock(bookId, request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 

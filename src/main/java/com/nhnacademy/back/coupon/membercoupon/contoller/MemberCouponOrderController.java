@@ -34,10 +34,10 @@ public class MemberCouponOrderController {
 		@ApiResponse(responseCode = "200", description = "주문서 쿠폰 조회 성공"),
 		@ApiResponse(responseCode = "400", description = "요청 파라미터 오류")
 	})
-	@GetMapping("/api/order/{memberId}/coupons")
+	@GetMapping("/api/order/{member-id}/coupons")
 	public ResponseEntity<List<ResponseOrderCouponDTO>> getCouponsInOrder(
 		@Parameter(description = "회원 ID", example = "member123", required = true)
-		@PathVariable("memberId") String memberId,
+		@PathVariable("member-id") String memberId,
 
 		@Parameter(
 			description = "상품 ID 리스트",
