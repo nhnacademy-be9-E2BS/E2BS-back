@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/home/{memberId}")
+@RequestMapping("/api/auth/home/{member-id}")
 public class HomeController {
 
 	private final HomeService homeService;
@@ -23,7 +23,7 @@ public class HomeController {
 	 * 메인 화면에서 회원 이름 가져오는 메서드
 	 */
 	@GetMapping
-	public ResponseEntity<ResponseHomeMemberNameDTO> getHomeMemberName(@PathVariable("memberId") String memberId) {
+	public ResponseEntity<ResponseHomeMemberNameDTO> getHomeMemberName(@PathVariable("member-id") String memberId) {
 		ResponseHomeMemberNameDTO response = homeService.getHomeMemberName(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);

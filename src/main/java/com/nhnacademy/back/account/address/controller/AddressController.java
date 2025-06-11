@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "마이페이지 배송지 API", description = "회원의 배송지 관리 기능 제공")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/mypage/{memberId}/addresses")
+@RequestMapping("/api/auth/mypage/{member-id}/addresses")
 public class AddressController {
 
 	private final AddressService addressService;
@@ -47,7 +47,7 @@ public class AddressController {
 	@Member
 	@GetMapping
 	public ResponseEntity<List<ResponseMemberAddressDTO>> getMemberAddresses(
-		@PathVariable("memberId") String memberId) {
+		@PathVariable("member-id") String memberId) {
 		List<ResponseMemberAddressDTO> responseMemberAddressDTOS = addressService.getMemberAddresses(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberAddressDTOS);
@@ -63,9 +63,9 @@ public class AddressController {
 				content = @Content(schema = @Schema(implementation = NotFoundAddressException.class)))
 		})
 	@Member
-	@GetMapping("/{addressId}")
-	public ResponseEntity<ResponseMemberAddressDTO> getAddress(@PathVariable("memberId") String memberId,
-		@PathVariable("addressId") long addressId) {
+	@GetMapping("/{address-id}")
+	public ResponseEntity<ResponseMemberAddressDTO> getAddress(@PathVariable("member-id") String memberId,
+		@PathVariable("address-id") long addressId) {
 		ResponseMemberAddressDTO responseMemberAddressDTO = addressService.getAddressByAddressId(
 			memberId, addressId
 		);
@@ -83,13 +83,13 @@ public class AddressController {
 			@ApiResponse(responseCode = "500", description = "회원의 특정 배송지 수정 실패", content = @Content(schema = @Schema(implementation = UpdateAddressFailedException.class)))
 		})
 	@Member
-	@PutMapping("/{addressId}")
+	@PutMapping("/{address-id}")
 	public ResponseEntity<Void> updateAddress(@Validated
 		@Parameter(description = "배송지 저장 요청 DTO", required = true, schema = @Schema(implementation = RequestMemberAddressSaveDTO.class))
 		@RequestBody RequestMemberAddressSaveDTO requestMemberAddressSaveDTO,
 		BindingResult bindingResult,
-		@PathVariable("memberId") String memberId,
-		@PathVariable("addressId") long addressId) {
+		@PathVariable("member-id") String memberId,
+		@PathVariable("address-id") long addressId) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
 		}
@@ -107,9 +107,9 @@ public class AddressController {
 			@ApiResponse(responseCode = "500", description = "회원의 특정 배송지 삭제 실패", content = @Content(schema = @Schema(implementation = DeleteAddressFailedException.class)))
 		})
 	@Member
-	@DeleteMapping("/{addressId}")
-	public ResponseEntity<Void> deleteAddress(@PathVariable("memberId") String memberId,
-		@PathVariable("addressId") long addressId) {
+	@DeleteMapping("/{address-id}")
+	public ResponseEntity<Void> deleteAddress(@PathVariable("member-id") String memberId,
+		@PathVariable("address-id") long addressId) {
 		addressService.deleteAddress(memberId, addressId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -124,9 +124,9 @@ public class AddressController {
 			@ApiResponse(responseCode = "500", description = "회원의 기본 배송지 설정 실패", content = @Content(schema = @Schema(implementation = UpdateAddressFailedException.class)))
 		})
 	@Member
-	@PostMapping("/{addressId}/default")
-	public ResponseEntity<Void> setDefaultAddress(@PathVariable("memberId") String memberId,
-		@PathVariable("addressId") long addressId) {
+	@PostMapping("/{address-id}/default")
+	public ResponseEntity<Void> setDefaultAddress(@PathVariable("member-id") String memberId,
+		@PathVariable("address-id") long addressId) {
 		addressService.setDefaultAddress(memberId, addressId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
