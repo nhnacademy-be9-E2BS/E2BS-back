@@ -28,10 +28,11 @@ public class AdminIssueBatchService {
 			.toJobParameters();
 
 		try {
+			log.info("관리자 쿠폰 발급 배치 실행 시작");
 			jobLauncher.run(adminCouponJob, params);
-			log.info("관리자 쿠폰 발급 배치 실행 성공");
 		} catch (JobExecutionException e) {
 			log.error("관리자 쿠폰 발급 배치 실행 실패 : {}", e.getMessage());
 		}
+		log.info("관리자 쿠폰 발급 배치 실행 성공");
 	}
 }

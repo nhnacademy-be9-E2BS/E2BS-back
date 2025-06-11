@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/mypage/{memberId}/coupons/counts")
+@RequestMapping("/api/auth/mypage/{member-id}/coupons/counts")
 @Tag(name = "마이페이지 사용가능 쿠폰 개수", description = "마이페이지에서 회원의 쿠폰 개수 조회")
 public class MemberCouponMypageController {
 
@@ -34,7 +34,7 @@ public class MemberCouponMypageController {
 	@GetMapping
 	public ResponseEntity<ResponseMypageMemberCouponDTO> getCouponCnt(
 		@Parameter(description = "회원 ID", example = "member123", required = true)
-		@PathVariable("memberId") String memberId) {
+		@PathVariable("member-id") String memberId) {
 
 		ResponseMypageMemberCouponDTO responseMemberCouponDTO = memberCouponService.getMemberCouponCnt(memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberCouponDTO);
