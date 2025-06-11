@@ -52,7 +52,7 @@ class TagControllerTest {
 		//when & then
 		mockMvc.perform(get("/api/auth/admin/tags")
 				.param("page", "0")
-				.param("size", "0")
+				.param("size", "10")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content").isArray())
@@ -82,11 +82,24 @@ class TagControllerTest {
 		RequestTagDTO request = new RequestTagDTO("update tag");
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
-		// when & then
+		//when & then
 		mockMvc.perform(put("/api/auth/admin/tags/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
 
+	@Test
+	@DisplayName("tag 삭제")
+	void deleteTagTest() throws Exception {
+		//given
+		RequestTagDTO request = new RequestTagDTO("delete tag");
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		//when & then
+		mockMvc.perform(delete("/api/auth/admin/tags/1")
+				.content(jsonRequest)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+	}
 }
