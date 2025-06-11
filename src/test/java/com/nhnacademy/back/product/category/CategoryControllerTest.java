@@ -141,7 +141,7 @@ class CategoryControllerTest {
 		mockMvc.perform(put("/api/auth/admin/categories/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isCreated());
+			.andExpect(status().isOk());
 	}
 
 	@Test

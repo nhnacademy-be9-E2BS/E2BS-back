@@ -124,6 +124,6 @@ class WrapperControllerTest {
 		mockMvc.perform(put("/api/auth/admin/wrappers/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isCreated());
+			.andExpect(status().isOk());
 	}
 }
