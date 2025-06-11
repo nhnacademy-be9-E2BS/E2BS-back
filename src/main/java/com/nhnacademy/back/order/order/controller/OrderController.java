@@ -64,7 +64,6 @@ public class OrderController {
 		ResponseEntity<ResponsePaymentConfirmDTO> response = orderService.confirmOrder(approveRequest);
 		if (response.getStatusCode().is2xxSuccessful()) {
 			//결제 승인 완료 시 포인트 차감, 쿠폰 사용, 포인트 적립 호출, 결제 정보 저장
-			// paymentServiceFactory.getPaymentService(approveRequest.getProvider()).createPayment(response.getBody());
 			paymentService.createPayment(response.getBody());
 		} else { // 승인 실패 시 롤백
 			orderService.deleteOrder(approveRequest.getOrderId());

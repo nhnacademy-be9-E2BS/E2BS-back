@@ -85,8 +85,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderServiceImpl implements OrderService {
 
 	private final MemberJpaRepository memberJpaRepository;
-	// @Value("${order.sc}")
-	// private String secretKey;
 
 	private final OrderJpaRepository orderJpaRepository;
 	private final OrderDetailJpaRepository orderDetailJpaRepository;
