@@ -22,8 +22,12 @@ import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentCon
 import com.nhnacademy.back.order.order.service.OrderService;
 import com.nhnacademy.back.order.payment.service.PaymentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "공통 주문 API", description = "공통 주문 관련 기능 제공")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/orders")
@@ -34,8 +38,10 @@ public class OrderController {
 	/**
 	 * 프론트에서 요청한 주문서 정보를 저장
 	 */
+	@Operation(summary = "외부 API 결제 주문서 저장", description = "사용자가 외부 API 결제를 진행할 시 미리 DB에 주문 내역을 저장하는 기능")
 	@PostMapping("/create/tossPay")
-	public ResponseEntity<ResponseOrderResultDTO> createOrder(@Validated @RequestBody RequestOrderWrapperDTO request,
+	public ResponseEntity<ResponseOrderResultDTO> createOrder(
+		@Parameter(description = "주문 상품 정보") @Validated @RequestBody RequestOrderWrapperDTO request,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
@@ -49,9 +55,12 @@ public class OrderController {
 	 * 이는 이후 다른 부분 구현 완료 시 진행할 예정
 	 * 외부 API에 대한 결제 이므로 결제 테이블에 저장도 요청해야 함
 	 */
+	@Operation(summary = "외부 API 결제 승인 요청", description = "사용자가 결제 완료 시 결제 승인을 요청하는 기능")
 	@PostMapping("/confirm")
-	public ResponseEntity<Void> orderConfirm(@RequestParam String orderId, @RequestParam String paymentKey,
-		@RequestParam long amount) {
+	public ResponseEntity<Void> orderConfirm(
+		@Parameter(description = "주문 코드") @RequestParam String orderId,
+		@Parameter(description = "결제 키") @RequestParam String paymentKey,
+		@Parameter(description = "결제 금액") @RequestParam long amount) {
 		// 승인 하고 이후에 결과에 따른 롤백처리 필요 할 수 있음
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response = orderService.confirmOrder(orderId, paymentKey, amount);
 		if (response.getStatusCode().is2xxSuccessful()) {
@@ -66,8 +75,9 @@ public class OrderController {
 	/**
 	 * 특정 주문서를 삭제하는 기능
 	 */
+	@Operation(summary = "외부 API 결제 모달 에러 시 주문서 삭제", description = "사용자가 결제 모달을 끌 시 주문서 내역을 삭제하는 기능")
 	@PostMapping("/cancel")
-	public ResponseEntity<Void> deleteOrder(@RequestParam String orderId) {
+	public ResponseEntity<Void> deleteOrder(@Parameter(description = "주문 코드") @RequestParam String orderId) {
 		return orderService.deleteOrder(orderId);
 	}
 
@@ -75,16 +85,19 @@ public class OrderController {
 	 * 특정 주문 코드에 대한 주문 상세 정보를 반환하는 메서드
 	 * 관리자 + 고객 둘 다 사용 메서드
 	 */
-	@GetMapping("/{orderCode}")
-	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(@PathVariable String orderCode) {
+	@Operation(summary = "특정 주문 내역 조회", description = "사용자가 특정 주문 코드의 주문 내역을 확인 가능하도록 반환하는 기능")
+	@GetMapping("/{order-code}")
+	public ResponseEntity<ResponseOrderWrapperDTO> getOrder(@Parameter(description = "주문 코드") @PathVariable(name = "order-code") String orderCode) {
 		return ResponseEntity.ok(orderService.getOrderByOrderCode(orderCode));
 	}
 
 	/**
 	 * 비회원용 주문 목록 조회
 	 */
+	@Operation(summary = "비회원 주문 내역 목록 조회", description = "비회원이 자신의 주문 내역을 확인하는 기능")
 	@GetMapping("/customers/orders")
-	ResponseEntity<Page<ResponseOrderDTO>> getOrdersByCustomerId(Pageable pageable, @RequestParam long customerId) {
+	ResponseEntity<Page<ResponseOrderDTO>> getOrdersByCustomerId(Pageable pageable,
+		@Parameter(description = "비회원 식별 번호") @RequestParam long customerId) {
 		return ResponseEntity.ok(orderService.getOrdersByCustomerId(pageable, customerId));
 	}
 

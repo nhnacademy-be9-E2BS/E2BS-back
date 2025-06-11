@@ -63,20 +63,20 @@ public class CouponController {
 			@ApiResponse(responseCode = "404", description = "해당 쿠폰 없음")
 		})
 	@Admin
-	@GetMapping("/{couponId}")
+	@GetMapping("/{coupon-id}")
 	public ResponseEntity<ResponseCouponDTO> getCoupon(
 		@Parameter(description = "쿠폰 ID", example = "1")
-		@PathVariable Long couponId) {
+		@PathVariable("coupon-id") Long couponId) {
 		ResponseCouponDTO response = couponService.getCoupon(couponId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@Operation(summary = "쿠폰 활성 여부 변경", description = "쿠폰의 활성 상태 토글")
 	@Admin
-	@PutMapping("/{couponId}")
+	@PutMapping("/{coupon-id}")
 	public ResponseEntity<Void> updateCoupon(
 		@Parameter(description = "쿠폰 ID", example = "1")
-		@PathVariable Long couponId) {
+		@PathVariable("coupon-id") Long couponId) {
 		couponService.updateCouponIsActive(couponId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

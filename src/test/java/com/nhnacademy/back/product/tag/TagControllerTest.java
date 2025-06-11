@@ -24,7 +24,6 @@ import com.nhnacademy.back.product.tag.domain.dto.request.RequestTagDTO;
 import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.service.TagService;
 
-
 @WebMvcTest(controllers = TagController.class)
 class TagControllerTest {
 
@@ -35,7 +34,6 @@ class TagControllerTest {
 
 	@MockitoBean
 	private TagService tagService;
-
 
 	@Test
 	@DisplayName("Tag 리스트 조회")
@@ -52,7 +50,7 @@ class TagControllerTest {
 		when(tagService.getTags(pageable)).thenReturn(wrappers);
 
 		//when & then
-		mockMvc.perform(get("/api/admin/tags")
+		mockMvc.perform(get("/api/auth/admin/tags")
 				.param("page", "0")
 				.param("size", "0")
 				.accept(MediaType.APPLICATION_JSON))
@@ -71,7 +69,7 @@ class TagControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		//when & then
-		mockMvc.perform(post("/api/admin/tags")
+		mockMvc.perform(post("/api/auth/admin/tags")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
@@ -85,11 +83,10 @@ class TagControllerTest {
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/admin/tags/1")
+		mockMvc.perform(put("/api/auth/admin/tags/1")
 				.content(jsonRequest)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
-
 
 }

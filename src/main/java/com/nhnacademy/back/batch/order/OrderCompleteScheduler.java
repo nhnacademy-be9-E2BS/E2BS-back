@@ -24,7 +24,7 @@ public class OrderCompleteScheduler {
 	private final OrderJpaRepository orderJpaRepository;
 	private final OrderStateJpaRepository orderStateJpaRepository;
 
-	@Scheduled(cron = "0 0 * * * *")
+	@Scheduled(cron = "0 0 4 * * *")
 	@Transactional
 	public void updateShipmentToCompleted() {
 		OrderState delivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY).orElse(null);

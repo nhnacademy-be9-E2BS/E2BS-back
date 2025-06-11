@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +20,6 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.service.CartService;
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
 
 @WebMvcTest(controllers = CartRestController.class)
 class CartRestControllerForMemberTest {
@@ -95,7 +93,7 @@ class CartRestControllerForMemberTest {
 	void getCartItemsByMember() throws Exception {
 		// given
 		List<ResponseCartItemsForMemberDTO> cartItems = List.of(
-			new ResponseCartItemsForMemberDTO(1L, 100L, "Product A", 1000, 500, new BigDecimal(50), new ResponseDeliveryFeeDTO(1L, 100, 1000, LocalDateTime.now()), "path/image.jpg", 2, 2000)
+			new ResponseCartItemsForMemberDTO(1L, 100L, "Product A", 1000, 500, new BigDecimal(50), "path/image.jpg", 2, 2000)
 		);
 
 		when(cartService.getCartItemsByMember("id123")).thenReturn(cartItems);

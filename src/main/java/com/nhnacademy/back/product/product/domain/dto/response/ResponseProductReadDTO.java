@@ -47,4 +47,12 @@ public class ResponseProductReadDTO {
 	// 기여자
 	private List<ResponseContributorDTO> contributors;
 
+	// 리뷰
+	private double avgRating;
+	private int reviewCount = 0;
+
+	// 좋아요
+	private boolean liked;
+	private long likeCount;
+
 }

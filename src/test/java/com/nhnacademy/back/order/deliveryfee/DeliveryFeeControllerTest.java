@@ -45,7 +45,7 @@ class DeliveryFeeControllerTest {
 		Page<ResponseDeliveryFeeDTO> page = new PageImpl<>(List.of(dto));
 		when(deliveryFeeService.getDeliveryFees(any())).thenReturn(page);
 
-		mockMvc.perform(get("/api/admin/deliveryFee"))
+		mockMvc.perform(get("/api/auth/admin/deliveryFee"))
 			.andExpect(status().isOk());
 	}
 
@@ -54,7 +54,7 @@ class DeliveryFeeControllerTest {
 	void testCreateDeliveryFee() throws Exception {
 		RequestDeliveryFeeDTO request = new RequestDeliveryFeeDTO(2500, 50000);
 
-		mockMvc.perform(post("/api/admin/deliveryFee")
+		mockMvc.perform(post("/api/auth/admin/deliveryFee")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
@@ -67,7 +67,7 @@ class DeliveryFeeControllerTest {
 	void testCreateDeliveryFee_validationFail() throws Exception {
 		RequestDeliveryFeeDTO request = new RequestDeliveryFeeDTO(-2500, 50000);
 
-		mockMvc.perform(post("/api/admin/deliveryFee")
+		mockMvc.perform(post("/api/auth/admin/deliveryFee")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest());

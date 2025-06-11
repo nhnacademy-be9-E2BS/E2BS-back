@@ -151,8 +151,12 @@ public class ReviewServiceImpl implements ReviewService {
 		String updateReviewContent = request.getReviewContent();
 
 		String updateImage = "";
+		if (!StringUtils.isEmpty(findReview.getReviewImage())) {
+			updateImage = findReview.getReviewImage();
+		}
+
 		MultipartFile reviewImageFile = request.getReviewImage();
-		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
+		if (!Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
 			// 기존 파일 삭제
 			if (!StringUtils.isEmpty(findReview.getReviewImage())) {
 				minioUtils.deleteObject(REVIEW_BUCKET, findReview.getReviewImage());
@@ -173,7 +177,7 @@ public class ReviewServiceImpl implements ReviewService {
 		findReview.changeReview(request, updateImage);
 
 		// 반환할 때 JS로 적용할 이미지 url 필요하여 가공
-		if (Objects.nonNull(reviewImageFile) && !Objects.requireNonNull(reviewImageFile.getOriginalFilename()).isBlank()) {
+		if (!StringUtils.isEmpty(updateImage)) {
 			updateImage = minioUtils.getPresignedUrl(REVIEW_BUCKET, updateImage);
 		}
 
@@ -265,11 +269,17 @@ public class ReviewServiceImpl implements ReviewService {
 		});
 	}
 
+	/**
+	 * 주문 코드의 리뷰가 존재하는지 검증 메소드
+	 */
 	@Override
 	public boolean existsReviewedOrderCode(String orderCode) {
 		return reviewRepository.existsReviewedOrderCode(orderCode);
 	}
 
+	/**
+	 * 주문상세 아이디로 리뷰 상세 조회 메소드
+	 */
 	@Override
 	public ResponseReviewDTO findByOrderDetailId(long orderDetailId) {
 		Review findReview = reviewRepository.findByOrderDetailId(orderDetailId)

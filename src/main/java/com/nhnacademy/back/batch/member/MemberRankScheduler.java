@@ -19,7 +19,7 @@ public class MemberRankScheduler {
 	private final JobLauncher jobLauncher;
 	private final Job rankMemberJob;
 
-	@Scheduled(cron = "0 0 * * * *") // 매일 새벽 4시(cron = "0 0 4 * * *")
+	@Scheduled(cron = "0 0 4 * * *") // 매일 새벽 4시(cron = "0 0 4 * * *")
 	public void runInactiveMemberJob() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder()
 			.addLong("time", System.currentTimeMillis()) // 매 실행마다 유니크 파라미터 필요

@@ -18,8 +18,9 @@ public class RequestUpdateCartItemsDTO {
 	@Schema(description = "게스트 세션 ID (게스트일 경우 필수)", example = "550e8400-e29b-41d4-a716-446655440000", nullable = true)
 	private String sessionId;
 
-	@Schema(description = "상품 ID", example = "101", nullable = true)
-	private Long productId;
+	@NotNull
+	@Schema(description = "상품 ID", example = "101", requiredMode = Schema.RequiredMode.REQUIRED)
+	private long productId;
 
 	@NotNull
 	@Schema(description = "담을 수량", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
