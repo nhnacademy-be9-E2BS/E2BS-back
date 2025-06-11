@@ -26,7 +26,7 @@ import com.nhnacademy.back.elasticsearch.domain.document.ProductSortType;
 import com.nhnacademy.back.elasticsearch.repository.impl.CustomProductSearchRepositoryImpl;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-class CustomProductSearchRepositoryImplTest {
+class CustomProductSearchRepositoryTest {
 
 	@Mock
 	ElasticsearchOperations elasticsearchOperations;
@@ -117,7 +117,7 @@ class CustomProductSearchRepositoryImplTest {
 		assertEquals(3, result.getContent().size());
 		verify(elasticsearchOperations).search(any(Query.class), eq(ProductDocument.class));
 	}
-	
+
 	@Test
 	@DisplayName("bestSellerProductIds 메소드 테스트 - fail")
 	void testBestSellerProductIds_pageNumberOverLimit_throws() {
