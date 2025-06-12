@@ -20,7 +20,7 @@ public class RequestUpdateCartItemsDTO {
 
 	@NotNull
 	@Schema(description = "상품 ID", example = "101", requiredMode = Schema.RequiredMode.REQUIRED)
-	private long productId;
+	private Long productId;
 
 	@NotNull
 	@Schema(description = "담을 수량", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)

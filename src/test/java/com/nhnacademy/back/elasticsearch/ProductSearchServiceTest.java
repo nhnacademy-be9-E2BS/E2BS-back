@@ -25,6 +25,7 @@ import com.nhnacademy.back.elasticsearch.domain.document.ProductSortType;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.repository.CustomProductSearchRepository;
 import com.nhnacademy.back.elasticsearch.repository.ProductSearchRepository;
+import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.elasticsearch.service.impl.ProductSearchServiceImpl;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -37,6 +38,8 @@ class ProductSearchServiceTest {
 	private ProductSearchRepository productSearchRepository;
 	@Mock
 	private CustomProductSearchRepository customProductSearchRepository;
+	@Mock
+	private ProductSearchService self;
 
 	@Test
 	@DisplayName("create product document - success")
@@ -82,11 +85,9 @@ class ProductSearchServiceTest {
 		RequestProductDocumentDTO request = new RequestProductDocumentDTO(
 			1L, "title", "description", "publisher", LocalDate.now(),
 			10000L, List.of("contributor"), List.of("tag"), List.of(1L, 2L));
-		ProductDocument productDocument = new ProductDocument(request);
 
 		when(customProductSearchRepository.searchAndSortProductIds(pageable, keyword, productSortType)).thenReturn(
 			mockPage);
-		when(productSearchRepository.findById(anyLong())).thenReturn(Optional.of(productDocument));
 
 		// when
 		Page<Long> result = productSearchService.getProductIdsBySearch(pageable, keyword, productSortType);

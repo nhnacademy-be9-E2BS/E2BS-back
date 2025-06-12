@@ -21,7 +21,6 @@ import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettin
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsDailySummaryDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMembersDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMonthlySummaryDTO;
-import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
@@ -154,16 +153,6 @@ public class AdminSettingsController {
 		memberService.withdrawMember(memberId);
 
 		return ResponseEntity.status(HttpStatus.OK).build();
-	}
-
-	@Operation(summary = "관리자 페이지 비회원 목록 조회", description = "관리자 페이지 비회원 목록 조회 기능")
-	@Admin
-	@GetMapping("/customers")
-	public ResponseEntity<Page<ResponseAdminSettingsNonMembersDTO>> getAdminSettingsNonMembers(
-		@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		Page<ResponseAdminSettingsNonMembersDTO> response = customerService.getAdminSettingsNonMembers(pageable);
-
-		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 }

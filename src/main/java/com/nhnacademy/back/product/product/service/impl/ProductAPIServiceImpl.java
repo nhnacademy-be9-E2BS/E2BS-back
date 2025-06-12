@@ -99,7 +99,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		for (Item item : items) {
 			ResponseProductsApiSearchDTO responseProductsApiSearchDTO = new ResponseProductsApiSearchDTO();
 			responseProductsApiSearchDTO.setPublisherName(item.publisher);
-			responseProductsApiSearchDTO.setProductTitle(item.Title);
+			responseProductsApiSearchDTO.setProductTitle(item.title);
 			responseProductsApiSearchDTO.setProductDescription(item.description);
 			responseProductsApiSearchDTO.setProductIsbn(item.isbn13);
 			responseProductsApiSearchDTO.setProductRegularPrice(item.priceStandard);
@@ -139,7 +139,7 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		for (Item item : items) {
 			ResponseProductApiSearchByQueryTypeDTO responseProductApiSearchByQueryTypeDTO = new ResponseProductApiSearchByQueryTypeDTO();
 			responseProductApiSearchByQueryTypeDTO.setPublisherName(item.publisher);
-			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.Title);
+			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.title);
 			responseProductApiSearchByQueryTypeDTO.setProductDescription(item.description);
 			responseProductApiSearchByQueryTypeDTO.setProductIsbn(item.isbn13);
 			responseProductApiSearchByQueryTypeDTO.setProductRegularPrice(item.priceStandard);
@@ -304,30 +304,6 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		if (categoryName == null) {
 			throw new IllegalArgumentException("QueryType is null");
 		}
-
-		// String categoryKorName = switch (categoryName.trim().toLowerCase()) { //카테고리 한국어로 변경
-		// 	case "itemnewall" -> "신간";
-		// 	case "blogbest" -> "블로그베스트";
-		// 	case "bestseller" -> "베스트셀러";
-		// 	case "itemnewspecial" -> "신간스페셜";
-		// 	default -> throw new IllegalArgumentException("Unknown queryType: " + categoryName);
-		// };
-		//
-		// Category parent = categoryJpaRepository.findCategoryByCategoryName("베스트"); //상위 카테고리 설정
-		// if (parent == null) {
-		// 	parent = new Category("베스트", null);
-		// 	parent = categoryJpaRepository.save(parent);
-		// }
-		//
-		// //카테고리가 존재하는지 확인
-		// Category queryTypeCategory = categoryJpaRepository.findCategoryByCategoryName(categoryKorName);
-		// if (queryTypeCategory == null) { //없으면 생성
-		// 	queryTypeCategory = new Category(categoryKorName, parent);
-		// 	categoryJpaRepository.save(queryTypeCategory);
-		// }
-		//
-		// productCategoryJpaRepository.save(new ProductCategory(product, parent));
-		// productCategoryJpaRepository.save(new ProductCategory(product, queryTypeCategory));
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
