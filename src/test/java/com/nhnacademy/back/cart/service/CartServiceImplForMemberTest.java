@@ -86,6 +86,20 @@ class CartServiceImplForMemberTest {
 	}
 
 	@Test
+	@DisplayName("회원 장바구니 생성 테스트")
+	void createCartForMember() {
+		// given
+		String memberId = "memberId";
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(customerRepository.findById(member.getCustomerId())).thenReturn(Optional.of(customer));
+
+		// when
+		cartService.createCartForMember(memberId);
+
+		// then
+		verify(cartRepository).save(any(Cart.class));
+	}
+	@Test
 	@DisplayName("회원 장바구니 항목 추가 테스트")
 	void createCartItemForMember() {
 		// given
