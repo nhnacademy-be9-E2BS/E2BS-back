@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "회원 등급 조회 API", description = "회원 등급 조회 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/mypage/{memberId}/rank")
+@RequestMapping("/api/auth/mypage/{member-id}/rank")
 public class MemberRankController {
 
 	private final MemberRankService memberRankService;
@@ -28,10 +28,11 @@ public class MemberRankController {
 	@Operation(summary = "회원 등급 조회", description = "회원 등급 조회 기능 제공")
 	@Member
 	@GetMapping
-	public ResponseEntity<List<ResponseMemberRankDTO>> getMemberRankService(@PathVariable("memberId") String memberId) {
+	public ResponseEntity<List<ResponseMemberRankDTO>> getMemberRankService(
+		@PathVariable("member-id") String memberId) {
 		List<ResponseMemberRankDTO> response = memberRankService.getMemberRanks();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 }
