@@ -98,7 +98,7 @@ public class CartServiceImpl implements CartService {
 		// 장바구니 아이템 생성
 		cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
 
-		return cart.getCartItems().size();
+		return cartItemsRepository.countByCart(cart);
 	}
 
 	/**
@@ -231,8 +231,9 @@ public class CartServiceImpl implements CartService {
 			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
-		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
-		return findCart.map(cart -> cart.getCartItems().size()).orElse(0);
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+		return cartItemsRepository.countByCart(findCart);
 	}
 
 
@@ -490,7 +491,7 @@ public class CartServiceImpl implements CartService {
 				}
 			}
 
-			return getCartItemsCountsForMember(findMember.getMemberId());
+			return cartItemsRepository.countByCart(findCart);
 		} else { // 비회원인 경우는 삭제만 처리하면 됨
 			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
 			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
