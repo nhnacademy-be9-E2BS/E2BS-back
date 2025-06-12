@@ -466,6 +466,10 @@ public class CartServiceImpl implements CartService {
 			}
 		}
 
+		// 기존 세션의 장바구니 비워주기
+		CartDTO emptyCart = new CartDTO();
+		redisTemplate.opsForValue().set(sessionId, emptyCart);
+
 		return cart.getCartItems().size();
 	}
 
