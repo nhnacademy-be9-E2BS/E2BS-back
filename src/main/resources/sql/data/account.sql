@@ -23,10 +23,10 @@ VALUES ('WEB'),
 
 -- MemberRank (ENUM + 숫자 필드)
 INSERT INTO member_rank (member_rank_name, member_rank_tier_bonus_rate, member_rank_require_amount)
-VALUES ('NORMAL', 0, 0),
-       ('ROYAL', 5, 100000),
-       ('GOLD', 10, 500000),
-       ('PLATINUM', 20, 900000);
+VALUES ('NORMAL', 1, 0),
+       ('ROYAL', 2, 100000),
+       ('GOLD', 3, 200000),
+       ('PLATINUM', 4, 300000);
 
 -- Customer 선삽입 (Member와 @OneToOne, @MapsId 관계)
 INSERT INTO customer (customer_email, customer_password, customer_name)

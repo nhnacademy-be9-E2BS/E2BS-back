@@ -20,6 +20,7 @@ import com.nhnacademy.back.account.oauth.exception.RegisterOAuthFailedException;
 import com.nhnacademy.back.account.oauth.model.dto.request.RequestOAuthRegisterDTO;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 import com.nhnacademy.back.account.socialauth.repository.SocialAuthJpaRepository;
+import com.nhnacademy.back.common.exception.BadRequestException;
 import com.nhnacademy.back.common.parser.DateParser;
 import com.nhnacademy.back.event.event.RegisterPointEvent;
 import com.nhnacademy.back.event.event.WelcomeCouponEvent;
@@ -95,6 +96,16 @@ public class OAuthService {
 		} catch (Exception ex) {
 			throw new RegisterOAuthFailedException("OAuth 회원 가입에 실패했습니다.");
 		}
+	}
+
+	public void paycoLastLogin(String memberId) {
+		try {
+			LocalDate loginLatest = LocalDate.now();
+			memberJpaRepository.updateMemberLoginLatestByMemberId(loginLatest, memberId);
+		} catch (Exception e) {
+			throw new BadRequestException("로그인 시간을 저장하지 못했습니다");
+		}
+
 	}
 
 }
