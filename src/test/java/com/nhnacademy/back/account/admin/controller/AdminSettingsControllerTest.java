@@ -24,7 +24,6 @@ import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettin
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsDailySummaryDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMembersDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMonthlySummaryDTO;
-import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.service.CustomerService;
@@ -187,33 +186,6 @@ class AdminSettingsControllerTest {
 
 		// Then
 		mockMvc.perform(delete("/api/auth/admin/settings/members//user"))
-			.andExpect(status().isOk());
-
-	}
-
-	@Test
-	@DisplayName("관리자 페이지 비회원 목록 조회 테스트")
-	void getAdminSettingsNonMembersTest() throws Exception {
-
-		// Given
-		ResponseAdminSettingsNonMembersDTO responseAdminSettingsNonMembersDTO = new ResponseAdminSettingsNonMembersDTO(
-			new Customer("user@naver.com", "1234", "user")
-		);
-
-		Page<ResponseAdminSettingsNonMembersDTO> page = new PageImpl<>(
-			List.of(responseAdminSettingsNonMembersDTO),
-			PageRequest.of(0, 10),
-			1
-		);
-
-		// When
-		when(customerService.getAdminSettingsNonMembers(PageRequest.of(0, 10)))
-			.thenReturn(page);
-
-		// Then
-		mockMvc.perform(get("/api/auth/admin/settings/customers")
-				.param("page", "0")
-				.param("size", "10"))
 			.andExpect(status().isOk());
 
 	}

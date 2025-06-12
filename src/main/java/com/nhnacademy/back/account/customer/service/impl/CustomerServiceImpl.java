@@ -1,12 +1,9 @@
 package com.nhnacademy.back.account.customer.service.impl;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsNonMembersDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerLoginDTO;
 import com.nhnacademy.back.account.customer.domain.dto.request.RequestCustomerRegisterDTO;
 import com.nhnacademy.back.account.customer.domain.dto.response.ResponseCustomerDTO;
@@ -27,14 +24,6 @@ public class CustomerServiceImpl implements CustomerService {
 	private final CustomerJpaRepository customerJpaRepository;
 
 	private final PasswordEncoder passwordEncoder;
-
-	@Override
-	public Page<ResponseAdminSettingsNonMembersDTO> getAdminSettingsNonMembers(Pageable pageable) {
-		Page<Customer> customers = customerJpaRepository.findCustomersNotMembers(pageable);
-
-		return customers.map(customer -> ResponseAdminSettingsNonMembersDTO.builder()
-			.customer(customer).build());
-	}
 
 	/**
 	 * 비회원 로그인 메소드
