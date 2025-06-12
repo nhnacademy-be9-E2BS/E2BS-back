@@ -23,6 +23,7 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.service.CartService;
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,16 +44,6 @@ public class CartRestController {
 
 	private final CartService cartService;
 
-
-	/** 게스트/회원 장바구니 공통 API **/
-	
-	@Operation(summary = "장바구니 상품 수 조회", description = "회원 ID로 장바구니에 담긴 상품 수를 조회합니다.")
-	@ApiResponse(responseCode = "200", description = "장바구니 상품 수 조회 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
-	@GetMapping("/api/carts/counts")
-	public ResponseEntity<Integer> getCartItemsCounts(@Parameter(description = "회원 ID", required = true) @RequestParam String memberId) {
-		Integer result = cartService.getCartItemsCountsForMember(memberId);
-		return ResponseEntity.ok(result);
-	}
 
 	@Operation(summary = "비회원 장바구니 병합", description = "비회원의 장바구니를 회원 장바구니로 병합합니다.")
 	@ApiResponse(responseCode = "200", description = "장바구니 병합 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
@@ -78,6 +69,7 @@ public class CartRestController {
 		@ApiResponse(responseCode = "201", description = "장바구니 상품 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
 		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
 	})
+	@Member
 	@PostMapping("/api/auth/members/carts/items")
 	public ResponseEntity<Integer> createCartItemForMember(@Parameter(description = "상품 추가 DTO", required = true) @Valid @RequestBody RequestAddCartItemsDTO requestDto,
 		                                                   @Parameter(hidden = true) BindingResult bindingResult) {
@@ -97,6 +89,7 @@ public class CartRestController {
 		@ApiResponse(responseCode = "200", description = "장바구니 수정 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
 		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
 	})
+	@Member
 	@PutMapping("/api/auth/members/carts/items/{cartItemId}")
 	public ResponseEntity<Integer> updateCartItemForMember(@Parameter(description = "카트 항목 ID", required = true) @PathVariable long cartItemId,
 		                                                   @Parameter(description = "수정 요청 DTO", required = true) @Valid @RequestBody RequestUpdateCartItemsDTO requestDto,
@@ -114,6 +107,7 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 상품 삭제", description = "회원 장바구니의 특정 상품을 삭제합니다.")
 	@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공")
+	@Member
 	@DeleteMapping("/api/auth/members/carts/items/{cartItemId}")
 	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "카트 항목 ID", required = true) @PathVariable long cartItemId) {
 		cartService.deleteCartItemForMember(cartItemId);
@@ -122,6 +116,7 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 전체 삭제", description = "회원의 장바구니 전체를 삭제합니다.")
 	@ApiResponse(responseCode = "204", description = "장바구니 전체 삭제 성공")
+	@Member
 	@DeleteMapping("/api/auth/members/{memberId}/carts")
 	public ResponseEntity<Void> deleteCartForMember(@Parameter(description = "회원 ID", required = true) @PathVariable String memberId) {
 		cartService.deleteCartForMember(memberId);
@@ -130,10 +125,20 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 조회", description = "회원의 장바구니 상품 목록을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "장바구니 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResponseCartItemsForMemberDTO.class))))
+	@Member
 	@GetMapping("/api/auth/members/{memberId}/carts")
 	public ResponseEntity<List<ResponseCartItemsForMemberDTO>> getCartItemsByMember(@Parameter(description = "회원 ID", required = true) @PathVariable String memberId) {
 		List<ResponseCartItemsForMemberDTO> body = cartService.getCartItemsByMember(memberId);
 		return ResponseEntity.ok(body);
+	}
+
+	@Operation(summary = "회원 장바구니 상품 수 조회", description = "회원 ID로 장바구니에 담긴 상품 수를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "장바구니 상품 수 조회 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
+	@Member
+	@GetMapping("/api/carts/counts")
+	public ResponseEntity<Integer> getCartItemsCountsForMember(@Parameter(description = "회원 ID", required = true) @RequestParam String memberId) {
+		Integer result = cartService.getCartItemsCountsForMember(memberId);
+		return ResponseEntity.ok(result);
 	}
 
 
