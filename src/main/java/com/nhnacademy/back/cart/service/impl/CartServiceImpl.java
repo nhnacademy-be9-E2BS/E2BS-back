@@ -3,10 +3,10 @@ package com.nhnacademy.back.cart.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -495,22 +495,18 @@ public class CartServiceImpl implements CartService {
 			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
 			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 
+			// 기존 cartItems
 			List<CartItemDTO> cartItems = cart.getCartItems();
-			Iterator<CartItemDTO> iterator = cartItems.iterator();
 
-			// for 루프 도중 remove()를 하기 위해서는 Iterator 활용
-			while (iterator.hasNext()) {
-				CartItemDTO cartItem = iterator.next();
-				for (Long productId : productIds) {
-					if (cartItem.getProductId() == productId) {
-						deleteCartItemForGuest(new RequestDeleteCartItemsForGuestDTO(requestOrderCartDeleteDTO.getSessionId(), productId));
-						iterator.remove(); // 안전하게 삭제
-						break;
-					}
-				}
-			}
+			// 기존 cartItems 중에서 productIds에 포함되지 않은 상품들만 남긴 새로운 리스트를 가공
+			List<CartItemDTO> filteredItems = cartItems.stream()
+				.filter(item -> productIds.stream().noneMatch(id -> id.equals(item.getProductId())))
+				.collect(Collectors.toList());
 
-			return cartItems.size();
+			cart.setCartItems(filteredItems); // 새로운 리스트로 덮어씌우기
+
+			return cart.getCartItems().size();
 		}
 	}
+
 }
