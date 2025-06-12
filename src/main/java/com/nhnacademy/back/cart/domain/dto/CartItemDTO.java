@@ -3,8 +3,6 @@ package com.nhnacademy.back.cart.domain.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import com.nhnacademy.back.order.deliveryfee.domain.dto.response.ResponseDeliveryFeeDTO;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
