@@ -42,13 +42,30 @@ class CartRestControllerForGuestTest {
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1L, 2);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
+		when(cartService.createCartItemForGuest(any(RequestAddCartItemsDTO.class))).thenReturn(2);
+
 		// when & then
 		mockMvc.perform(post("/api/guests/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
-			.andExpect(status().isCreated());
+			.andExpect(status().isCreated())
+			.andExpect(content().string("2"));
 
 		verify(cartService).createCartItemForGuest(any(RequestAddCartItemsDTO.class));
+	}
+
+	@Test
+	@DisplayName("POST /api/guests/carts/items - 게스트 장바구니 항목 추가 테스트 실패(유효성 검증)")
+	void createCartItemForGuest_Fail_Validation() throws Exception {
+		// given
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, null, null, null);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(post("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -58,13 +75,30 @@ class CartRestControllerForGuestTest {
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", "session123", 1L,3);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
+		when(cartService.updateCartItemForGuest(any(RequestUpdateCartItemsDTO.class))).thenReturn(3);
+
 		// when & then
 		mockMvc.perform(put("/api/guests/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(content().string("3"));
 
 		verify(cartService).updateCartItemForGuest(any(RequestUpdateCartItemsDTO.class));
+	}
+
+	@Test
+	@DisplayName("PUT /api/guests/carts/items - 게스트 장바구니 항목 수량 변경 테스트 실패(유효성 검증)")
+	void updateCartItemForGuest_Fail_Validation() throws Exception {
+		// given
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, null, null, null);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(put("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -84,7 +118,21 @@ class CartRestControllerForGuestTest {
 	}
 
 	@Test
-	@DisplayName("DELETE /api/guests/{sessionId}/carts/- 게스트 장바구니 항목 전체 삭제 테스트")
+	@DisplayName("DELETE /api/guests/carts/items - 게스트 장바구니 항목 삭제 테스트 실패(유효성 검증)")
+	void deleteCartItemForGuest_Fail_Validation() throws Exception {
+		// given
+		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(null, null);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(delete("/api/guests/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("DELETE /api/guests/{sessionId}/carts - 게스트 장바구니 항목 전체 삭제 테스트")
 	void deleteCartForGuest() throws Exception {
 		String sessionId = "sessionId-123";
 
