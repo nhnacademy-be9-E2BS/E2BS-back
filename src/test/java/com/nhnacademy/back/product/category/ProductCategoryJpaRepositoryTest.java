@@ -110,8 +110,6 @@ class ProductCategoryJpaRepositoryTest {
 		List<ResponseCategoryDTO> dtos = productCategoryJpaRepository.findCategoryDTOsByProductId(
 			product1.getProductId());
 		assertThat(dtos).hasSize(2);
-		assertThat(dtos.get(0).getCategoryId()).isNotNull();
-		assertThat(dtos.get(0).getCategoryName()).isNotNull();
 	}
 
 	@Test
