@@ -35,8 +35,8 @@ public class MemberDormantMemberStateController {
 			@ApiResponse(responseCode = "500", description = "휴면 회원 상태 조회 실패", content = @Content(schema = @Schema(implementation = NotFoundMemberStateException.class))),
 			@ApiResponse(responseCode = "500", description = "휴면 회원 상태 변경 실패", content = @Content(schema = @Schema(implementation = UpdateMemberStateFailedException.class)))
 		})
-	@PostMapping("/members/{memberId}/dooray")
-	public ResponseEntity<Void> changeMemberStateActive(@PathVariable("memberId") String memberId) {
+	@PostMapping("/members/{member-id}/dooray")
+	public ResponseEntity<Void> changeMemberStateActive(@PathVariable("member-id") String memberId) {
 		memberService.changeDormantMemberStateActive(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -50,11 +50,11 @@ public class MemberDormantMemberStateController {
 			@ApiResponse(responseCode = "200", description = "휴면 회원 Email 주소 조회 성공"),
 			@ApiResponse(responseCode = "500", description = "회원 정보 조회 실패", content = @Content(schema = @Schema(implementation = NotFoundMemberException.class)))
 		})
-	@GetMapping("/members/{memberId}")
-	public ResponseEntity<ResponseMemberEmailDTO> getMemberEmail(@PathVariable("memberId") String memberId) {
+	@GetMapping("/members/{member-id}")
+	public ResponseEntity<ResponseMemberEmailDTO> getMemberEmail(@PathVariable("member-id") String memberId) {
 		ResponseMemberEmailDTO responseMemberEmailDTO = memberService.getMemberEmail(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberEmailDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberEmailDTO);
 	}
 
 }
