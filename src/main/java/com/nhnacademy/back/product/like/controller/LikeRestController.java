@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.back.common.annotation.Member;
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.like.domain.dto.request.RequestCreateLikeDTO;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
@@ -41,6 +42,7 @@ public class LikeRestController {
 		@ApiResponse(responseCode = "200", description = "좋아요 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
 	})
+	@Member
 	@PostMapping("/api/products/{productId}/likes")
 	public ResponseEntity<Void> createLike(@Parameter(description = "좋아요할 상품 ID", required = true) @PathVariable long productId,
 		                                   @Parameter(description = "좋아요 생성 요청 DTO", required = true) @Validated @RequestBody RequestCreateLikeDTO requestDto, 
@@ -57,6 +59,7 @@ public class LikeRestController {
 		@ApiResponse(responseCode = "200", description = "좋아요 삭제 성공"),
 		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
 	})
+	@Member
 	@DeleteMapping("/api/products/{productId}/likes")
 	public ResponseEntity<Void> deleteLike(@Parameter(description = "좋아요 취소할 상품 ID", required = true) @PathVariable long productId,
 		                                   @Parameter(description = "사용자 식별자", required = true) @RequestParam String memberId) {
@@ -66,6 +69,7 @@ public class LikeRestController {
 
 	@Operation(summary = "회원이 좋아요한 상품 목록 조회", description = "특정 회원이 좋아요한 상품들을 페이징하여 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "좋아요 상품 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResponseLikedProductDTO.class))))
+	@Member
 	@GetMapping("/api/products/likes")
 	public ResponseEntity<Page<ResponseLikedProductDTO>> getLikedProductsByCustomer(@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		                                                                            @Parameter(hidden = true) Pageable pageable) {
@@ -75,6 +79,7 @@ public class LikeRestController {
 
 	@Operation(summary = "상품 좋아요 수 조회", description = "특정 상품의 좋아요 수를 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "좋아요 수 조회 성공", content = @Content(schema = @Schema(implementation = Long.class)))
+	@Member
 	@GetMapping("/api/products/{productId}/likes/counts")
 	public ResponseEntity<Long> getLikeCounts(@Parameter(description = "좋아요 수를 조회할 상품 ID", required = true) @PathVariable long productId) {
 		long body = likeService.getLikeCount(productId);
