@@ -64,6 +64,14 @@ public class CartRestController {
 	
 	/** 회원 장바구니 API **/
 
+	@Operation(summary = "회원 장바구니 생성", description = "회원이 장바구니를 생성합니다.")
+	@ApiResponse(responseCode = "201", description = "장바구니 생성 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
+	@PostMapping("/api/auth/members/{memberId}/carts")
+	public ResponseEntity<Void> createCartByMember(@Parameter(description = "회원 아이디", required = true) @PathVariable String memberId) {
+		cartService.createCartForMember(memberId);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
 	@Operation(summary = "회원 장바구니 상품 추가", description = "회원의 장바구니에 상품을 추가합니다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "장바구니 상품 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),

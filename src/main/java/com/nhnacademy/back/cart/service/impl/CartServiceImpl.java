@@ -58,6 +58,22 @@ public class CartServiceImpl implements CartService {
 	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
 	/**
+	 * 회원 장바구니 생성 메소드
+	 */
+	@Override
+	public void createCartForMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
+			.orElseThrow(CustomerNotFoundException::new);
+
+		Cart cart = new Cart(findCustomer);
+		cartRepository.save(cart);
+	}
+
+	/**
 	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
 	@Transactional
