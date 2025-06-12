@@ -35,7 +35,6 @@ import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.order.order.exception.OrderDetailNotFoundException;
 import com.nhnacademy.back.order.order.exception.OrderNotFoundException;
 import com.nhnacademy.back.order.order.exception.OrderProcessException;
-import com.nhnacademy.back.order.order.exception.PaymentApproveFailedException;
 import com.nhnacademy.back.order.wrapper.exception.WrapperNotFoundException;
 import com.nhnacademy.back.product.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.back.product.category.exception.CategoryDeleteNotAllowedException;
@@ -68,7 +67,7 @@ public class GlobalExceptionHandler {
 		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class,
 		UpdateMemberRoleFailedException.class,
 		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class,
-		DeleteAddressFailedException.class, PaymentApproveFailedException.class,
+		DeleteAddressFailedException.class,
 		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class, CustomerEmailNotExistsException.class,
 		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class, OrderProcessException.class, ProductNotForSaleException.class})
 	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
