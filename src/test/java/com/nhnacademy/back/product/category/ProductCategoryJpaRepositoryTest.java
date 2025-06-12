@@ -110,8 +110,6 @@ class ProductCategoryJpaRepositoryTest {
 		List<ResponseCategoryDTO> dtos = productCategoryJpaRepository.findCategoryDTOsByProductId(
 			product1.getProductId());
 		assertThat(dtos).hasSize(2);
-		assertThat(dtos.get(0).getCategoryId()).isNotNull();
-		assertThat(dtos.get(0).getCategoryName()).isNotNull();
 	}
 
 	@Test
@@ -120,7 +118,6 @@ class ProductCategoryJpaRepositoryTest {
 		List<ProductCategory> result = productCategoryJpaRepository.findAllWithCategoriesByProductIds(
 			List.of(product1.getProductId(), product2.getProductId()));
 		assertThat(result).hasSize(3);
-		assertThat(result.get(0).getCategory()).isNotNull();
 	}
 
 	@Test

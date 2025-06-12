@@ -136,7 +136,7 @@ public class CategoryController {
 		@Parameter(description = "카테고리 등록 및 수정 모델", required = true, schema = @Schema(implementation = RequestCategoryDTO.class)) @RequestBody RequestCategoryDTO request) {
 		categoryService.updateCategory(categoryId, request);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	/**

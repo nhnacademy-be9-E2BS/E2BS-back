@@ -2,10 +2,13 @@ package com.nhnacademy.back.product.product.api;
 
 import java.time.LocalDate;
 
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class Item{
-	public String Title = ""; //제목
+	public String title = ""; //제목
 
 	public String publisher = ""; //출판사
 
@@ -23,7 +26,7 @@ public class Item{
 	public LocalDate pubDate;
 
 	public String cover = ""; //상품 이미지
-	public String Link = ""; // 상품링크
+	public String link = ""; // 상품링크
 
 	public String stockstatus = ""; //재고상태
 

@@ -9,9 +9,11 @@ import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
 import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

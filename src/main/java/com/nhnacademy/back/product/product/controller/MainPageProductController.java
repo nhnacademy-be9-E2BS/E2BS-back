@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseMainPageProductDTO;
 import com.nhnacademy.back.product.product.service.MainPageProductService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "도서", description = "메인 페이지 도서 관련 API")
 @RestController
 @RequestMapping("/api/category")
 public class MainPageProductController {

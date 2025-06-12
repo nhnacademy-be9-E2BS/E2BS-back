@@ -51,6 +51,34 @@ class CartRestControllerForMemberTest {
 	}
 
 	@Test
+	@DisplayName("POST /api/auth/members/carts/items - 회원 장바구니 항목 추가 테스트 실패(유효성 검사)")
+	void createCartItemForMember_Fail_Validation() throws Exception {
+		// given: quantity 음수로 유효성 오류 유발
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO("member123", null, 1L, null);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(post("/api/auth/members/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("POST /api/auth/members/carts/items - 회원 장바구니 항목 추가 테스트 실패(memberId와 sessionId 모두 null)")
+	void createCartItemForMember_Fail_IllegalArgument() throws Exception {
+		// given
+		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, null, 1L, 2);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(post("/api/auth/members/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	@DisplayName("PUT /api/auth/members/carts/items/{cartItemsId} - 회원 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForMember() throws Exception {
 		// given
@@ -64,6 +92,34 @@ class CartRestControllerForMemberTest {
 			.andExpect(status().isOk());
 
 		verify(cartService).updateCartItemForMember(anyLong(), any(RequestUpdateCartItemsDTO.class));
+	}
+
+	@Test
+	@DisplayName("PUT /api/auth/members/carts/items/{cartItemId} - 회원 장바구니 항목 수량 변경 테스트 실패(유효성 검증)")
+	void updateCartItemForMember_Fail_Validation() throws Exception {
+		// given
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("member123", null, 1L, null);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(put("/api/auth/members/carts/items/10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("PUT /api/auth/members/carts/items/{cartItemId} - 회원 장바구니 항목 수량 변경 테스트 실패(memberId와 sessionId 모두 null)")
+	void updateCartItemForMember_Fail_IllegalArgument() throws Exception {
+		// given
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, null, 1L, 3);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
+		// when & then
+		mockMvc.perform(put("/api/auth/members/carts/items/10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
+			.andExpect(status().isBadRequest());
 	}
 
 	@Test

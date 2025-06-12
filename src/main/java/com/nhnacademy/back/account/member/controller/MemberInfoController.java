@@ -45,11 +45,11 @@ public class MemberInfoController {
 				content = @Content(schema = @Schema(implementation = NotFoundMemberException.class)))
 		})
 	@Member
-	@GetMapping("/{memberId}")
-	public ResponseEntity<ResponseMemberInfoDTO> getMember(@PathVariable("memberId") String memberId) {
+	@GetMapping("/{member-id}")
+	public ResponseEntity<ResponseMemberInfoDTO> getMember(@PathVariable("member-id") String memberId) {
 		ResponseMemberInfoDTO responseMemberInfoDTO = memberService.getMemberInfo(new RequestMemberIdDTO(memberId));
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberInfoDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberInfoDTO);
 	}
 
 	@Operation(summary = "회원 정보 변경", description = "회원 정보 변경 기능",
@@ -60,8 +60,8 @@ public class MemberInfoController {
 			@ApiResponse(responseCode = "500", description = "회원 정보 변경 실패", content = @Content(schema = @Schema(implementation = UpdateMemberInfoFailedException.class)))
 		})
 	@Member
-	@PutMapping("/{memberId}/info")
-	public ResponseEntity<Void> updateMemberInfo(@PathVariable("memberId") String memberId,
+	@PutMapping("/{member-id}/info")
+	public ResponseEntity<Void> updateMemberInfo(@PathVariable("member-id") String memberId,
 		@Validated @Parameter(description = "회원 정보 요청 DTO", required = true, schema = @Schema(implementation = RequestMemberInfoDTO.class))
 		@RequestBody RequestMemberInfoDTO requestMemberInfoDTO,
 		BindingResult bindingResult) {
@@ -70,7 +70,7 @@ public class MemberInfoController {
 		}
 		memberService.updateMemberInfo(requestMemberInfoDTO);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@Operation(summary = "회원 탈퇴", description = "회원 탈퇴 기능",
@@ -80,8 +80,8 @@ public class MemberInfoController {
 			@ApiResponse(responseCode = "500", description = "회원 탈퇴 실패", content = @Content(schema = @Schema(implementation = UpdateMemberStateFailedException.class)))
 		})
 	@Member
-	@PostMapping("/{memberId}/info")
-	public ResponseEntity<Void> withdrawMember(@PathVariable("memberId") String memberId) {
+	@PostMapping("/{member-id}/info")
+	public ResponseEntity<Void> withdrawMember(@PathVariable("member-id") String memberId) {
 		memberService.withdrawMember(memberId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();

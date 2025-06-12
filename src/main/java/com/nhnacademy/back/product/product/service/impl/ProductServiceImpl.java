@@ -3,9 +3,12 @@ package com.nhnacademy.back.product.product.service.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -88,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 	private final LikeJpaRepository likeJpaRepository;
 
 	private final MinioUtils minioUtils;
-	private final String BUCKET_NAME = "e2bs-products-image";
+	private final static String BUCKET_NAME = "e2bs-products-image";
 
 	/**
 	 * 도서를 DB에 저장
@@ -356,15 +359,19 @@ public class ProductServiceImpl implements ProductService {
 	public Page<ResponseProductReadDTO> getProductsToElasticSearch(Page<Long> productIds, String memberId) {
 		List<Long> idOrder = productIds.getContent();
 		List<Product> unorderedProducts = productJpaRepository.findAllById(idOrder);
-		List<ResponseProductReadDTO> responseProductReadDTOS = new ArrayList<>();
-		// 한 권이라도 존재하지 않으면 예외 발생
-		if (unorderedProducts.size() != idOrder.size()) {
-			throw new ProductNotFoundException();
-		}
 
-		for (Product result : unorderedProducts) {
-			responseProductReadDTOS.add(getProductByChangedImagePath(result, memberId));
-		}
+		Map<Long, Product> productMap = unorderedProducts.stream()
+			.collect(Collectors.toMap(Product::getProductId, Function.identity()));
+
+		List<ResponseProductReadDTO> responseProductReadDTOS = idOrder.stream()
+			.map(id -> {
+				Product product = productMap.get(id);
+				if (product == null) {
+					throw new ProductNotFoundException();
+				}
+				return getProductByChangedImagePath(product, memberId);
+			})
+			.toList();
 
 		return new PageImpl<>(responseProductReadDTOS, productIds.getPageable(), productIds.getTotalElements());
 	}

@@ -13,6 +13,7 @@ import com.nhnacademy.back.product.state.domain.entity.ProductState;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +42,7 @@ public class Product {
 	@JoinColumn(name = "product_state_id")
 	private ProductState productState;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 

@@ -109,6 +109,6 @@ public class WrapperController {
 		@RequestBody RequestModifyWrapperDTO request) {
 		wrapperService.updateWrapper(wrapperId, request);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }

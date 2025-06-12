@@ -3,6 +3,7 @@ package com.nhnacademy.back.elasticsearch.service.impl;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,23 @@ import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
 import com.nhnacademy.back.product.product.exception.ProductAlreadyExistsException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductSearchServiceImpl implements ProductSearchService {
 
 	private final ProductSearchRepository productSearchRepository;
 	private final CustomProductSearchRepository customProductSearchRepository;
+
+	// 프록시 지연 주입
+	@Lazy
+	private final ProductSearchService self;
+
+	public ProductSearchServiceImpl(ProductSearchRepository productSearchRepository,
+		CustomProductSearchRepository customProductSearchRepository, @Lazy ProductSearchService self) {
+		this.productSearchRepository = productSearchRepository;
+		this.customProductSearchRepository = customProductSearchRepository;
+		this.self = self;
+	}
 
 	@Override
 	@Transactional
@@ -48,7 +57,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
 		// 검색 횟수 update
 		for (Long productId : productIds.getContent()) {
-			updateProductDocumentSearches(productId);
+			self.updateProductDocumentSearches(productId);
 		}
 
 		return productIds;

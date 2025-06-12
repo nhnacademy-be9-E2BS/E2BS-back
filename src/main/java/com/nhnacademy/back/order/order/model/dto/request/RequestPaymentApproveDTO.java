@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestTossCancelDTO {
-	private String cancelReason;
-	private long cancelAmount;
+public class RequestPaymentApproveDTO {
+	private String orderId;
+	private String paymentKey;
+	private long amount;
+	private String provider;
 }

@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,15 +33,16 @@ import com.nhnacademy.back.event.event.OrderPointEvent;
 import com.nhnacademy.back.event.event.OrderPointPaymentEvent;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
+import com.nhnacademy.back.order.order.adaptor.PaymentAdaptorFactory;
 import com.nhnacademy.back.order.order.adaptor.TossAdaptor;
 import com.nhnacademy.back.order.order.exception.OrderNotFoundException;
 import com.nhnacademy.back.order.order.exception.OrderProcessException;
+import com.nhnacademy.back.order.order.model.dto.request.RequestCancelDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.request.RequestTossCancelDTO;
-import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberRecentOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
@@ -50,7 +50,7 @@ import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderProductDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
 import com.nhnacademy.back.order.order.model.entity.Order;
 import com.nhnacademy.back.order.order.model.entity.OrderDetail;
 import com.nhnacademy.back.order.order.repository.OrderDetailJpaRepository;
@@ -73,6 +73,7 @@ import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import com.nhnacademy.back.product.product.service.ProductService;
+import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,8 +85,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderServiceImpl implements OrderService {
 
 	private final MemberJpaRepository memberJpaRepository;
-	@Value("${order.sc}")
-	private String secretKey;
 
 	private final OrderJpaRepository orderJpaRepository;
 	private final OrderDetailJpaRepository orderDetailJpaRepository;
@@ -108,6 +107,8 @@ public class OrderServiceImpl implements OrderService {
 	private final TossAdaptor tossAdaptor;
 
 	private final ApplicationEventPublisher eventPublisher;
+
+	private final PaymentAdaptorFactory paymentAdaptorFactory;
 
 	/**
 	 * 주문서를 저장하는 서비스
@@ -213,6 +214,11 @@ public class OrderServiceImpl implements OrderService {
 					"없는 포장지 입니다: " + requestOrderDetailDTO.getWrapperId()));
 			OrderDetail orderDetail = new OrderDetail(requestOrderDetailDTO, product, order, wrapper);
 			// 재고 선 차감
+
+			if (!product.getProductState().getProductStateName().equals(ProductStateName.SALE)) {
+				throw new OrderProcessException("판매 중인 상품이 아닙니다.");
+			}
+
 			productService.updateProductStock(product.getProductId(),
 				new RequestProductStockUpdateDTO(-requestOrderDetailDTO.getOrderQuantity()));
 			orderDetailJpaRepository.save(orderDetail);
@@ -226,14 +232,15 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Transactional
 	@Override
-	public ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount) {
-		RequestTossConfirmDTO requestTossConfirmDTO = new RequestTossConfirmDTO(orderId, paymentKey, amount);
-		// 결제 승인 결과를 받아 온 응답
-		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossAdaptor.confirmOrder(requestTossConfirmDTO,
-			secretKey);
+	public ResponseEntity<ResponsePaymentConfirmDTO> confirmOrder(RequestPaymentApproveDTO approveRequest) {
+		// 프로바이더에 따라 결제 승인 결과를 받아 온 응답
+		ResponseEntity<ResponsePaymentConfirmDTO> response = paymentAdaptorFactory.getAdapter(
+			approveRequest.getProvider()).confirmOrder(approveRequest);
+
 		// 만약 승인된 경우 결제 상태 업데이트, 포인트 차감, 적립, 쿠폰 사용
 		if (response.getStatusCode().is2xxSuccessful()) {
-			Order order = orderJpaRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
+			Order order = orderJpaRepository.findById(approveRequest.getOrderId())
+				.orElseThrow(OrderNotFoundException::new);
 			// 포인트 차감
 			eventPublisher.publishEvent(
 				new OrderPointPaymentEvent(order.getCustomer().getCustomerId(), order.getOrderPointAmount()));
@@ -275,7 +282,8 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	public ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode) {
-		ResponseOrderDTO order = orderJpaRepository.findById(orderCode).map(ResponseOrderDTO::fromEntity).orElse(null);
+		ResponseOrderDTO order = orderJpaRepository.findById(orderCode).map(ResponseOrderDTO::fromEntity)
+			.orElseThrow(OrderNotFoundException::new);
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
 		if (payment != null) {
 			order.setPaymentMethod(payment.getPaymentMethod().getPaymentMethodName().name());
@@ -310,7 +318,8 @@ public class OrderServiceImpl implements OrderService {
 				.map(ResponseOrderDTO::fromEntity);
 		} else if (startDate != null && endDate != null) { // 날짜 검색인 경우
 			return orderJpaRepository
-				.findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable, customerId, startDate.atStartOfDay(),
+				.findAllByCustomer_CustomerIdAndOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(pageable, customerId,
+					startDate.atStartOfDay(),
 					endDate.atTime(LocalTime.MAX))
 				.map(ResponseOrderDTO::fromEntity);
 		} else if (orderCode != null && !orderCode.isEmpty()) { // 주문 코드로 검색
@@ -377,12 +386,8 @@ public class OrderServiceImpl implements OrderService {
 		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
 		if (payment != null) {
-			ResponseEntity<ResponseTossPaymentConfirmDTO> tossResponse = tossAdaptor.cancelOrder(
-				payment.getPaymentKey(),
-				new RequestTossCancelDTO("구매자 변심", payment.getTotalPaymentAmount()),
-				secretKey);
-
-			return ResponseEntity.status(tossResponse.getStatusCode()).build();
+			return paymentAdaptorFactory.getAdapter(payment.getPaymentMethod().getPaymentMethodName().getProvider())
+				.cancelOrder(payment.getPaymentKey(), new RequestCancelDTO("구매자 변심", payment.getTotalPaymentAmount()));
 		}
 
 		return ResponseEntity.ok().build();

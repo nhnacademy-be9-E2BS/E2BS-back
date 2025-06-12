@@ -1,8 +1,7 @@
 package com.nhnacademy.back.order.order.service;
 
-import java.util.List;
-
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,19 +9,20 @@ import org.springframework.http.ResponseEntity;
 
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
+import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseMemberRecentOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseTossPaymentConfirmDTO;
+import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
 
 public interface OrderService {
 	ResponseEntity<ResponseOrderResultDTO> createOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
 
 	ResponseEntity<ResponseOrderResultDTO> createPointOrder(RequestOrderWrapperDTO requestOrderWrapperDTO);
 
-	ResponseEntity<ResponseTossPaymentConfirmDTO> confirmOrder(String orderId, String paymentKey, long amount);
+	ResponseEntity<ResponsePaymentConfirmDTO> confirmOrder(RequestPaymentApproveDTO approveRequest);
 
 	ResponseEntity<Void> deleteOrder(String orderId);
 

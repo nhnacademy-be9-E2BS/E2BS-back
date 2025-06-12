@@ -84,6 +84,6 @@ public class PublisherController {
 		@Parameter(description = "출판사 등록 및 수정 DTO", required = true, schema = @Schema(implementation = RequestPublisherDTO.class)) @RequestBody RequestPublisherDTO request) {
 		publisherService.updatePublisher(publisherId, request);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }

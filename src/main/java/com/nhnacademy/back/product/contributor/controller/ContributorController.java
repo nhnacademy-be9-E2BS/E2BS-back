@@ -21,6 +21,9 @@ import com.nhnacademy.back.product.contributor.domain.dto.request.RequestContrib
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponseContributorDTO;
 import com.nhnacademy.back.product.contributor.service.ContributorService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "기여자(관리자)", description = "관리자 기여자 관련 API")
 @RestController
 @RequestMapping("/api/admin/contributors")
 public class ContributorController {
