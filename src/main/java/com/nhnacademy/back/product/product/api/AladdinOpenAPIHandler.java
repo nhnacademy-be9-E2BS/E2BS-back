@@ -1,6 +1,7 @@
 package com.nhnacademy.back.product.product.api;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -19,25 +21,23 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.ParserAdapter;
 
 public class AladdinOpenAPIHandler extends DefaultHandler {
-	private List<Item> Items = new ArrayList<>();
+	private List<Item> items = new ArrayList<>();
 	private Item currentItem;
 	private boolean inItemElement = false;
 	private String tempValue;
 
 	public List<Item> getItems() {
-		return Items; // null 걱정 없음
-	}
-
-	public AladdinOpenAPIHandler() {
+		return items;
 	}
 
 
 	@Override
 	public void startDocument() throws SAXException {
-		Items = new ArrayList<>();
+		items = new ArrayList<>();
 	}
 
 
+	@Override
 	public void startElement(String namespace, String localName, String qName, Attributes atts) {
 		if (localName.equals("item")) {
 			currentItem = new Item();
@@ -72,16 +72,17 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 		tempValue = tempValue + new String(ch, start, length);
 	}
 
+	@Override
 	public void endElement(String namespaceURI, String localName, String qName) {
 		if (inItemElement) {
 			if (localName.equals("item")) {
-				Items.add(currentItem);
+				items.add(currentItem);
 				currentItem = null;
 				inItemElement = false;
 			} else if (localName.equals("title")) {
-				currentItem.Title = tempValue;
+				currentItem.setTitle(tempValue);
 			} else if (localName.equals("link")) {
-				currentItem.Link = tempValue;
+				currentItem.link = tempValue;
 			} else if (localName.equals("isbn13")) {
 				currentItem.isbn13 = tempValue;
 			} else if (localName.equals("priceStandard")) {
@@ -104,19 +105,21 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 		}
 	}
 
-	public void parseXml(String xmlUrl) throws Exception {
+	public void parseXml(String xmlUrl) throws IOException, ParserConfigurationException, SAXException {
 		URL url = new URL(xmlUrl);
-		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
-		StringBuilder response = new StringBuilder();
-		String line;
-		while ((line = in.readLine()) != null) {
-			response.append(line);
+		StringBuilder response;
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+			response = new StringBuilder();
+			String line;
+			while ((line = in.readLine()) != null) {
+				response.append(line);
+			}
+			in.close();
 		}
-		in.close();
 
 		String fixedXml = response.toString()
-			.replaceAll("<hr>", "<hr/>")
-			.replaceAll("&nbsp;", " ");
+			.replace("<hr>", "<hr/>")
+			.replace("&nbsp;", " ");
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
