@@ -1,6 +1,7 @@
 package com.nhnacademy.back.coupon.membercoupon;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -190,8 +191,12 @@ class MemberCouponServiceTest {
 	void testGetCouponsInOrderByMemberIdAndProductIdsMemberNotFound() {
 		when(memberJpaRepository.getMemberByMemberId("user1")).thenReturn(null);
 
-		assertThatThrownBy(() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)))
-			.isInstanceOf(NotFoundMemberException.class)
-			.hasMessageContaining("아이디에 해당하는 회원을 찾지 못했습니다.");
+		NotFoundMemberException exception = assertThrows(
+			NotFoundMemberException.class,
+			() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L))
+		);
+
+		assertTrue(exception.getMessage().contains("아이디에 해당하는 회원을 찾지 못했습니다."));
 	}
+
 }
