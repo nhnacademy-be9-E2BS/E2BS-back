@@ -30,7 +30,7 @@ public class WrapperServiceImpl implements WrapperService {
 	private final WrapperJpaRepository wrapperJpaRepository;
 
 	private final MinioUtils minioUtils;
-	private final String BUCKET_NAME = "e2bs-wrappers-image";
+	private static final String BUCKET_NAME = "e2bs-wrappers-image";
 
 	/**
 	 * Wrapper를 DB에 저장하는 로직

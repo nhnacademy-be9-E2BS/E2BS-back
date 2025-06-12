@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
 	/**
 	 * HttpStatus.BAD_REQUEST 경우의 에러 핸들러
 	 */
-	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class,
+	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class, IllegalArgumentException.class,
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
 		ProductAlreadyExistsException.class, TagAlreadyExistsException.class, ProductStockDecrementException.class,
 		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
