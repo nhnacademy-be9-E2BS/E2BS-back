@@ -60,6 +60,7 @@ public class CartServiceImpl implements CartService {
 	/**
 	 * 회원 장바구니 생성 메소드
 	 */
+	@Transactional
 	@Override
 	public void createCartForMember(String memberId) {
 		Member findMember = memberRepository.getMemberByMemberId(memberId);
