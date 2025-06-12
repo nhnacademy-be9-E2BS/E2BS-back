@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.back.order.order.adaptor.mapper.TossResponseMapper;
+import com.nhnacademy.back.order.order.exception.PaymentApproveFailedException;
 import com.nhnacademy.back.order.order.model.dto.request.RequestCancelDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestTossConfirmDTO;
@@ -34,7 +35,7 @@ public class TossPaymentAdaptor implements PaymentAdaptor {
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossAdaptor.confirmOrder(dto, secretKey);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
-			// throw new PaymentApproveFailedException("TOSS 결제 실패");
+			throw new PaymentApproveFailedException("TOSS 결제 실패");
 		}
 
 		return ResponseEntity.status(response.getStatusCode()).body(tossMapper.toResult(response.getBody()));
