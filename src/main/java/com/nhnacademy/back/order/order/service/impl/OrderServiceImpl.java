@@ -282,7 +282,8 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	public ResponseOrderWrapperDTO getOrderByOrderCode(String orderCode) {
-		ResponseOrderDTO order = orderJpaRepository.findById(orderCode).map(ResponseOrderDTO::fromEntity).orElse(null);
+		ResponseOrderDTO order = orderJpaRepository.findById(orderCode).map(ResponseOrderDTO::fromEntity)
+			.orElseThrow(OrderNotFoundException::new);
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
 		if (payment != null) {
 			order.setPaymentMethod(payment.getPaymentMethod().getPaymentMethodName().name());
@@ -385,12 +386,6 @@ public class OrderServiceImpl implements OrderService {
 		// 주문 코드에 해당하는 외부 API 결제 내역이 있는지 확인, 있다면 결제 취소 요청
 		Payment payment = paymentJpaRepository.findByOrderOrderCode(orderCode).orElse(null);
 		if (payment != null) {
-
-			// ResponseEntity<ResponseTossPaymentConfirmDTO> tossResponse = tossAdaptor.cancelOrder(
-			// 	payment.getPaymentKey(),
-			// 	new RequestCancelDTO("구매자 변심", payment.getTotalPaymentAmount()), secretKey);
-
-			// return ResponseEntity.status(tossResponse.getStatusCode()).build();
 			return paymentAdaptorFactory.getAdapter(payment.getPaymentMethod().getPaymentMethodName().getProvider())
 				.cancelOrder(payment.getPaymentKey(), new RequestCancelDTO("구매자 변심", payment.getTotalPaymentAmount()));
 		}

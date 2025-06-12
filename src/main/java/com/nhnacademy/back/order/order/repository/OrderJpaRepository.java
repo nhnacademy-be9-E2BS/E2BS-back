@@ -22,23 +22,20 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 	Page<Order> findAllByOrderCreatedAtBetweenOrderByOrderCreatedAtDesc(Pageable pageable,
 		LocalDateTime startDate, LocalDateTime endDate);
 
-	@Query("""
-			SELECT o FROM Order o
-			WHERE LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%'))
-			ORDER BY o.orderCreatedAt DESC
-		""")
+	@Query("SELECT o FROM Order o " +
+		"WHERE LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%')) " +
+		"ORDER BY o.orderCreatedAt DESC")
 	Page<Order> searchByOrderCodeIgnoreCase(
 		@Param("orderCode") String orderCode,
 		Pageable pageable
 	);
 
-	@Query(value = """
-		SELECT o.* FROM `order` o 
-		JOIN customer c ON o.customer_id = c.customer_id
-		JOIN member m ON m.customer_id = c.customer_id 
-		WHERE LOWER(m.member_id) LIKE LOWER(CONCAT('%', :memberId, '%'))
-		ORDER BY o.order_created_at DESC
-		""", nativeQuery = true)
+	@Query(value = "SELECT o.* FROM `order` o " +
+		"JOIN customer c ON o.customer_id = c.customer_id " +
+		"JOIN member m ON m.customer_id = c.customer_id " +
+		"WHERE LOWER(m.member_id) LIKE LOWER(CONCAT('%', :memberId, '%')) " +
+		"ORDER BY o.order_created_at DESC"
+		, nativeQuery = true)
 	Page<Order> searchByMemberIdIgnoreCase(
 		@Param("memberId") String memberId,
 		Pageable pageable

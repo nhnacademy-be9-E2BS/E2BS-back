@@ -33,10 +33,6 @@ public class TossPaymentAdaptor implements PaymentAdaptor {
 
 		ResponseEntity<ResponseTossPaymentConfirmDTO> response = tossAdaptor.confirmOrder(dto, secretKey);
 
-		if (!response.getStatusCode().is2xxSuccessful()) {
-			// throw new PaymentApproveFailedException("TOSS 결제 실패");
-		}
-
 		return ResponseEntity.status(response.getStatusCode()).body(tossMapper.toResult(response.getBody()));
 	}
 

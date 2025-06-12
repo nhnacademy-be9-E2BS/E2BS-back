@@ -35,8 +35,7 @@ class CustomProductSearchRepositoryTest {
 	CustomProductSearchRepositoryImpl repository;
 
 	private ProductDocument createDoc(Long id) {
-		ProductDocument doc = new ProductDocument(id);
-		return doc;
+		return new ProductDocument(id);
 	}
 
 	@Test
