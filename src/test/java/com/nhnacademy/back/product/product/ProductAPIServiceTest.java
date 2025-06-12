@@ -61,9 +61,10 @@ import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
+
 @MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
-public class ProductAPIServiceTest {
+class ProductAPIServiceTest {
 
 	@Mock ProductJpaRepository productJpaRepository;
 	@Mock PublisherJpaRepository publisherJpaRepository;
@@ -91,7 +92,7 @@ public class ProductAPIServiceTest {
 
 		Item item = new Item();
 		item.isbn13 = "12345";
-		item.Title = "Test Book";
+		item.title = "Test Book";
 		item.description = "Desc";
 		item.cover = "CoverUrl";
 		item.publisher = "Pub";
@@ -138,7 +139,7 @@ public class ProductAPIServiceTest {
 
 		Item item = new Item();
 		item.isbn13 = "abc";
-		item.Title = "BS Book";
+		item.title = "BS Book";
 		List<Item> items = List.of(item);
 
 		try (MockedConstruction<AladdinOpenAPI> mockCtor =
