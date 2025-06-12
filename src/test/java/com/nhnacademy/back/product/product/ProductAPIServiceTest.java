@@ -139,7 +139,6 @@ public class ProductAPIServiceTest {
 		Item item = new Item();
 		item.isbn13 = "abc";
 		item.Title = "BS Book";
-		// 나머지 필드 세팅...
 		List<Item> items = List.of(item);
 
 		try (MockedConstruction<AladdinOpenAPI> mockCtor =
@@ -212,15 +211,14 @@ public class ProductAPIServiceTest {
 	@Test
 	@DisplayName("createProductByQuery queryType null 시 IllegalArgumentException")
 	void createByQuery_queryTypeNull() {
-		// 1) Mock DTO
 		RequestProductApiCreateByQueryDTO req = mock(RequestProductApiCreateByQueryDTO.class);
 		when(req.getPublisherName()).thenReturn("P");
 		when(req.getProductIsbn()).thenReturn("I1");
-		when(req.getProductImage()).thenReturn("dummy.jpg");            // 이미지 널 방지
-		when(req.getContributors()).thenReturn("Bob(Editor)");         // parse 분기 통과
-		when(req.getCategoryIds()).thenReturn(List.of(1L));            // 카테고리 널 방지
-		when(req.getTagIds()).thenReturn(null);                        // tagIds null 분기
-		when(req.getQueryType()).thenReturn(null);                     // 여기가 진짜 null
+		when(req.getProductImage()).thenReturn("dummy.jpg");
+		when(req.getContributors()).thenReturn("Bob(Editor)");
+		when(req.getCategoryIds()).thenReturn(List.of(1L));
+		when(req.getTagIds()).thenReturn(null);
+		when(req.getQueryType()).thenReturn(null);
 
 		when(publisherJpaRepository.findByPublisherName("P"))
 			.thenReturn(null)
@@ -234,7 +232,6 @@ public class ProductAPIServiceTest {
 		when(productStateJpaRepository.save(any()))
 			.thenReturn(new ProductState(ProductStateName.SALE));
 
-		// 4) Product 저장 stub
 		Product dummy = createForTest(42L, "T","D", LocalDate.now(), 123);
 		when(productJpaRepository.save(any())).thenReturn(dummy);
 
@@ -306,13 +303,10 @@ public class ProductAPIServiceTest {
 		when(productTagJpaRepository.save(any()))
 			.thenAnswer(i -> i.getArgument(0));
 
-		// Elasticsearch 호출 stub
 		doNothing().when(productSearchService).createProductDocument(any(RequestProductDocumentDTO.class));
 
-		// 실행
 		service.createProduct(req);
 
-		// 검증
 		verify(publisherService).createPublisher(any());
 		verify(productStateJpaRepository).save(any());
 		verify(productImageJpaRepository).save(any(ProductImage.class));
@@ -324,16 +318,13 @@ public class ProductAPIServiceTest {
 	@DisplayName("createProduct 카테고리 개수 제한 예외")
 	void createProduct_categoryLimit() {
 		RequestProductApiCreateDTO req = mock(RequestProductApiCreateDTO.class);
-		// 필수 stub 추가
 		when(req.getPublisherName()).thenReturn("P");
 		when(req.getProductIsbn()).thenReturn("I1");
 		when(req.getProductImage()).thenReturn("dummy.jpg");      // image null 방지
 		when(req.getContributors()).thenReturn("Alice(Dev)");   // parse null 방지
 
-		// 빈 카테고리 리스트
 		when(req.getCategoryIds()).thenReturn(List.of());
 
-		// 나머지 로직 stub
 		when(productJpaRepository.existsByProductIsbn("I1")).thenReturn(false);
 		when(publisherJpaRepository.findByPublisherName("P")).thenReturn(new Publisher("P"));
 		when(productStateJpaRepository.findByProductStateName(any()))
@@ -341,7 +332,6 @@ public class ProductAPIServiceTest {
 		when(productJpaRepository.save(any()))
 			.thenReturn(createForTest(1L,"","",LocalDate.now(),0));
 
-		// 이제 카테고리 개수 제한 예외가 발생해야 합니다.
 		assertThatThrownBy(() -> service.createProduct(req))
 			.isInstanceOf(ProductCategoryCreateNotAllowException.class);
 	}
@@ -358,7 +348,6 @@ public class ProductAPIServiceTest {
 		when(req.getCategoryIds()).thenReturn(List.of(5L));
 		when(req.getTagIds()).thenReturn(null);  // null 태그
 
-		// 퍼블리셔, 스테이트, Product 저장 stub
 		when(publisherJpaRepository.findByPublisherName("PQ"))
 			.thenReturn(null)
 			.thenReturn(new Publisher("PQ"));
@@ -372,7 +361,6 @@ public class ProductAPIServiceTest {
 		Product prod = createForTest(200L, "TQ","DQ", LocalDate.now(), 200);
 		when(productJpaRepository.save(any())).thenReturn(prod);
 
-		// 기여자 저장 stub
 		when(positionJpaRepository.existsByPositionName(any())).thenReturn(false);
 		when(positionJpaRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 		when(positionJpaRepository.findPositionByPositionName(any()))
@@ -381,7 +369,6 @@ public class ProductAPIServiceTest {
 		when(productContributorJpaRepository.save(any()))
 			.thenAnswer(i -> i.getArgument(0));
 
-		// 카테고리 저장 stub
 		Category c5 = new Category( "C5", null);
 		when(categoryJpaRepository.findById(5L)).thenReturn(Optional.of(c5));
 		when(productCategoryJpaRepository.save(any()))
@@ -389,13 +376,10 @@ public class ProductAPIServiceTest {
 		when(productCategoryJpaRepository.findCategoryIdsByProductId(200L))
 			.thenReturn(List.of(1L));
 
-		// Elasticsearch 호출 stub
 		doNothing().when(productSearchService).createProductDocument(any(RequestProductDocumentDTO.class));
 
-		// 실행 (예외 없이 정상)
 		service.createProductByQuery(req);
 
-		// 검증
 		verify(productImageJpaRepository).save(any(ProductImage.class));
 		verify(productSearchService).createProductDocument(any());
 	}

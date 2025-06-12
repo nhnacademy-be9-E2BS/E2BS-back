@@ -82,12 +82,10 @@ class MainPageProductServiceTest {
 		ProductCategory pc1 = new ProductCategory(product(10L), cat);
 		ProductCategory pc2 = new ProductCategory(product(20L), cat);
 		given(productCategoryJpaRepository.findProductIdByCategory(cat)).willReturn(List.of(pc1, pc2));
-		// stub productJpaRepository
 		Product p1 = product(10L);
 		Product p2 = product(20L);
 		given(productJpaRepository.findByIdWithImages(10L)).willReturn(Optional.of(p1));
 		given(productJpaRepository.findByIdWithImages(20L)).willReturn(Optional.of(p2));
-		// stub contributors
 		ResponseContributorDTO contrib = new ResponseContributorDTO("p1","Alice");
 		given(productContributorJpaRepository.findContributorDTOsByProductId(10L))
 			.willReturn(List.of(contrib));

@@ -215,10 +215,8 @@ class ProductAdminControllerTest {
 		RequestProductApiCreateDTO req = new RequestProductApiCreateDTO();
 		req.setPublisherName("Pub");
 		req.setProductIsbn("123");
-		// (other fields can be null as no validation in controller)
 		doNothing().when(productApiService).createProduct(any(RequestProductApiCreateDTO.class));
 
-		// when & then
 		mockMvc.perform(post("/api/auth/admin/books/aladdin/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(req)))
