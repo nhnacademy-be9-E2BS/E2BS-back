@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "마이페이지 배송지 저장 API", description = "회원의 배송지 정보 저장 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/mypage/{memberId}/addresses/save")
+@RequestMapping("/api/auth/mypage/{member-id}/addresses/form")
 public class AddressSaveController {
 
 	private final AddressService addressService;
@@ -43,7 +43,7 @@ public class AddressSaveController {
 		})
 	@Member
 	@PostMapping
-	public ResponseEntity<Void> saveMemberAddress(@PathVariable("memberId") String memberId,
+	public ResponseEntity<Void> saveMemberAddress(@PathVariable("member-id") String memberId,
 		@Validated @Parameter(description = "배송지 저장 요청 DTO", required = true, schema = @Schema(implementation = RequestMemberAddressSaveDTO.class))
 		@RequestBody RequestMemberAddressSaveDTO requestMemberAddressSaveDTO,
 		BindingResult bindingResult) {
