@@ -27,10 +27,10 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 	private final ElasticsearchOperations elasticsearchOperations;
 
-	private final static String productReviewCount = "productReviewCount";
-	private final static String productHits = "productHits";
-	private final static String productSearches = "productSearches";
-	private final static String productPublishedAt = "productPublishedAt";
+	private static final String productReviewCount = "productReviewCount";
+	private static final String productHits = "productHits";
+	private static final String productSearches = "productSearches";
+	private static final String productPublishedAt = "productPublishedAt";
 
 	/**
 	 * 검색어로 검색 후 정렬
@@ -186,11 +186,11 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 				Sort.Order.desc(productHits),
 				Sort.Order.desc(productSearches)
 			);
-			case LATEST -> Sort.by(Sort.Order.desc("productPublishedAt"));
+			case LATEST -> Sort.by(Sort.Order.desc(productPublishedAt));
 			case LOW_PRICE -> Sort.by(Sort.Order.asc("productSalePrice"));
 			case HIGH_PRICE -> Sort.by(Sort.Order.desc("productSalePrice"));
 			case RATING -> Sort.by(Sort.Order.desc("productReviewRate"));
-			case REVIEW_COUNT -> Sort.by(Sort.Order.desc("productReviewCount"));
+			case REVIEW_COUNT -> Sort.by(Sort.Order.desc(productReviewCount));
 			default -> Sort.unsorted();
 		};
 	}
