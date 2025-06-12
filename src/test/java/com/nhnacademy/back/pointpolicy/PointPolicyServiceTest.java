@@ -24,7 +24,7 @@ import com.nhnacademy.back.pointpolicy.repository.PointPolicyJpaRepository;
 import com.nhnacademy.back.pointpolicy.service.impl.PointPolicyServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class PointPolicyServiceImplTest {
+class PointPolicyServiceTest {
 
 	@Mock
 	PointPolicyJpaRepository repository;
@@ -64,14 +64,53 @@ class PointPolicyServiceImplTest {
 	@Test
 	@DisplayName("회원가입 포인트 정책 조회")
 	void getRegisterPointPolicies() {
-		PointPolicy policy = new PointPolicy(PointPolicyType.REGISTER, "policy1", 5, LocalDateTime.now());
+		PointPolicy policy1 = new PointPolicy(PointPolicyType.REGISTER, "policy1", 5, LocalDateTime.now());
 		when(repository.findByPointPolicyTypeOrderByPointPolicyIsActiveDescPointPolicyCreatedAtDesc(PointPolicyType.REGISTER))
-			.thenReturn(List.of(policy));
+			.thenReturn(List.of(policy1));
 
-		var result = service.getRegisterPointPolicies();
+		var result1 = service.getRegisterPointPolicies();
 
-		assertEquals(1, result.size());
-		assertEquals("policy1", result.get(0).getPointPolicyName());
+		assertEquals(1, result1.size());
+		assertEquals("policy1", result1.get(0).getPointPolicyName());
+	}
+
+	@Test
+	@DisplayName("이미지 리뷰 포인트 정책 조회")
+	void getReviewImgPointPolicies() {
+		PointPolicy policy1 = new PointPolicy(PointPolicyType.REVIEW_IMG, "policy1", 5, LocalDateTime.now());
+		when(repository.findByPointPolicyTypeOrderByPointPolicyIsActiveDescPointPolicyCreatedAtDesc(PointPolicyType.REVIEW_IMG))
+			.thenReturn(List.of(policy1));
+
+		var result1 = service.getReviewImgPointPolicies();
+
+		assertEquals(1, result1.size());
+		assertEquals("policy1", result1.get(0).getPointPolicyName());
+	}
+
+	@Test
+	@DisplayName("일반 리뷰 포인트 정책 조회")
+	void getReviewPointPolicies() {
+		PointPolicy policy1 = new PointPolicy(PointPolicyType.REVIEW, "policy1", 5, LocalDateTime.now());
+		when(repository.findByPointPolicyTypeOrderByPointPolicyIsActiveDescPointPolicyCreatedAtDesc(PointPolicyType.REVIEW))
+			.thenReturn(List.of(policy1));
+
+		var result1 = service.getReviewPointPolicies();
+
+		assertEquals(1, result1.size());
+		assertEquals("policy1", result1.get(0).getPointPolicyName());
+	}
+
+	@Test
+	@DisplayName("기본 적립률 포인트 정책 조회")
+	void getBookPointPolicies() {
+		PointPolicy policy1 = new PointPolicy(PointPolicyType.BOOK, "policy1", 5, LocalDateTime.now());
+		when(repository.findByPointPolicyTypeOrderByPointPolicyIsActiveDescPointPolicyCreatedAtDesc(PointPolicyType.BOOK))
+			.thenReturn(List.of(policy1));
+
+		var result1 = service.getBookPointPolicies();
+
+		assertEquals(1, result1.size());
+		assertEquals("policy1", result1.get(0).getPointPolicyName());
 	}
 
 	@Test
