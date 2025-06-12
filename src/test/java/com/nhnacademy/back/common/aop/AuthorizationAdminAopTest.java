@@ -25,10 +25,10 @@ import com.nhnacademy.back.jwt.rule.JwtRule;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-class AuthorizationMemberAopTest {
+class AuthorizationAdminAopTest {
 
 	@InjectMocks
-	private AuthorizationMemberAop authorizationMemberAop;
+	private AuthorizationAdminAop authorizationAdminAop;
 
 	@Mock
 	private HttpServletRequest request;
@@ -39,7 +39,7 @@ class AuthorizationMemberAopTest {
 	@Mock
 	private ProceedingJoinPoint joinPoint;
 
-	private static final String MEMBER_ID = "user";
+	private static final String ADMIN_ID = "admin";
 	private static final String ACCESS_TOKEN = "header.payload.signature";
 
 	private AutoCloseable mocks;
@@ -55,7 +55,7 @@ class AuthorizationMemberAopTest {
 	}
 
 	@Test
-	@DisplayName("회원 권한 체크 메서드 테스트")
+	@DisplayName("관리자 권한 체크 메서드 테스트")
 	void checkAuthorizationMemberAopMethodTest() throws Throwable {
 
 		// Given
@@ -64,18 +64,18 @@ class AuthorizationMemberAopTest {
 		when(request.getHeader(JwtRule.JWT_ISSUE_HEADER.getValue())).thenReturn(headerValue);
 
 		try (MockedStatic<JwtMemberIdParser> parserMock = mockStatic(JwtMemberIdParser.class)) {
-			parserMock.when(() -> JwtMemberIdParser.getMemberId(ACCESS_TOKEN)).thenReturn(MEMBER_ID);
+			parserMock.when(() -> JwtMemberIdParser.getMemberId(ACCESS_TOKEN)).thenReturn(ADMIN_ID);
 
-			MemberRole role = new MemberRole(1L, MemberRoleName.MEMBER);
+			MemberRole role = new MemberRole(1L, MemberRoleName.ADMIN);
 			Member member = mock(Member.class);
 
 			// When
 			when(member.getMemberRole()).thenReturn(role);
-			when(memberJpaRepository.getMemberByMemberId(MEMBER_ID)).thenReturn(member);
+			when(memberJpaRepository.getMemberByMemberId(ADMIN_ID)).thenReturn(member);
 
 			when(joinPoint.proceed()).thenReturn("success");
 
-			Object result = authorizationMemberAop.checkAuthorizationMemberAop(joinPoint);
+			Object result = authorizationAdminAop.checkAuthorizationAdminAop(joinPoint);
 
 			// Then
 			assertThat(result).isEqualTo("success");
@@ -86,7 +86,7 @@ class AuthorizationMemberAopTest {
 	}
 
 	@Test
-	@DisplayName("회원 권한 체크 메서드 AccessDeniedException 테스트")
+	@DisplayName("관리자 권한 체크 메서드 AccessDeniedException 테스트")
 	void checkAuthorizationMemberAopMethodAccessDeniedExceptionTest() throws Throwable {
 
 		// Given
@@ -94,20 +94,21 @@ class AuthorizationMemberAopTest {
 		when(request.getHeader(JwtRule.JWT_ISSUE_HEADER.getValue())).thenReturn(headerValue);
 
 		try (MockedStatic<JwtMemberIdParser> parserMock = mockStatic(JwtMemberIdParser.class)) {
-			parserMock.when(() -> JwtMemberIdParser.getMemberId(ACCESS_TOKEN)).thenReturn(MEMBER_ID);
+			parserMock.when(() -> JwtMemberIdParser.getMemberId(ACCESS_TOKEN)).thenReturn(ADMIN_ID);
 
-			MemberRole role = new MemberRole(2L, MemberRoleName.ADMIN);
+			MemberRole role = new MemberRole(2L, MemberRoleName.MEMBER);
 			Member member = mock(Member.class);
 
 			// When
 			when(member.getMemberRole()).thenReturn(role);
-			when(memberJpaRepository.getMemberByMemberId(MEMBER_ID)).thenReturn(member);
+			when(memberJpaRepository.getMemberByMemberId(ADMIN_ID)).thenReturn(member);
 
 			// Then
 			Assertions.assertThrows(AccessDeniedException.class, () -> {
-				authorizationMemberAop.checkAuthorizationMemberAop(joinPoint);
+				authorizationAdminAop.checkAuthorizationAdminAop(joinPoint);
 			});
 
 		}
 	}
+
 }

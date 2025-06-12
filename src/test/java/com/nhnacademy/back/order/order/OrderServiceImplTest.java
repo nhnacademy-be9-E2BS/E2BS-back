@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +30,17 @@ import org.springframework.http.ResponseEntity;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
+import com.nhnacademy.back.account.memberrank.domain.entity.RankName;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
+import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
+import com.nhnacademy.back.account.memberstate.domain.entity.MemberStateName;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
+import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuthName;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
@@ -568,4 +579,182 @@ class OrderServiceImplTest {
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 개수 조회 메서드 테스트")
+	void getAllOrdersMethodTest() throws Exception {
+
+		// Given
+
+		// When
+		when(orderJpaRepository.countAllOrders()).thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getAllOrders();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 매출액 조회 메서드 테스트")
+	void getTotalSalesMethodTest() throws Exception {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalSales())
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalSales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 이번 달 총 매출액 조회 메서드 테스트")
+	void getTotalMonthlySalesMethodTest() throws Exception {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalMonthlySales(any(LocalDateTime.class), any(LocalDateTime.class)))
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalMonthlySales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 하루 매출액 조회 메서드 테스트")
+	void getTotalDailySalesMethodTest() throws Exception {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalDailySales(any(LocalDateTime.class), any(LocalDateTime.class)))
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalDailySales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 테스트")
+	void getMemberOrdersCntMethodTest() throws Exception {
+
+		// Given
+		Customer customer = Customer.builder()
+			.customerId(1L)
+			.customerName("김도윤")
+			.customerEmail("user@test.com")
+			.build();
+
+		Member member = Member.builder()
+			.customer(customer)
+			.memberId("user")
+			.memberBirth(LocalDate.now())
+			.memberPhone("010-1234-1234")
+			.memberCreatedAt(LocalDate.now())
+			.memberState(new MemberState(3L, MemberStateName.ACTIVE))
+			.memberRank(new MemberRank(1L, RankName.NORMAL, 1, 1L))
+			.memberRole(new MemberRole(1, MemberRoleName.MEMBER))
+			.socialAuth(new SocialAuth(1L, SocialAuthName.WEB))
+			.build();
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(member);
+		when(orderJpaRepository.countOrdersByCustomer(member.getCustomer())).thenReturn(1);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getMemberOrdersCnt("user");
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 NotFoundMemberException 테스트")
+	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() throws Exception {
+
+		// Given
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
+
+		// Then
+		org.junit.jupiter.api.Assertions.assertThrows(NotFoundMemberException.class, () -> {
+			orderService.getMemberOrdersCnt("user");
+		});
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 테스트")
+	void getMemberRecentOrdersMethodTest() throws Exception {
+
+		// Given
+		String memberId = "user";
+
+		Customer customer = mock(Customer.class);
+		Member member = mock(Member.class);
+		when(member.getCustomer()).thenReturn(customer);
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(member);
+
+		OrderState waitState = new OrderState(1L, OrderStateName.WAIT);
+		OrderState deliveryState = new OrderState(2L, OrderStateName.DELIVERY);
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT)).thenReturn(Optional.of(waitState));
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY)).thenReturn(
+			Optional.of(deliveryState));
+
+		// When
+		Order order = mock(Order.class);
+		when(order.getOrderCode()).thenReturn("123456");
+		when(order.getOrderCreatedAt()).thenReturn(LocalDateTime.now());
+		when(order.getOrderState()).thenReturn(waitState);
+
+		when(orderJpaRepository.findOrdersByCustomerAndOrderState(customer, List.of(waitState, deliveryState)))
+			.thenReturn(List.of(order));
+
+		Product product = mock(Product.class);
+		when(product.getProductTitle()).thenReturn("hello");
+
+		OrderDetail orderDetail = mock(OrderDetail.class);
+		when(orderDetail.getProduct()).thenReturn(product);
+		when(orderDetail.getOrderQuantity()).thenReturn(2);
+		when(orderDetail.getOrderDetailPerPrice()).thenReturn(10000L);
+
+		when(orderDetailJpaRepository.findByOrderOrderCode("123456"))
+			.thenReturn(List.of(orderDetail));
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getMemberRecentOrders("user");
+		}).doesNotThrowAnyException();
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 NotFoundMemberException 테스트")
+	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() throws Exception {
+
+		// Given
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
+
+		// Then
+		org.junit.jupiter.api.Assertions.assertThrows(NotFoundMemberException.class, () -> {
+			orderService.getMemberRecentOrders("user");
+		});
+
+	}
+
 }
