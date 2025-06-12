@@ -125,6 +125,66 @@ class PointHistoryServiceTest {
 	}
 
 	@Test
+	@DisplayName("이미지 리뷰 포인트 적립 성공")
+	void earnImgReviewPoint_Success() {
+		String memberId = "user";
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
+
+		PointPolicy policy = new PointPolicy(
+			PointPolicyType.REVIEW_IMG,
+			"이미지 리뷰 포인트 정책",
+			100L,
+			LocalDateTime.now()
+		);
+		when(pointPolicyJpaRepository.findByPointPolicyTypeAndPointPolicyIsActive(PointPolicyType.REVIEW_IMG, true))
+			.thenReturn(policy);
+
+		service.earnImgReviewPoint(memberId);
+
+		verify(pointHistoryJpaRepository, times(1)).save(any(PointHistory.class));
+	}
+
+	@Test
+	@DisplayName("일반 리뷰 포인트 적립 성공")
+	void earnReviewPoint_Success() {
+		String memberId = "user";
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
+
+		PointPolicy policy = new PointPolicy(
+			PointPolicyType.REVIEW,
+			"일반 리뷰 포인트 정책",
+			100L,
+			LocalDateTime.now()
+		);
+		when(pointPolicyJpaRepository.findByPointPolicyTypeAndPointPolicyIsActive(PointPolicyType.REVIEW, true))
+			.thenReturn(policy);
+
+		service.earnReviewPoint(memberId);
+
+		verify(pointHistoryJpaRepository, times(1)).save(any(PointHistory.class));
+	}
+
+	@Test
+	@DisplayName("기본 적립률 포인트 적립 성공")
+	void earnOrderPoint_Success() {
+		long customerId = 1L;
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByCustomerId(customerId)).thenReturn(mockMember);
+
+		service.earnOrderPoint(1L, 3000L);
+
+		verify(pointHistoryJpaRepository, times(1)).save(any(PointHistory.class));
+	}
+
+	@Test
 	@DisplayName("회원가입 포인트 적립 - 활성화된 정책 없을 때 예외")
 	void earnRegisterPoint_NoActivePolicy() {
 		String memberId = "user";
@@ -137,6 +197,36 @@ class PointHistoryServiceTest {
 			.thenReturn(null);
 
 		assertThrows(PointPolicyNotFoundException.class, () -> service.earnRegisterPoint(memberId));
+	}
+
+	@Test
+	@DisplayName("이미지 리뷰 포인트 적립 - 활성화된 정책 없을 때 예외")
+	void earnImgReviewPoint_NoActivePolicy() {
+		String memberId = "user";
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
+
+		when(pointPolicyJpaRepository.findByPointPolicyTypeAndPointPolicyIsActive(PointPolicyType.REVIEW_IMG, true))
+			.thenReturn(null);
+
+		assertThrows(PointPolicyNotFoundException.class, () -> service.earnImgReviewPoint(memberId));
+	}
+
+	@Test
+	@DisplayName("일반 리뷰 포인트 적립 - 활성화된 정책 없을 때 예외")
+	void earnReviewPoint_NoActivePolicy() {
+		String memberId = "user";
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
+
+		when(pointPolicyJpaRepository.findByPointPolicyTypeAndPointPolicyIsActive(PointPolicyType.REVIEW, true))
+			.thenReturn(null);
+
+		assertThrows(PointPolicyNotFoundException.class, () -> service.earnReviewPoint(memberId));
 	}
 
 	@Test
@@ -177,5 +267,33 @@ class PointHistoryServiceTest {
 
 		assertThrows(InsufficientPointException.class,
 			() -> spyService.payPoint(customerId, pointToPay));
+	}
+
+	@Test
+	@DisplayName("포인트 복구 성공")
+	void recoverPoint_Success() {
+		long customerId = 1L;
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByCustomerId(customerId)).thenReturn(mockMember);
+
+		service.recoverPoint(1L, 3000L);
+
+		verify(pointHistoryJpaRepository, times(1)).save(any(PointHistory.class));
+	}
+
+	@Test
+	@DisplayName("포인트 회수 성공")
+	void retrievePoint_Success() {
+		long customerId = 1L;
+
+		Member mockMember = Mockito.mock(Member.class);
+
+		when(memberJpaRepository.getMemberByCustomerId(customerId)).thenReturn(mockMember);
+
+		service.retrievePoint(1L, 3000L);
+
+		verify(pointHistoryJpaRepository, times(1)).save(any(PointHistory.class));
 	}
 }

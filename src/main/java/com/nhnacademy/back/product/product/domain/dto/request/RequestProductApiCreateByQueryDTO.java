@@ -58,10 +58,6 @@ public class RequestProductApiCreateByQueryDTO {
 	@NotNull
 	private int productStock;
 
-	/**
-	 *
-	 */
-
 	List<Long> categoryIds;
 	List<Long> tagIds;
 }

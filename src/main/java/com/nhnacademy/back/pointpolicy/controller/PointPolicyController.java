@@ -4,7 +4,12 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.annotation.Admin;
 import com.nhnacademy.back.pointpolicy.domain.dto.request.RequestPointPolicyRegisterDTO;
@@ -17,9 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -77,10 +80,8 @@ public class PointPolicyController {
 	}
 
 	@Operation(summary = "포인트 정책 활성화", description = "특정 포인트 정책 활성화")
-	@ApiResponses({
-		@ApiResponse(responseCode = "204", description = "활성화 성공"),
-		@ApiResponse(responseCode = "404", description = "정책 ID 없음")
-	})
+	@ApiResponse(responseCode = "204", description = "활성화 성공")
+	@ApiResponse(responseCode = "404", description = "정책 ID 없음")
 	@Admin
 	@PutMapping("/api/admin/pointPolicies/{point-policy-id}/activate")
 	public ResponseEntity<Void> activatePointPolicy(
@@ -91,11 +92,9 @@ public class PointPolicyController {
 	}
 
 	@Operation(summary = "포인트 정책 수정", description = "기존 포인트 정책 내용을 수정")
-	@ApiResponses({
-		@ApiResponse(responseCode = "204", description = "수정 성공"),
-		@ApiResponse(responseCode = "400", description = "요청값 오류"),
-		@ApiResponse(responseCode = "404", description = "정책 ID 없음")
-	})
+	@ApiResponse(responseCode = "204", description = "수정 성공")
+	@ApiResponse(responseCode = "400", description = "요청값 오류")
+	@ApiResponse(responseCode = "404", description = "정책 ID 없음")
 	@Admin
 	@PutMapping("/api/admin/pointPolicies/{point-policy-id}")
 	public ResponseEntity<Void> updatePointPolicy(
