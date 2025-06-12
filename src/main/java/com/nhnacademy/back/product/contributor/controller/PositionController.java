@@ -21,6 +21,9 @@ import com.nhnacademy.back.product.contributor.domain.dto.request.RequestPositio
 import com.nhnacademy.back.product.contributor.domain.dto.response.ResponsePositionDTO;
 import com.nhnacademy.back.product.contributor.service.PositionService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "역할(관리자)", description = "관리자 기여자의 역할 관련 API")
 @RestController
 @RequestMapping("/api/admin/positions")
 public class PositionController {

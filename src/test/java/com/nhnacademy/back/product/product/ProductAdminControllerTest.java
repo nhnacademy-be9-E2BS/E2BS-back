@@ -1,6 +1,6 @@
 package com.nhnacademy.back.product.product;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -25,9 +25,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.product.controller.ProductAdminController;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateByQueryDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiCreateDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchByQueryTypeDTO;
+import com.nhnacademy.back.product.product.domain.dto.request.RequestProductApiSearchDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductMetaDTO;
 import com.nhnacademy.back.product.product.domain.dto.request.RequestProductSalePriceUpdateDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductApiSearchByQueryTypeDTO;
 import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductReadDTO;
+import com.nhnacademy.back.product.product.domain.dto.response.ResponseProductsApiSearchDTO;
 import com.nhnacademy.back.product.product.service.ProductAPIService;
 import com.nhnacademy.back.product.product.service.ProductService;
 import com.nhnacademy.back.product.publisher.domain.dto.response.ResponsePublisherDTO;
@@ -40,11 +46,13 @@ class ProductAdminControllerTest {
 	private MockMvc mockMvc;
 	@MockitoBean
 	private ProductService productService;
-	@MockitoBean
-	private ProductAPIService productAPIService;
 
+	@MockitoBean
+	private ProductAPIService productApiService;
 	@Autowired
 	private ObjectMapper objectMapper;
+
+
 
 	@Test
 	@DisplayName("도서 저장")
@@ -160,4 +168,75 @@ class ProductAdminControllerTest {
 			.andExpect(status().isOk());
 	}
 
+
+	@Test
+	@DisplayName("알라딘 api 도서 검색")
+	void searchProducts_withQuery() throws Exception {
+		// given
+		ResponseProductsApiSearchDTO dto = new ResponseProductsApiSearchDTO();
+		dto.setProductTitle("Book1");
+		Page<ResponseProductsApiSearchDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0,10), 1);
+		given(productApiService.searchProducts(any(RequestProductApiSearchDTO.class), eq(PageRequest.of(0,10))))
+			.willReturn(page);
+
+		// when & then
+		mockMvc.perform(get("/api/auth/admin/books/aladdin/search")
+				.param("query", "foo")
+				.param("queryType", "Title")
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].productTitle").value("Book1"));
+	}
+
+	@Test
+	@DisplayName("알라딘 api 도서 검색2")
+	void searchProducts_withoutQuery() throws Exception {
+		// given
+		ResponseProductApiSearchByQueryTypeDTO dto = new ResponseProductApiSearchByQueryTypeDTO();
+		dto.setProductTitle("BS1");
+		Page<ResponseProductApiSearchByQueryTypeDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0,5), 1);
+		given(productApiService.searchProductsByQuery(any(RequestProductApiSearchByQueryTypeDTO.class), eq(PageRequest.of(0,5))))
+			.willReturn(page);
+
+		// when & then
+		mockMvc.perform(get("/api/auth/admin/books/aladdin/search")
+				.param("queryType", "Bestseller")
+				.param("page", "0")
+				.param("size", "5"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].productTitle").value("BS1"));
+	}
+
+	@Test
+	@DisplayName("알라딘 api 도서 등록")
+	void createProductByApi() throws Exception {
+		// given
+		RequestProductApiCreateDTO req = new RequestProductApiCreateDTO();
+		req.setPublisherName("Pub");
+		req.setProductIsbn("123");
+		doNothing().when(productApiService).createProduct(any(RequestProductApiCreateDTO.class));
+
+		mockMvc.perform(post("/api/auth/admin/books/aladdin/register")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(req)))
+			.andExpect(status().isCreated());
+	}
+
+	@Test
+	@DisplayName("알라딘 api 도서 등록2")
+	void createProductQueryByApi() throws Exception {
+		// given
+		RequestProductApiCreateByQueryDTO req = new RequestProductApiCreateByQueryDTO();
+		req.setPublisherName("PubQ");
+		req.setProductIsbn("456");
+		req.setQueryType("Bestseller");
+		doNothing().when(productApiService).createProductByQuery(any(RequestProductApiCreateByQueryDTO.class));
+
+		// when & then
+		mockMvc.perform(post("/api/auth/admin/books/aladdin/register/list")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(req)))
+			.andExpect(status().isCreated());
+	}
 }
