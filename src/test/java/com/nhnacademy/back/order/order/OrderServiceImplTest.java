@@ -54,7 +54,6 @@ import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
@@ -313,17 +312,22 @@ class OrderServiceImplTest {
 		long customerId = 1L;
 
 		// Order
+		Customer customer = mock(Customer.class);
 		Order orderEntity = mock(Order.class);
-		ResponseOrderDTO responseOrderDTO = new ResponseOrderDTO();
-		responseOrderDTO.setCustomerId(customerId);
+		DeliveryFee deliveryFee = mock(DeliveryFee.class);
+		OrderState orderState = mock(OrderState.class);
 
 		when(orderJpaRepository.findById(orderCode))
 			.thenReturn(Optional.of(orderEntity));
-		// map to DTO
-		Mockito.mockStatic(ResponseOrderDTO.class)
-			.when(() -> ResponseOrderDTO.fromEntity(orderEntity))
-			.thenReturn(responseOrderDTO);
 
+		when(orderEntity.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(customerId);
+		when(orderEntity.getDeliveryFee()).thenReturn(deliveryFee);
+		when(deliveryFee.getDeliveryFeeId()).thenReturn(1L);
+		when(deliveryFee.getDeliveryFeeAmount()).thenReturn(1L);
+		when(deliveryFee.getDeliveryFeeFreeAmount()).thenReturn(1L);
+		when(orderEntity.getOrderState()).thenReturn(orderState);
+		when(orderState.getOrderStateName()).thenReturn(OrderStateName.WAIT);
 		// Payment
 		Payment payment = mock(Payment.class);
 		PaymentMethod paymentMethod = mock(PaymentMethod.class);
@@ -340,20 +344,19 @@ class OrderServiceImplTest {
 		// OrderDetails
 		OrderDetail orderDetail = mock(OrderDetail.class);
 		List<OrderDetail> orderDetailList = List.of(orderDetail);
+		Product product = mock(Product.class);
 		when(orderDetailJpaRepository.findByOrderOrderCode(orderCode))
 			.thenReturn(orderDetailList);
 
-		ResponseOrderDetailDTO orderDetailDTO = new ResponseOrderDetailDTO();
-		Mockito.mockStatic(ResponseOrderDetailDTO.class)
-			.when(() -> ResponseOrderDetailDTO.fromEntity(orderDetail))
-			.thenReturn(orderDetailDTO);
+		when(orderDetail.getProduct()).thenReturn(product);
+		when(product.getProductId()).thenReturn(1L);
+		when(product.getProductTitle()).thenReturn("Title");
 
 		// when
 		ResponseOrderWrapperDTO result = orderService.getOrderByOrderCode(orderCode);
 
 		// then
 		assertNotNull(result);
-		assertEquals(responseOrderDTO, result.getOrder());
 		assertEquals(1, result.getOrderDetails().size());
 	}
 

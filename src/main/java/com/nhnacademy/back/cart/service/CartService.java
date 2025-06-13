@@ -10,6 +10,7 @@ import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 
 public interface CartService {
+	void createCartForMember(String memberId);
 	int createCartItemForMember(RequestAddCartItemsDTO request);
 	int updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request);
 	void deleteCartItemForMember(long cartItemId);

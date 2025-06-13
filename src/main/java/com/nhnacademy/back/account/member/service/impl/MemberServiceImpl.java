@@ -297,6 +297,16 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	public String getMemberRole(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+
+		return member.getMemberRole().getMemberRoleName().name();
+	}
+
+	@Override
 	@Transactional
 	public void changeDormantMemberStateActive(String memberId) {
 		MemberState memberState = memberStateJpaRepository.getMemberStateByMemberStateId(1);
