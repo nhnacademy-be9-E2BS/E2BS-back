@@ -1,7 +1,6 @@
 package com.nhnacademy.back.account.memberrank.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ public class MemberRankServiceImpl implements MemberRankService {
 				.memberRankTierBonusRate(memberRank.getMemberRankTierBonusRate())
 				.memberRankRequireAmount(memberRank.getMemberRankRequireAmount())
 				.build())
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 }

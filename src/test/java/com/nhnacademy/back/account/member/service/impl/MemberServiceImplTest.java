@@ -153,9 +153,8 @@ class MemberServiceImplTest {
 		when(memberService.existsMemberByMemberId(requestLoginMemberDTO.getMemberId())).thenReturn(false);
 
 		// Then
-		Assertions.assertThrows(LoginMemberIsNotExistsException.class, () -> {
-			memberService.loginMember(requestLoginMemberDTO);
-		});
+		Assertions.assertThrows(LoginMemberIsNotExistsException.class,
+			() -> memberService.loginMember(requestLoginMemberDTO));
 
 	}
 
@@ -178,9 +177,8 @@ class MemberServiceImplTest {
 		when(memberService.getMemberByMemberId("user")).thenReturn(member);
 
 		// Then
-		Assertions.assertThrows(MemberStateWithdrawException.class, () -> {
-			memberService.loginMember(requestLoginMemberDTO);
-		});
+		Assertions.assertThrows(MemberStateWithdrawException.class,
+			() -> memberService.loginMember(requestLoginMemberDTO));
 
 	}
 
@@ -206,9 +204,8 @@ class MemberServiceImplTest {
 		when(memberService.existsMemberByMemberId(memberId)).thenReturn(true);
 
 		// Then
-		Assertions.assertThrows(AlreadyExistsMemberIdException.class, () -> {
-			memberService.registerMember(requestRegisterMemberDTO);
-		});
+		Assertions.assertThrows(AlreadyExistsMemberIdException.class,
+			() -> memberService.registerMember(requestRegisterMemberDTO));
 
 	}
 
@@ -249,7 +246,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 정보를 가져오는 메서드 테스트")
-	void getMemberInfoMethodTest() throws Exception {
+	void getMemberInfoMethodTest() {
 
 		// Given
 		Customer customer = Customer.builder()
@@ -282,7 +279,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 정보를 가져오는 메서드 NotFoundMemberException 테스트")
-	void getMemberInfoMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberInfoMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -290,15 +287,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.getMemberInfo(new RequestMemberIdDTO("user"));
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.getMemberInfo(new RequestMemberIdDTO("user")));
 
 	}
 
 	@Test
 	@DisplayName("회원 정보 수정 메서드 테스트")
-	void updateMemberInfoMethodTest() throws Exception {
+	void updateMemberInfoMethodTest() {
 
 		// Given
 		RequestMemberInfoDTO requestMemberInfoDTO = new RequestMemberInfoDTO(
@@ -346,7 +342,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 정보 수정 메서드 NotFoundMemberException 테스트")
-	void updateMemberInfoMethodNotFoundMemberExceptionTest() throws Exception {
+	void updateMemberInfoMethodNotFoundMemberExceptionTest() {
 
 		// Given
 		RequestMemberInfoDTO requestMemberInfoDTO = new RequestMemberInfoDTO(
@@ -358,15 +354,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.updateMemberInfo(requestMemberInfoDTO);
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.updateMemberInfo(requestMemberInfoDTO));
 
 	}
 
 	@Test
 	@DisplayName("회원 정보 수정 메서드 UpdateMemberInfoFailedException 테스트")
-	void updateMemberInfoMethodUpdateMemberInfoFailedExceptionTest() throws Exception {
+	void updateMemberInfoMethodUpdateMemberInfoFailedExceptionTest() {
 
 		// Given
 		RequestMemberInfoDTO requestMemberInfoDTO = new RequestMemberInfoDTO(
@@ -400,15 +395,14 @@ class MemberServiceImplTest {
 		)).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberInfoFailedException.class, () -> {
-			memberService.updateMemberInfo(requestMemberInfoDTO);
-		});
+		Assertions.assertThrows(UpdateMemberInfoFailedException.class,
+			() -> memberService.updateMemberInfo(requestMemberInfoDTO));
 
 	}
 
 	@Test
 	@DisplayName("회원 정보 수정 메서드 UpdateMemberInfoFailedException2 테스트")
-	void updateMemberInfoMethodUpdateMemberInfoFailedException2Test() throws Exception {
+	void updateMemberInfoMethodUpdateMemberInfoFailedException2Test() {
 
 		// Given
 		RequestMemberInfoDTO requestMemberInfoDTO = new RequestMemberInfoDTO(
@@ -448,15 +442,14 @@ class MemberServiceImplTest {
 		)).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberInfoFailedException.class, () -> {
-			memberService.updateMemberInfo(requestMemberInfoDTO);
-		});
+		Assertions.assertThrows(UpdateMemberInfoFailedException.class,
+			() -> memberService.updateMemberInfo(requestMemberInfoDTO));
 
 	}
 
 	@Test
 	@DisplayName("마이페이지 회원 탈퇴 메서드 테스트")
-	void withdrawMemberMethodTest() throws Exception {
+	void withdrawMemberMethodTest() {
 
 		// Given
 		MemberState memberState = new MemberState(3L, MemberStateName.WITHDRAW); // 탈퇴 상태
@@ -492,7 +485,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("마이페이지 회원 탈퇴 메서드 NotFoundMemberException 테스트")
-	void withdrawMemberMethodNotFoundMemberExceptionTest() throws Exception {
+	void withdrawMemberMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -500,15 +493,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.withdrawMember("user");
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.withdrawMember("user"));
 
 	}
 
 	@Test
 	@DisplayName("마이페이지 회원 탈퇴 메서드 UpdateMemberStateFailedException 테스트")
-	void withdrawMemberMethodUpdateMemberStateFailedExceptionTest() throws Exception {
+	void withdrawMemberMethodUpdateMemberStateFailedExceptionTest() {
 
 		// Given
 		MemberState memberState = new MemberState(3L, MemberStateName.WITHDRAW); // 탈퇴 상태
@@ -537,15 +529,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.updateMemberMemberState(memberState, "user")).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberStateFailedException.class, () -> {
-			memberService.withdrawMember("user");
-		});
+		Assertions.assertThrows(UpdateMemberStateFailedException.class,
+			() -> memberService.withdrawMember("user"));
 
 	}
 
 	@Test
 	@DisplayName("총 회원 수 조회 메서드 테스트")
-	void getTotalMemberCntMethodTest() throws Exception {
+	void getTotalMemberCntMethodTest() {
 
 		// Given
 
@@ -561,7 +552,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("오늘 로그인한 회원 수 조회 메서드 테스트")
-	void getTotalTodayLoginMemberCnt() throws Exception {
+	void getTotalTodayLoginMemberCnt() {
 
 		// Given
 
@@ -577,7 +568,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 회원 상태 변경 메서드 테스트")
-	void updateMemberStateMethodTest() throws Exception {
+	void updateMemberStateMethodTest() {
 
 		// Given
 		MemberState memberState = new MemberState(3L, MemberStateName.ACTIVE);
@@ -619,7 +610,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 회원 상태 변경 메서드 NotFoundMemberException 테스트")
-	void updateMemberStateMethodNotFoundMemberExceptionTest() throws Exception {
+	void updateMemberStateMethodNotFoundMemberExceptionTest() {
 
 		// Given
 		RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO = new RequestAdminSettingsMemberStateDTO(
@@ -630,14 +621,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.updateMemberState("user", requestAdminSettingsMemberStateDTO);
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.updateMemberState("user", requestAdminSettingsMemberStateDTO));
+
 	}
 
 	@Test
 	@DisplayName("관리자 페이지 회원 상태 변경 메서드 UpdateMemberStateFailedException 테스트")
-	void updateMemberStateMethodUpdateMemberStateFailedExceptionTest() throws Exception {
+	void updateMemberStateMethodUpdateMemberStateFailedExceptionTest() {
 
 		// Given
 		MemberState memberState = new MemberState(3L, MemberStateName.ACTIVE);
@@ -671,15 +662,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.updateMemberMemberState(memberState, "user")).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberStateFailedException.class, () -> {
-			memberService.updateMemberState("user", requestAdminSettingsMemberStateDTO);
-		});
+		Assertions.assertThrows(UpdateMemberStateFailedException.class,
+			() -> memberService.updateMemberState("user", requestAdminSettingsMemberStateDTO));
 
 	}
 
 	@Test
 	@DisplayName("관리자 페이지 회원 권한 변경 메서드 테스트")
-	void updateMemberRoleMethodTest() throws Exception {
+	void updateMemberRoleMethodTest() {
 
 		// Given
 		MemberRole memberRole = new MemberRole(1, MemberRoleName.MEMBER);
@@ -716,7 +706,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 회원 권한 변경 메서드 NotFoundMemberException 테스트")
-	void updateMemberRoleMethodNotFoundMemberExceptionTest() throws Exception {
+	void updateMemberRoleMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -724,15 +714,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.updateMemberRole("user");
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.updateMemberRole("user"));
 
 	}
 
 	@Test
 	@DisplayName("관리자 페이지 회원 권한 변경 메서드 UpdateMemberRoleFailedException 테스트")
-	void updateMemberRoleMethodUpdateMemberRoleFailedExceptionTest() throws Exception {
+	void updateMemberRoleMethodUpdateMemberRoleFailedExceptionTest() {
 
 		// Given
 		MemberRole memberRole = new MemberRole(1, MemberRoleName.MEMBER);
@@ -761,15 +750,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.updateMemberRole(memberRole, "user")).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberRoleFailedException.class, () -> {
-			memberService.updateMemberRole("user");
-		});
+		Assertions.assertThrows(UpdateMemberRoleFailedException.class,
+			() -> memberService.updateMemberRole("user"));
 
 	}
 
 	@Test
 	@DisplayName("회원 상태 변경 메서드 테스트")
-	void getMemberStateMethodTest() throws Exception {
+	void getMemberStateMethodTest() {
 
 		// Given
 		Customer customer = Customer.builder()
@@ -802,7 +790,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 상태 변경 메서드 NotFoundMemberException 테스트")
-	void getMemberStateMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberStateMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -810,14 +798,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.getMemberState("user");
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.getMemberState("user"));
+
 	}
 
 	@Test
 	@DisplayName("회원 휴면 상태 변경 메서드 테스트")
-	void changeDormantMemberStateActiveMethodTest() throws Exception {
+	void changeDormantMemberStateActiveMethodTest() {
 
 		// Given
 		MemberState memberState = new MemberState(1L, MemberStateName.ACTIVE);
@@ -835,24 +823,22 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 휴면 상태 변경 메서드 NotFoundMemberStateException 테스트")
-	void changeDormantMemberStateActiveMethodNotFoundMemberStateExceptionTest() throws Exception {
+	void changeDormantMemberStateActiveMethodNotFoundMemberStateExceptionTest() {
 
 		// Given
-		MemberState memberState = new MemberState(1L, MemberStateName.ACTIVE);
 
 		// When
 		when(memberStateJpaRepository.getMemberStateByMemberStateId(1L)).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberStateException.class, () -> {
-			memberService.changeDormantMemberStateActive("user");
-		});
+		Assertions.assertThrows(NotFoundMemberStateException.class,
+			() -> memberService.changeDormantMemberStateActive("user"));
 
 	}
 
 	@Test
 	@DisplayName("회원 휴면 상태 변경 메서드 UpdateMemberStateFailedException 테스트")
-	void changeDormantMemberStateActiveMethodUpdateMemberStateFailedExceptionTest() throws Exception {
+	void changeDormantMemberStateActiveMethodUpdateMemberStateFailedExceptionTest() {
 
 		// Given
 		MemberState memberState = new MemberState(1L, MemberStateName.ACTIVE);
@@ -862,15 +848,14 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.updateMemberMemberState(memberState, "user")).thenReturn(0);
 
 		// Then
-		Assertions.assertThrows(UpdateMemberStateFailedException.class, () -> {
-			memberService.changeDormantMemberStateActive("user");
-		});
+		Assertions.assertThrows(UpdateMemberStateFailedException.class,
+			() -> memberService.changeDormantMemberStateActive("user"));
 
 	}
 
 	@Test
 	@DisplayName("회원 이메일 조회 메서드 테스트")
-	void getMemberEmailMethodTest() throws Exception {
+	void getMemberEmailMethodTest() {
 
 		// Given
 		Customer customer = Customer.builder()
@@ -903,7 +888,7 @@ class MemberServiceImplTest {
 
 	@Test
 	@DisplayName("회원 이메일 조회 메서드 NotFoundMemberException 테스트")
-	void getMemberEmailMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberEmailMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -911,9 +896,8 @@ class MemberServiceImplTest {
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
-		Assertions.assertThrows(NotFoundMemberException.class, () -> {
-			memberService.getMemberEmail("user");
-		});
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> memberService.getMemberEmail("user"));
 
 	}
 

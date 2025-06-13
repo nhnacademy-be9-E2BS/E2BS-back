@@ -601,7 +601,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 매출액 조회 메서드 테스트")
-	void getTotalSalesMethodTest() throws Exception {
+	void getTotalSalesMethodTest() {
 
 		// Given
 
