@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -105,13 +108,29 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 	}
 
 	public void parseXml(String xmlUrl) throws IOException, ParserConfigurationException, SAXException {
-		URL url = new URL(xmlUrl);
-		StringBuilder response;
-		try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
-			response = new StringBuilder();
-			String line;
-			while ((line = in.readLine()) != null) {
-				response.append(line);
+		HttpURLConnection conn = null;
+		StringBuilder response = new StringBuilder();
+
+		try {
+			URI uri = new URI(xmlUrl);             // URL 대신 URI 사용
+			URL url = uri.toURL();                 // 변환 후 사용
+
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setConnectTimeout(5000); // 5초 타임아웃 설정
+			conn.setReadTimeout(5000);    // 5초 읽기 타임아웃
+
+			try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+				String line;
+				while ((line = in.readLine()) != null) {
+					response.append(line);
+				}
+			}
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (conn != null) {
+				conn.disconnect();
 			}
 		}
 
@@ -126,5 +145,6 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 		pa.setContentHandler(this);
 		pa.parse(new InputSource(new StringReader(fixedXml)));
 	}
+
 
 }
