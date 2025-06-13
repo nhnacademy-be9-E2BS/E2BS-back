@@ -45,7 +45,7 @@ public class PublisherController {
 	@Admin
 	@GetMapping
 	public ResponseEntity<Page<ResponsePublisherDTO>> getPublishers(
-		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable) {
+		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 1000) Pageable pageable) {
 		Page<ResponsePublisherDTO> response = publisherService.getPublishers(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

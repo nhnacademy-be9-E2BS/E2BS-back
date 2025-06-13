@@ -50,8 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-	private final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
-	private final String UPDATE_MEMBER_ROLE_FAILED = "회원 권한을 변경하지 못했습니다.";
+	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
+	private static final String UPDATE_MEMBER_ROLE_FAILED = "회원 권한을 변경하지 못했습니다.";
 
 	private final MemberJpaRepository memberJpaRepository;
 	private final MemberRankJpaRepository memberRankJpaRepository;
@@ -140,7 +140,6 @@ public class MemberServiceImpl implements MemberService {
 			.socialAuth(socialAuth)
 			.build();
 
-		// memberJpaRepository.saveAndFlush(member);
 		memberJpaRepository.save(member);
 
 		// 회원가입 포인트 적립 이벤트 발행

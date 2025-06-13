@@ -127,10 +127,10 @@ class CartServiceImplForGuestTest {
 	void createCartItemForGuest_productNotForSale() {
 		// given
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1L, 1);
-		Product product = mock(Product.class);
-		when(product.getProductState()).thenReturn(new ProductState(2L, ProductStateName.OUT));
+		Product mockProduct = mock(Product.class);
+		when(mockProduct.getProductState()).thenReturn(new ProductState(2L, ProductStateName.OUT));
 
-		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+		when(productRepository.findById(1L)).thenReturn(Optional.of(mockProduct));
 
 		// when & then
 		assertThrows(ProductNotForSaleException.class, () -> cartService.createCartItemForGuest(request));

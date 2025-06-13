@@ -34,7 +34,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -46,11 +45,12 @@ public class ReviewRestController {
 	private final ReviewService reviewService;
 
 
-	@Operation(summary = "리뷰 생성", description = "리뷰 내용을 작성하고 이미지를 포함하여 리뷰를 등록합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "리뷰 생성 성공"),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "리뷰 생성",
+		description = "리뷰 내용을 작성하고 이미지를 포함하여 리뷰를 등록합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "리뷰 생성 성공"),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PostMapping(value = "/api/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Void> createReview(@Parameter(description = "리뷰 메타 데이터", required = true) @Validated @RequestPart("requestMeta") RequestCreateReviewMetaDTO requestMeta,
 		                                     @Parameter(hidden = true) BindingResult bindingResult,
@@ -71,11 +71,12 @@ public class ReviewRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@Operation(summary = "리뷰 수정", description = "리뷰 내용을 수정하고 이미지를 변경합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "리뷰 수정 성공", content = @Content(schema = @Schema(implementation = ResponseUpdateReviewDTO.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "리뷰 수정",
+		description = "리뷰 내용을 수정하고 이미지를 변경합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "리뷰 수정 성공", content = @Content(schema = @Schema(implementation = ResponseUpdateReviewDTO.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PutMapping("/api/reviews/{reviewId}")
 	public ResponseEntity<ResponseUpdateReviewDTO> updateReview(@Parameter(description = "리뷰 ID", required = true) @PathVariable long reviewId,
 		                                                        @Parameter(description = "리뷰 내용", required = true) @Validated @RequestPart("reviewContent") String reviewContent,

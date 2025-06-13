@@ -89,7 +89,6 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 생성 테스트")
 	void createCartForMember() {
 		// given
-		String memberId = "memberId";
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(customerRepository.findById(member.getCustomerId())).thenReturn(Optional.of(customer));
 
@@ -135,7 +134,7 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 항목 추가 테스트- 실패(판매 중 아닌 상품)")
 	void createCartItemForMember_Fail_ProductNotForSale() {
 		// given
-		Product product = new Product(productId, new ProductState(2L, ProductStateName.OUT), new Publisher("a"),
+		Product newProduct = new Product(productId, new ProductState(2L, ProductStateName.OUT), new Publisher("a"),
 			"title1", "content1", "description", LocalDate.now(), "isbn",
 			10000, 8000, false, 1, null);
 
@@ -143,7 +142,7 @@ class CartServiceImplForMemberTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+		when(productRepository.findById(productId)).thenReturn(Optional.of(newProduct));
 
 		// when & then
 		assertThrows(ProductNotForSaleException.class, () -> cartService.createCartItemForMember(request));
@@ -249,9 +248,7 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 목록 조회 테스트 - 정상 케이스")
 	void getCartItemsByMember() {
 		// given
-		String memberId = "test-member";
-
-		Product product = Product.builder()
+		Product newProduct = Product.builder()
 			.productId(productId)
 			.productTitle("상품A")
 			.productRegularPrice(10000L)
@@ -259,18 +256,18 @@ class CartServiceImplForMemberTest {
 			.productImage(new ArrayList<>())
 			.build();
 
-		ProductImage image = new ProductImage(product, "product.jpg");
-		product.getProductImage().add(image);
+		ProductImage image = new ProductImage(newProduct, "product.jpg");
+		newProduct.getProductImage().add(image);
 
 		CartItems cartItem = mock(CartItems.class);
 		when(cartItem.getCartItemsId()).thenReturn(1L);
-		when(cartItem.getProduct()).thenReturn(product);
+		when(cartItem.getProduct()).thenReturn(newProduct);
 		when(cartItem.getCartItemsQuantity()).thenReturn(2);
 
-		Member member = mock(Member.class);
-		when(member.getCustomerId()).thenReturn(100L);
+		Member mockMember = mock(Member.class);
+		when(mockMember.getCustomerId()).thenReturn(100L);
 
-		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(100L)).thenReturn(List.of(cartItem));
 
 		// when
@@ -278,7 +275,7 @@ class CartServiceImplForMemberTest {
 
 		// then
 		assertEquals(1, result.size());
-		ResponseCartItemsForMemberDTO dto = result.get(0);
+		ResponseCartItemsForMemberDTO dto = result.getFirst();
 		assertEquals("상품A", dto.getProductTitle());
 		assertEquals("product.jpg", dto.getProductImagePath());
 		assertEquals(BigDecimal.valueOf(20), dto.getDiscountRate());
@@ -289,15 +286,13 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 목록 조회 테스트 - 실패(상품이 없는 경우)")
 	void getCartItemsByMember_Fail_NotFoundProduct() {
 		// given
-		String memberId = "test-member";
-
 		CartItems cartItem = mock(CartItems.class);
 		when(cartItem.getProduct()).thenReturn(null);
 
-		Member member = mock(Member.class);
-		when(member.getCustomerId()).thenReturn(300L);
+		Member mockMember = mock(Member.class);
+		when(mockMember.getCustomerId()).thenReturn(300L);
 
-		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
+		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(300L)).thenReturn(List.of(cartItem));
 
 		// when & then

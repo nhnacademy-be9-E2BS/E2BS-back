@@ -25,7 +25,6 @@ import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettin
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMembersDTO;
 import com.nhnacademy.back.account.admin.domain.dto.response.ResponseAdminSettingsMonthlySummaryDTO;
 import com.nhnacademy.back.account.admin.service.AdminSettingsService;
-import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.service.CustomerService;
 import com.nhnacademy.back.account.member.service.MemberService;
 import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
