@@ -48,7 +48,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("회원 주소 목록 조회 메서드 테스트")
-	void getMemberAddressesMethodTest() throws Exception {
+	void getMemberAddressesMethodTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -94,7 +94,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("회원 배송지 저장 메서드 테스트")
-	void saveMemberAddressMethodTest() throws Exception {
+	void saveMemberAddressMethodTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -149,7 +149,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("회원 배송지 저장 메서드 SaveAddressFailedException 테스트")
-	void saveMemberAddressMethodSaveAddressFailedExceptionTest() throws Exception {
+	void saveMemberAddressMethodSaveAddressFailedExceptionTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -204,7 +204,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 주소 조회 메서드 테스트")
-	void getAddressByAddressIdMethodTest() throws Exception {
+	void getAddressByAddressIdMethodTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -247,7 +247,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 주소 조회 메서드 NotFoundAddressException 테스트")
-	void getAddressByAddressIdMethodNotFoundAddressExceptionTest() throws Exception {
+	void getAddressByAddressIdMethodNotFoundAddressExceptionTest() {
 
 		// Given
 
@@ -263,7 +263,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 주소 수정 메서드 테스트")
-	void updateAddressMethodTest() throws Exception {
+	void updateAddressMethodTest() {
 
 		// Given
 		RequestMemberAddressSaveDTO requestMemberAddressSaveDTO = RequestMemberAddressSaveDTO.builder()
@@ -275,19 +275,6 @@ class AddressServiceImplTest {
 			.addressExtra("1234#")
 			.addressReceiver("김도윤")
 			.addressReceiverPhone("010-1234-1234")
-			.build();
-
-		UpdateAddressDTO updateAddressDTO = UpdateAddressDTO.builder()
-			.addressAlias("회사")
-			.addressCode("12345")
-			.addressInfo("서울특별시 송파구 올림픽로")
-			.addressDetail("우성아파트 7동")
-			.addressExtra("공동현관 비밀번호: 1234#")
-			.addressDefault(true)
-			.addressCreatedAt(LocalDateTime.now())
-			.addressId(1001L)
-			.addressReceiver("김도윤")
-			.addressReceiverPhone("010-1234-5678")
 			.build();
 
 		// When
@@ -302,7 +289,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 주소 수정 메서드 UpdateAddressFailedException 테스트")
-	void updateAddressMethodUpdateAddressFailedExceptionTest() throws Exception {
+	void updateAddressMethodUpdateAddressFailedExceptionTest() {
 
 		// Given
 		RequestMemberAddressSaveDTO requestMemberAddressSaveDTO = RequestMemberAddressSaveDTO.builder()
@@ -314,19 +301,6 @@ class AddressServiceImplTest {
 			.addressExtra("1234#")
 			.addressReceiver("김도윤")
 			.addressReceiverPhone("010-1234-1234")
-			.build();
-
-		UpdateAddressDTO updateAddressDTO = UpdateAddressDTO.builder()
-			.addressAlias("회사")
-			.addressCode("12345")
-			.addressInfo("서울특별시 송파구 올림픽로")
-			.addressDetail("우성아파트 7동")
-			.addressExtra("공동현관 비밀번호: 1234#")
-			.addressDefault(true)
-			.addressCreatedAt(LocalDateTime.now())
-			.addressId(1001L)
-			.addressReceiver("김도윤")
-			.addressReceiverPhone("010-1234-5678")
 			.build();
 
 		// When
@@ -341,7 +315,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 삭제 메서드 테스트")
-	void deleteAddressMethodTest() throws Exception {
+	void deleteAddressMethodTest() {
 
 		// Given
 
@@ -375,7 +349,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("기본 배송지 설정 메서드 테스트")
-	void setDefaultAddressMethodTest() throws Exception {
+	void setDefaultAddressMethodTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -406,7 +380,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("기본 배송지 설정 메서드 UpdateAddressFailedException 테스트")
-	void setDefaultAddressMethodUpdateAddressFailedExceptionTest() throws Exception {
+	void setDefaultAddressMethodUpdateAddressFailedExceptionTest() {
 
 		// Given
 		Member member = Member.builder()
@@ -436,7 +410,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("기본 배송지 설정 메서드 UpdateAddressFailedException2 테스트")
-	void setDefaultAddressMethodUpdateAddressFailedException2Test() throws Exception {
+	void setDefaultAddressMethodUpdateAddressFailedException2Test() {
 
 		// Given
 		Member member = Member.builder()
