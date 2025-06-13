@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -17,7 +19,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import com.nhnacademy.back.batch.member.MemberDormantScheduler;
 
 @ExtendWith(MockitoExtension.class)
-public class MemberDormantSchedulerTest {
+class MemberDormantSchedulerTest {
 
 	@Mock
 	private JobLauncher jobLauncher;
@@ -43,6 +45,7 @@ public class MemberDormantSchedulerTest {
 
 	@Test
 	void runInactiveMemberJob_failure_shouldCatchException() throws Exception {
+		Logger logger = LoggerFactory.getLogger(getClass());
 		// Given
 		when(jobLauncher.run(eq(dormantMemberJob), any(JobParameters.class)))
 			.thenThrow(new RuntimeException("Batch failed"));
@@ -50,7 +53,8 @@ public class MemberDormantSchedulerTest {
 		// When
 		try {
 			scheduler.runInactiveMemberJob();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			logger.warn("Exception caught during runInactiveMemberJob test", e);
 		}
 
 		// Then

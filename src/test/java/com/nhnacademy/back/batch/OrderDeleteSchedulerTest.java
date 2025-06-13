@@ -17,7 +17,7 @@ import com.nhnacademy.back.order.order.repository.OrderJpaRepository;
 import com.nhnacademy.back.order.order.service.OrderService;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderDeleteSchedulerTest {
+class OrderDeleteSchedulerTest {
 	@Mock
 	OrderJpaRepository orderJpaRepository;
 

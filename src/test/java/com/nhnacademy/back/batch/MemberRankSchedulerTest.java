@@ -1,5 +1,6 @@
 package com.nhnacademy.back.batch;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
@@ -45,13 +46,10 @@ class MemberRankSchedulerTest {
 		when(jobLauncher.run(eq(rankMemberJob), any(JobParameters.class)))
 			.thenThrow(new RuntimeException("실패 테스트"));
 
-		// When
-		try {
-			memberRankScheduler.runInactiveMemberJob();
-		} catch (Exception ignored) {
-		}
-
-		// Then
+		// When & Then
+		assertDoesNotThrow(() -> memberRankScheduler.runInactiveMemberJob());
 		verify(jobLauncher, times(1)).run(eq(rankMemberJob), any(JobParameters.class));
 	}
+
+
 }

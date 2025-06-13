@@ -15,7 +15,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import com.nhnacademy.back.batch.birthday.BirthdayCouponScheduler;
 
 @ExtendWith(MockitoExtension.class)
-public class BirthdayCouponSchedulerTest {
+class BirthdayCouponSchedulerTest {
 
 	@Mock
 	private JobLauncher jobLauncher;
