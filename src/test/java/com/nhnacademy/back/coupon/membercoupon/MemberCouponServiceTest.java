@@ -192,7 +192,9 @@ class MemberCouponServiceTest {
 	void testGetCouponsInOrderByMemberIdAndProductIdsMemberNotFound() {
 		when(memberJpaRepository.getMemberByMemberId("user1")).thenReturn(null);
 
+		List<Long> productIds = List.of(100L);
+
 		Assertions.assertThrows(NotFoundMemberException.class,
-			() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)));
+			() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", productIds));
 	}
 }

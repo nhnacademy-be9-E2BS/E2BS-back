@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
-import com.nhnacademy.back.product.state.exception.ProductStateNotFoundException;
 import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
 import com.nhnacademy.back.product.state.service.impl.ProductStateServiceImpl;
 
@@ -40,7 +39,7 @@ class ProductStateServiceTest {
 
 		// then
 		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getProductStateName()).isEqualTo(ProductStateName.SALE);
+		assertThat(result.getFirst().getProductStateName()).isEqualTo(ProductStateName.SALE);
 	}
 
 	@Test
@@ -65,10 +64,7 @@ class ProductStateServiceTest {
 		// when & then
 		assertThatThrownBy(() -> {
 			ProductState state = productStateJpaRepository.findByProductStateName(ProductStateName.DELETE);
-			if (state == null) {
-				throw new ProductStateNotFoundException("해당 상태가 존재하지 않습니다.");
-			}
-		}).isInstanceOf(ProductStateNotFoundException.class)
-			.hasMessageContaining("해당 상태가 존재하지 않습니다.");
+			state.toString();
+		}).isInstanceOf(NullPointerException.class);
 	}
 }
