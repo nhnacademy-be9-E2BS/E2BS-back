@@ -38,7 +38,7 @@ public class ContributorController {
 	 */
 	@Admin
 	@GetMapping()
-	public ResponseEntity<Page<ResponseContributorDTO>> getContributors(@PageableDefault() Pageable pageable) {
+	public ResponseEntity<Page<ResponseContributorDTO>> getContributors(@PageableDefault(size = 1000) Pageable pageable) {
 		Page<ResponseContributorDTO> contributors = contributorService.getContributors(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(contributors);
 	}

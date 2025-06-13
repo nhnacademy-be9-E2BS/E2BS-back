@@ -26,7 +26,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Tag(name = "태그", description = "태그 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class TagController {
 		})
 	@Admin
 	@GetMapping
-	public ResponseEntity<Page<ResponseTagDTO>> getTags(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+	public ResponseEntity<Page<ResponseTagDTO>> getTags(@PageableDefault(size = 1000) Pageable pageable) {
 		Page<ResponseTagDTO> tags = tagService.getTags(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(tags);
 	}
