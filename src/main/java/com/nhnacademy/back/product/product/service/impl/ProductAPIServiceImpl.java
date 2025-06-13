@@ -98,15 +98,15 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		for (Item item : items) {
 			ResponseProductsApiSearchDTO responseProductsApiSearchDTO = new ResponseProductsApiSearchDTO();
-			responseProductsApiSearchDTO.setPublisherName(item.publisher);
-			responseProductsApiSearchDTO.setProductTitle(item.title);
-			responseProductsApiSearchDTO.setProductDescription(item.description);
-			responseProductsApiSearchDTO.setProductIsbn(item.isbn13);
-			responseProductsApiSearchDTO.setProductRegularPrice(item.priceStandard);
-			responseProductsApiSearchDTO.setProductSalePrice(item.priceSales);
-			responseProductsApiSearchDTO.setProductImage(item.cover);
-			responseProductsApiSearchDTO.setContributors(item.author);
-			responseProductsApiSearchDTO.setProductPublishedAt(item.pubDate);
+			responseProductsApiSearchDTO.setPublisherName(item.getPublisher());
+			responseProductsApiSearchDTO.setProductTitle(item.getTitle());
+			responseProductsApiSearchDTO.setProductDescription(item.getDescription());
+			responseProductsApiSearchDTO.setProductIsbn(item.getIsbn13());
+			responseProductsApiSearchDTO.setProductRegularPrice(item.getPriceStandard());
+			responseProductsApiSearchDTO.setProductSalePrice(item.getPriceSales());
+			responseProductsApiSearchDTO.setProductImage(item.getCover());
+			responseProductsApiSearchDTO.setContributors(item.getAuthor());
+			responseProductsApiSearchDTO.setProductPublishedAt(item.getPubDate());
 
 			responseList.add(responseProductsApiSearchDTO);
 		}
@@ -138,15 +138,15 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		List<ResponseProductApiSearchByQueryTypeDTO> responseList = new ArrayList<>();
 		for (Item item : items) {
 			ResponseProductApiSearchByQueryTypeDTO responseProductApiSearchByQueryTypeDTO = new ResponseProductApiSearchByQueryTypeDTO();
-			responseProductApiSearchByQueryTypeDTO.setPublisherName(item.publisher);
-			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.title);
-			responseProductApiSearchByQueryTypeDTO.setProductDescription(item.description);
-			responseProductApiSearchByQueryTypeDTO.setProductIsbn(item.isbn13);
-			responseProductApiSearchByQueryTypeDTO.setProductRegularPrice(item.priceStandard);
-			responseProductApiSearchByQueryTypeDTO.setProductSalePrice(item.priceSales);
-			responseProductApiSearchByQueryTypeDTO.setProductImage(item.cover);
-			responseProductApiSearchByQueryTypeDTO.setContributors(item.author);
-			responseProductApiSearchByQueryTypeDTO.setProductPublishedAt(item.pubDate);
+			responseProductApiSearchByQueryTypeDTO.setPublisherName(item.getPublisher());
+			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.getTitle());
+			responseProductApiSearchByQueryTypeDTO.setProductDescription(item.getDescription());
+			responseProductApiSearchByQueryTypeDTO.setProductIsbn(item.getIsbn13());
+			responseProductApiSearchByQueryTypeDTO.setProductRegularPrice(item.getPriceStandard());
+			responseProductApiSearchByQueryTypeDTO.setProductSalePrice(item.getPriceSales());
+			responseProductApiSearchByQueryTypeDTO.setProductImage(item.getCover());
+			responseProductApiSearchByQueryTypeDTO.setContributors(item.getAuthor());
+			responseProductApiSearchByQueryTypeDTO.setProductPublishedAt(item.getPubDate());
 
 			responseList.add(responseProductApiSearchByQueryTypeDTO);
 		}

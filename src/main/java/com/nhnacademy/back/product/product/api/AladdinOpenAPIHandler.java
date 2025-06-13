@@ -82,25 +82,25 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 			} else if (localName.equals("title")) {
 				currentItem.setTitle(tempValue);
 			} else if (localName.equals("link")) {
-				currentItem.link = tempValue;
+				currentItem.setLink(tempValue);
 			} else if (localName.equals("isbn13")) {
-				currentItem.isbn13 = tempValue;
+				currentItem.setIsbn13(tempValue);
 			} else if (localName.equals("priceStandard")) {
-				currentItem.priceStandard = Integer.parseInt(tempValue);
+				currentItem.setPriceStandard(Integer.parseInt(tempValue));
 			} else if (localName.equals("priceSales")) {
-				currentItem.priceSales = Integer.parseInt(tempValue);
+				currentItem.setPriceSales(Integer.parseInt(tempValue));
 			} else if (localName.equals("description")) {
-				currentItem.description = tempValue;
+				currentItem.setDescription(tempValue);
 			} else if (localName.equals("publisher")) {
-				currentItem.publisher = tempValue;
+				currentItem.setPublisher(tempValue);
 			} else if (localName.equals("author")) {
-				currentItem.author = tempValue;
+				currentItem.setAuthor(tempValue);
 			} else if (localName.equals("cover")) {
-				currentItem.cover = tempValue;
+				currentItem.setCover(tempValue);
 			} else if (localName.equals("stockstatus")) {
-				currentItem.stockstatus = tempValue;
+				currentItem.setStockstatus(tempValue);
 			} else if (localName.equals("pubDate")) {
-				currentItem.pubDate = LocalDate.parse(tempValue);
+				currentItem.setPubDate(LocalDate.parse(tempValue));
 			}
 		}
 	}
