@@ -47,7 +47,7 @@ public class WrapperController {
 		})
 	@GetMapping("/api/wrappers")
 	public ResponseEntity<Page<ResponseWrapperDTO>> getWrappersBySaleable(
-		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 10) Pageable pageable) {
+		@Parameter(description = "페이징 정보") @PageableDefault(page = 0, size = 1000) Pageable pageable) {
 		Page<ResponseWrapperDTO> wrappers = wrapperService.getWrappersBySaleable(true, pageable);
 
 		return ResponseEntity.status(HttpStatus.OK).body(wrappers);

@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -37,11 +36,12 @@ public class LikeRestController {
 	private final LikeService likeService;
 
 
-	@Operation(summary = "좋아요 생성", description = "특정 상품에 대해 사용자가 좋아요를 생성합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "좋아요 생성 성공"),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "좋아요 생성",
+		description = "특정 상품에 대해 사용자가 좋아요를 생성합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "좋아요 생성 성공"),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@Member
 	@PostMapping("/api/products/{productId}/likes")
 	public ResponseEntity<Void> createLike(@Parameter(description = "좋아요할 상품 ID", required = true) @PathVariable long productId,
@@ -54,11 +54,12 @@ public class LikeRestController {
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "좋아요 삭제", description = "특정 상품에 대해 사용자의 좋아요를 삭제합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "좋아요 삭제 성공"),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "좋아요 삭제",
+		description = "특정 상품에 대해 사용자의 좋아요를 삭제합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "좋아요 삭제 성공"),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@Member
 	@DeleteMapping("/api/products/{productId}/likes")
 	public ResponseEntity<Void> deleteLike(@Parameter(description = "좋아요 취소할 상품 ID", required = true) @PathVariable long productId,
