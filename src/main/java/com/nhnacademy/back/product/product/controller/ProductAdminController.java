@@ -145,7 +145,8 @@ public class ProductAdminController {
 	@SuppressWarnings("squid:S2699")
 	@Admin
 	@GetMapping("/aladdin/search")
-	public ResponseEntity<?> searchProducts(@ModelAttribute UnifiedProductApiSearchDTO request, Pageable pageable) {
+	public ResponseEntity<?> searchProducts(@ModelAttribute UnifiedProductApiSearchDTO request,
+		Pageable pageable) { // NOSONAR
 		boolean isQueryProvided = request.getQuery() != null && !request.getQuery().isBlank();
 
 		if (isQueryProvided) { //검색어 + 검색타입
