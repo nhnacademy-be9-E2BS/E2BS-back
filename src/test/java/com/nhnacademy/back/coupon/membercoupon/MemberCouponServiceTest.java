@@ -180,7 +180,8 @@ class MemberCouponServiceTest {
 		when(memberCouponJpaRepository.findProductCoupons(1L, List.of(100L, 200L))).thenReturn(List.of(dto1, dto2));
 		when(memberCouponJpaRepository.findCategoryCoupons(1L, List.of(100L, 200L))).thenReturn(List.of(dto2));
 
-		List<ResponseOrderCouponDTO> result = service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L, 200L));
+		List<ResponseOrderCouponDTO> result = service.getCouponsInOrderByMemberIdAndProductIds("user1",
+			List.of(100L, 200L));
 
 		// memberCouponId 기준 중복 제거 되므로 결과는 2개
 		assertThat(result).hasSize(2);
@@ -191,6 +192,7 @@ class MemberCouponServiceTest {
 	void testGetCouponsInOrderByMemberIdAndProductIdsMemberNotFound() {
 		when(memberJpaRepository.getMemberByMemberId("user1")).thenReturn(null);
 
-		Assertions.assertThrows(NotFoundMemberException.class, () -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)));
+		Assertions.assertThrows(NotFoundMemberException.class,
+			() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)));
 	}
 }

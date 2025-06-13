@@ -60,7 +60,7 @@ class OAuthServiceTest {
 
 	@Test
 	@DisplayName("OAuth 로그인 전 회원인지 체크 메서드 테스트")
-	void checkOAuthIdMethodTest() throws Exception {
+	void checkOAuthIdMethodTest() {
 
 		// Given
 
@@ -76,7 +76,7 @@ class OAuthServiceTest {
 
 	@Test
 	@DisplayName("OAuth 계정 회원가입 메서드 테스트")
-	void registerOAuthMethodTest() throws Exception {
+	void registerOAuthMethodTest() {
 
 		// Given
 		RequestOAuthRegisterDTO requestOAuthRegisterDTO = new RequestOAuthRegisterDTO(
@@ -107,7 +107,7 @@ class OAuthServiceTest {
 
 	@Test
 	@DisplayName("OAuth 계정 회원가입 메서드 RegisterOAuthFailedException 테스트")
-	void registerOAuthMethodRegisterOAuthFailedExceptionTest() throws Exception {
+	void registerOAuthMethodRegisterOAuthFailedExceptionTest() {
 
 		// Given
 		RequestOAuthRegisterDTO requestOAuthRegisterDTO = new RequestOAuthRegisterDTO(
