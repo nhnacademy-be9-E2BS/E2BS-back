@@ -338,8 +338,8 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 	private Map<String, String> parse(String contributors) {
 		String[] contributorArr = contributors.split(",");
-		String contributorName = "";
-		String positionName = "";
+		String contributorName;
+		String positionName;
 		Map<String, String> result = new LinkedHashMap<>();
 
 		for (String contributor : contributorArr) {
