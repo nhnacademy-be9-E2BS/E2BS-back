@@ -32,7 +32,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,11 +71,12 @@ public class CartRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@Operation(summary = "회원 장바구니 상품 추가", description = "회원의 장바구니에 상품을 추가합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "장바구니 상품 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "회원 장바구니 상품 추가",
+		description = "회원의 장바구니에 상품을 추가합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "장바구니 상품 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@Member
 	@PostMapping("/api/auth/members/carts/items")
 	public ResponseEntity<Integer> createCartItemForMember(@Parameter(description = "상품 추가 DTO", required = true) @Valid @RequestBody RequestAddCartItemsDTO requestDto,
@@ -92,11 +92,13 @@ public class CartRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(cartQuantity);
 	}
 
-	@Operation(summary = "회원 장바구니 상품 수정", description = "회원 장바구니 상품 정보를 수정합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "장바구니 수정 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "회원 장바구니 상품 수정",
+		description = "회원 장바구니 상품 정보를 수정합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "장바구니 수정 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+
+		})
 	@Member
 	@PutMapping("/api/auth/members/carts/items/{cartItemId}")
 	public ResponseEntity<Integer> updateCartItemForMember(@Parameter(description = "카트 항목 ID", required = true) @PathVariable long cartItemId,
@@ -152,11 +154,12 @@ public class CartRestController {
 
 	/** 게스트 장바구니 API **/
 
-	@Operation(summary = "비회원 장바구니 상품 추가", description = "비회원 장바구니에 상품을 추가합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "장바구니 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "비회원 장바구니 상품 추가",
+		description = "비회원 장바구니에 상품을 추가합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "장바구니 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PostMapping("/api/guests/carts/items")
 	public ResponseEntity<Integer> createCartItemForGuest(@Parameter(description = "추가 요청 DTO", required = true) @Valid @RequestBody RequestAddCartItemsDTO requestDto,
 		                                                  @Parameter(hidden = true) BindingResult bindingResult) {
@@ -168,11 +171,12 @@ public class CartRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(cartQuantity);
 	}
 
-	@Operation(summary = "비회원 장바구니 상품 수정", description = "비회원 장바구니 상품 정보를 수정합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "장바구니 수정 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "비회원 장바구니 상품 수정",
+		description = "비회원 장바구니 상품 정보를 수정합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "장바구니 수정 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PutMapping("/api/guests/carts/items")
 	public ResponseEntity<Integer> updateCartItemForGuest(@Parameter(description = "수정 요청 DTO", required = true) @Valid @RequestBody RequestUpdateCartItemsDTO requestDto,
 		                                                  @Parameter(hidden = true) BindingResult bindingResult) {
@@ -184,11 +188,13 @@ public class CartRestController {
 		return ResponseEntity.ok(cartQuantity);
 	}
 
-	@Operation(summary = "비회원 장바구니 상품 삭제", description = "비회원 장바구니에서 상품을 삭제합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공"),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "비회원 장바구니 상품 삭제",
+		description = "비회원 장바구니에서 상품을 삭제합니다.",
+		responses = {
+			@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공"),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+
+		})
 	@DeleteMapping("/api/guests/carts/items")
 	public ResponseEntity<Void> deleteCartItemForGuest(@Parameter(description = "삭제 요청 DTO", required = true) @Valid @RequestBody RequestDeleteCartItemsForGuestDTO requestDto,
 		                                               @Parameter(hidden = true) BindingResult bindingResult) {

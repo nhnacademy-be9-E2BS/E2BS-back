@@ -386,36 +386,36 @@ class OrderServiceImplTest {
 			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
 		}
 	}
-	//
-	// @Test
-	// @DisplayName("특정 회원 주문 내역 조회(주문 상태 검색)")
-	// void testGetOrdersByMemberIdWithOrderState() {
-	// 	// given
-	// 	Member member = mock(Member.class);
-	// 	Pageable pageable = PageRequest.of(0, 10);
-	// 	Order order = mock(Order.class);
-	// 	OrderState orderState = mock(OrderState.class);
-	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
-	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
-	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
-	// 	when(member.getCustomerId()).thenReturn(1L);
-	// 	when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
-	// 		orderState)).thenReturn(orderPage);
-	// 	when(orderStateJpaRepository.findByOrderStateName(any())).thenReturn(Optional.ofNullable(orderState));
-	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
-	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
-	//
-	// 		// when
-	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), "WAIT", null, null,
-	// 			null);
-	//
-	// 		// then
-	// 		assertThat(result).isNotNull();
-	// 		assertEquals(1, result.getContent().size());
-	// 		verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
-	// 			orderState);
-	// 	}
-	// }
+
+	@Test
+	@DisplayName("특정 회원 주문 내역 조회(주문 상태 검색)")
+	void testGetOrdersByMemberIdWithOrderState() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		OrderState orderState = mock(OrderState.class);
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+			orderState)).thenReturn(orderPage);
+		when(orderStateJpaRepository.findByOrderStateName(any())).thenReturn(Optional.ofNullable(orderState));
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), "WAIT", null, null,
+				null);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+				orderState);
+		}
+	}
 
 	@Test
 	@DisplayName("특정 회원 주문 내역 조회(주문 날짜 검색)")
@@ -447,33 +447,33 @@ class OrderServiceImplTest {
 		}
 	}
 
-	// @Test
-	// @DisplayName("특정 회원 주문 내역 조회(주문 코드 검색)")
-	// void testGetOrdersByMemberIdWithOrderCode() {
-	// 	// given
-	// 	Member member = mock(Member.class);
-	// 	Pageable pageable = PageRequest.of(0, 10);
-	// 	Order order = mock(Order.class);
-	// 	String orderCode = "TEST-ORDER-CODE";
-	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
-	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
-	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
-	// 	when(member.getCustomerId()).thenReturn(1L);
-	// 	when(orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable)).thenReturn(
-	// 		orderPage);
-	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
-	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
-	//
-	// 		// when
-	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null,
-	// 			null, orderCode);
-	//
-	// 		// then
-	// 		assertThat(result).isNotNull();
-	// 		assertEquals(1, result.getContent().size());
-	// 		verify(orderJpaRepository).searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable);
-	// 	}
-	// }
+	@Test
+	@DisplayName("특정 회원 주문 내역 조회(주문 코드 검색)")
+	void testGetOrdersByMemberIdWithOrderCode() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		String orderCode = "TEST-ORDER-CODE";
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable)).thenReturn(
+			orderPage);
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null,
+				null, orderCode);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable);
+		}
+	}
 
 	@Test
 	@DisplayName("배송 대기 상태인 상품의 주문 취소(외부 결제 X)")
@@ -585,7 +585,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 개수 조회 메서드 테스트")
-	void getAllOrdersMethodTest() throws Exception {
+	void getAllOrdersMethodTest() {
 
 		// Given
 
@@ -601,7 +601,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 매출액 조회 메서드 테스트")
-	void getTotalSalesMethodTest() throws Exception {
+	void getTotalSalesMethodTest() {
 
 		// Given
 
@@ -618,7 +618,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 이번 달 총 매출액 조회 메서드 테스트")
-	void getTotalMonthlySalesMethodTest() throws Exception {
+	void getTotalMonthlySalesMethodTest() {
 
 		// Given
 
@@ -635,7 +635,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 하루 매출액 조회 메서드 테스트")
-	void getTotalDailySalesMethodTest() throws Exception {
+	void getTotalDailySalesMethodTest() {
 
 		// Given
 
@@ -652,7 +652,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 테스트")
-	void getMemberOrdersCntMethodTest() throws Exception {
+	void getMemberOrdersCntMethodTest() {
 
 		// Given
 		Customer customer = Customer.builder()
@@ -686,7 +686,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 NotFoundMemberException 테스트")
-	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -702,7 +702,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 테스트")
-	void getMemberRecentOrdersMethodTest() throws Exception {
+	void getMemberRecentOrdersMethodTest() {
 
 		// Given
 		String memberId = "user";
@@ -746,7 +746,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 NotFoundMemberException 테스트")
-	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() {
 
 		// Given
 

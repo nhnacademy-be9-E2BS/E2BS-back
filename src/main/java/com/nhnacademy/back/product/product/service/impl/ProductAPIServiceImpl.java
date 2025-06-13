@@ -98,15 +98,15 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 		for (Item item : items) {
 			ResponseProductsApiSearchDTO responseProductsApiSearchDTO = new ResponseProductsApiSearchDTO();
-			responseProductsApiSearchDTO.setPublisherName(item.publisher);
-			responseProductsApiSearchDTO.setProductTitle(item.title);
-			responseProductsApiSearchDTO.setProductDescription(item.description);
-			responseProductsApiSearchDTO.setProductIsbn(item.isbn13);
-			responseProductsApiSearchDTO.setProductRegularPrice(item.priceStandard);
-			responseProductsApiSearchDTO.setProductSalePrice(item.priceSales);
-			responseProductsApiSearchDTO.setProductImage(item.cover);
-			responseProductsApiSearchDTO.setContributors(item.author);
-			responseProductsApiSearchDTO.setProductPublishedAt(item.pubDate);
+			responseProductsApiSearchDTO.setPublisherName(item.getPublisher());
+			responseProductsApiSearchDTO.setProductTitle(item.getTitle());
+			responseProductsApiSearchDTO.setProductDescription(item.getDescription());
+			responseProductsApiSearchDTO.setProductIsbn(item.getIsbn13());
+			responseProductsApiSearchDTO.setProductRegularPrice(item.getPriceStandard());
+			responseProductsApiSearchDTO.setProductSalePrice(item.getPriceSales());
+			responseProductsApiSearchDTO.setProductImage(item.getCover());
+			responseProductsApiSearchDTO.setContributors(item.getAuthor());
+			responseProductsApiSearchDTO.setProductPublishedAt(item.getPubDate());
 
 			responseList.add(responseProductsApiSearchDTO);
 		}
@@ -138,15 +138,15 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		List<ResponseProductApiSearchByQueryTypeDTO> responseList = new ArrayList<>();
 		for (Item item : items) {
 			ResponseProductApiSearchByQueryTypeDTO responseProductApiSearchByQueryTypeDTO = new ResponseProductApiSearchByQueryTypeDTO();
-			responseProductApiSearchByQueryTypeDTO.setPublisherName(item.publisher);
-			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.title);
-			responseProductApiSearchByQueryTypeDTO.setProductDescription(item.description);
-			responseProductApiSearchByQueryTypeDTO.setProductIsbn(item.isbn13);
-			responseProductApiSearchByQueryTypeDTO.setProductRegularPrice(item.priceStandard);
-			responseProductApiSearchByQueryTypeDTO.setProductSalePrice(item.priceSales);
-			responseProductApiSearchByQueryTypeDTO.setProductImage(item.cover);
-			responseProductApiSearchByQueryTypeDTO.setContributors(item.author);
-			responseProductApiSearchByQueryTypeDTO.setProductPublishedAt(item.pubDate);
+			responseProductApiSearchByQueryTypeDTO.setPublisherName(item.getPublisher());
+			responseProductApiSearchByQueryTypeDTO.setProductTitle(item.getTitle());
+			responseProductApiSearchByQueryTypeDTO.setProductDescription(item.getDescription());
+			responseProductApiSearchByQueryTypeDTO.setProductIsbn(item.getIsbn13());
+			responseProductApiSearchByQueryTypeDTO.setProductRegularPrice(item.getPriceStandard());
+			responseProductApiSearchByQueryTypeDTO.setProductSalePrice(item.getPriceSales());
+			responseProductApiSearchByQueryTypeDTO.setProductImage(item.getCover());
+			responseProductApiSearchByQueryTypeDTO.setContributors(item.getAuthor());
+			responseProductApiSearchByQueryTypeDTO.setProductPublishedAt(item.getPubDate());
 
 			responseList.add(responseProductApiSearchByQueryTypeDTO);
 		}
@@ -189,35 +189,9 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		Product product = productJpaRepository.save(Product.createProductApiEntity(request, publisher, state));
 
 		List<String> tagNames = new ArrayList<>();
-		List<String> contributorNames = new ArrayList<>();
+		List<String> contributorNames = saveContributors(request.getContributors(), product);
 
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
-
-		Map<String, String> map = parse(request.getContributors());
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String contributorName = entry.getKey();
-			String positionName = entry.getValue();
-
-			if (!positionJpaRepository.existsByPositionName(positionName)) {
-				positionJpaRepository.save(new Position(positionName));
-			}
-
-			Position position = positionJpaRepository.findPositionByPositionName(positionName);
-			Contributor contributor = new Contributor(contributorName, position);
-
-
-			//중복 검사
-			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
-				continue;
-			} else {
-				contributorJpaRepository.save(contributor);
-				contributorNames.add(contributorName);
-			}
-
-			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
-			ProductContributor productContributor = new ProductContributor(contributor, product);
-			productContributorJpaRepository.save(productContributor);
-		}
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
@@ -283,35 +257,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		Product product = Product.createProductApiByQueryEntity(request, publisher, state);
 
 		List<String> tagNames = new ArrayList<>();
-		List<String> contributorNames = new ArrayList<>();
+		List<String> contributorNames = saveContributors(request.getContributors(), product);
 
 		productJpaRepository.save(product);
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
-		Map<String, String> map = parse(request.getContributors());
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String contributorName = entry.getKey();
-			String positionName = entry.getValue();
-
-			if (!positionJpaRepository.existsByPositionName(positionName)) {
-				positionJpaRepository.save(new Position(positionName));
-			}
-
-			Position position = positionJpaRepository.findPositionByPositionName(positionName);
-			Contributor contributor = new Contributor(contributorName, position);
-
-
-			//중복 검사
-			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
-				continue;
-			} else {
-				contributorJpaRepository.save(contributor);
-				contributorNames.add(contributorName);
-			}
-
-			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
-			ProductContributor productContributor = new ProductContributor(contributor, product);
-			productContributorJpaRepository.save(productContributor);
-		}
 
 		String categoryName = request.getQueryType(); //파라미터로 들어온 카테고리 이름
 		if (categoryName == null) {
@@ -358,10 +307,39 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
 	}
 
+	private List<String> saveContributors(String contributorStr, Product product) {
+		Map<String, String> map = parse(contributorStr);
+		List<String> contributorNames = new ArrayList<>();
+
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String contributorName = entry.getKey();
+			String positionName = entry.getValue();
+
+			if (!positionJpaRepository.existsByPositionName(positionName)) {
+				positionJpaRepository.save(new Position(positionName));
+			}
+			Position position = positionJpaRepository.findPositionByPositionName(positionName);
+			Contributor contributor = new Contributor(contributorName, position);
+
+			//중복 검사
+			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
+				continue;
+			} else {
+				contributorJpaRepository.save(contributor);
+				contributorNames.add(contributorName);
+			}
+			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
+			ProductContributor productContributor = new ProductContributor(contributor, product);
+			productContributorJpaRepository.save(productContributor);
+		}
+		return contributorNames;
+	}
+
+
 	private Map<String, String> parse(String contributors) {
 		String[] contributorArr = contributors.split(",");
-		String contributorName = "";
-		String positionName = "";
+		String contributorName;
+		String positionName;
 		Map<String, String> result = new LinkedHashMap<>();
 
 		for (String contributor : contributorArr) {
