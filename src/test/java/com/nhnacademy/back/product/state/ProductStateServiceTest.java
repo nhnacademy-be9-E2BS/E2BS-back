@@ -54,17 +54,4 @@ class ProductStateServiceTest {
 		// then
 		assertThat(result).isEmpty();
 	}
-
-	@Test
-	@DisplayName("존재하지 않는 상태명 조회 - 예외 발생")
-	void findByProductStateName_notFound() {
-		// given
-		given(productStateJpaRepository.findByProductStateName(ProductStateName.DELETE)).willReturn(null);
-
-		// when & then
-		assertThatThrownBy(() -> {
-			ProductState state = productStateJpaRepository.findByProductStateName(ProductStateName.DELETE);
-			state.toString();
-		}).isInstanceOf(NullPointerException.class);
-	}
 }

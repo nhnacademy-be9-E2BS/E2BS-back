@@ -113,13 +113,16 @@ class ReviewServiceImplTest {
 		OrderDetail orderDetail = mock(OrderDetail.class);
 
 		MultipartFile imageFile = new MockMultipartFile("file", "image.jpg", "image/jpeg", "data".getBytes());
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), null, member.getMemberId(), "내용", 4, imageFile);
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), null, member.getMemberId(),
+			"내용", 4, imageFile);
 
 		when(memberRepository.getMemberByMemberId(member.getMemberId())).thenReturn(member);
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
-		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
-		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(List.of(orderDetail));
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId,
+			product.getProductId())).thenReturn(true);
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(
+			List.of(orderDetail));
 		doNothing().when(minioUtils).uploadObject(any(), any(), any());
 		when(reviewRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -141,7 +144,7 @@ class ReviewServiceImplTest {
 		// when & then
 		assertThrows(NotFoundMemberException.class, () -> reviewService.createReview(request));
 	}
-	
+
 	@Test
 	@DisplayName("비회원 리뷰 생성 테스트")
 	void createReview_Customer() {
@@ -149,12 +152,15 @@ class ReviewServiceImplTest {
 		OrderDetail orderDetail = mock(OrderDetail.class);
 
 		MultipartFile imageFile = new MockMultipartFile("file", "image.jpg", "image/jpeg", "data".getBytes());
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 4, imageFile);
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 4,
+			imageFile);
 
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
-		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(true);
-		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(List.of(orderDetail));
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId,
+			product.getProductId())).thenReturn(true);
+		when(orderDetailRepository.findByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(
+			List.of(orderDetail));
 		when(reviewRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
 		// when
@@ -196,14 +202,15 @@ class ReviewServiceImplTest {
 		// given
 		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 		when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
-		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId, product.getProductId())).thenReturn(false);
+		when(reviewRepository.existsReviewedOrderDetailsByCustomerIdAndProductId(customerId,
+			product.getProductId())).thenReturn(false);
 
-		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 5, null);
+		RequestCreateReviewDTO request = new RequestCreateReviewDTO(product.getProductId(), customerId, null, "내용", 5,
+			null);
 
 		// when & then
 		assertThrows(OrderDetailNotFoundException.class, () -> reviewService.createReview(request));
 	}
-
 
 	@Test
 	@DisplayName("리뷰 수정 테스트")
@@ -226,7 +233,7 @@ class ReviewServiceImplTest {
 		assertEquals("수정된 내용", result.getReviewContent());
 		assertEquals("storageUrl", result.getReviewImageUrl());
 	}
-	
+
 	@Test
 	@DisplayName("리뷰 수정 테스트 - 실패(리뷰를 찾지 못한 경우)")
 	void updateReview_Fail_ReviewNotFound() {
@@ -313,8 +320,11 @@ class ReviewServiceImplTest {
 		when(memberRepository.getMemberByMemberId("wrongId")).thenReturn(null);
 
 		// when & then
+		Pageable pageable = Pageable.unpaged();
+
 		assertThrows(RuntimeException.class,
-			() -> reviewService.getReviewsByMember("wrongId", Pageable.unpaged()));
+			() -> reviewService.getReviewsByMember("wrongId", pageable));
+
 	}
 
 	@Test
@@ -364,5 +374,5 @@ class ReviewServiceImplTest {
 		assertThrows(ReviewNotFoundException.class,
 			() -> reviewService.findByOrderDetailId(999L));
 	}
-	
+
 }
