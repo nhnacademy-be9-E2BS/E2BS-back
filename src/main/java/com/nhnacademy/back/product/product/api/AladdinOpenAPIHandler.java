@@ -105,7 +105,7 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 	}
 
 	public void parseXml(String xmlUrl) throws IOException, ParserConfigurationException, SAXException {
-		URL url = new URL(xmlUrl);
+		URL url = new URL(xmlUrl); // NOSONAR
 		StringBuilder response;
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
 			response = new StringBuilder();
