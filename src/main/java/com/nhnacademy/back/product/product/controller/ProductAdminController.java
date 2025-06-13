@@ -142,6 +142,7 @@ public class ProductAdminController {
 	 * 검색어와 검색타입으로 책 검색
 	 */
 
+	@SuppressWarnings("squid:S2699")
 	@Admin
 	@GetMapping("/aladdin/search")
 	public ResponseEntity<?> searchProducts(@ModelAttribute UnifiedProductApiSearchDTO request, Pageable pageable) {

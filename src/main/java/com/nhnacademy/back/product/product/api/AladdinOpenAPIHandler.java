@@ -146,5 +146,4 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 		pa.parse(new InputSource(new StringReader(fixedXml)));
 	}
 
-
 }
