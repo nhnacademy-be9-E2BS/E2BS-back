@@ -32,14 +32,16 @@ class ProductStateServiceTest {
 	void getProductStates_success() {
 		// given
 		ProductState state = new ProductState(1L, ProductStateName.SALE);
-		given(productStateJpaRepository.findAll()).willReturn(List.of(state));
+		ProductState state2 = new ProductState(ProductStateName.OUT);
+		given(productStateJpaRepository.findAll()).willReturn(List.of(state, state2));
 
 		// when
 		List<ProductState> result = productStateService.getProductStates();
 
 		// then
-		assertThat(result).hasSize(1);
+		assertThat(result).hasSize(2);
 		assertThat(result.getFirst().getProductStateName()).isEqualTo(ProductStateName.SALE);
+		assertThat(result.get(1).getProductStateName()).isEqualTo(ProductStateName.OUT);
 	}
 
 	@Test
@@ -54,4 +56,5 @@ class ProductStateServiceTest {
 		// then
 		assertThat(result).isEmpty();
 	}
+
 }
