@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +29,12 @@ public class CustomerLoginController {
 	private final CustomerService customerService;
 
 
-	@Operation(summary = "비회원 로그인", description = "이메일과 비밀번호를 이용한 비회원 로그인 요청을 처리합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "비회원 로그인 성공", content = @Content(schema = @Schema(implementation = ResponseCustomerDTO.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "비회원 로그인",
+		description = "이메일과 비밀번호를 이용한 비회원 로그인 요청을 처리합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "비회원 로그인 성공", content = @Content(schema = @Schema(implementation = ResponseCustomerDTO.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PostMapping("/api/customers/login")
 	public ResponseEntity<ResponseCustomerDTO> customerLogin(@Parameter(description = "비회원 로그인 요청 DTO", required = true) @Valid @RequestBody RequestCustomerLoginDTO requestCustomerLoginDTO,
 		                                                     @Parameter(hidden = true) BindingResult bindingResult) {

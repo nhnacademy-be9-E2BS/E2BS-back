@@ -69,7 +69,7 @@ class AuthorizationMemberAopTest {
 			MemberRole role = new MemberRole(1L, MemberRoleName.MEMBER);
 			Member member = mock(Member.class);
 
-			// when
+			// When
 			when(member.getMemberRole()).thenReturn(role);
 			when(memberJpaRepository.getMemberByMemberId(MEMBER_ID)).thenReturn(member);
 

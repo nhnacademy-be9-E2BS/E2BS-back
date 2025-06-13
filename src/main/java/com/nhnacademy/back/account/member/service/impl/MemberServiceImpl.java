@@ -50,8 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-	private final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
-	private final String UPDATE_MEMBER_ROLE_FAILED = "회원 권한을 변경하지 못했습니다.";
+	private static final String notFoundMember = "아이디에 해당하는 회원을 찾지 못했습니다.";
+	private static final String updateMemberRoleFailed = "회원 권한을 변경하지 못했습니다.";
 
 	private final MemberJpaRepository memberJpaRepository;
 	private final MemberRankJpaRepository memberRankJpaRepository;
@@ -89,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = getMemberByMemberId(requestLoginMemberDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		if (member.getMemberState().getMemberStateName() == MemberStateName.WITHDRAW) {
@@ -140,7 +140,6 @@ public class MemberServiceImpl implements MemberService {
 			.socialAuth(socialAuth)
 			.build();
 
-		// memberJpaRepository.saveAndFlush(member);
 		memberJpaRepository.save(member);
 
 		// 회원가입 포인트 적립 이벤트 발행
@@ -160,7 +159,7 @@ public class MemberServiceImpl implements MemberService {
 	public ResponseMemberInfoDTO getMemberInfo(RequestMemberIdDTO requestMemberIdDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberIdDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		return new ResponseMemberInfoDTO(
@@ -179,7 +178,7 @@ public class MemberServiceImpl implements MemberService {
 	public void updateMemberInfo(RequestMemberInfoDTO requestMemberInfoDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(requestMemberInfoDTO.getMemberId());
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		int memberResult = memberJpaRepository.updateMemberInfo(
@@ -211,7 +210,7 @@ public class MemberServiceImpl implements MemberService {
 	public void withdrawMember(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		MemberState withdrawMemberState = memberStateJpaRepository.getMemberStateByMemberStateId(3);
@@ -246,7 +245,7 @@ public class MemberServiceImpl implements MemberService {
 		RequestAdminSettingsMemberStateDTO requestAdminSettingsMemberStateDTO) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		MemberStateName memberStateName = MemberStateName.valueOf(
@@ -256,7 +255,7 @@ public class MemberServiceImpl implements MemberService {
 
 		int result = memberJpaRepository.updateMemberMemberState(memberState, memberId);
 		if (result <= 0) {
-			throw new UpdateMemberStateFailedException(UPDATE_MEMBER_ROLE_FAILED);
+			throw new UpdateMemberStateFailedException(updateMemberRoleFailed);
 		}
 	}
 
@@ -268,7 +267,7 @@ public class MemberServiceImpl implements MemberService {
 	public void updateMemberRole(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		int result = 0;
@@ -281,7 +280,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		if (result <= 0) {
-			throw new UpdateMemberRoleFailedException(UPDATE_MEMBER_ROLE_FAILED);
+			throw new UpdateMemberRoleFailedException(updateMemberRoleFailed);
 		}
 	}
 
@@ -289,11 +288,21 @@ public class MemberServiceImpl implements MemberService {
 	public ResponseMemberStateDTO getMemberState(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		MemberState memberState = member.getMemberState();
 		return new ResponseMemberStateDTO(memberState.getMemberStateName().name());
+	}
+
+	@Override
+	public String getMemberRole(String memberId) {
+		Member member = memberJpaRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(member)) {
+			throw new NotFoundMemberException(notFoundMember);
+		}
+
+		return member.getMemberRole().getMemberRoleName().name();
 	}
 
 	@Override
@@ -314,7 +323,7 @@ public class MemberServiceImpl implements MemberService {
 	public ResponseMemberEmailDTO getMemberEmail(String memberId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 		if (Objects.isNull(member)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(notFoundMember);
 		}
 
 		return new ResponseMemberEmailDTO(member.getCustomer().getCustomerEmail());

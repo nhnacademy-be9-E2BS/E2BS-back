@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +30,17 @@ import org.springframework.http.ResponseEntity;
 import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.account.memberrank.domain.entity.MemberRank;
+import com.nhnacademy.back.account.memberrank.domain.entity.RankName;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRole;
+import com.nhnacademy.back.account.memberrole.domain.entity.MemberRoleName;
+import com.nhnacademy.back.account.memberstate.domain.entity.MemberState;
+import com.nhnacademy.back.account.memberstate.domain.entity.MemberStateName;
 import com.nhnacademy.back.account.pointhistory.service.PointHistoryService;
+import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
+import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuthName;
 import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import com.nhnacademy.back.order.deliveryfee.domain.entity.DeliveryFee;
 import com.nhnacademy.back.order.deliveryfee.repository.DeliveryFeeJpaRepository;
@@ -43,7 +54,6 @@ import com.nhnacademy.back.order.order.model.dto.request.RequestOrderReturnDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestOrderWrapperDTO;
 import com.nhnacademy.back.order.order.model.dto.request.RequestPaymentApproveDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDTO;
-import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderDetailDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderResultDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponseOrderWrapperDTO;
 import com.nhnacademy.back.order.order.model.dto.response.ResponsePaymentConfirmDTO;
@@ -302,17 +312,22 @@ class OrderServiceImplTest {
 		long customerId = 1L;
 
 		// Order
+		Customer customer = mock(Customer.class);
 		Order orderEntity = mock(Order.class);
-		ResponseOrderDTO responseOrderDTO = new ResponseOrderDTO();
-		responseOrderDTO.setCustomerId(customerId);
+		DeliveryFee deliveryFee = mock(DeliveryFee.class);
+		OrderState orderState = mock(OrderState.class);
 
 		when(orderJpaRepository.findById(orderCode))
 			.thenReturn(Optional.of(orderEntity));
-		// map to DTO
-		Mockito.mockStatic(ResponseOrderDTO.class)
-			.when(() -> ResponseOrderDTO.fromEntity(orderEntity))
-			.thenReturn(responseOrderDTO);
 
+		when(orderEntity.getCustomer()).thenReturn(customer);
+		when(customer.getCustomerId()).thenReturn(customerId);
+		when(orderEntity.getDeliveryFee()).thenReturn(deliveryFee);
+		when(deliveryFee.getDeliveryFeeId()).thenReturn(1L);
+		when(deliveryFee.getDeliveryFeeAmount()).thenReturn(1L);
+		when(deliveryFee.getDeliveryFeeFreeAmount()).thenReturn(1L);
+		when(orderEntity.getOrderState()).thenReturn(orderState);
+		when(orderState.getOrderStateName()).thenReturn(OrderStateName.WAIT);
 		// Payment
 		Payment payment = mock(Payment.class);
 		PaymentMethod paymentMethod = mock(PaymentMethod.class);
@@ -329,20 +344,19 @@ class OrderServiceImplTest {
 		// OrderDetails
 		OrderDetail orderDetail = mock(OrderDetail.class);
 		List<OrderDetail> orderDetailList = List.of(orderDetail);
+		Product product = mock(Product.class);
 		when(orderDetailJpaRepository.findByOrderOrderCode(orderCode))
 			.thenReturn(orderDetailList);
 
-		ResponseOrderDetailDTO orderDetailDTO = new ResponseOrderDetailDTO();
-		Mockito.mockStatic(ResponseOrderDetailDTO.class)
-			.when(() -> ResponseOrderDetailDTO.fromEntity(orderDetail))
-			.thenReturn(orderDetailDTO);
+		when(orderDetail.getProduct()).thenReturn(product);
+		when(product.getProductId()).thenReturn(1L);
+		when(product.getProductTitle()).thenReturn("Title");
 
 		// when
 		ResponseOrderWrapperDTO result = orderService.getOrderByOrderCode(orderCode);
 
 		// then
 		assertNotNull(result);
-		assertEquals(responseOrderDTO, result.getOrder());
 		assertEquals(1, result.getOrderDetails().size());
 	}
 
@@ -372,36 +386,36 @@ class OrderServiceImplTest {
 			verify(orderJpaRepository).findAllByCustomer_CustomerIdOrderByOrderCreatedAtDesc(pageable, 1L);
 		}
 	}
-	//
-	// @Test
-	// @DisplayName("특정 회원 주문 내역 조회(주문 상태 검색)")
-	// void testGetOrdersByMemberIdWithOrderState() {
-	// 	// given
-	// 	Member member = mock(Member.class);
-	// 	Pageable pageable = PageRequest.of(0, 10);
-	// 	Order order = mock(Order.class);
-	// 	OrderState orderState = mock(OrderState.class);
-	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
-	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
-	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
-	// 	when(member.getCustomerId()).thenReturn(1L);
-	// 	when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
-	// 		orderState)).thenReturn(orderPage);
-	// 	when(orderStateJpaRepository.findByOrderStateName(any())).thenReturn(Optional.ofNullable(orderState));
-	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
-	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
-	//
-	// 		// when
-	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), "WAIT", null, null,
-	// 			null);
-	//
-	// 		// then
-	// 		assertThat(result).isNotNull();
-	// 		assertEquals(1, result.getContent().size());
-	// 		verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
-	// 			orderState);
-	// 	}
-	// }
+
+	@Test
+	@DisplayName("특정 회원 주문 내역 조회(주문 상태 검색)")
+	void testGetOrdersByMemberIdWithOrderState() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		OrderState orderState = mock(OrderState.class);
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+			orderState)).thenReturn(orderPage);
+		when(orderStateJpaRepository.findByOrderStateName(any())).thenReturn(Optional.ofNullable(orderState));
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), "WAIT", null, null,
+				null);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).findAllByCustomer_CustomerIdAndOrderStateOrderByOrderCreatedAtDesc(pageable, 1L,
+				orderState);
+		}
+	}
 
 	@Test
 	@DisplayName("특정 회원 주문 내역 조회(주문 날짜 검색)")
@@ -433,33 +447,33 @@ class OrderServiceImplTest {
 		}
 	}
 
-	// @Test
-	// @DisplayName("특정 회원 주문 내역 조회(주문 코드 검색)")
-	// void testGetOrdersByMemberIdWithOrderCode() {
-	// 	// given
-	// 	Member member = mock(Member.class);
-	// 	Pageable pageable = PageRequest.of(0, 10);
-	// 	Order order = mock(Order.class);
-	// 	String orderCode = "TEST-ORDER-CODE";
-	// 	ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
-	// 	Page<Order> orderPage = new PageImpl<>(List.of(order));
-	// 	when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
-	// 	when(member.getCustomerId()).thenReturn(1L);
-	// 	when(orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable)).thenReturn(
-	// 		orderPage);
-	// 	try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
-	// 		mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
-	//
-	// 		// when
-	// 		Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null,
-	// 			null, orderCode);
-	//
-	// 		// then
-	// 		assertThat(result).isNotNull();
-	// 		assertEquals(1, result.getContent().size());
-	// 		verify(orderJpaRepository).searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable);
-	// 	}
-	// }
+	@Test
+	@DisplayName("특정 회원 주문 내역 조회(주문 코드 검색)")
+	void testGetOrdersByMemberIdWithOrderCode() {
+		// given
+		Member member = mock(Member.class);
+		Pageable pageable = PageRequest.of(0, 10);
+		Order order = mock(Order.class);
+		String orderCode = "TEST-ORDER-CODE";
+		ResponseOrderDTO responseOrderDTO = mock(ResponseOrderDTO.class);
+		Page<Order> orderPage = new PageImpl<>(List.of(order));
+		when(memberJpaRepository.getMemberByMemberId(anyString())).thenReturn(member);
+		when(member.getCustomerId()).thenReturn(1L);
+		when(orderJpaRepository.searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable)).thenReturn(
+			orderPage);
+		try (MockedStatic<ResponseOrderDTO> mockedStatic = Mockito.mockStatic(ResponseOrderDTO.class)) {
+			mockedStatic.when(() -> ResponseOrderDTO.fromEntity(order)).thenReturn(responseOrderDTO);
+
+			// when
+			Page<ResponseOrderDTO> result = orderService.getOrdersByMemberId(pageable, anyString(), null, null,
+				null, orderCode);
+
+			// then
+			assertThat(result).isNotNull();
+			assertEquals(1, result.getContent().size());
+			verify(orderJpaRepository).searchByCustomerIdAndOrderCodeIgnoreCase(1L, orderCode, pageable);
+		}
+	}
 
 	@Test
 	@DisplayName("배송 대기 상태인 상품의 주문 취소(외부 결제 X)")
@@ -568,4 +582,182 @@ class OrderServiceImplTest {
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 개수 조회 메서드 테스트")
+	void getAllOrdersMethodTest() {
+
+		// Given
+
+		// When
+		when(orderJpaRepository.countAllOrders()).thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getAllOrders();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 매출액 조회 메서드 테스트")
+	void getTotalSalesMethodTest() throws Exception {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalSales())
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalSales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 이번 달 총 매출액 조회 메서드 테스트")
+	void getTotalMonthlySalesMethodTest() {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalMonthlySales(any(LocalDateTime.class), any(LocalDateTime.class)))
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalMonthlySales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 하루 매출액 조회 메서드 테스트")
+	void getTotalDailySalesMethodTest() {
+
+		// Given
+
+		// When
+		when(orderDetailJpaRepository.getTotalDailySales(any(LocalDateTime.class), any(LocalDateTime.class)))
+			.thenReturn(1L);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getTotalDailySales();
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 테스트")
+	void getMemberOrdersCntMethodTest() {
+
+		// Given
+		Customer customer = Customer.builder()
+			.customerId(1L)
+			.customerName("김도윤")
+			.customerEmail("user@test.com")
+			.build();
+
+		Member member = Member.builder()
+			.customer(customer)
+			.memberId("user")
+			.memberBirth(LocalDate.now())
+			.memberPhone("010-1234-1234")
+			.memberCreatedAt(LocalDate.now())
+			.memberState(new MemberState(3L, MemberStateName.ACTIVE))
+			.memberRank(new MemberRank(1L, RankName.NORMAL, 1, 1L))
+			.memberRole(new MemberRole(1, MemberRoleName.MEMBER))
+			.socialAuth(new SocialAuth(1L, SocialAuthName.WEB))
+			.build();
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(member);
+		when(orderJpaRepository.countOrdersByCustomer(member.getCustomer())).thenReturn(1);
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getMemberOrdersCnt("user");
+		}).doesNotThrowAnyException();
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 NotFoundMemberException 테스트")
+	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() {
+
+		// Given
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
+
+		// Then
+		org.junit.jupiter.api.Assertions.assertThrows(NotFoundMemberException.class, () -> {
+			orderService.getMemberOrdersCnt("user");
+		});
+
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 테스트")
+	void getMemberRecentOrdersMethodTest() {
+
+		// Given
+		String memberId = "user";
+
+		Customer customer = mock(Customer.class);
+		Member member = mock(Member.class);
+		when(member.getCustomer()).thenReturn(customer);
+		when(memberJpaRepository.getMemberByMemberId(memberId)).thenReturn(member);
+
+		OrderState waitState = new OrderState(1L, OrderStateName.WAIT);
+		OrderState deliveryState = new OrderState(2L, OrderStateName.DELIVERY);
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT)).thenReturn(Optional.of(waitState));
+		when(orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY)).thenReturn(
+			Optional.of(deliveryState));
+
+		// When
+		Order order = mock(Order.class);
+		when(order.getOrderCode()).thenReturn("123456");
+		when(order.getOrderCreatedAt()).thenReturn(LocalDateTime.now());
+		when(order.getOrderState()).thenReturn(waitState);
+
+		when(orderJpaRepository.findOrdersByCustomerAndOrderState(customer, List.of(waitState, deliveryState)))
+			.thenReturn(List.of(order));
+
+		Product product = mock(Product.class);
+		when(product.getProductTitle()).thenReturn("hello");
+
+		OrderDetail orderDetail = mock(OrderDetail.class);
+		when(orderDetail.getProduct()).thenReturn(product);
+		when(orderDetail.getOrderQuantity()).thenReturn(2);
+		when(orderDetail.getOrderDetailPerPrice()).thenReturn(10000L);
+
+		when(orderDetailJpaRepository.findByOrderOrderCode("123456"))
+			.thenReturn(List.of(orderDetail));
+
+		// Then
+		Assertions.assertThatCode(() -> {
+			orderService.getMemberRecentOrders("user");
+		}).doesNotThrowAnyException();
+	}
+
+	@Test
+	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 NotFoundMemberException 테스트")
+	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() {
+
+		// Given
+
+		// When
+		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
+
+		// Then
+		org.junit.jupiter.api.Assertions.assertThrows(NotFoundMemberException.class, () -> {
+			orderService.getMemberRecentOrders("user");
+		});
+
+	}
+
 }

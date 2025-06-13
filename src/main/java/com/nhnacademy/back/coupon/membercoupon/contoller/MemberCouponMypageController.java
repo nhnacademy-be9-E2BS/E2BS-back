@@ -10,7 +10,6 @@ import com.nhnacademy.back.coupon.membercoupon.service.MemberCouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
@@ -25,12 +24,12 @@ public class MemberCouponMypageController {
 
 	@Operation(
 		summary = "사용가능한 쿠폰 개수 조회",
-		description = "회원 ID를 기준으로 사용가능한 쿠폰 개수를 조회합니다."
+		description = "회원 ID를 기준으로 사용가능한 쿠폰 개수를 조회합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "쿠폰 개수 조회 성공"),
+			@ApiResponse(responseCode = "404", description = "해당 회원 ID가 존재하지 않음")
+		}
 	)
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "쿠폰 개수 조회 성공"),
-		@ApiResponse(responseCode = "404", description = "해당 회원 ID가 존재하지 않음")
-	})
 	@GetMapping
 	public ResponseEntity<ResponseMypageMemberCouponDTO> getCouponCnt(
 		@Parameter(description = "회원 ID", example = "member123", required = true)

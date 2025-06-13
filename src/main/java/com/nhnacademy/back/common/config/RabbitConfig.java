@@ -52,6 +52,9 @@ public class RabbitConfig {
 	public static final String WELCOME_DLQ = "E2BS.welcome.coupon.queue.dlq";
 	public static final String WELCOME_DLK = "E2BS.welcome.coupon.key.dlk";
 
+	private static final String DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+	private static final String DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
+
 	@Bean
 	public Queue directDLQ() {
 		return new Queue(DIRECT_DLQ, true);
@@ -73,8 +76,8 @@ public class RabbitConfig {
 	@Bean
 	public Queue directQueue() {
 		Map<String, Object> arguments = new HashMap<>();
-		arguments.put("x-dead-letter-exchange", DIRECT_DLX);
-		arguments.put("x-dead-letter-routing-key", DIRECT_DLK);
+		arguments.put(DEAD_LETTER_EXCHANGE, DIRECT_DLX);
+		arguments.put(DEAD_LETTER_ROUTING_KEY, DIRECT_DLK);
 		return new Queue(DIRECT_QUEUE, true, false, false, arguments);
 	}
 
@@ -114,8 +117,8 @@ public class RabbitConfig {
 	@Bean
 	public Queue birthdayQueue() {
 		Map<String, Object> arguments = new HashMap<>();
-		arguments.put("x-dead-letter-exchange", BIRTHDAY_DLX);
-		arguments.put("x-dead-letter-routing-key", BIRTHDAY_DLK);
+		arguments.put(DEAD_LETTER_EXCHANGE, BIRTHDAY_DLX);
+		arguments.put(DEAD_LETTER_ROUTING_KEY, BIRTHDAY_DLK);
 		return new Queue(BIRTHDAY_QUEUE, true, false, false, arguments);
 	}
 
@@ -155,8 +158,8 @@ public class RabbitConfig {
 	@Bean
 	public Queue welcomeQueue() {
 		Map<String, Object> arguments = new HashMap<>();
-		arguments.put("x-dead-letter-exchange", WELCOME_DLX);
-		arguments.put("x-dead-letter-routing-key", WELCOME_DLK);
+		arguments.put(DEAD_LETTER_EXCHANGE, WELCOME_DLX);
+		arguments.put(DEAD_LETTER_ROUTING_KEY, WELCOME_DLK);
 		return new Queue(WELCOME_QUEUE, true, false, false, arguments);
 	}
 

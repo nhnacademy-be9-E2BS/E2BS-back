@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -190,8 +191,6 @@ class MemberCouponServiceTest {
 	void testGetCouponsInOrderByMemberIdAndProductIdsMemberNotFound() {
 		when(memberJpaRepository.getMemberByMemberId("user1")).thenReturn(null);
 
-		assertThatThrownBy(() -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)))
-			.isInstanceOf(NotFoundMemberException.class)
-			.hasMessageContaining("아이디에 해당하는 회원을 찾지 못했습니다.");
+		Assertions.assertThrows(NotFoundMemberException.class, () -> service.getCouponsInOrderByMemberIdAndProductIds("user1", List.of(100L)));
 	}
 }

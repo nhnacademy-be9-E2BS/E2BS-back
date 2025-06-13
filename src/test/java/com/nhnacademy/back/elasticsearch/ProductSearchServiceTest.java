@@ -82,10 +82,6 @@ class ProductSearchServiceTest {
 		List<Long> productIdList = List.of(1L);
 		Page<Long> mockPage = new PageImpl<>(productIdList, pageable, productIdList.size());
 
-		RequestProductDocumentDTO request = new RequestProductDocumentDTO(
-			1L, "title", "description", "publisher", LocalDate.now(),
-			10000L, List.of("contributor"), List.of("tag"), List.of(1L, 2L));
-
 		when(customProductSearchRepository.searchAndSortProductIds(pageable, keyword, productSortType)).thenReturn(
 			mockPage);
 

@@ -313,8 +313,9 @@ class ReviewServiceImplTest {
 		when(memberRepository.getMemberByMemberId("wrongId")).thenReturn(null);
 
 		// when & then
-		assertThrows(NotFoundMemberException.class,
-			() -> reviewService.getReviewsByMember("wrongId", Pageable.unpaged()));
+		assertThrows(NotFoundMemberException.class, () ->
+			reviewService.getReviewsByMember("wrongId", Pageable.unpaged())
+		);
 	}
 
 	@Test

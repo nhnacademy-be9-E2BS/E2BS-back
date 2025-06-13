@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -58,6 +57,23 @@ public class CartServiceImpl implements CartService {
 	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
 	/**
+	 * 회원 장바구니 생성 메소드
+	 */
+	@Transactional
+	@Override
+	public void createCartForMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
+			.orElseThrow(CustomerNotFoundException::new);
+
+		Cart cart = new Cart(findCustomer);
+		cartRepository.save(cart);
+	}
+
+	/**
 	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
 	@Transactional
@@ -98,7 +114,7 @@ public class CartServiceImpl implements CartService {
 		// 장바구니 아이템 생성
 		cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
 
-		return cart.getCartItems().size();
+		return cartItemsRepository.countByCart(cart);
 	}
 
 	/**
@@ -231,8 +247,9 @@ public class CartServiceImpl implements CartService {
 			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
-		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
-		return findCart.map(cart -> cart.getCartItems().size()).orElse(0);
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+		return cartItemsRepository.countByCart(findCart);
 	}
 
 
@@ -448,6 +465,10 @@ public class CartServiceImpl implements CartService {
 			}
 		}
 
+		// 기존 세션의 장바구니 비워주기
+		CartDTO emptyCart = new CartDTO();
+		redisTemplate.opsForValue().set(sessionId, emptyCart);
+
 		return cart.getCartItems().size();
 	}
 
@@ -457,56 +478,88 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	@Override
 	public Integer deleteOrderCompleteCartItems(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
-		List<Long> productIds = requestOrderCartDeleteDTO.getProductIds();
-		List<Integer> cartQuantities = requestOrderCartDeleteDTO.getCartQuantities();
+		if (isMember(requestOrderCartDeleteDTO)) {
+			return deleteForMember(requestOrderCartDeleteDTO);
+		} else {
+			return deleteForNonMember(requestOrderCartDeleteDTO);
+		}
+	}
 
-		// 회원인 경우는 DB에 이미 수량이 더 존재할 수 있으므로 수량 업데이트
-		if (!StringUtils.isEmpty(requestOrderCartDeleteDTO.getMemberId())) {
-			Member findMember = memberRepository.getMemberByMemberId(requestOrderCartDeleteDTO.getMemberId());
-			if (Objects.isNull(findMember)) {
-				throw new NotFoundMemberException(NOT_FOUND_MEMBER);
-			}
+	// 회원 여부 확인
+	private boolean isMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+		return !StringUtils.isEmpty(requestOrderCartDeleteDTO.getMemberId());
+	}
 
-			Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
-				.orElseThrow(CartNotFoundException::new);
+	// 회원일 경우 처리
+	private Integer deleteForMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+		Member findMember = findMember(requestOrderCartDeleteDTO.getMemberId());
+		Cart findCart = findCartForMember(findMember);
 
-			List<CartItems> cartItems = findCart.getCartItems();
+		List<CartItems> cartItems = findCart.getCartItems();
 
-			// 현재 cartItems 리스트를 순회 중인데 동시에 remove 도 일어나므로 ConcurrentModificationException 발생 방지를 위해 리스트 복사
-			List<CartItems> copiedCartItems = new ArrayList<>(cartItems);
-			for (CartItems cartItem : copiedCartItems) {
-				for (int i = 0; i < productIds.size(); i++) {
-					if (cartItem.getProduct().getProductId() == productIds.get(i)) {
-						int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
+		// CartItems 수량 업데이트 또는 삭제
+		updateCartItems(cartItems, requestOrderCartDeleteDTO.getProductIds(), requestOrderCartDeleteDTO.getCartQuantities());
 
-						if (newQuantity > 0) {
-							cartItem.changeCartItemsQuantity(newQuantity);
-						} else {
-							cartItemsRepository.delete(cartItem);
-							cartItems.remove(cartItem); // 관계 정리
-						}
-						break;
+		return cartItemsRepository.countByCart(findCart);
+	}
+
+	// 회원 정보 조회
+	private Member findMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		return findMember;
+	}
+
+	// 회원의 Cart 조회
+	private Cart findCartForMember(Member findMember) {
+		return cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+	}
+
+	// CartItems의 수량을 업데이트하거나 삭제
+	private void updateCartItems(List<CartItems> cartItems, List<Long> productIds, List<Integer> cartQuantities) {
+		List<CartItems> copiedCartItems = new ArrayList<>(cartItems);
+		for (CartItems cartItem : copiedCartItems) {
+			for (int i = 0; i < productIds.size(); i++) {
+				if (cartItem.getProduct().getProductId() == productIds.get(i)) {
+					int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
+
+					if (newQuantity > 0) {
+						cartItem.changeCartItemsQuantity(newQuantity);
+					} else {
+						cartItemsRepository.delete(cartItem);
+						cartItems.remove(cartItem); // 관계 정리
 					}
+					break;
 				}
 			}
-
-			return getCartItemsCountsForMember(findMember.getMemberId());
-		} else { // 비회원인 경우는 삭제만 처리하면 됨
-			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
-			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
-
-			// 기존 cartItems
-			List<CartItemDTO> cartItems = cart.getCartItems();
-
-			// 기존 cartItems 중에서 productIds에 포함되지 않은 상품들만 남긴 새로운 리스트를 가공
-			List<CartItemDTO> filteredItems = cartItems.stream()
-				.filter(item -> productIds.stream().noneMatch(id -> id.equals(item.getProductId())))
-				.collect(Collectors.toList());
-
-			cart.setCartItems(filteredItems); // 새로운 리스트로 덮어씌우기
-
-			return cart.getCartItems().size();
 		}
+	}
+
+	// 비회원일 경우 처리
+	private Integer deleteForNonMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+		CartDTO cart = getCartFromRedis(requestOrderCartDeleteDTO.getSessionId());
+
+		// CartItems 필터링
+		List<CartItemDTO> filteredItems = filterCartItems(cart.getCartItems(), requestOrderCartDeleteDTO.getProductIds());
+		cart.setCartItems(filteredItems);
+
+		return cart.getCartItems().size();
+	}
+
+	// Redis에서 Cart 정보 조회
+	private CartDTO getCartFromRedis(String sessionId) {
+		Object o = redisTemplate.opsForValue().get(sessionId);
+		return objectMapper.convertValue(o, CartDTO.class);
+	}
+
+	// CartItems에서 특정 상품들을 제외한 새로운 리스트 생성
+	private List<CartItemDTO> filterCartItems(List<CartItemDTO> cartItems, List<Long> productIds) {
+		return cartItems.stream()
+			.filter(item -> productIds.stream().noneMatch(id -> id.equals(item.getProductId())))
+			.toList();
 	}
 
 }
