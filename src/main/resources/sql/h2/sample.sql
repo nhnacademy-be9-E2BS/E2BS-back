@@ -390,10 +390,7 @@ VALUES (2, 1);
 
 INSERT INTO point_policy (point_policy_id, point_policy_type, point_policy_name, point_policy_figure,
                           point_policy_created_at, point_policy_is_active)
-VALUES (1, 'REGISTER', '2025년 회원가입 정책', 5000, now(), true),
-       (2, 'REVIEW', '일반 리뷰 정책', 500, now(), true),
-       (3, 'REVIEW_IMG', '이미지 리뷰 정책', 800, now(), true),
-       (4, 'BOOK', '기본 적립률(%) 정책', 5, now(), true),
-       (5, 'REGISTER', '2021년 회원가입 정책', 7000, now(), false),
-       (6, 'REGISTER', '2020년 회원가입 정책', 3000, now(), false),
-       (7, 'BOOK', '2024년 기본 적립률(%) 정책', 5, now(), false);
+VALUES (1, 'REGISTER', '기본 회원가입 정책', 5000, now(), true),
+       (2, 'REVIEW', '기본 일반 리뷰 정책', 500, now(), true),
+       (3, 'REVIEW_IMG', '기본 이미지 리뷰 정책', 800, now(), true),
+       (4, 'BOOK', '기본 적립률(%) 정책', 5, now(), true);

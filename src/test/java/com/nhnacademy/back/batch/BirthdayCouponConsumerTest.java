@@ -22,7 +22,7 @@ import com.nhnacademy.back.coupon.coupon.repository.CouponJpaRepository;
 import com.nhnacademy.back.coupon.membercoupon.repository.MemberCouponJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class BirthdayCouponConsumerTest {
+class BirthdayCouponConsumerTest {
 
 	@Mock
 	private MemberJpaRepository memberRepository;

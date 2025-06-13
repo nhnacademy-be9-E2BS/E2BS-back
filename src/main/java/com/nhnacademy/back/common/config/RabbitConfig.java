@@ -52,8 +52,8 @@ public class RabbitConfig {
 	public static final String WELCOME_DLQ = "E2BS.welcome.coupon.queue.dlq";
 	public static final String WELCOME_DLK = "E2BS.welcome.coupon.key.dlk";
 
-	private final String DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
-	private final String DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
+	private static final String DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+	private static final String DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
 
 	@Bean
 	public Queue directDLQ() {
