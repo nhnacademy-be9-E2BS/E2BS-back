@@ -204,9 +204,15 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 
 			Position position = positionJpaRepository.findPositionByPositionName(positionName);
 			Contributor contributor = new Contributor(contributorName, position);
-			contributorJpaRepository.save(contributor);
 
-			contributorNames.add(contributorName);
+
+			//중복 검사
+			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
+				continue;
+			} else {
+				contributorJpaRepository.save(contributor);
+				contributorNames.add(contributorName);
+			}
 
 			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
 			ProductContributor productContributor = new ProductContributor(contributor, product);
@@ -291,15 +297,16 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			}
 
 			Position position = positionJpaRepository.findPositionByPositionName(positionName);
+			Contributor contributor = new Contributor(contributorName, position);
+
 
 			//중복 검사
 			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
 				continue;
+			} else {
+				contributorJpaRepository.save(contributor);
+				contributorNames.add(contributorName);
 			}
-
-			Contributor contributor = new Contributor(contributorName, position);
-			contributorJpaRepository.save(contributor);
-			contributorNames.add(contributorName);
 
 			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
 			ProductContributor productContributor = new ProductContributor(contributor, product);
