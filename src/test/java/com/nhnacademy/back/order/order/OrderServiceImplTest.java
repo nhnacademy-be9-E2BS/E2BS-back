@@ -585,7 +585,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 개수 조회 메서드 테스트")
-	void getAllOrdersMethodTest() throws Exception {
+	void getAllOrdersMethodTest() {
 
 		// Given
 
@@ -601,7 +601,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 매출액 조회 메서드 테스트")
-	void getTotalSalesMethodTest() throws Exception {
+	void getTotalSalesMethodTest() {
 
 		// Given
 
@@ -618,7 +618,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 이번 달 총 매출액 조회 메서드 테스트")
-	void getTotalMonthlySalesMethodTest() throws Exception {
+	void getTotalMonthlySalesMethodTest() {
 
 		// Given
 
@@ -635,7 +635,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 하루 매출액 조회 메서드 테스트")
-	void getTotalDailySalesMethodTest() throws Exception {
+	void getTotalDailySalesMethodTest() {
 
 		// Given
 
@@ -652,7 +652,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 테스트")
-	void getMemberOrdersCntMethodTest() throws Exception {
+	void getMemberOrdersCntMethodTest() {
 
 		// Given
 		Customer customer = Customer.builder()
@@ -686,7 +686,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 총 주문 건수 조회 메서드 NotFoundMemberException 테스트")
-	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberOrdersCntMethodNotFoundMemberExceptionTest() {
 
 		// Given
 
@@ -702,7 +702,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 테스트")
-	void getMemberRecentOrdersMethodTest() throws Exception {
+	void getMemberRecentOrdersMethodTest() {
 
 		// Given
 		String memberId = "user";
@@ -746,7 +746,7 @@ class OrderServiceImplTest {
 
 	@Test
 	@DisplayName("관리자 페이지 최근 주문 내역 조회 메서드 NotFoundMemberException 테스트")
-	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() throws Exception {
+	void getMemberRecentOrdersMethodNotFoundMemberExceptionTest() {
 
 		// Given
 

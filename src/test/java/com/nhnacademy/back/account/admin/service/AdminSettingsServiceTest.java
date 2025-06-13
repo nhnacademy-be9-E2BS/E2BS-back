@@ -57,7 +57,7 @@ class AdminSettingsServiceTest {
 
 	@Test
 	@DisplayName("관리자 페이지 조회를 위한 값 조회 메서드 테스트")
-	void getAdminSettingsTest() throws Exception {
+	void getAdminSettingsTest() {
 
 		// Given
 
@@ -78,7 +78,7 @@ class AdminSettingsServiceTest {
 
 	@Test
 	@DisplayName("관리자 페이지 일자별 요약 데이터를 위한 데이터 조회 메서드 테스트")
-	void getAdminSettingsDailySummaries() throws Exception {
+	void getAdminSettingsDailySummaries() {
 
 		// Given
 
@@ -95,7 +95,7 @@ class AdminSettingsServiceTest {
 
 	@Test
 	@DisplayName("관리자 페이지 이번 달 데이터 조회 메서드 테스트")
-	void getAdminSettingsMonthlySummary() throws Exception {
+	void getAdminSettingsMonthlySummary() {
 
 		// Given
 
@@ -113,7 +113,7 @@ class AdminSettingsServiceTest {
 
 	@Test
 	@DisplayName("관리자 페이지 회원 목록 조회 메서드 테스트")
-	void getAdminSettingsMembersMethodTest() throws Exception {
+	void getAdminSettingsMembersMethodTest() {
 
 		// Given
 		Pageable pageable = PageRequest.of(0, 10);
