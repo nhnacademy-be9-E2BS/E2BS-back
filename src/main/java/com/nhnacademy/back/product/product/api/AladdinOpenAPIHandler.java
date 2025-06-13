@@ -115,19 +115,20 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 			URI uri = new URI(xmlUrl);             // URL 대신 URI 사용
 			URL url = uri.toURL();                 // 변환 후 사용
 
-			conn = (HttpURLConnection) url.openConnection();
+			conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setConnectTimeout(5000); // 5초 타임아웃 설정
 			conn.setReadTimeout(5000);    // 5초 읽기 타임아웃
 
-			try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+			try (BufferedReader in = new BufferedReader(
+				new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
 				String line;
 				while ((line = in.readLine()) != null) {
 					response.append(line);
 				}
 			}
 		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e); // NOSONAR
 		} finally {
 			if (conn != null) {
 				conn.disconnect();
