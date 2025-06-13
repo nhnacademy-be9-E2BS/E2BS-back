@@ -91,15 +91,16 @@ class ProductAPIServiceTest {
 		when(req.getQueryType()).thenReturn("Title");
 
 		Item item = new Item();
-		item.isbn13 = "12345";
-		item.title = "Test Book";
-		item.description = "Desc";
-		item.cover = "CoverUrl";
-		item.publisher = "Pub";
-		item.priceStandard = 2000;
-		item.priceSales = 1500;
-		item.author = "Author";
-		item.pubDate = LocalDate.of(2020,1,1);
+		item.setIsbn13("12345");
+		item.setTitle("Test Book");
+		item.setDescription("Desc");
+		item.setCover("CoverUrl");
+		item.setPublisher("Pub");
+		item.setPriceStandard(2000);
+		item.setPriceSales(1500);
+		item.setAuthor("Author");
+		item.setPubDate(LocalDate.of(2020, 1, 1));
+
 		List<Item> items = List.of(item);
 
 		try (MockedConstruction<AladdinOpenAPI> mockCtor =
@@ -138,8 +139,8 @@ class ProductAPIServiceTest {
 		when(req.getQueryType()).thenReturn("Bestseller");
 
 		Item item = new Item();
-		item.isbn13 = "abc";
-		item.title = "BS Book";
+		item.setIsbn13("abc");
+		item.setTitle("BS Book");
 		List<Item> items = List.of(item);
 
 		try (MockedConstruction<AladdinOpenAPI> mockCtor =
