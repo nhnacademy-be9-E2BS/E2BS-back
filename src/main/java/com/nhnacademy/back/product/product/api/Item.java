@@ -8,27 +8,27 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Item{
-	public String title = ""; //제목
+	private String title = ""; //제목
 
-	public String publisher = ""; //출판사
+	private String publisher;//출판사
 
-	public String author =""; //저자
+	private String author; //저자
 
 
-	public String description = ""; //상품설명
+	private String description; //상품설명
 
-	public String isbn13 = ""; //13자리 ISBN
+	private String isbn13; //13자리 ISBN
 
-	public int priceStandard = 0; // 정가
+	private int priceStandard; // 정가
 
-	public int priceSales = 0; //판매가
+	private int priceSales; //판매가
 
-	public LocalDate pubDate;
+	private LocalDate pubDate;
 
-	public String cover = ""; //상품 이미지
-	public String link = ""; // 상품링크
+	private String cover; //상품 이미지
+	private String link; // 상품링크
 
-	public String stockstatus = ""; //재고상태
+	private String stockstatus; //재고상태
 
 
 }
