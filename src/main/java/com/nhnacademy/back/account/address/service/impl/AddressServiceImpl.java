@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +27,6 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
-
-	@Lazy
-	private final AddressService self;
 
 	private final AddressJpaRepository addressJpaRepository;
 	private final MemberJpaRepository memberJpaRepository;
@@ -76,7 +72,7 @@ public class AddressServiceImpl implements AddressService {
 			throw new SaveAddressFailedException("배송지를 저장히지 못했습니다.");
 		}
 
-		self.setDefaultAddress(memberId, savedAddress.getAddressId());
+		privateSetDefaultAddress(memberId, savedAddress.getAddressId());
 	}
 
 	public ResponseMemberAddressDTO getAddressByAddressId(String memberId, long addressId) {
@@ -122,7 +118,7 @@ public class AddressServiceImpl implements AddressService {
 			throw new UpdateAddressFailedException("배송지 정보를 수정하지 못했습니다.");
 		}
 
-		self.setDefaultAddress(memberId, addressId);
+		privateSetDefaultAddress(memberId, addressId);
 	}
 
 	@Transactional
@@ -136,6 +132,10 @@ public class AddressServiceImpl implements AddressService {
 
 	@Transactional
 	public void setDefaultAddress(String memberId, long addressId) {
+		privateSetDefaultAddress(memberId, addressId);
+	}
+
+	private void privateSetDefaultAddress(String memberId, long addressId) {
 		Member member = memberJpaRepository.getMemberByMemberId(memberId);
 
 		int result = addressJpaRepository.updateAllAddressDefaultFalse(member);
