@@ -282,13 +282,14 @@ class MemberServiceImplTest {
 	void getMemberInfoMethodNotFoundMemberExceptionTest() {
 
 		// Given
+		RequestMemberIdDTO requestMemberIdDTO = new RequestMemberIdDTO("user");
 
 		// When
 		when(memberJpaRepository.getMemberByMemberId("user")).thenReturn(null);
 
 		// Then
 		Assertions.assertThrows(NotFoundMemberException.class,
-			() -> memberService.getMemberInfo(new RequestMemberIdDTO("user")));
+			() -> memberService.getMemberInfo(requestMemberIdDTO));
 
 	}
 
