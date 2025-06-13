@@ -291,6 +291,12 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			}
 
 			Position position = positionJpaRepository.findPositionByPositionName(positionName);
+
+			//중복 검사
+			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
+				continue;
+			}
+
 			Contributor contributor = new Contributor(contributorName, position);
 			contributorJpaRepository.save(contributor);
 			contributorNames.add(contributorName);
