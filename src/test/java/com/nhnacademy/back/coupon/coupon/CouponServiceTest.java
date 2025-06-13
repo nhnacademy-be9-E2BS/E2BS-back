@@ -1,11 +1,22 @@
 package com.nhnacademy.back.coupon.coupon;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.back.coupon.coupon.domain.dto.request.RequestCouponDTO;
 import com.nhnacademy.back.coupon.coupon.domain.dto.response.ResponseCouponDTO;
@@ -13,7 +24,9 @@ import com.nhnacademy.back.coupon.coupon.domain.entity.CategoryCoupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.Coupon;
 import com.nhnacademy.back.coupon.coupon.domain.entity.ProductCoupon;
 import com.nhnacademy.back.coupon.coupon.exception.CouponNotFoundException;
-import com.nhnacademy.back.coupon.coupon.repository.*;
+import com.nhnacademy.back.coupon.coupon.repository.CategoryCouponJpaRepository;
+import com.nhnacademy.back.coupon.coupon.repository.CouponJpaRepository;
+import com.nhnacademy.back.coupon.coupon.repository.ProductCouponJpaRepository;
 import com.nhnacademy.back.coupon.coupon.service.impl.CouponServiceImpl;
 import com.nhnacademy.back.coupon.couponpolicy.domain.entity.CouponPolicy;
 import com.nhnacademy.back.coupon.couponpolicy.exception.CouponPolicyNotFoundException;
@@ -23,14 +36,7 @@ import com.nhnacademy.back.product.category.repository.CategoryJpaRepository;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.*;
-
+@ExtendWith(MockitoExtension.class)
 class CouponServiceTest {
 
 	@InjectMocks
@@ -48,11 +54,6 @@ class CouponServiceTest {
 	private CategoryJpaRepository categoryJpaRepository;
 	@Mock
 	private ProductJpaRepository productJpaRepository;
-
-	@BeforeEach
-	void setUp() {
-		MockitoAnnotations.openMocks(this);
-	}
 
 	@Test
 	@DisplayName("카테고리 쿠폰 생성 성공")
@@ -118,11 +119,11 @@ class CouponServiceTest {
 		CouponPolicy policy = mock(CouponPolicy.class);
 		Coupon coupon = new Coupon(policy, "생일 쿠폰");
 
-		when(couponJpaRepository.findById(5L)).thenReturn(Optional.of(coupon));
-		when(categoryCouponJpaRepository.findById(5L)).thenReturn(Optional.empty());
-		when(productCouponJpaRepository.findById(5L)).thenReturn(Optional.empty());
+		when(couponJpaRepository.findById(0L)).thenReturn(Optional.of(coupon));
+		when(categoryCouponJpaRepository.findById(0L)).thenReturn(Optional.empty());
+		when(productCouponJpaRepository.findById(0L)).thenReturn(Optional.empty());
 
-		ResponseCouponDTO result = couponService.getCoupon(5L);
+		ResponseCouponDTO result = couponService.getCoupon(0L);
 
 		assertThat(result.getCouponName()).isEqualTo("생일 쿠폰");
 	}
@@ -157,5 +158,26 @@ class CouponServiceTest {
 
 		assertThrows(CouponNotFoundException.class, () -> couponService.updateCouponIsActive(999L));
 	}
+
+	@Test
+	@DisplayName("활성화된 쿠폰만 조회")
+	void getCouponsIsActive_success() {
+		Pageable pageable = PageRequest.of(0, 10);
+		CouponPolicy policy = mock(CouponPolicy.class);
+		Coupon coupon = new Coupon(policy, "활성 쿠폰");
+		coupon.setCouponIsActive(true);
+
+		Page<Coupon> page = new PageImpl<>(List.of(coupon));
+
+		when(couponJpaRepository.findAllByCouponIsActiveTrue(pageable)).thenReturn(page);
+		when(categoryCouponJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
+		when(productCouponJpaRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+		Page<ResponseCouponDTO> result = couponService.getCouponsIsActive(pageable);
+
+		assertThat(result.getContent()).hasSize(1);
+		assertThat(result.getContent().get(0).isCouponIsActive()).isTrue();
+	}
+
 
 }

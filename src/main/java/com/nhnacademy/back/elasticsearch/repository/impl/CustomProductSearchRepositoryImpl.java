@@ -27,10 +27,10 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 	private final ElasticsearchOperations elasticsearchOperations;
 
-	private static final String productReviewCount = "productReviewCount";
-	private static final String productHits = "productHits";
-	private static final String productSearches = "productSearches";
-	private static final String productPublishedAt = "productPublishedAt";
+	private static final String PRODUCT_REVIEW_COUNT = "productReviewCount";
+	private static final String PRODUCT_HITS = "productHits";
+	private static final String PRODUCT_SEARCHES = "productSearches";
+	private static final String PRODUCT_PUBLISHED_AT = "productPublishedAt";
 
 	/**
 	 * 검색어로 검색 후 정렬
@@ -45,7 +45,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 			.or(new Criteria("productTags").matches(keyword).boost(5.0f));
 
 		if (sortType == ProductSortType.RATING) {
-			criteria = criteria.and(productReviewCount).greaterThanEqual(100);
+			criteria = criteria.and(PRODUCT_REVIEW_COUNT).greaterThanEqual(100);
 		}
 
 		return executeSearchWithCriteria(criteria, pageable, sortType);
@@ -59,7 +59,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 		Criteria criteria = Criteria.where("productCategoryIds").in(categoryId);
 
 		if (sortType == ProductSortType.RATING) {
-			criteria = criteria.and(productReviewCount).greaterThanEqual(100);
+			criteria = criteria.and(PRODUCT_REVIEW_COUNT).greaterThanEqual(100);
 		}
 
 		return executeSearchWithCriteria(criteria, pageable, sortType);
@@ -74,8 +74,8 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		Query query = new CriteriaQuery(criteria);
 		query.addSort(Sort.by(
-			Sort.Order.desc(productHits),
-			Sort.Order.desc(productSearches)
+			Sort.Order.desc(PRODUCT_HITS),
+			Sort.Order.desc(PRODUCT_SEARCHES)
 		));
 		query.setPageable(PageRequest.of(0, 12));
 
@@ -94,7 +94,7 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 		Criteria criteria = new Criteria();
 
 		Query query = new CriteriaQuery(criteria);
-		query.addSort(Sort.by(Sort.Order.desc(productPublishedAt)));
+		query.addSort(Sort.by(Sort.Order.desc(PRODUCT_PUBLISHED_AT)));
 		query.setPageable(PageRequest.of(0, 12));
 
 		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
@@ -117,8 +117,8 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		Query query = new CriteriaQuery(criteria);
 		query.addSort(Sort.by(
-			Sort.Order.desc(productHits),
-			Sort.Order.desc(productSearches)
+			Sort.Order.desc(PRODUCT_HITS),
+			Sort.Order.desc(PRODUCT_SEARCHES)
 		));
 		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
 
@@ -137,10 +137,10 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 	@Override
 	public Page<Long> newestSellerProductIds(Pageable pageable) {
 		LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
-		Criteria criteria = new Criteria(productPublishedAt).greaterThanEqual(threeMonthsAgo);
+		Criteria criteria = new Criteria(PRODUCT_PUBLISHED_AT).greaterThanEqual(threeMonthsAgo);
 
 		Query query = new CriteriaQuery(criteria);
-		query.addSort(Sort.by(Sort.Order.desc(productPublishedAt)));
+		query.addSort(Sort.by(Sort.Order.desc(PRODUCT_PUBLISHED_AT)));
 		query.setPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
 
 		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
@@ -183,14 +183,14 @@ public class CustomProductSearchRepositoryImpl implements CustomProductSearchRep
 
 		return switch (sortType) {
 			case POPULARITY -> Sort.by(
-				Sort.Order.desc(productHits),
-				Sort.Order.desc(productSearches)
+				Sort.Order.desc(PRODUCT_HITS),
+				Sort.Order.desc(PRODUCT_SEARCHES)
 			);
-			case LATEST -> Sort.by(Sort.Order.desc(productPublishedAt));
+			case LATEST -> Sort.by(Sort.Order.desc(PRODUCT_PUBLISHED_AT));
 			case LOW_PRICE -> Sort.by(Sort.Order.asc("productSalePrice"));
 			case HIGH_PRICE -> Sort.by(Sort.Order.desc("productSalePrice"));
 			case RATING -> Sort.by(Sort.Order.desc("productReviewRate"));
-			case REVIEW_COUNT -> Sort.by(Sort.Order.desc(productReviewCount));
+			case REVIEW_COUNT -> Sort.by(Sort.Order.desc(PRODUCT_REVIEW_COUNT));
 			default -> Sort.unsorted();
 		};
 	}

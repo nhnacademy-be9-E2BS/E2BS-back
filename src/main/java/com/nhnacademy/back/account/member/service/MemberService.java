@@ -38,6 +38,8 @@ public interface MemberService {
 
 	ResponseMemberStateDTO getMemberState(String memberId);
 
+	String getMemberRole(String memberId);
+
 	void changeDormantMemberStateActive(String memberId);
 
 	ResponseMemberEmailDTO getMemberEmail(String memberId);

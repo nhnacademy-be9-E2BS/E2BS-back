@@ -1,8 +1,7 @@
 package com.nhnacademy.back.coupon.membercoupon;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
@@ -70,7 +69,7 @@ class MemberCouponOrderControllerTest {
 			)
 		);
 
-		when(memberCouponService.getCouponsInOrderByMemberIdAndProductIds(eq(memberId), eq(productIds)))
+		when(memberCouponService.getCouponsInOrderByMemberIdAndProductIds(memberId, productIds))
 			.thenReturn(coupons);
 
 		mockMvc.perform(get("/api/order/{memberId}/coupons", memberId)

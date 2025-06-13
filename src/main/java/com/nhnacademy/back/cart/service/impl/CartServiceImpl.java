@@ -58,6 +58,23 @@ public class CartServiceImpl implements CartService {
 	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
 	/**
+	 * 회원 장바구니 생성 메소드
+	 */
+	@Transactional
+	@Override
+	public void createCartForMember(String memberId) {
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+		if (Objects.isNull(findMember)) {
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+		}
+		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
+			.orElseThrow(CustomerNotFoundException::new);
+
+		Cart cart = new Cart(findCustomer);
+		cartRepository.save(cart);
+	}
+
+	/**
 	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
 	@Transactional
@@ -98,7 +115,7 @@ public class CartServiceImpl implements CartService {
 		// 장바구니 아이템 생성
 		cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
 
-		return cart.getCartItems().size();
+		return cartItemsRepository.countByCart(cart);
 	}
 
 	/**
@@ -231,8 +248,9 @@ public class CartServiceImpl implements CartService {
 			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
-		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
-		return findCart.map(cart -> cart.getCartItems().size()).orElse(0);
+		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseThrow(CartNotFoundException::new);
+		return cartItemsRepository.countByCart(findCart);
 	}
 
 
@@ -448,6 +466,10 @@ public class CartServiceImpl implements CartService {
 			}
 		}
 
+		// 기존 세션의 장바구니 비워주기
+		CartDTO emptyCart = new CartDTO();
+		redisTemplate.opsForValue().set(sessionId, emptyCart);
+
 		return cart.getCartItems().size();
 	}
 
@@ -490,7 +512,7 @@ public class CartServiceImpl implements CartService {
 				}
 			}
 
-			return getCartItemsCountsForMember(findMember.getMemberId());
+			return cartItemsRepository.countByCart(findCart);
 		} else { // 비회원인 경우는 삭제만 처리하면 됨
 			Object o = redisTemplate.opsForValue().get(requestOrderCartDeleteDTO.getSessionId());
 			CartDTO cart = objectMapper.convertValue(o, CartDTO.class);

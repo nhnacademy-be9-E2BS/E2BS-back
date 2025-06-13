@@ -221,30 +221,34 @@ class CartServiceImplTest {
 		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO(memberId, null, productIds, quantities);
 
 		Member member = Member.builder()
-			.customerId(100L)
+			.customerId(1L)
 			.customer(customer)
 			.memberId(memberId)
 			.build();
 
-		Product product = Product.builder()
+		Product product1 = Product.builder()
 			.productId(1L)
+			.build();
+		Product product2 = Product.builder()
+			.productId(2L)
 			.build();
 
 		Cart cart = new Cart(customer);
-		CartItems item1 = new CartItems(cart, product, 5);
-		CartItems item2 = new CartItems(cart, product, 3);
+		CartItems item1 = new CartItems(cart, product1, 2);
+		CartItems item2 = new CartItems(cart, product2, 3);
 		cart.getCartItems().add(item1);
 		cart.getCartItems().add(item2);
 
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(cartRepository.findByCustomer_CustomerId(member.getCustomerId())).thenReturn(Optional.of(cart));
+		when(cartItemsRepository.countByCart(cart)).thenReturn(1);
 
 		// when
 		Integer result = cartService.deleteOrderCompleteCartItems(dto);
 
 		// then
-		assertEquals(1, result); // item1만 남음
-		verify(cartItemsRepository, times(1)).delete(item2);
+		assertEquals(1, result); // item2만 남음
+		verify(cartItemsRepository, times(1)).delete(item1);
 	}
 
 	@Test

@@ -33,7 +33,7 @@ public class OrderMypageController {
 	public ResponseEntity<ResponseMemberOrderDTO> getMemberOrders(@PathVariable("memberId") String memberId) {
 		ResponseMemberOrderDTO responseMemberOrderDTO = orderService.getMemberOrdersCnt(memberId);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseMemberOrderDTO);
+		return ResponseEntity.status(HttpStatus.OK).body(responseMemberOrderDTO);
 	}
 
 	/**

@@ -47,6 +47,26 @@ class CustomProductSearchRepositoryTest {
 		ProductSortType sortType = ProductSortType.RATING;
 
 		SearchHits<ProductDocument> searchHits = mockSearchHits(List.of(1L, 2L, 3L));
+		when(elasticsearchOperations.search(any(CriteriaQuery.class), eq(ProductDocument.class))).thenReturn(
+			searchHits);
+
+		// when
+		Page<Long> result = repository.searchAndSortProductIds(pageable, keyword, sortType);
+
+		// then
+		assertEquals(3, result.getContent().size());
+		verify(elasticsearchOperations).search(any(CriteriaQuery.class), eq(ProductDocument.class));
+	}
+
+	@Test
+	@DisplayName("searchAndSortProductIds 메소드 테스트 - no sorting")
+	void testSearchAndSortProductIds_noSort() {
+		// given
+		Pageable pageable = PageRequest.of(0, 10);
+		String keyword = "test";
+		ProductSortType sortType = ProductSortType.NO_SORT;
+
+		SearchHits<ProductDocument> searchHits = mockSearchHits(List.of(1L, 2L, 3L));
 
 		when(elasticsearchOperations.search(any(CriteriaQuery.class), eq(ProductDocument.class))).thenReturn(
 			searchHits);
@@ -56,6 +76,24 @@ class CustomProductSearchRepositoryTest {
 
 		// then
 		assertEquals(3, result.getContent().size());
+		verify(elasticsearchOperations).search(any(CriteriaQuery.class), eq(ProductDocument.class));
+	}
+
+	@Test
+	@DisplayName("categoryAndSortProductIds 메소드 테스트 - sorting")
+	void testCategoryAndSortProductIds_ratingSort() {
+		Pageable pageable = PageRequest.of(0, 5);
+		Long categoryId = 100L;
+		ProductSortType sortType = ProductSortType.RATING;
+
+		SearchHits<ProductDocument> searchHits = mockSearchHits(List.of(10L, 20L));
+
+		when(elasticsearchOperations.search(any(CriteriaQuery.class), eq(ProductDocument.class))).thenReturn(
+			searchHits);
+
+		Page<Long> result = repository.categoryAndSortProductIds(pageable, categoryId, sortType);
+
+		assertEquals(2, result.getContent().size());
 		verify(elasticsearchOperations).search(any(CriteriaQuery.class), eq(ProductDocument.class));
 	}
 
