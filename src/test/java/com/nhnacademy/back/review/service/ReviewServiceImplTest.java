@@ -313,8 +313,10 @@ class ReviewServiceImplTest {
 		when(memberRepository.getMemberByMemberId("wrongId")).thenReturn(null);
 
 		// when & then
-		assertThrows(NotFoundMemberException.class,
-			() -> reviewService.getReviewsByMember("wrongId", Pageable.unpaged()));
+		assertThrows(NotFoundMemberException.class, () -> {
+			Pageable pageable = Pageable.unpaged();  // 예외가 발생할 수 있는 코드 분리
+			reviewService.getReviewsByMember("wrongId", pageable);
+		});
 	}
 
 	@Test

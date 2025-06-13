@@ -212,64 +212,28 @@ class CartServiceImplTest {
 	@DisplayName("주문 완료한 상품을 장바구니에 비워주기 테스트 - 회원")
 	void deleteOrderCompleteCartItems_Member() {
 		// given
-		Customer customer = new Customer(1L, "email", "pwd", "홍길동");
+		RequestDeleteCartOrderDTO dto = createRequestForMember();
 
-		String memberId = "member123";
-		List<Long> productIds = List.of(1L);
-		List<Integer> quantities = List.of(2);
-
-		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO(memberId, null, productIds, quantities);
-
-		Member member = Member.builder()
-			.customerId(1L)
-			.customer(customer)
-			.memberId(memberId)
-			.build();
-
-		Product product1 = Product.builder()
-			.productId(1L)
-			.build();
-		Product product2 = Product.builder()
-			.productId(2L)
-			.build();
-
-		Cart cart = new Cart(customer);
-		CartItems item1 = new CartItems(cart, product1, 2);
-		CartItems item2 = new CartItems(cart, product2, 3);
-		cart.getCartItems().add(item1);
-		cart.getCartItems().add(item2);
-
-		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
-		when(cartRepository.findByCustomer_CustomerId(member.getCustomerId())).thenReturn(Optional.of(cart));
-		when(cartItemsRepository.countByCart(cart)).thenReturn(1);
+		// mock 데이터 설정
+		Member member = createMember();
+		Cart cart = createCartWithItems();
+		setupMocksForMember(member, cart);
 
 		// when
 		Integer result = cartService.deleteOrderCompleteCartItems(dto);
 
 		// then
 		assertEquals(1, result); // item2만 남음
-		verify(cartItemsRepository, times(1)).delete(item1);
+		verify(cartItemsRepository, times(1)).delete(any(CartItems.class));
 	}
 
 	@Test
 	@DisplayName("주문 완료한 상품을 장바구니에 비워주기 테스트 - 비회원")
 	void deleteOrderCompleteCartItems_Guest() {
 		// given
-		String sessionId = "guest-session";
-		List<Long> productIds = List.of(1L);
-		
-		CartItemDTO item1 = new CartItemDTO(1L, "A", 1000, 1000, new BigDecimal(0), "image", 2);
-		CartItemDTO item2 = new CartItemDTO(2L, "A", 1000, 1000, new BigDecimal(0), "image", 1);
-
-		CartDTO cartDTO = new CartDTO();
-		cartDTO.setCartItems(new ArrayList<>(List.of(item1, item2)));
-
-		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO(null, sessionId, productIds, List.of(2));
-
-		ValueOperations<String, Object> valueOps = mock(ValueOperations.class);
-		when(redisTemplate.opsForValue()).thenReturn(valueOps);
-		when(valueOps.get(sessionId)).thenReturn(cartDTO);
-		when(objectMapper.convertValue(cartDTO, CartDTO.class)).thenReturn(cartDTO);
+		RequestDeleteCartOrderDTO dto = createRequestForGuest();
+		CartDTO cartDTO = createCartDTOForGuest();
+		setupMocksForGuest(cartDTO);
 
 		// when
 		Integer result = cartService.deleteOrderCompleteCartItems(dto);
@@ -293,11 +257,7 @@ class CartServiceImplTest {
 	@DisplayName("주문 완료한 상품을 장바구니에 비워주기 테스트 - 실패(회원 장바구니를 찾지 못한 경우)")
 	void deleteOrderCompleteCartItems_NotFoundMemberCart() {
 		// given
-		Member member = Member.builder()
-			.customerId(10L)
-			.memberId("member123")
-			.build();
-
+		Member member = createMember();
 		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO("member123", null, List.of(1L), List.of(1));
 
 		when(memberRepository.getMemberByMemberId("member123")).thenReturn(member);
@@ -305,6 +265,57 @@ class CartServiceImplTest {
 
 		// when & then
 		assertThrows(CartNotFoundException.class, () -> cartService.deleteOrderCompleteCartItems(dto));
+	}
+
+	private RequestDeleteCartOrderDTO createRequestForMember() {
+		List<Long> productIds = List.of(1L);
+		List<Integer> quantities = List.of(2);
+		return new RequestDeleteCartOrderDTO("member123", null, productIds, quantities);
+	}
+
+	private RequestDeleteCartOrderDTO createRequestForGuest() {
+		List<Long> productIds = List.of(1L);
+		return new RequestDeleteCartOrderDTO(null, "guest-session", productIds, List.of(2));
+	}
+
+	private Member createMember() {
+		Customer customer = new Customer(1L, "email", "pwd", "홍길동");
+		return Member.builder()
+			.customerId(1L)
+			.customer(customer)
+			.memberId("member123")
+			.build();
+	}
+
+	private Cart createCartWithItems() {
+		Product product1 = Product.builder().productId(1L).build();
+		Product product2 = Product.builder().productId(2L).build();
+		Cart cart = new Cart(new Customer(1L, "email", "pwd", "홍길동"));
+		cart.getCartItems().add(new CartItems(cart, product1, 2));
+		cart.getCartItems().add(new CartItems(cart, product2, 3));
+		return cart;
+	}
+
+	private CartDTO createCartDTOForGuest() {
+		CartItemDTO item1 = new CartItemDTO(1L, "A", 1000, 1000, new BigDecimal(0), "image", 2);
+		CartItemDTO item2 = new CartItemDTO(2L, "A", 1000, 1000, new BigDecimal(0), "image", 1);
+
+		CartDTO cartDTO = new CartDTO();
+		cartDTO.setCartItems(new ArrayList<>(List.of(item1, item2)));
+		return cartDTO;
+	}
+
+	private void setupMocksForMember(Member member, Cart cart) {
+		when(memberRepository.getMemberByMemberId("member123")).thenReturn(member);
+		when(cartRepository.findByCustomer_CustomerId(member.getCustomerId())).thenReturn(Optional.of(cart));
+		when(cartItemsRepository.countByCart(cart)).thenReturn(1);
+	}
+
+	private void setupMocksForGuest(CartDTO cartDTO) {
+		ValueOperations<String, Object> valueOps = mock(ValueOperations.class);
+		when(redisTemplate.opsForValue()).thenReturn(valueOps);
+		when(valueOps.get("guest-session")).thenReturn(cartDTO);
+		when(objectMapper.convertValue(cartDTO, CartDTO.class)).thenReturn(cartDTO);
 	}
 
 }

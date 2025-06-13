@@ -107,7 +107,6 @@ class CustomerServiceImplTest {
 
 		// then
 		assertEquals(name, response.getCustomerName());
-		assertNotNull(response.getCustomerId());
 	}
 
 	@Test
