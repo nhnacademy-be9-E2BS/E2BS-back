@@ -1,5 +1,6 @@
 package com.nhnacademy.back.product.product.api;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -7,6 +8,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 public class AladdinOpenAPI {
 	String query;
@@ -76,7 +81,7 @@ public class AladdinOpenAPI {
 		return baseUrl + sb;
 	}
 
-	public List<Item> searchBooks() throws Exception {
+	public List<Item> searchBooks() throws IOException, ParserConfigurationException, SAXException {
 		String searchUrl = getSerachUrl(this.query, this.queryType);
 		api.parseXml(searchUrl);
 		if (api.getItems().isEmpty()) {
@@ -86,11 +91,11 @@ public class AladdinOpenAPI {
 		}
 	}
 
-	public List<Item> getListBooks() throws Exception {
+	public List<Item> getListBooks() throws IOException, ParserConfigurationException, SAXException {
 		String listUrl = getListUrl(this.queryType);
 		api.parseXml(listUrl);
 		if (api.getItems().isEmpty()) {
-			return null;
+			return api.getItems();
 		} else {
 			return new ArrayList<>(api.getItems());
 		}

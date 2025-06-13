@@ -189,35 +189,9 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		Product product = productJpaRepository.save(Product.createProductApiEntity(request, publisher, state));
 
 		List<String> tagNames = new ArrayList<>();
-		List<String> contributorNames = new ArrayList<>();
+		List<String> contributorNames = saveContributors(request.getContributors(), product);
 
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
-
-		Map<String, String> map = parse(request.getContributors());
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String contributorName = entry.getKey();
-			String positionName = entry.getValue();
-
-			if (!positionJpaRepository.existsByPositionName(positionName)) {
-				positionJpaRepository.save(new Position(positionName));
-			}
-
-			Position position = positionJpaRepository.findPositionByPositionName(positionName);
-			Contributor contributor = new Contributor(contributorName, position);
-
-
-			//중복 검사
-			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
-				continue;
-			} else {
-				contributorJpaRepository.save(contributor);
-				contributorNames.add(contributorName);
-			}
-
-			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
-			ProductContributor productContributor = new ProductContributor(contributor, product);
-			productContributorJpaRepository.save(productContributor);
-		}
 
 		//request에 담긴 categoryID들로 카테고리 찾아서 categoryProduct 테이블에 상품아이디랑 카테고리 아이디 넣기
 		List<Long> categoryIds = request.getCategoryIds();
@@ -283,35 +257,10 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		Product product = Product.createProductApiByQueryEntity(request, publisher, state);
 
 		List<String> tagNames = new ArrayList<>();
-		List<String> contributorNames = new ArrayList<>();
+		List<String> contributorNames = saveContributors(request.getContributors(), product);
 
 		productJpaRepository.save(product);
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
-		Map<String, String> map = parse(request.getContributors());
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String contributorName = entry.getKey();
-			String positionName = entry.getValue();
-
-			if (!positionJpaRepository.existsByPositionName(positionName)) {
-				positionJpaRepository.save(new Position(positionName));
-			}
-
-			Position position = positionJpaRepository.findPositionByPositionName(positionName);
-			Contributor contributor = new Contributor(contributorName, position);
-
-
-			//중복 검사
-			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
-				continue;
-			} else {
-				contributorJpaRepository.save(contributor);
-				contributorNames.add(contributorName);
-			}
-
-			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
-			ProductContributor productContributor = new ProductContributor(contributor, product);
-			productContributorJpaRepository.save(productContributor);
-		}
 
 		String categoryName = request.getQueryType(); //파라미터로 들어온 카테고리 이름
 		if (categoryName == null) {
@@ -357,6 +306,35 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 			tagNames, contributorNames,
 			productCategoryJpaRepository.findCategoryIdsByProductId(product.getProductId())));
 	}
+
+	private List<String> saveContributors(String contributorStr, Product product) {
+		Map<String, String> map = parse(contributorStr);
+		List<String> contributorNames = new ArrayList<>();
+
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String contributorName = entry.getKey();
+			String positionName = entry.getValue();
+
+			if (!positionJpaRepository.existsByPositionName(positionName)) {
+				positionJpaRepository.save(new Position(positionName));
+			}
+			Position position = positionJpaRepository.findPositionByPositionName(positionName);
+			Contributor contributor = new Contributor(contributorName, position);
+
+			//중복 검사
+			if (contributorJpaRepository.existsByContributorNameAndPosition(contributorName, position)) {
+				continue;
+			} else {
+				contributorJpaRepository.save(contributor);
+				contributorNames.add(contributorName);
+			}
+			// productContribuotr 테이블에 기여자 아이디랑 상품 아이디 저장하기
+			ProductContributor productContributor = new ProductContributor(contributor, product);
+			productContributorJpaRepository.save(productContributor);
+		}
+		return contributorNames;
+	}
+
 
 	private Map<String, String> parse(String contributors) {
 		String[] contributorArr = contributors.split(",");

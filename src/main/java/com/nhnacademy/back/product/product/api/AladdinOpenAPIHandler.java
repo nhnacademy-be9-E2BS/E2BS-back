@@ -30,12 +30,10 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 		return items;
 	}
 
-
 	@Override
 	public void startDocument() throws SAXException {
 		items = new ArrayList<>();
 	}
-
 
 	@Override
 	public void startElement(String namespace, String localName, String qName, Attributes atts) {
@@ -62,12 +60,13 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 			tempValue = "";
 		} else if (localName.equals("stockstatus")) {
 			tempValue = "";
-		}  else if (localName.equals("pubDate")) {
+		} else if (localName.equals("pubDate")) {
 			tempValue = "";
+		}
+
 	}
 
-}
-
+	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		tempValue = tempValue + new String(ch, start, length);
 	}
@@ -114,7 +113,6 @@ public class AladdinOpenAPIHandler extends DefaultHandler {
 			while ((line = in.readLine()) != null) {
 				response.append(line);
 			}
-			in.close();
 		}
 
 		String fixedXml = response.toString()
