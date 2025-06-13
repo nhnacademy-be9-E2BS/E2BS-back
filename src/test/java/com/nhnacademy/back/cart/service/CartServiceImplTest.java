@@ -215,7 +215,7 @@ class CartServiceImplTest {
 		RequestDeleteCartOrderDTO dto = createRequestForMember();
 
 		// mock 데이터 설정
-		Member member = createMember("member123");
+		Member member = createMember();
 		Cart cart = createCartWithItems();
 		setupMocksForMember(member, cart);
 
@@ -257,7 +257,7 @@ class CartServiceImplTest {
 	@DisplayName("주문 완료한 상품을 장바구니에 비워주기 테스트 - 실패(회원 장바구니를 찾지 못한 경우)")
 	void deleteOrderCompleteCartItems_NotFoundMemberCart() {
 		// given
-		Member member = createMember("member123");
+		Member member = createMember();
 		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO("member123", null, List.of(1L), List.of(1));
 
 		when(memberRepository.getMemberByMemberId("member123")).thenReturn(member);
@@ -278,12 +278,12 @@ class CartServiceImplTest {
 		return new RequestDeleteCartOrderDTO(null, "guest-session", productIds, List.of(2));
 	}
 
-	private Member createMember(String memberId) {
+	private Member createMember() {
 		Customer customer = new Customer(1L, "email", "pwd", "홍길동");
 		return Member.builder()
 			.customerId(1L)
 			.customer(customer)
-			.memberId(memberId)
+			.memberId("member123")
 			.build();
 	}
 
