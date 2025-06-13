@@ -332,7 +332,7 @@ class AddressServiceImplTest {
 
 	@Test
 	@DisplayName("배송지 삭제 메서드 DeleteAddressFailedException 테스트")
-	void deleteAddressMethodDeleteAddressFailedExceptionTest() throws Exception {
+	void deleteAddressMethodDeleteAddressFailedExceptionTest() {
 
 		// Given
 

@@ -27,7 +27,7 @@ class MemberRankServiceImplTest {
 
 	@Test
 	@DisplayName("회원 등급 조회 메서드 테스트")
-	void getMemberRanksMethodTest() throws Exception {
+	void getMemberRanksMethodTest() {
 
 		// Given
 		List<MemberRank> memberRanks = List.of(
