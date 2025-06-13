@@ -35,13 +35,13 @@ class CartRestControllerForMemberTest {
 
 
 	@Test
-	@DisplayName("POST /api/auth/members/carts - 회원 장바구니 생성 테스트")
+	@DisplayName("POST /api/members/carts - 회원 장바구니 생성 테스트")
 	void createCartForMember() throws Exception {
 		// given
 		String memberId = "memberId1";
 
 		// when & then
-		mockMvc.perform(post("/api/auth/members/{memberId}/carts", memberId)
+		mockMvc.perform(post("/api/members/{memberId}/carts", memberId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
 	}

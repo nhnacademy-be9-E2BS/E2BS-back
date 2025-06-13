@@ -98,6 +98,7 @@ public class OAuthService {
 		}
 	}
 
+	@Transactional
 	public void paycoLastLogin(String memberId) {
 		try {
 			LocalDate loginLatest = LocalDate.now();
