@@ -45,13 +45,15 @@ class MemberRankSchedulerTest {
 		when(jobLauncher.run(eq(rankMemberJob), any(JobParameters.class)))
 			.thenThrow(new RuntimeException("실패 테스트"));
 
-		// When
+		// When & Then
 		try {
 			memberRankScheduler.runInactiveMemberJob();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			System.out.println("exception occur");
 		}
 
-		// Then
 		verify(jobLauncher, times(1)).run(eq(rankMemberJob), any(JobParameters.class));
 	}
+
+
 }

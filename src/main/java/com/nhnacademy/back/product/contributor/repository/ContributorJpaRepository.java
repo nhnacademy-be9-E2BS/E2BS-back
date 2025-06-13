@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.back.product.contributor.domain.entity.Contributor;
+import com.nhnacademy.back.product.contributor.domain.entity.Position;
 
 public interface ContributorJpaRepository extends JpaRepository<Contributor, Long> {
 	boolean existsByContributorName(String contributorName);
@@ -13,4 +14,6 @@ public interface ContributorJpaRepository extends JpaRepository<Contributor, Lon
 	List<Contributor> findAllByContributorNameIn(List<String> contributorName);
 
 	Optional<Contributor> findByContributorName(String contributorName);
+
+	boolean existsByContributorNameAndPosition(String contributorName, Position position);
 }

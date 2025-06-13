@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +36,12 @@ public class CustomerRegisterController {
 	private final CustomerService customerService;
 
 
-	@Operation(summary = "비회원 등록", description = "비회원의 이메일, 이름, 비밀번호 등을 입력하여 등록을 수행합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "비회원 등록 성공", content = @Content(schema = @Schema(implementation = ResponseCustomerDTO.class))),
-		@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
-	})
+	@Operation(summary = "비회원 등록",
+		description = "비회원의 이메일, 이름, 비밀번호 등을 입력하여 등록을 수행합니다.",
+		responses = {
+			@ApiResponse(responseCode = "201", description = "비회원 등록 성공", content = @Content(schema = @Schema(implementation = ResponseCustomerDTO.class))),
+			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
+		})
 	@PostMapping
 	public ResponseEntity<ResponseCustomerDTO> registerCustomer(@Parameter(description = "비회원 등록 요청 DTO", required = true) @Valid @RequestBody RequestCustomerRegisterDTO requestCustomerRegisterDTO,
 		                                                        @Parameter(hidden = true) BindingResult bindingResult) {
