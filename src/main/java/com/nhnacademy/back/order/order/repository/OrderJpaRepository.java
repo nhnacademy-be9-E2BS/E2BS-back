@@ -50,12 +50,10 @@ public interface OrderJpaRepository extends JpaRepository<Order, String> {
 		Long customerId,
 		LocalDateTime startDate, LocalDateTime endDate);
 
-	@Query("""
-			SELECT o FROM Order o
-			WHERE o.customer.customerId = :customerId
-			  AND LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%'))
-			ORDER BY o.orderCreatedAt DESC
-		""")
+	@Query("SELECT o FROM Order o " +
+		"WHERE o.customer.customerId = :customerId " +
+		"AND LOWER(o.orderCode) LIKE LOWER(CONCAT('%', :orderCode, '%')) " +
+		"ORDER BY o.orderCreatedAt DESC")
 	Page<Order> searchByCustomerIdAndOrderCodeIgnoreCase(
 		@Param("customerId") Long customerId,
 		@Param("orderCode") String orderCode,

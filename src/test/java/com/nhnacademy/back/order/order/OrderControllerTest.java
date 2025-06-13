@@ -40,7 +40,7 @@ import com.nhnacademy.back.order.payment.service.PaymentService;
 
 @WebMvcTest(OrderController.class)
 @ActiveProfiles("dev")
-public class OrderControllerTest {
+class OrderControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
