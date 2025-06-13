@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.nhnacademy.back.product.category.initializer.CategoryCacheInitializer;
 
-public class CategoryCacheInitializerTest {
+class CategoryCacheInitializerTest {
 
 	@Test
 	@DisplayName("Redis에 해당 키들이 있을 경우 삭제되는지 확인")
