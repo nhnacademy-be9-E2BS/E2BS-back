@@ -7,8 +7,6 @@ import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -497,9 +495,10 @@ public class OrderServiceImpl implements OrderService {
 			throw new NotFoundMemberException("회원을 찾지 못했습니다.");
 		}
 
-		Optional<OrderState> orderStateWait = orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT);
-		Optional<OrderState> orderStateDelivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY);
-		List<OrderState> orderStates = Arrays.asList(orderStateWait.get(), orderStateDelivery.get());
+		OrderState orderStateWait = orderStateJpaRepository.findByOrderStateName(OrderStateName.WAIT).orElse(null);
+		OrderState orderStateDelivery = orderStateJpaRepository.findByOrderStateName(OrderStateName.DELIVERY)
+			.orElse(null);
+		List<OrderState> orderStates = Arrays.asList(orderStateWait, orderStateDelivery);
 
 		List<Order> orders = orderJpaRepository.findOrdersByCustomerAndOrderState(
 			member.getCustomer(), orderStates
@@ -522,7 +521,7 @@ public class OrderServiceImpl implements OrderService {
 				products,
 				order.getOrderState().getOrderStateName().name()
 			);
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 
 }
