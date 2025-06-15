@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "회원 장바구니 상품 응답 DTO")
 public class ResponseCartItemsForMemberDTO {
 
-	@Schema(description = "장바구니 항목 ID", example = "1")
-	private long cartItemsId;
-
 	@Schema(description = "상품 ID", example = "1001")
 	private long productId;
 

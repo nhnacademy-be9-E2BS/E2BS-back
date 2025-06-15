@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGuestDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestMergeCartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
@@ -100,9 +102,8 @@ public class CartRestController {
 
 		})
 	@Member
-	@PutMapping("/api/auth/members/carts/items/{cartItemId}")
-	public ResponseEntity<Integer> updateCartItemForMember(@Parameter(description = "카트 항목 ID", required = true) @PathVariable long cartItemId,
-		                                                   @Parameter(description = "수정 요청 DTO", required = true) @Valid @RequestBody RequestUpdateCartItemsDTO requestDto,
+	@PutMapping("/api/auth/members/carts/items")
+	public ResponseEntity<Integer> updateCartItemForMember(@Parameter(description = "수정 요청 DTO", required = true) @Valid @RequestBody RequestUpdateCartItemsDTO requestDto,
 		                                                   @Parameter(hidden = true) BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new ValidationFailedException(bindingResult);
@@ -111,16 +112,16 @@ public class CartRestController {
 			throw new IllegalArgumentException("회원아이디와 세션아이디 둘 다 null 일 수 는 없습니다.");
 		}
 
-		int cartQuantity = cartService.updateCartItemForMember(cartItemId, requestDto);
+		int cartQuantity = cartService.updateCartItemForMember(requestDto);
 		return ResponseEntity.ok(cartQuantity);
 	}
 
 	@Operation(summary = "회원 장바구니 상품 삭제", description = "회원 장바구니의 특정 상품을 삭제합니다.")
 	@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공")
 	@Member
-	@DeleteMapping("/api/auth/members/carts/items/{cartItemId}")
-	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "카트 항목 ID", required = true) @PathVariable long cartItemId) {
-		cartService.deleteCartItemForMember(cartItemId);
+	@DeleteMapping("/api/auth/members/carts/items")
+	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "삭제 요청 DTO", required = true) @ModelAttribute RequestDeleteCartItemsForMemberDTO request) {
+		cartService.deleteCartItemForMember(request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
