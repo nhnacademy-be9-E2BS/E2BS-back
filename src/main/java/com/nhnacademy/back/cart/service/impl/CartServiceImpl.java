@@ -247,9 +247,8 @@ public class CartServiceImpl implements CartService {
 			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
 		}
 
-		Cart findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
-			.orElseThrow(CartNotFoundException::new);
-		return cartItemsRepository.countByCart(findCart);
+		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
+		return findCart.map(cartItemsRepository::countByCart).orElse(0);
 	}
 
 
@@ -524,7 +523,7 @@ public class CartServiceImpl implements CartService {
 		for (CartItems cartItem : copiedCartItems) {
 			for (int i = 0; i < productIds.size(); i++) {
 				if (cartItem.getProduct().getProductId() == productIds.get(i)) {
-					int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i) * 2;
+					int newQuantity = cartItem.getCartItemsQuantity() - cartQuantities.get(i);
 
 					if (newQuantity > 0) {
 						cartItem.changeCartItemsQuantity(newQuantity);
@@ -541,12 +540,15 @@ public class CartServiceImpl implements CartService {
 	// 비회원일 경우 처리
 	private Integer deleteForNonMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		CartDTO cart = getCartFromRedis(requestOrderCartDeleteDTO.getSessionId());
+		if (Objects.nonNull(cart) && Objects.nonNull(cart.getCartItems())) {
+			// CartItems 필터링
+			List<CartItemDTO> filteredItems = filterCartItems(cart.getCartItems(), requestOrderCartDeleteDTO.getProductIds());
+			cart.setCartItems(filteredItems);
 
-		// CartItems 필터링
-		List<CartItemDTO> filteredItems = filterCartItems(cart.getCartItems(), requestOrderCartDeleteDTO.getProductIds());
-		cart.setCartItems(filteredItems);
+			return cart.getCartItems().size();
+		}
 
-		return cart.getCartItems().size();
+		return 0;
 	}
 
 	// Redis에서 Cart 정보 조회

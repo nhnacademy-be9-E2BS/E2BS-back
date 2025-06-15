@@ -144,7 +144,6 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 상품 수 조회", description = "회원 ID로 장바구니에 담긴 상품 수를 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "장바구니 상품 수 조회 성공", content = @Content(schema = @Schema(implementation = Integer.class)))
-	@Member
 	@GetMapping("/api/carts/counts")
 	public ResponseEntity<Integer> getCartItemsCountsForMember(@Parameter(description = "회원 ID", required = true) @RequestParam String memberId) {
 		Integer result = cartService.getCartItemsCountsForMember(memberId);
