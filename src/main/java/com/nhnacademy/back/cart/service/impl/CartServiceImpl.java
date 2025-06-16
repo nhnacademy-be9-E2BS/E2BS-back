@@ -513,8 +513,8 @@ public class CartServiceImpl implements CartService {
 
 	// 회원의 Cart 조회
 	private Cart findCartForMember(Member findMember) {
-		return cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
-			.orElseThrow(CartNotFoundException::new);
+		Optional<Cart> findCart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId());
+		return findCart.orElse(null);
 	}
 
 	// CartItems의 수량을 업데이트하거나 삭제
