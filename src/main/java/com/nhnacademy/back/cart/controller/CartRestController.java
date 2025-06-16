@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -120,7 +119,12 @@ public class CartRestController {
 	@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공")
 	@Member
 	@DeleteMapping("/api/auth/members/carts/items")
-	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "삭제 요청 DTO", required = true) @ModelAttribute RequestDeleteCartItemsForMemberDTO request) {
+	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "삭제 요청 DTO", required = true) @Valid @RequestBody RequestDeleteCartItemsForMemberDTO request,
+		                                                @Parameter(hidden = true) BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			throw new ValidationFailedException(bindingResult);
+		}
+
 		cartService.deleteCartItemForMember(request);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

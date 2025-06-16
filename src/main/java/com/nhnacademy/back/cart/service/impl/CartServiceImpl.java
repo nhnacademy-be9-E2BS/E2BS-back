@@ -487,14 +487,17 @@ public class CartServiceImpl implements CartService {
 		Object o;
 		CartDTO orderCart;
 
+		// 회원인 경우
 		if (isMember(requestOrderCartDeleteDTO)) {
 			o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
-		} else {
-			o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
+			orderCart = objectMapper.convertValue(o, CartDTO.class);
+			return deleteOrderComplete(MEMBER_HASH_NAME, orderCart, requestOrderCartDeleteDTO);
 		}
-		orderCart = objectMapper.convertValue(o, CartDTO.class);
 		
-		return deleteOrderComplete(orderCart, requestOrderCartDeleteDTO);
+		// 게스트인 경우
+		o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
+		orderCart = objectMapper.convertValue(o, CartDTO.class);
+		return deleteOrderComplete(GUEST_HASH_NAME, orderCart, requestOrderCartDeleteDTO);
 	}
 
 	// 회원 여부 확인
@@ -503,23 +506,22 @@ public class CartServiceImpl implements CartService {
 	}
 	
 	// 장바구니 삭제 메소드
-	private Integer deleteOrderComplete(CartDTO orderCart, RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
+	private Integer deleteOrderComplete(String hashName, CartDTO orderCart, RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		if (Objects.nonNull(orderCart) && Objects.nonNull(orderCart.getCartItems())) {
-			// CartItems 필터링
-			List<CartItemDTO> filteredItems = filterCartItems(orderCart.getCartItems(), requestOrderCartDeleteDTO.getProductIds());
-			orderCart.setCartItems(filteredItems);
+			// CartItems 필터링 : CartItems에서 특정 상품들을 제외한 새로운 리스트 생성
+			List<CartItemDTO> filteredItems = orderCart.getCartItems().stream()
+				.filter(item -> requestOrderCartDeleteDTO.getProductIds().stream().noneMatch(id -> id.equals(item.getProductId())))
+				.toList();
 
+			// 기존 장바구니에 삭제된 항목 갱신된 리스트로 적용
+			orderCart.setCartItems(filteredItems);
+			
+			// 삭제한 cart로 갱신
+			redisTemplate.opsForHash().put(hashName, requestOrderCartDeleteDTO.getMemberId(), orderCart);
 			return orderCart.getCartItems().size();
 		}
 
 		return 0;
-	}
-
-	// CartItems에서 특정 상품들을 제외한 새로운 리스트 생성
-	private List<CartItemDTO> filterCartItems(List<CartItemDTO> cartItems, List<Long> productIds) {
-		return cartItems.stream()
-			.filter(item -> productIds.stream().noneMatch(id -> id.equals(item.getProductId())))
-			.toList();
 	}
 
 }
