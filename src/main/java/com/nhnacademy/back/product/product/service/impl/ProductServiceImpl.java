@@ -24,6 +24,7 @@ import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.elasticsearch.domain.dto.request.RequestProductDocumentDTO;
 import com.nhnacademy.back.elasticsearch.service.ProductSearchService;
+import com.nhnacademy.back.product.category.domain.dto.response.ResponseCategoryDTO;
 import com.nhnacademy.back.product.category.domain.entity.Category;
 import com.nhnacademy.back.product.category.domain.entity.ProductCategory;
 import com.nhnacademy.back.product.category.exception.CategoryNotFoundException;
@@ -60,6 +61,7 @@ import com.nhnacademy.back.product.state.domain.entity.ProductState;
 import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 import com.nhnacademy.back.product.state.exception.ProductStateNotFoundException;
 import com.nhnacademy.back.product.state.repository.ProductStateJpaRepository;
+import com.nhnacademy.back.product.tag.domain.dto.response.ResponseTagDTO;
 import com.nhnacademy.back.product.tag.domain.entity.ProductTag;
 import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.exception.TagNotFoundException;
@@ -527,4 +529,26 @@ public class ProductServiceImpl implements ProductService {
 		);
 	}
 
+	/**
+	 * 도서의 카테고리와 태그를 이용해 연관도서를 가져오는 메서드
+	 */
+	@Override
+	public List<ResponseProductReadDTO> getRecommendedProducts(Long bookId, String memberId) {
+		ResponseProductReadDTO currentBook = getProduct(bookId, memberId);
+		List<Long> categoryIds = currentBook.getCategories().stream()
+			.map(ResponseCategoryDTO::getCategoryId)
+			.collect(Collectors.toList());
+		List<Long> tagIds = currentBook.getTags().stream()
+			.map(ResponseTagDTO::getTagId)
+			.collect(Collectors.toList());
+
+		List<Product> recommendedBooks = productJpaRepository.findByCategoriesInOrTagsIn(categoryIds, tagIds, bookId);
+
+		return recommendedBooks.stream()
+			.limit(6)
+			.map(product -> getProductByChangedImagePath(product, memberId))
+			.collect(Collectors.toList());
+	}
 }
+
+

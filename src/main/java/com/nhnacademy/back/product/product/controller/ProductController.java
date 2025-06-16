@@ -58,4 +58,21 @@ public class ProductController {
 		List<ResponseProductReadDTO> productsDTO = productService.getProducts(products);
 		return ResponseEntity.status(HttpStatus.OK).body(productsDTO);
 	}
+
+	/**
+	 * 도서 상세조회 시 연관 도서 5권을 반환
+	 * 200 상태코드 반환
+	 */
+	@Operation(summary = "도서 ID로 상품의 연관 도서 조회",
+		description = "연관 도서를 조회합니다.",
+		responses = {
+			@ApiResponse(responseCode = "200", description = "조회 성공")
+		})
+	@GetMapping("/{book-id}/recommend-books")
+	public ResponseEntity<List<ResponseProductReadDTO>> getRecommendedProducts(
+		@Parameter(description = "조회할 도서 ID", example = "1", required = true) @PathVariable("book-id") long bookId,
+		@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId) {
+		List<ResponseProductReadDTO> response = productService.getRecommendedProducts(bookId, memberId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 }
