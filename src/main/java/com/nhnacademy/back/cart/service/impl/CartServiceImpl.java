@@ -493,6 +493,9 @@ public class CartServiceImpl implements CartService {
 	private Integer deleteForMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		Member findMember = findMember(requestOrderCartDeleteDTO.getMemberId());
 		Cart findCart = findCartForMember(findMember);
+		if (Objects.isNull(findCart)) {
+			return 0;
+		}
 
 		List<CartItems> cartItems = findCart.getCartItems();
 
