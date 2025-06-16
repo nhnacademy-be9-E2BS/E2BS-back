@@ -38,4 +38,7 @@ public interface ProductService {
 
 	//메인페이지 전용 - id 리스트를 받아서 도서 조회
 	List<ResponseMainPageProductDTO> getProductsToMain(List<Long> productIds);
+
+	// 연관도서 조회
+	List<ResponseProductReadDTO> getRecommendedProducts(Long bookId, String memberId);
 }

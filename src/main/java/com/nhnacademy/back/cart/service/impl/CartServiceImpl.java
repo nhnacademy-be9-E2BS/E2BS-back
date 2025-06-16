@@ -27,6 +27,8 @@ import com.nhnacademy.back.cart.exception.CartAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.service.CartService;
+import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -44,6 +46,8 @@ public class CartServiceImpl implements CartService {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper;
 
+	private final MinioUtils minioUtils;
+	private static final String PRODUCT_BUCKET = "e2bs-products-image";
 
 	private static final String MEMBER_HASH_NAME = "MemberCart:";
 	private static final String GUEST_HASH_NAME = "GuestCart:";
@@ -213,11 +217,16 @@ public class CartServiceImpl implements CartService {
 					.orElseThrow(ProductNotFoundException::new);
 
 				// 기본 이미지 설정
-				String productImagePath = "default.jpg";
+				String productImagePath = "";
 
 				// 해당 상품의 이미지 검증
 				if (Objects.nonNull(product.getProductImage()) && !product.getProductImage().isEmpty()) {
-					productImagePath = product.getProductImage().getFirst().getProductImagePath();
+					ProductImage firstProductImage = product.getProductImage().getFirst();
+					if (firstProductImage.getProductImagePath().startsWith("http")) {
+						productImagePath = firstProductImage.getProductImagePath();
+					} else {
+						productImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, firstProductImage.getProductImagePath());
+					}
 				}
 
 				//  DTO 가공
@@ -411,6 +420,16 @@ public class CartServiceImpl implements CartService {
 		// DTO 가공
 		return cartItems.stream()
 			.map(cartItem -> {
+				// 기본 이미지 설정
+				String productImagePath = "";
+				if (Objects.nonNull(cartItem.getProductImagePath()) && !cartItem.getProductImagePath().isEmpty()) {
+					if (cartItem.getProductImagePath().startsWith("http")) {
+						productImagePath = cartItem.getProductImagePath();
+					} else {
+						productImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, cartItem.getProductImagePath());
+					}
+				}
+
 				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
 				return new ResponseCartItemsForGuestDTO(
 				cartItem.getProductId(),
@@ -493,7 +512,7 @@ public class CartServiceImpl implements CartService {
 			orderCart = objectMapper.convertValue(o, CartDTO.class);
 			return deleteOrderComplete(MEMBER_HASH_NAME, orderCart, requestOrderCartDeleteDTO);
 		}
-		
+
 		// 게스트인 경우
 		o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
 		orderCart = objectMapper.convertValue(o, CartDTO.class);
@@ -504,7 +523,7 @@ public class CartServiceImpl implements CartService {
 	private boolean isMember(RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		return !StringUtils.isEmpty(requestOrderCartDeleteDTO.getMemberId());
 	}
-	
+
 	// 장바구니 삭제 메소드
 	private Integer deleteOrderComplete(String hashName, CartDTO orderCart, RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		if (Objects.nonNull(orderCart) && Objects.nonNull(orderCart.getCartItems())) {
@@ -515,7 +534,7 @@ public class CartServiceImpl implements CartService {
 
 			// 기존 장바구니에 삭제된 항목 갱신된 리스트로 적용
 			orderCart.setCartItems(filteredItems);
-			
+
 			// 삭제한 cart로 갱신
 			redisTemplate.opsForHash().put(hashName, requestOrderCartDeleteDTO.getMemberId(), orderCart);
 			return orderCart.getCartItems().size();
