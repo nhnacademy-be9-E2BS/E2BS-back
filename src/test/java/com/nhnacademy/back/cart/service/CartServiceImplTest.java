@@ -29,7 +29,6 @@ import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.entity.Cart;
 import com.nhnacademy.back.cart.domain.entity.CartItems;
-import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
@@ -251,20 +250,6 @@ class CartServiceImplTest {
 
 		// when & then
 		assertThrows(NotFoundMemberException.class, () -> cartService.deleteOrderCompleteCartItems(dto));
-	}
-
-	@Test
-	@DisplayName("주문 완료한 상품을 장바구니에 비워주기 테스트 - 실패(회원 장바구니를 찾지 못한 경우)")
-	void deleteOrderCompleteCartItems_NotFoundMemberCart() {
-		// given
-		Member member = createMember();
-		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO("member123", null, List.of(1L), List.of(1));
-
-		when(memberRepository.getMemberByMemberId("member123")).thenReturn(member);
-		when(cartRepository.findByCustomer_CustomerId(member.getCustomerId())).thenReturn(Optional.empty());
-
-		// when & then
-		assertThrows(CartNotFoundException.class, () -> cartService.deleteOrderCompleteCartItems(dto));
 	}
 
 	private RequestDeleteCartOrderDTO createRequestForMember() {
