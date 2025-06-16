@@ -537,17 +537,17 @@ public class ProductServiceImpl implements ProductService {
 		ResponseProductReadDTO currentBook = getProduct(bookId, memberId);
 		List<Long> categoryIds = currentBook.getCategories().stream()
 			.map(ResponseCategoryDTO::getCategoryId)
-			.collect(Collectors.toList());
+			.toList();
 		List<Long> tagIds = currentBook.getTags().stream()
 			.map(ResponseTagDTO::getTagId)
-			.collect(Collectors.toList());
+			.toList();
 
 		List<Product> recommendedBooks = productJpaRepository.findByCategoriesInOrTagsIn(categoryIds, tagIds, bookId);
 
 		return recommendedBooks.stream()
 			.limit(6)
 			.map(product -> getProductByChangedImagePath(product, memberId))
-			.collect(Collectors.toList());
+			.toList();
 	}
 }
 
