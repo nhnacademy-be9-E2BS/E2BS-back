@@ -1,5 +1,7 @@
 package com.nhnacademy.back.cart.service.impl;
 
+import static java.util.stream.Collectors.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.back.account.member.domain.entity.Member;
+import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
@@ -23,9 +27,13 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
+import com.nhnacademy.back.cart.domain.entity.Cart;
+import com.nhnacademy.back.cart.domain.entity.CartItems;
 import com.nhnacademy.back.cart.exception.CartAlreadyExistsException;
 import com.nhnacademy.back.cart.exception.CartItemNotFoundException;
 import com.nhnacademy.back.cart.exception.CartNotFoundException;
+import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
+import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
 import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
@@ -41,6 +49,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
+
+	private final MemberJpaRepository memberRepository;
+	private final CartJpaRepository cartRepository;
+	private final CartItemsJpaRepository cartItemsRepository;
 
 	private final ProductJpaRepository productRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -101,7 +113,7 @@ public class CartServiceImpl implements CartService {
 		}
 
 		// 장바구니 항목 생성 및 Cart에 추가
-		String productImagePath = "default.jpg";
+		String productImagePath = "";
 		if (Objects.nonNull(findProduct.getProductImage()) && !findProduct.getProductImage().isEmpty()) {
 			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
@@ -192,7 +204,8 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	@Override
 	public void deleteCartForMember(String memberId) {
-		redisTemplate.opsForHash().delete(MEMBER_HASH_NAME, memberId);
+		CartDTO emptyCart = new CartDTO();
+		redisTemplate.opsForHash().put(MEMBER_HASH_NAME, memberId, emptyCart);
 	}
 
 	/**
@@ -347,7 +360,7 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public int updateCartItemForGuest(RequestUpdateCartItemsDTO request) {
-		Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, request.getSessionId());
+		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, request.getSessionId());
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
 			throw new CartNotFoundException();
@@ -395,12 +408,6 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public void deleteCartForGuest(String sessionId) {
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, sessionId);
-		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
-		if (Objects.isNull(cart)) {
-			throw new CartItemNotFoundException();
-		}
-
 		redisTemplate.opsForHash().delete(GUEST_HASH_NAME, sessionId);
 	}
 
@@ -437,7 +444,7 @@ public class CartServiceImpl implements CartService {
 				cartItem.getProductRegularPrice(),
 				cartItem.getProductSalePrice(),
 				cartItem.getDiscountRate(),
-				cartItem.getProductImagePath(),
+				productImagePath,
 				cartItem.getCartItemsQuantity(),
 				productTotalPrice);
 			})
@@ -541,6 +548,34 @@ public class CartServiceImpl implements CartService {
 		}
 
 		return 0;
+	}
+
+	@Transactional
+	@Override
+	public void saveCartItemsDBFromRedis(String memberId, List<CartItemDTO> cartItems) {
+		if (!memberRepository.existsMemberByMemberId(memberId)) {
+			return;
+		}
+		Member findMember = memberRepository.getMemberByMemberId(memberId);
+
+		Cart cart = cartRepository.findByCustomer_CustomerId(findMember.getCustomerId())
+			.orElseGet(() -> cartRepository.save(new Cart(findMember.getCustomer())));
+
+		List<CartItems> entities = cartItems.stream()
+			.map(dto -> {
+				Product findProduct = productRepository.findById(dto.getProductId())
+					.orElseThrow(ProductNotFoundException::new);
+
+				return CartItems.builder()
+					.cart(cart)
+					.product(findProduct)
+					.cartItemsQuantity(dto.getCartItemsQuantity())
+					.build();
+			})
+			.collect(toList());
+
+		cartItemsRepository.deleteCartItemsByCart(cart);
+		cartItemsRepository.saveAll(entities);
 	}
 
 }
