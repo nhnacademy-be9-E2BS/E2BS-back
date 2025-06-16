@@ -32,6 +32,7 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
@@ -58,6 +59,9 @@ class CartServiceImplForMemberTest {
 
 	@Mock
 	private CartItemsJpaRepository cartItemsRepository;
+
+	@Mock
+	private MinioUtils minioUtils;
 
 	@InjectMocks
 	private CartServiceImpl cartService;
@@ -270,6 +274,8 @@ class CartServiceImplForMemberTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(mockMember);
 		when(cartItemsRepository.findByCart_Customer_CustomerId(100L)).thenReturn(List.of(cartItem));
 
+		when(minioUtils.getPresignedUrl("e2bs-products-image", "product.jpg")).thenReturn("https://example.com/image1.jpg");
+
 		// when
 		List<ResponseCartItemsForMemberDTO> result = cartService.getCartItemsByMember(memberId);
 
@@ -277,7 +283,7 @@ class CartServiceImplForMemberTest {
 		assertEquals(1, result.size());
 		ResponseCartItemsForMemberDTO dto = result.getFirst();
 		assertEquals("상품A", dto.getProductTitle());
-		assertEquals("product.jpg", dto.getProductImagePath());
+		assertEquals("https://example.com/image1.jpg", dto.getProductImagePath());
 		assertEquals(BigDecimal.valueOf(20), dto.getDiscountRate());
 		assertEquals(16000L, dto.getProductTotalPrice());
 	}
