@@ -25,4 +25,17 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 	Optional<Product> findByIdWithImages(@Param("id") Long id);
 
 	List<Product> findAllByPublisher_PublisherId(long publisherPublisherId);
+
+	@Query("SELECT p FROM Product p " +
+		"LEFT JOIN ProductCategory pc ON pc.product = p " +
+		"LEFT JOIN ProductTag pt ON pt.product = p " +
+		"WHERE p.productId != :bookId " +
+		"GROUP BY p " +
+		"HAVING COUNT(CASE WHEN pc.category.categoryId IN :categoryIds THEN 1 END) + " +
+		"       COUNT(CASE WHEN pt.tag.tagId IN :tagIds THEN 1 END) > 0 " +
+		"ORDER BY (COUNT(CASE WHEN pc.category.categoryId IN :categoryIds THEN 1 END) + " +
+		"          COUNT(CASE WHEN pt.tag.tagId IN :tagIds THEN 1 END)) DESC")
+	List<Product> findByCategoriesInOrTagsIn(@Param("categoryIds") List<Long> categoryIds,
+		@Param("tagIds") List<Long> tagIds,
+		@Param("bookId") Long bookId);
 }
