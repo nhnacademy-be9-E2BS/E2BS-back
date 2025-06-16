@@ -33,6 +33,8 @@ import com.nhnacademy.back.cart.exception.CartNotFoundException;
 import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
 import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.CartService;
+import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
@@ -53,6 +55,9 @@ public class CartServiceImpl implements CartService {
 	private final CartItemsJpaRepository cartItemsRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper;
+
+	private final MinioUtils minioUtils;
+	private static final String PRODUCT_BUCKET = "e2bs-products-image";
 
 	private static final String NOT_FOUND_MEMBER = "아이디에 해당하는 회원을 찾지 못했습니다.";
 
@@ -200,11 +205,16 @@ public class CartServiceImpl implements CartService {
 				}
 
 				// 기본 이미지 설정
-				String productImagePath = "default.jpg";
+				String productImagePath = "";
 
 				// 해당 상품의 이미지 검증
 				if (Objects.nonNull(product.getProductImage()) && !product.getProductImage().isEmpty()) {
-					productImagePath = product.getProductImage().getFirst().getProductImagePath();
+					ProductImage firstProductImage = product.getProductImage().getFirst();
+					if (firstProductImage.getProductImagePath().startsWith("http")) {
+						productImagePath = firstProductImage.getProductImagePath();
+					} else {
+						productImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, firstProductImage.getProductImagePath());
+					}
 				}
 
 				//  DTO 가공
@@ -399,6 +409,16 @@ public class CartServiceImpl implements CartService {
 		// DTO 가공
 		return cartItems.stream()
 			.map(cartItem -> {
+				// 기본 이미지 설정
+				String productImagePath = "";
+				if (Objects.nonNull(cartItem.getProductImagePath()) && !cartItem.getProductImagePath().isEmpty()) {
+					if (cartItem.getProductImagePath().startsWith("http")) {
+						productImagePath = cartItem.getProductImagePath();
+					} else {
+						productImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, cartItem.getProductImagePath());
+					}
+				}
+
 				long productTotalPrice = cartItem.getProductSalePrice() * cartItem.getCartItemsQuantity();
 				return new ResponseCartItemsForGuestDTO(
 				cartItem.getProductId(),
@@ -406,7 +426,7 @@ public class CartServiceImpl implements CartService {
 				cartItem.getProductRegularPrice(),
 				cartItem.getProductSalePrice(),
 				cartItem.getDiscountRate(),
-				cartItem.getProductImagePath(),
+				productImagePath,
 				cartItem.getCartItemsQuantity(),
 				productTotalPrice);
 			})
