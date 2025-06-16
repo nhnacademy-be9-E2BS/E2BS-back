@@ -28,6 +28,7 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGues
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
@@ -52,6 +53,9 @@ class CartServiceImplForGuestTest {
 	/// redisTemplate.opsForValue()에서 사용되는 구현체
 	@Mock
 	private ValueOperations<String, Object> valueOperations;
+
+	@Mock
+	private MinioUtils minioUtils;
 
 	@InjectMocks
 	private CartServiceImpl cartService;
@@ -205,6 +209,9 @@ class CartServiceImplForGuestTest {
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
+
+		when(minioUtils.getPresignedUrl("e2bs-products-image", "/image1.jpg")).thenReturn("https://example.com/image1.jpg");
+		when(minioUtils.getPresignedUrl("e2bs-products-image", "/image2.jpg")).thenReturn("https://example.com/image2.jpg");
 
 		// when
 		List<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest(sessionId);
