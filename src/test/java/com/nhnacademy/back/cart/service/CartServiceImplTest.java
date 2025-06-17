@@ -152,7 +152,6 @@ class CartServiceImplTest {
 	@DisplayName("주문 완료한 상품 항목 장바구니에 수량 변경 또는 삭제 업데이트 테스트 - 회원")
 	void deleteOrderCompleteCartItems_member() {
 		// given
-		String memberId = "member1";
 		RequestDeleteCartOrderDTO dto = new RequestDeleteCartOrderDTO();
 		dto.setMemberId(memberId);
 		dto.setProductIds(List.of(100L));

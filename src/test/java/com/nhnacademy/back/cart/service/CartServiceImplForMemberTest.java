@@ -53,7 +53,7 @@ class CartServiceImplForMemberTest {
 	private CartServiceImpl cartService;
 
 
-	private final String MEMBER_HASH_NAME = "MemberCart:";
+	private final String memberHashName = "MemberCart:";
 	private final String memberId = "member1";
 	private final Long productId = 1L;
 
@@ -67,20 +67,20 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 생성 테스트")
 	void createCartForMember() {
 		// given
-		when(hashOperations.hasKey(MEMBER_HASH_NAME, memberId)).thenReturn(false);
+		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(false);
 
 		// when
 		cartService.createCartForMember(memberId);
 
 		// then
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), any(CartDTO.class));
+		verify(hashOperations).put(eq(memberHashName), eq(memberId), any(CartDTO.class));
 	}
 
 	@Test
 	@DisplayName("회원 장바구니 생성 테스트 - 실패(장바구니 이미 존재한 경우)")
 	void createCartForMember_alreadyExists_throwException() {
 		// given
-		when(hashOperations.hasKey(MEMBER_HASH_NAME, memberId)).thenReturn(true);
+		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(true);
 
 		// when & then
 		assertThrows(CartAlreadyExistsException.class, () -> cartService.createCartForMember(memberId));
@@ -99,8 +99,8 @@ class CartServiceImplForMemberTest {
 			.productState(new ProductState(1L, ProductStateName.SALE))
 			.build();
 
-		when(hashOperations.hasKey(MEMBER_HASH_NAME, memberId)).thenReturn(true);
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(new CartDTO());
+		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(true);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(new CartDTO());
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(new CartDTO());
 
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -110,7 +110,7 @@ class CartServiceImplForMemberTest {
 
 		// then
 		assertEquals(1, size);
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), any(CartDTO.class));
+		verify(hashOperations).put(eq(memberHashName), eq(memberId), any(CartDTO.class));
 	}
 
 	@Test
@@ -128,8 +128,8 @@ class CartServiceImplForMemberTest {
 		CartDTO cartDTO = new CartDTO();
 		cartDTO.setCartItems(new ArrayList<>(List.of(existingItem)));
 
-		when(hashOperations.hasKey(MEMBER_HASH_NAME, memberId)).thenReturn(true);
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(cartDTO);
+		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(true);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(cartDTO);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cartDTO);
 
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -140,7 +140,7 @@ class CartServiceImplForMemberTest {
 		// then
 		assertEquals(1, size);
 		assertEquals(5, existingItem.getCartItemsQuantity()); // 2 + 3 = 5
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), eq(cartDTO));
+		verify(hashOperations).put(memberHashName, memberId, cartDTO);
 	}
 
 	@Test
@@ -154,7 +154,7 @@ class CartServiceImplForMemberTest {
 
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(memberId, "", productId, 1);
 
-		when(hashOperations.hasKey(MEMBER_HASH_NAME, memberId)).thenReturn(false);
+		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(false);
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
 		// when & then
@@ -171,7 +171,7 @@ class CartServiceImplForMemberTest {
 		CartDTO cartDTO = new CartDTO();
 		cartDTO.setCartItems(new ArrayList<>(List.of(cartItem)));
 
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(cartDTO);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(cartDTO);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cartDTO);
 
 		// when
@@ -180,7 +180,7 @@ class CartServiceImplForMemberTest {
 		// then
 		assertEquals(1, size);
 		assertEquals(5, cartItem.getCartItemsQuantity());
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), eq(cartDTO));
+		verify(hashOperations).put(memberHashName, memberId, cartDTO);
 	}
 
 	@Test
@@ -193,7 +193,7 @@ class CartServiceImplForMemberTest {
 		CartDTO cartDTO = new CartDTO();
 		cartDTO.setCartItems(new ArrayList<>(List.of(cartItem)));
 
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(cartDTO);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(cartDTO);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cartDTO);
 
 		// when
@@ -201,7 +201,7 @@ class CartServiceImplForMemberTest {
 
 		// then
 		assertEquals(0, size);
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), eq(cartDTO));
+		verify(hashOperations).put(memberHashName, memberId, cartDTO);
 	}
 
 	@Test
@@ -214,7 +214,7 @@ class CartServiceImplForMemberTest {
 		CartDTO cartDTO = new CartDTO();
 		cartDTO.setCartItems(new ArrayList<>(List.of(cartItem)));
 
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(cartDTO);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(cartDTO);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cartDTO);
 
 		// when
@@ -222,7 +222,7 @@ class CartServiceImplForMemberTest {
 
 		// then
 		assertTrue(cartDTO.getCartItems().isEmpty());
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), eq(cartDTO));
+		verify(hashOperations).put(memberHashName, memberId, cartDTO);
 	}
 
 	@Test
@@ -232,7 +232,7 @@ class CartServiceImplForMemberTest {
 		cartService.deleteCartForMember(memberId);
 
 		// when & then
-		verify(hashOperations).put(eq(MEMBER_HASH_NAME), eq(memberId), any(CartDTO.class));
+		verify(hashOperations).put(eq(memberHashName), eq(memberId), any(CartDTO.class));
 	}
 
 	@Test
@@ -247,7 +247,7 @@ class CartServiceImplForMemberTest {
 		CartDTO cartDTO = new CartDTO();
 		cartDTO.setCartItems(new ArrayList<>(List.of(cartItem)));
 
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(cartDTO);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(cartDTO);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(cartDTO);
 
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
@@ -264,7 +264,7 @@ class CartServiceImplForMemberTest {
 	@DisplayName("회원 장바구니 목록 조회 - 장바구니가 비었을 경우")
 	void getCartItemsByMember_emptyCart() {
 		// given
-		when(hashOperations.get(MEMBER_HASH_NAME, memberId)).thenReturn(null);
+		when(hashOperations.get(memberHashName, memberId)).thenReturn(null);
 		when(objectMapper.convertValue(any(), eq(CartDTO.class))).thenReturn(null);
 
 		// when
