@@ -77,8 +77,6 @@ public class MemberRegisterController {
 	@Operation(summary = "회원가입 시 아이디 중복 체크", description = "회원가입 시 아이디 중복 체크 기능")
 	@GetMapping("/{member-id}/register")
 	public ResponseEntity<Map<String, Boolean>> checkMemberIdDev(@PathVariable("member-id") String memberId) {
-		log.info("register check duplication");
-
 		boolean idDuplicateCheck = memberService.existsMemberByMemberId(memberId);
 		Map<String, Boolean> response = Collections.singletonMap("available", !idDuplicateCheck);
 
