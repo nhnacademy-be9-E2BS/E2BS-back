@@ -18,33 +18,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
-import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.cart.domain.dto.CartDTO;
 import com.nhnacademy.back.cart.domain.dto.CartItemDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartOrderDTO;
-import com.nhnacademy.back.cart.repository.CartItemsJpaRepository;
-import com.nhnacademy.back.cart.repository.CartJpaRepository;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
-import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CartServiceImplTest {
-
-	@Mock
-	private CustomerJpaRepository customerRepository;
-
-	@Mock
-	private MemberJpaRepository memberRepository;
-
-	@Mock
-	private ProductJpaRepository productRepository;
-
-	@Mock
-	private CartJpaRepository cartRepository;
-
-	@Mock
-	private CartItemsJpaRepository cartItemsRepository;
 
 	@Mock
 	private RedisTemplate<String, Object> redisTemplate;
@@ -62,8 +42,10 @@ class CartServiceImplTest {
 	@InjectMocks
 	private CartServiceImpl cartService;
 
+
 	private final String memberId = "member123";
 	private final String sessionId = "guest-session-xyz";
+
 
 	@Test
 	@DisplayName("게스트 장바구니를 회원 장바구니에 병합 테스트")

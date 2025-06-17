@@ -27,7 +27,6 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.exception.CartAlreadyExistsException;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
-import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
@@ -38,21 +37,20 @@ import com.nhnacademy.back.product.state.domain.entity.ProductStateName;
 class CartServiceImplForMemberTest {
 
 	@Mock
-	ProductJpaRepository productRepository;
+	private ProductJpaRepository productRepository;
 
 	@Mock
-	RedisTemplate<String, Object> redisTemplate;
-	@Mock
-	ObjectMapper objectMapper;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	@Mock
-	MinioUtils minioUtils;
+	private ObjectMapper objectMapper;
 
+	/// redisTemplate.opsForHash()에서 사용되는 구현체
 	@Mock
-	HashOperations<String, Object, Object> hashOperations;
+	private HashOperations<String, Object, Object> hashOperations;
 
 	@InjectMocks
-	CartServiceImpl cartService;
+	private CartServiceImpl cartService;
 
 
 	private final String MEMBER_HASH_NAME = "MemberCart:";
@@ -63,6 +61,7 @@ class CartServiceImplForMemberTest {
 	void setup() {
 		when(redisTemplate.opsForHash()).thenReturn(hashOperations);
 	}
+
 
 	@Test
 	@DisplayName("회원 장바구니 생성 테스트")
