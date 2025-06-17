@@ -46,7 +46,6 @@ import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
-@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -81,6 +80,7 @@ public class CartServiceImpl implements CartService {
 	/**
 	 * 회원일 때 장바구니 항목 생성 메소드
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public int createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 장바구니 조회
@@ -212,6 +212,7 @@ public class CartServiceImpl implements CartService {
 	/**
 	 * 회원인 고객의 장바구니 목록 조회 메소드
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public List<ResponseCartItemsForMemberDTO> getCartItemsByMember(String memberId) {
 		// 고객이 담은 장바구니들을 리스트로 담음
@@ -290,6 +291,7 @@ public class CartServiceImpl implements CartService {
 	/**
 	 * 게스트일 때 장바구니 항목 생성 메소드
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public int createCartItemForGuest(RequestAddCartItemsDTO request) {
 		// 상품 존재 검증
@@ -317,7 +319,7 @@ public class CartServiceImpl implements CartService {
 			CartItemDTO existingItem = existingItemOpt.get();
 			existingItem.setCartItemsQuantity(existingItem.getCartItemsQuantity() + request.getQuantity());
 
-			redisTemplate.opsForValue().set(guestRedisKey, cart);
+			redisTemplate.opsForValue().set(guestRedisKey, cart, Duration.ofHours(2));
 			return cart.getCartItems().size();
 		}
 
@@ -465,7 +467,6 @@ public class CartServiceImpl implements CartService {
 	/**
 	 * 게스트 장바구니 -> 회원 장바구니와 병합 메소드
 	 */
-	@Transactional
 	@Override
 	public Integer mergeCartItemsToMemberFromGuest(String memberId, String sessionId) {
 		// 회원 장바구니 확인
@@ -535,7 +536,7 @@ public class CartServiceImpl implements CartService {
 		}
 
 		// 게스트인 경우
-		String guestRedisKey = GUEST_HASH_NAME + requestOrderCartDeleteDTO.getMemberId();
+		String guestRedisKey = GUEST_HASH_NAME + requestOrderCartDeleteDTO.getSessionId();
 		o = redisTemplate.opsForValue().get(guestRedisKey);
 		orderCart = objectMapper.convertValue(o, CartDTO.class);
 
