@@ -29,7 +29,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Tag(name = "회원가입 API", description = "회원 회원가입 기능")
 @RequiredArgsConstructor
 @RestController
@@ -75,6 +77,8 @@ public class MemberRegisterController {
 	@Operation(summary = "회원가입 시 아이디 중복 체크", description = "회원가입 시 아이디 중복 체크 기능")
 	@GetMapping("/{member-id}/register")
 	public ResponseEntity<Map<String, Boolean>> checkMemberIdDev(@PathVariable("member-id") String memberId) {
+		log.info("register check duplication");
+
 		boolean idDuplicateCheck = memberService.existsMemberByMemberId(memberId);
 		Map<String, Boolean> response = Collections.singletonMap("available", !idDuplicateCheck);
 

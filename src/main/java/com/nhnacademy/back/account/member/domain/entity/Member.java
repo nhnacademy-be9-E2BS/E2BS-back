@@ -10,6 +10,7 @@ import com.nhnacademy.back.account.socialauth.domain.entity.SocialAuth;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -31,7 +32,7 @@ public class Member {
 	@Id
 	private long customerId;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId  // 공유 기본 키 사용
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
@@ -50,19 +51,19 @@ public class Member {
 
 	private LocalDate memberLoginLatest;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_rank_id")
 	private MemberRank memberRank;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_state_id")
 	private MemberState memberState;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_role_id")
 	private MemberRole memberRole;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_auth_id")
 	private SocialAuth socialAuth;
 
