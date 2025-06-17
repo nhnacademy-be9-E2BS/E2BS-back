@@ -42,28 +42,28 @@ public class CartScheduler {
 
 			for (Object memberIdObject : memberIds) {
 				String memberId = String.valueOf(memberIdObject);
-				try {
-					Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, memberId);
-					if (Objects.isNull(o)) {
-						continue;
-					}
-
-					CartDTO cartDTO = objectMapper.convertValue(o, CartDTO.class);
-					if (cartDTO.getCartItems().isEmpty()) {
-						continue;
-					}
-
-					cartService.saveCartItemsDBFromRedis(memberId, cartDTO.getCartItems());
-
-					log.info("Redis → DB 장바구니 동기화 완료 - memberId: {}", memberId);
-				} catch (Exception e) {
-					log.warn("memberId: {} 동기화 중 오류 발생", memberId, e);
-				}
+				syncCartForMember(memberId);
 			}
 
 		} catch (Exception e) {
 			log.error("전체 Redis 장바구니 동기화 실패", e);
 		}
 	}
-	
+
+	private void syncCartForMember(String memberId) {
+		try {
+			Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, memberId);
+
+			if (Objects.nonNull(o)) {
+				CartDTO cartDTO = objectMapper.convertValue(o, CartDTO.class);
+				if (!cartDTO.getCartItems().isEmpty()) {
+					cartService.saveCartItemsDBFromRedis(memberId, cartDTO.getCartItems());
+					log.info("Redis → DB 장바구니 동기화 완료 - memberId: {}", memberId);
+				}
+			}
+		} catch (Exception e) {
+			log.warn("memberId: {} 동기화 중 오류 발생", memberId, e);
+		}
+	}
+
 }

@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,7 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public void createCartForMember(String memberId) {
-		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, memberId)) {
+		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, memberId)) {  // NOSONAR
 			throw new CartAlreadyExistsException();
 		}
 
@@ -84,7 +85,7 @@ public class CartServiceImpl implements CartService {
 	public int createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 장바구니 조회
 		CartDTO cart;
-		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, request.getMemberId())) {
+		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, request.getMemberId())) {  // NOSONAR
 			Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, request.getMemberId());
 			cart = objectMapper.convertValue(o, CartDTO.class);
 		} else {
@@ -188,7 +189,7 @@ public class CartServiceImpl implements CartService {
 		Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, request.getMemberId());
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
-			throw new CartItemNotFoundException();
+			throw new CartNotFoundException();
 		}
 
 		// 해당 항목 삭제
@@ -300,7 +301,9 @@ public class CartServiceImpl implements CartService {
 		}
 
 		// Redis에서 장바구니 가져오기 (없으면 생성)
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, request.getSessionId());
+		String guestRedisKey = GUEST_HASH_NAME + request.getSessionId();
+
+		Object o = redisTemplate.opsForValue().get(guestRedisKey);
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
 			cart = new CartDTO();
@@ -314,12 +317,12 @@ public class CartServiceImpl implements CartService {
 			CartItemDTO existingItem = existingItemOpt.get();
 			existingItem.setCartItemsQuantity(existingItem.getCartItemsQuantity() + request.getQuantity());
 
-			redisTemplate.opsForValue().set(request.getSessionId(), cart);
+			redisTemplate.opsForValue().set(guestRedisKey, cart);
 			return cart.getCartItems().size();
 		}
 
 		// 장바구니 항목 생성 및 Cart에 추가
-		String productImagePath = "default.jpg";
+		String productImagePath = "";
 		if (Objects.nonNull(findProduct.getProductImage()) && !findProduct.getProductImage().isEmpty()) {
 			productImagePath = findProduct.getProductImage().getFirst().getProductImagePath();
 		}
@@ -350,7 +353,7 @@ public class CartServiceImpl implements CartService {
 		cart.getCartItems().add(newItem);
 
 		// 변경된 Cart 객체를 Redis에 저장
-		redisTemplate.opsForHash().put(GUEST_HASH_NAME, request.getSessionId(), cart);
+		redisTemplate.opsForValue().set(guestRedisKey, cart, Duration.ofHours(2));
 
 		return cart.getCartItems().size();
 	}
@@ -360,7 +363,9 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public int updateCartItemForGuest(RequestUpdateCartItemsDTO request) {
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, request.getSessionId());
+		String guestRedisKey = GUEST_HASH_NAME + request.getSessionId();
+
+		Object o = redisTemplate.opsForValue().get(guestRedisKey);
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
 			throw new CartNotFoundException();
@@ -380,7 +385,7 @@ public class CartServiceImpl implements CartService {
 		}
 
 		// 변경된 Cart 객체를 Redis에 저장
-		redisTemplate.opsForHash().put(GUEST_HASH_NAME, request.getSessionId(), cart);
+		redisTemplate.opsForValue().set(guestRedisKey, cart, Duration.ofHours(2));
 
 		return cart.getCartItems().size();
 	}
@@ -390,17 +395,20 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public void deleteCartItemForGuest(RequestDeleteCartItemsForGuestDTO request) {
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, request.getSessionId());
+		String guestRedisKey = GUEST_HASH_NAME + request.getSessionId();
+
+		// 게스트 장바구니 조회
+		Object o = redisTemplate.opsForValue().get(guestRedisKey);
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart)) {
-			throw new CartItemNotFoundException();
+			throw new CartNotFoundException();
 		}
 
 		// 해당 항목 삭제
 		cart.getCartItems().removeIf(item -> item.getProductId() == request.getProductId());
 
-		// 삭제된 Cart 객체를 Redis에 저장
-		redisTemplate.opsForHash().put(GUEST_HASH_NAME, request.getSessionId(), cart);
+		// 항목이 삭제된 Cart 객체를 Redis에 저장
+		redisTemplate.opsForValue().set(guestRedisKey, cart, Duration.ofHours(2));
 	}
 
 	/**
@@ -408,7 +416,7 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public void deleteCartForGuest(String sessionId) {
-		redisTemplate.opsForHash().delete(GUEST_HASH_NAME, sessionId);
+		redisTemplate.delete(GUEST_HASH_NAME + sessionId);
 	}
 
 	/**
@@ -416,7 +424,10 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Override
 	public List<ResponseCartItemsForGuestDTO> getCartItemsByGuest(String sessionId) {
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, sessionId);
+		String guestRedisKey = GUEST_HASH_NAME + sessionId;
+
+		// 게스트 장바구니 조회
+		Object o = redisTemplate.opsForValue().get(guestRedisKey);
 		CartDTO cart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(cart) || cart.getCartItems().isEmpty()) {
 			return List.of();
@@ -459,15 +470,17 @@ public class CartServiceImpl implements CartService {
 	public Integer mergeCartItemsToMemberFromGuest(String memberId, String sessionId) {
 		// 회원 장바구니 확인
 		CartDTO memberCart;
-		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, memberId)) {
+		if (redisTemplate.opsForHash().hasKey(MEMBER_HASH_NAME, memberId)) {  // NOSONAR
 			Object o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, memberId);
 			memberCart = objectMapper.convertValue(o, CartDTO.class);
 		} else {
 			memberCart = new CartDTO();
 		}
 
-		// 게스트 장바구니 확인 
-		Object o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, sessionId);
+		// 게스트 장바구니 조회
+		String guestRedisKey = GUEST_HASH_NAME + sessionId;
+
+		Object o = redisTemplate.opsForValue().get(guestRedisKey);
 		CartDTO guestCart = objectMapper.convertValue(o, CartDTO.class);
 		if (Objects.isNull(guestCart)) {
 			return memberCart.getCartItems().size();
@@ -484,22 +497,22 @@ public class CartServiceImpl implements CartService {
 
 			for (CartItemDTO guestItem : guestCart.getCartItems()) {
 				CartItemDTO existingItem = memberItemMap.get(guestItem.getProductId());
-				if (existingItem != null) {
+				if (Objects.nonNull(existingItem)) {
 					// 중복 상품은 수량만 증가
+					// 기존 memberCart에서 참조 값으로 map에 넣은 것이기에 수량 변경이 적용됨
 					existingItem.setCartItemsQuantity(existingItem.getCartItemsQuantity() + guestItem.getCartItemsQuantity());
 				} else {
 					// 새로운 상품은 회원 장바구니에 추가
 					memberCart.getCartItems().add(guestItem);
-					memberItemMap.put(guestItem.getProductId(), guestItem);
 				}
 			}
 
-			// 병합 후: Redis에 회원 장바구니 저장
+			// 병합 후 Redis에 회원 장바구니 저장
 			redisTemplate.opsForHash().put(MEMBER_HASH_NAME, memberId, memberCart);
 		}
 
-		// 병합 완료 후, 게스트 장바구니 삭제
-		redisTemplate.opsForHash().delete(GUEST_HASH_NAME, sessionId);
+		// 병합 완료 후 게스트 장바구니 삭제
+		redisTemplate.delete(guestRedisKey);
 
 		// 최종 회원 장바구니 항목 개수 반환
 		return memberCart.getCartItems().size();
@@ -517,13 +530,16 @@ public class CartServiceImpl implements CartService {
 		if (isMember(requestOrderCartDeleteDTO)) {
 			o = redisTemplate.opsForHash().get(MEMBER_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
 			orderCart = objectMapper.convertValue(o, CartDTO.class);
+
 			return deleteOrderComplete(MEMBER_HASH_NAME, orderCart, requestOrderCartDeleteDTO);
 		}
 
 		// 게스트인 경우
-		o = redisTemplate.opsForHash().get(GUEST_HASH_NAME, requestOrderCartDeleteDTO.getMemberId());
+		String guestRedisKey = GUEST_HASH_NAME + requestOrderCartDeleteDTO.getMemberId();
+		o = redisTemplate.opsForValue().get(guestRedisKey);
 		orderCart = objectMapper.convertValue(o, CartDTO.class);
-		return deleteOrderComplete(GUEST_HASH_NAME, orderCart, requestOrderCartDeleteDTO);
+
+		return deleteOrderComplete(guestRedisKey, orderCart, requestOrderCartDeleteDTO);
 	}
 
 	// 회원 여부 확인
@@ -534,7 +550,7 @@ public class CartServiceImpl implements CartService {
 	// 장바구니 삭제 메소드
 	private Integer deleteOrderComplete(String hashName, CartDTO orderCart, RequestDeleteCartOrderDTO requestOrderCartDeleteDTO) {
 		if (Objects.nonNull(orderCart) && Objects.nonNull(orderCart.getCartItems())) {
-			// CartItems 필터링 : CartItems에서 특정 상품들을 제외한 새로운 리스트 생성
+			// CartItems 필터링: CartItems 에서 특정 상품들을 제외한 새로운 리스트 생성
 			List<CartItemDTO> filteredItems = orderCart.getCartItems().stream()
 				.filter(item -> requestOrderCartDeleteDTO.getProductIds().stream().noneMatch(id -> id.equals(item.getProductId())))
 				.toList();
@@ -542,8 +558,13 @@ public class CartServiceImpl implements CartService {
 			// 기존 장바구니에 삭제된 항목 갱신된 리스트로 적용
 			orderCart.setCartItems(filteredItems);
 
-			// 삭제한 cart로 갱신
-			redisTemplate.opsForHash().put(hashName, requestOrderCartDeleteDTO.getMemberId(), orderCart);
+			// 주문 항목을 삭제한 cart로 갱신
+			if (hashName.equals(MEMBER_HASH_NAME)) {
+				redisTemplate.opsForHash().put(hashName, requestOrderCartDeleteDTO.getMemberId(), orderCart);
+			} else {
+				redisTemplate.opsForValue().set(hashName, orderCart);
+			}
+
 			return orderCart.getCartItems().size();
 		}
 
