@@ -83,7 +83,7 @@ class CartServiceImplTest {
 	@DisplayName("게스트 장바구니를 회원 장바구니에 병합 테스트 - 회원 장바구니에 동일 상품 존재 시 수량 증가 테스트")
 	void mergeCartItemsToMemberFromGuest_IncreaseQuantity() {
 		// given
-		Long productId = 100L;
+		long productId = 100L;
 		int originalQuantity = 3;
 		int guestQuantity = 2;
 
