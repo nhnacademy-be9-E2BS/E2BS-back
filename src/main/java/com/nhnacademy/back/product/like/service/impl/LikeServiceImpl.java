@@ -13,6 +13,8 @@ import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
 import com.nhnacademy.back.product.like.exception.LikeAlreadyExistsException;
@@ -37,6 +39,10 @@ public class LikeServiceImpl implements LikeService {
 	private final ProductJpaRepository productRepository;
 	private final LikeJpaRepository likeRepository;
 	private final ReviewJpaRepository reviewRepository;
+
+	private final MinioUtils minioUtils;
+	private static final String PRODUCT_BUCKET = "e2bs-products-image";
+
 
 	/**
 	 * 좋아요 생성 메소드
@@ -110,12 +116,22 @@ public class LikeServiceImpl implements LikeService {
 					product.getProductId())
 				.orElseThrow(LikeNotFoundException::new);
 
+			String productThumbnailImagePath = "";
+			if (Objects.nonNull(product.getProductImage().getFirst().getProductImagePath())) {
+				ProductImage thumbnailImage = product.getProductImage().getFirst();
+				if (thumbnailImage.getProductImagePath().startsWith("http")) {
+					productThumbnailImagePath = thumbnailImage.getProductImagePath();
+				} else {
+					productThumbnailImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, thumbnailImage.getProductImagePath());
+				}
+			}
+
 			return new ResponseLikedProductDTO(
 				product.getProductId(),
 				product.getProductTitle(),
 				product.getProductSalePrice(),
 				product.getPublisher().getPublisherName(),
-				product.getProductImage().getFirst().getProductImagePath(),
+				productThumbnailImagePath,
 				likeCount,
 				reviewAvg,
 				reviewCount,
