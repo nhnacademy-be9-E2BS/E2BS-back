@@ -41,6 +41,7 @@ import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
 import com.nhnacademy.back.product.product.exception.ProductNotFoundException;
+import com.nhnacademy.back.product.product.exception.ProductStockDecrementException;
 import com.nhnacademy.back.product.product.repository.ProductJpaRepository;
 
 import io.micrometer.common.util.StringUtils;
@@ -98,6 +99,10 @@ public class CartServiceImpl implements CartService {
 		// 상품 상태 검증
 		if (findProduct.getProductState().getProductStateId() != 1) {
 			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
+		}
+		// 상품 재고 검증
+		if (findProduct.getProductStock() < request.getQuantity()) {
+			throw new ProductStockDecrementException("현재 재고가 부족한 상품입니다.");
 		}
 
 		// 현재 고객이 장바구니 아이템을 가지고 있을 경우 병합

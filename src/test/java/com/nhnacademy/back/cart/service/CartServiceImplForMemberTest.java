@@ -97,6 +97,7 @@ class CartServiceImplForMemberTest {
 		Product product = Product.builder()
 			.productId(productId)
 			.productState(new ProductState(1L, ProductStateName.SALE))
+			.productStock(3)
 			.build();
 
 		when(hashOperations.hasKey(memberHashName, memberId)).thenReturn(true);
@@ -122,6 +123,7 @@ class CartServiceImplForMemberTest {
 		Product product = Product.builder()
 			.productId(productId)
 			.productState(new ProductState(1L, ProductStateName.SALE))
+			.productStock(3)
 			.build();
 
 		CartItemDTO existingItem = new CartItemDTO(productId, "title", 1000, 800, BigDecimal.valueOf(20), "image", 2);
