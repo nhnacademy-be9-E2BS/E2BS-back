@@ -24,6 +24,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 import com.nhnacademy.back.account.customer.respoitory.CustomerJpaRepository;
 import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
@@ -55,6 +56,9 @@ class LikeServiceImplTest {
 
 	@Mock
 	private ReviewJpaRepository reviewRepository;
+
+	@Mock
+	private MinioUtils minioUtils;
 
 	@InjectMocks
 	private LikeServiceImpl likeService;
