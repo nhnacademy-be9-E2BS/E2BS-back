@@ -255,11 +255,12 @@ public class ProductAPIServiceImpl implements ProductAPIService {
 		}
 
 		Product product = Product.createProductApiByQueryEntity(request, publisher, state);
+		productJpaRepository.save(product);
 
 		List<String> tagNames = new ArrayList<>();
 		List<String> contributorNames = saveContributors(request.getContributors(), product);
 
-		productJpaRepository.save(product);
+		//productJpaRepository.save(product);
 		productImageJpaRepository.save(new ProductImage(product, request.getProductImage()));
 
 		String categoryName = request.getQueryType(); //파라미터로 들어온 카테고리 이름
