@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.back.cart.domain.dto.request.RequestAddCartItemsDTO;
+import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDTO;
 import com.nhnacademy.back.cart.service.CartService;
@@ -45,7 +46,7 @@ class CartRestControllerForMemberTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated());
 	}
-	
+
 	@Test
 	@DisplayName("POST /api/auth/members/carts/items - 회원 장바구니 항목 추가 테스트")
 	void createCartItemForMember() throws Exception {
@@ -91,58 +92,63 @@ class CartRestControllerForMemberTest {
 	}
 
 	@Test
-	@DisplayName("PUT /api/auth/members/carts/items/{cartItemsId} - 회원 장바구니 항목 수량 변경 테스트")
+	@DisplayName("PUT /api/auth/members/carts/items - 회원 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForMember() throws Exception {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("id123", null, 1L, 5);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/auth/members/carts/items/{cartItemsId}", 1L)
+		mockMvc.perform(put("/api/auth/members/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isOk());
 
-		verify(cartService).updateCartItemForMember(anyLong(), any(RequestUpdateCartItemsDTO.class));
+		verify(cartService).updateCartItemForMember(any(RequestUpdateCartItemsDTO.class));
 	}
 
 	@Test
-	@DisplayName("PUT /api/auth/members/carts/items/{cartItemId} - 회원 장바구니 항목 수량 변경 테스트 실패(유효성 검증)")
+	@DisplayName("PUT /api/auth/members/carts/items - 회원 장바구니 항목 수량 변경 테스트 실패(유효성 검증)")
 	void updateCartItemForMember_Fail_Validation() throws Exception {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("member123", null, 1L, null);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/auth/members/carts/items/10")
+		mockMvc.perform(put("/api/auth/members/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isBadRequest());
 	}
 
 	@Test
-	@DisplayName("PUT /api/auth/members/carts/items/{cartItemId} - 회원 장바구니 항목 수량 변경 테스트 실패(memberId와 sessionId 모두 null)")
+	@DisplayName("PUT /api/auth/members/carts/items - 회원 장바구니 항목 수량 변경 테스트 실패(memberId와 sessionId 모두 null)")
 	void updateCartItemForMember_Fail_IllegalArgument() throws Exception {
 		// given
 		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO(null, null, 1L, 3);
 		String jsonRequest = objectMapper.writeValueAsString(request);
 
 		// when & then
-		mockMvc.perform(put("/api/auth/members/carts/items/10")
+		mockMvc.perform(put("/api/auth/members/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonRequest))
 			.andExpect(status().isBadRequest());
 	}
 
 	@Test
-	@DisplayName("DELETE /api/auth/members/carts/items/{cartItemsId} - 회원 장바구니 항목 삭제 테스트")
+	@DisplayName("DELETE /api/auth/members/carts/items - 회원 장바구니 항목 삭제 테스트")
 	void deleteCartItemForMember() throws Exception {
+		// given
+		RequestDeleteCartItemsForMemberDTO request = new RequestDeleteCartItemsForMemberDTO("memberId1", 1L);
+		String jsonRequest = objectMapper.writeValueAsString(request);
+
 		// when & then
-		mockMvc.perform(delete("/api/auth/members/carts/items/{cartItemsId}", 1L)
-				.contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(delete("/api/auth/members/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonRequest))
 			.andExpect(status().isNoContent());
 
-		verify(cartService).deleteCartItemForMember(1L);
+		verify(cartService).deleteCartItemForMember(request);
 	}
 
 	@Test
@@ -161,7 +167,7 @@ class CartRestControllerForMemberTest {
 	void getCartItemsByMember() throws Exception {
 		// given
 		List<ResponseCartItemsForMemberDTO> cartItems = List.of(
-			new ResponseCartItemsForMemberDTO(1L, 100L, "Product A", 1000, 500, new BigDecimal(50), "path/image.jpg", 2, 2000)
+			new ResponseCartItemsForMemberDTO(100L, "Product A", 1000, 500, new BigDecimal(50), "path/image.jpg", 2, 2000)
 		);
 
 		when(cartService.getCartItemsByMember("id123")).thenReturn(cartItems);

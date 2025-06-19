@@ -76,6 +76,7 @@ public class ResponseTossPaymentConfirmDTO {
 	// Optional nested DTOs in case 다른 결제수단 쓰게 될 경우 대비
 	@Getter
 	@Setter
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Card {
 	}
 

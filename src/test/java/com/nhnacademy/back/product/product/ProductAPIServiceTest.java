@@ -61,24 +61,36 @@ import com.nhnacademy.back.product.tag.domain.entity.Tag;
 import com.nhnacademy.back.product.tag.repository.ProductTagJpaRepository;
 import com.nhnacademy.back.product.tag.repository.TagJpaRepository;
 
-
 @MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
 class ProductAPIServiceTest {
 
-	@Mock ProductJpaRepository productJpaRepository;
-	@Mock PublisherJpaRepository publisherJpaRepository;
-	@Mock ProductImageJpaRepository productImageJpaRepository;
-	@Mock ContributorJpaRepository contributorJpaRepository;
-	@Mock PositionJpaRepository positionJpaRepository;
-	@Mock PublisherService publisherService;
-	@Mock ProductContributorJpaRepository productContributorJpaRepository;
-	@Mock ProductStateJpaRepository productStateJpaRepository;
-	@Mock ProductCategoryJpaRepository productCategoryJpaRepository;
-	@Mock ProductTagJpaRepository productTagJpaRepository;
-	@Mock CategoryJpaRepository categoryJpaRepository;
-	@Mock TagJpaRepository tagJpaRepository;
-	@Mock ProductSearchService productSearchService;
+	@Mock
+	ProductJpaRepository productJpaRepository;
+	@Mock
+	PublisherJpaRepository publisherJpaRepository;
+	@Mock
+	ProductImageJpaRepository productImageJpaRepository;
+	@Mock
+	ContributorJpaRepository contributorJpaRepository;
+	@Mock
+	PositionJpaRepository positionJpaRepository;
+	@Mock
+	PublisherService publisherService;
+	@Mock
+	ProductContributorJpaRepository productContributorJpaRepository;
+	@Mock
+	ProductStateJpaRepository productStateJpaRepository;
+	@Mock
+	ProductCategoryJpaRepository productCategoryJpaRepository;
+	@Mock
+	ProductTagJpaRepository productTagJpaRepository;
+	@Mock
+	CategoryJpaRepository categoryJpaRepository;
+	@Mock
+	TagJpaRepository tagJpaRepository;
+	@Mock
+	ProductSearchService productSearchService;
 
 	@InjectMocks
 	ProductAPIServiceImpl service;
@@ -126,7 +138,9 @@ class ProductAPIServiceTest {
 				 mockConstruction(AladdinOpenAPI.class, (mockApi, ctx) -> {
 					 when(mockApi.searchBooks()).thenThrow(new RuntimeException("fail API"));
 				 })) {
-			assertThatThrownBy(() -> service.searchProducts(req, PageRequest.of(0,5)))
+			PageRequest pageRequest = PageRequest.of(0, 5);
+
+			assertThatThrownBy(() -> service.searchProducts(req, pageRequest))
 				.isInstanceOf(SearchBookException.class)
 				.hasMessageContaining("Search book failed");
 		}
@@ -148,7 +162,7 @@ class ProductAPIServiceTest {
 					 when(mockApi.getListBooks()).thenReturn(items);
 				 })) {
 			Page<ResponseProductApiSearchByQueryTypeDTO> page =
-				service.searchProductsByQuery(req, PageRequest.of(0,3));
+				service.searchProductsByQuery(req, PageRequest.of(0, 3));
 
 			assertThat(page.getTotalElements()).isEqualTo(1);
 			assertThat(page.getContent().get(0).getProductTitle()).isEqualTo("BS Book");
@@ -170,7 +184,6 @@ class ProductAPIServiceTest {
 			.hasMessageContaining("Product already exists");
 	}
 
-
 	@Test
 	@DisplayName("createProductByQuery 중복 예외")
 	void createByQuery_duplicateThrows() {
@@ -191,12 +204,13 @@ class ProductAPIServiceTest {
 		try (var mc = mockConstruction(AladdinOpenAPI.class, (m, c) ->
 			when(m.getListBooks()).thenThrow(new RuntimeException("fail"))
 		)) {
-			assertThatThrownBy(() -> service.searchProductsByQuery(req, PageRequest.of(0,1)))
+			PageRequest pageRequest = PageRequest.of(0, 1);
+
+			assertThatThrownBy(() -> service.searchProductsByQuery(req, pageRequest))
 				.isInstanceOf(SearchBookException.class)
 				.hasMessageContaining("Search book failed");
 		}
 	}
-
 
 	@Test
 	void parse_util() throws Exception {
@@ -204,9 +218,9 @@ class ProductAPIServiceTest {
 		parse.setAccessible(true);
 
 		@SuppressWarnings("unchecked")
-		Map<String,String> map1 = (Map<String,String>)parse.invoke(service, "Alice(Dev), Bob");
-		assertThat(map1).containsEntry("Alice","Dev")
-			.containsEntry("Bob","없음");
+		Map<String, String> map1 = (Map<String, String>)parse.invoke(service, "Alice(Dev), Bob");
+		assertThat(map1).containsEntry("Alice", "Dev")
+			.containsEntry("Bob", "없음");
 	}
 
 	// 7. createProductByQuery – queryType null
@@ -234,7 +248,7 @@ class ProductAPIServiceTest {
 		when(productStateJpaRepository.save(any()))
 			.thenReturn(new ProductState(ProductStateName.SALE));
 
-		Product dummy = createForTest(42L, "T","D", LocalDate.now(), 123);
+		Product dummy = createForTest(42L, "T", "D", LocalDate.now(), 123);
 		when(productJpaRepository.save(any())).thenReturn(dummy);
 
 		when(positionJpaRepository.existsByPositionName(any())).thenReturn(false);
@@ -244,7 +258,7 @@ class ProductAPIServiceTest {
 		when(contributorJpaRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 		when(productContributorJpaRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-		Category c1 = new Category( "C1", null);
+		Category c1 = new Category("C1", null);
 		when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(c1));
 		when(productCategoryJpaRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 		when(productCategoryJpaRepository.findCategoryIdsByProductId(42L))
@@ -280,7 +294,7 @@ class ProductAPIServiceTest {
 		when(productStateJpaRepository.save(any()))
 			.thenReturn(new ProductState(ProductStateName.SALE));
 
-		Product saved = createForTest(100L, "T","D", LocalDate.now(), 123);
+		Product saved = createForTest(100L, "T", "D", LocalDate.now(), 123);
 		when(productJpaRepository.save(any())).thenReturn(saved);
 
 		when(positionJpaRepository.existsByPositionName(anyString())).thenReturn(false);
@@ -291,16 +305,16 @@ class ProductAPIServiceTest {
 		when(productContributorJpaRepository.save(any(ProductContributor.class)))
 			.thenAnswer(i -> i.getArgument(0));
 
-		Category c1 = new Category("1" , null);
+		Category c1 = new Category("1", null);
 		Category c2 = new Category("2", c1);
 		when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(c1));
 		when(categoryJpaRepository.findById(2L)).thenReturn(Optional.of(c2));
 		when(productCategoryJpaRepository.save(any(ProductCategory.class)))
 			.thenAnswer(i -> i.getArgument(0));
 		when(productCategoryJpaRepository.findCategoryIdsByProductId(100L))
-			.thenReturn(List.of(1L,2L));
+			.thenReturn(List.of(1L, 2L));
 
-		Tag t10 = new Tag( "Tag10");
+		Tag t10 = new Tag("Tag10");
 		when(tagJpaRepository.findById(10L)).thenReturn(Optional.of(t10));
 		when(productTagJpaRepository.save(any()))
 			.thenAnswer(i -> i.getArgument(0));
@@ -332,12 +346,11 @@ class ProductAPIServiceTest {
 		when(productStateJpaRepository.findByProductStateName(any()))
 			.thenReturn(new ProductState(ProductStateName.SALE));
 		when(productJpaRepository.save(any()))
-			.thenReturn(createForTest(1L,"","",LocalDate.now(),0));
+			.thenReturn(createForTest(1L, "", "", LocalDate.now(), 0));
 
 		assertThatThrownBy(() -> service.createProduct(req))
 			.isInstanceOf(ProductCategoryCreateNotAllowException.class);
 	}
-
 
 	@Test
 	@DisplayName("createProductByQuery tagIds null 분기(정상 처리)")
@@ -360,7 +373,7 @@ class ProductAPIServiceTest {
 			.thenReturn(new ProductState(ProductStateName.SALE));
 		when(productStateJpaRepository.save(any()))
 			.thenReturn(new ProductState(ProductStateName.SALE));
-		Product prod = createForTest(200L, "TQ","DQ", LocalDate.now(), 200);
+		Product prod = createForTest(200L, "TQ", "DQ", LocalDate.now(), 200);
 		when(productJpaRepository.save(any())).thenReturn(prod);
 
 		when(positionJpaRepository.existsByPositionName(any())).thenReturn(false);
@@ -371,7 +384,7 @@ class ProductAPIServiceTest {
 		when(productContributorJpaRepository.save(any()))
 			.thenAnswer(i -> i.getArgument(0));
 
-		Category c5 = new Category( "C5", null);
+		Category c5 = new Category("C5", null);
 		when(categoryJpaRepository.findById(5L)).thenReturn(Optional.of(c5));
 		when(productCategoryJpaRepository.save(any()))
 			.thenAnswer(i -> i.getArgument(0));
@@ -407,6 +420,5 @@ class ProductAPIServiceTest {
 			.productImage(new ArrayList<>())
 			.build();
 	}
-
 
 }

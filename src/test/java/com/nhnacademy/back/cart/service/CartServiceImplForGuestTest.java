@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import com.nhnacademy.back.cart.domain.dto.request.RequestDeleteCartItemsForGues
 import com.nhnacademy.back.cart.domain.dto.request.RequestUpdateCartItemsDTO;
 import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForGuestDTO;
 import com.nhnacademy.back.cart.service.impl.CartServiceImpl;
+import com.nhnacademy.back.common.util.MinioUtils;
 import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.product.domain.entity.Product;
 import com.nhnacademy.back.product.product.exception.ProductNotForSaleException;
@@ -53,11 +55,14 @@ class CartServiceImplForGuestTest {
 	@Mock
 	private ValueOperations<String, Object> valueOperations;
 
+	@Mock
+	private MinioUtils minioUtils;
+
 	@InjectMocks
 	private CartServiceImpl cartService;
 
 
-	private final String sessionId = "guest-session-123";
+	private final String hashName = "GuestCart:";
 	private Product product;
 
 	@BeforeEach
@@ -74,17 +79,18 @@ class CartServiceImplForGuestTest {
 		RequestAddCartItemsDTO request = new RequestAddCartItemsDTO(null, "session123", 1L, 2);
 		ProductImage productImage = new ProductImage(product, "image.jpg");
 		product.getProductImage().add(productImage);
-		
+
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(valueOperations.get("session123")).thenReturn(null);
+		when(redisTemplate.opsForValue().get(hashName + request.getSessionId())).thenReturn(null);
+		when(objectMapper.convertValue(null, CartDTO.class)).thenReturn(null);
 
 		// when
 		int size = cartService.createCartItemForGuest(request);
 
 		// then
 		assertEquals(1, size);
-		verify(valueOperations).set(eq("session123"), any(CartDTO.class));
+		verify(valueOperations).set(eq(hashName + request.getSessionId()), any(CartDTO.class), eq(Duration.ofHours(2)));
 	}
 
 	@Test
@@ -99,7 +105,7 @@ class CartServiceImplForGuestTest {
 
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(valueOperations.get("session123")).thenReturn(cart);
+		when(redisTemplate.opsForValue().get(hashName + request.getSessionId())).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
 
 		// when
@@ -108,7 +114,7 @@ class CartServiceImplForGuestTest {
 		// then
 		assertEquals(1, size);
 		assertEquals(4, existingItem.getCartItemsQuantity()); // 기존 1 + 3
-		verify(valueOperations).set("session123", cart);
+		verify(valueOperations).set(eq(hashName + request.getSessionId()), any(CartDTO.class), eq(Duration.ofHours(2)));
 	}
 
 	@Test
@@ -140,13 +146,13 @@ class CartServiceImplForGuestTest {
 	@DisplayName("게스트 장바구니 항목 수량 변경 테스트")
 	void updateCartItemForGuest() {
 		// given
-		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", sessionId, 1L, 5);
+		RequestUpdateCartItemsDTO request = new RequestUpdateCartItemsDTO("", "session123", 1L, 5);
 
 		CartItemDTO cartItem = new CartItemDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), "/image1.jpg", 2);
 		CartDTO cart = new CartDTO(List.of(cartItem));
 
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
+		when(redisTemplate.opsForValue().get(hashName + request.getSessionId())).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
 
 		// when
@@ -154,7 +160,7 @@ class CartServiceImplForGuestTest {
 
 		// then
 		assertThat(cartItem.getCartItemsQuantity()).isEqualTo(5);
-		verify(redisTemplate.opsForValue()).set(eq(sessionId), any(CartDTO.class));
+		verify(valueOperations).set(eq(hashName + request.getSessionId()), any(CartDTO.class), eq(Duration.ofHours(2)));
 	}
 
 	@Test
@@ -163,10 +169,10 @@ class CartServiceImplForGuestTest {
 		// given
 		CartItemDTO item = new CartItemDTO(1L, "Product 1", 1000, 500, new BigDecimal(50), "/image1.jpg", 2);
 		CartDTO cart = new CartDTO(new ArrayList<>(List.of(item)));
-		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO(sessionId, 1L);
+		RequestDeleteCartItemsForGuestDTO request = new RequestDeleteCartItemsForGuestDTO("session123", 1L);
 
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
+		when(redisTemplate.opsForValue().get(hashName + request.getSessionId())).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
 
 		// when
@@ -174,24 +180,17 @@ class CartServiceImplForGuestTest {
 
 		// then
 		assertEquals(0, cart.getCartItems().size());
-		verify(redisTemplate.opsForValue()).set(eq(sessionId), any(CartDTO.class));
+		verify(valueOperations).set(eq(hashName + request.getSessionId()), any(CartDTO.class), eq(Duration.ofHours(2)));
 	}
 
 	@Test
 	@DisplayName("게스트 장바구니 항목 전체 삭제 테스트")
 	void deleteCartForGuest() {
-		// given
-		CartDTO cart = new CartDTO();
-
-		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
-		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
-
 		// when
-		cartService.deleteCartForGuest(sessionId);
+		cartService.deleteCartForGuest("session123");
 
 		// then
-		verify(redisTemplate).delete(sessionId);
+		verify(redisTemplate).delete(hashName + "session123");
 	}
 
 	@Test
@@ -203,11 +202,14 @@ class CartServiceImplForGuestTest {
 		CartDTO cart = new CartDTO(List.of(item1, item2));
 
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(redisTemplate.opsForValue().get(sessionId)).thenReturn(cart);
+		when(redisTemplate.opsForValue().get(hashName + "session123")).thenReturn(cart);
 		when(objectMapper.convertValue(cart, CartDTO.class)).thenReturn(cart);
 
+		when(minioUtils.getPresignedUrl("e2bs-products-image", "/image1.jpg")).thenReturn("https://example.com/image1.jpg");
+		when(minioUtils.getPresignedUrl("e2bs-products-image", "/image2.jpg")).thenReturn("https://example.com/image2.jpg");
+
 		// when
-		List<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest(sessionId);
+		List<ResponseCartItemsForGuestDTO> result = cartService.getCartItemsByGuest("session123");
 
 		// then
 		assertEquals(2, result.size());
