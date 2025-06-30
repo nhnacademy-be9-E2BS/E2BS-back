@@ -119,7 +119,7 @@ class LikeServiceImplTest {
 		when(memberRepository.getMemberByMemberId(memberId)).thenReturn(member);
 		when(member.getCustomerId()).thenReturn(customerId);
 		when(likeRepository.existsByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)).thenReturn(true);
-		when(likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)).thenReturn(
+		when(likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, productId)).thenReturn(
 			Optional.of(like));
 
 		// when
