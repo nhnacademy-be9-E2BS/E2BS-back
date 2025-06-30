@@ -86,7 +86,7 @@ public class LikeServiceImpl implements LikeService {
 			throw new LikeNotFoundException();
 		}
 
-		Like findLike = likeRepository.findByProduct_ProductIdAndCustomer_CustomerId(productId, customerId)
+		Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, productId)
 			.orElseThrow(LikeNotFoundException::new);
 
 		likeRepository.delete(findLike);
