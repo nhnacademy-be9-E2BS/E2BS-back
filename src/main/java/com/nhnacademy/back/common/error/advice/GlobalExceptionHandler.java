@@ -1,7 +1,5 @@
 package com.nhnacademy.back.common.error.advice;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,61 +53,90 @@ import com.nhnacademy.back.review.exception.ReviewNotFoundException;
 public class GlobalExceptionHandler {
 
 	/**
-	 * HttpStatus.BAD_REQUEST 경우의 에러 핸들러
+	 * 400 BAD REQUEST - 잘못된 요청
 	 */
-	@ExceptionHandler({CartItemAlreadyExistsException.class, ValidationFailedException.class, IllegalArgumentException.class,
-		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
-		ProductAlreadyExistsException.class, TagAlreadyExistsException.class, ProductStockDecrementException.class,
-		BadRequestException.class, LoginMemberIsNotExistsException.class, PublisherAlreadyExistsException.class,
-		MemberStateWithdrawException.class, CategoryAlreadyExistsException.class,
-		CategoryDeleteNotAllowedException.class, ProductCategoryCreateNotAllowException.class,
-		SaveAddressFailedException.class, UpdateAddressFailedException.class, DeleteAddressFailedException.class,
-		UpdateMemberInfoFailedException.class, UpdateMemberStateFailedException.class,
-		UpdateMemberRoleFailedException.class,
-		DeleteMemberFailedException.class, SaveAddressFailedException.class, UpdateAddressFailedException.class,
+	@ExceptionHandler({
+		ValidationFailedException.class,
+		IllegalArgumentException.class,
+		BadRequestException.class,
+		SaveAddressFailedException.class,
+		UpdateAddressFailedException.class,
 		DeleteAddressFailedException.class,
-		ReviewAlreadyExistsException.class, RegisterOAuthFailedException.class, CustomerEmailNotExistsException.class,
-		CustomerEmailNotExistsException.class, CustomerEmailAlreadyExistsException.class, OrderProcessException.class, ProductNotForSaleException.class})
-	public ResponseEntity<GlobalErrorResponse> handleAlreadyExistsException(Exception ex) {
-		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
-			LocalDateTime.now());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+		LoginMemberIsNotExistsException.class,
+		UpdateMemberInfoFailedException.class,
+		UpdateMemberStateFailedException.class,
+		UpdateMemberRoleFailedException.class,
+		DeleteMemberFailedException.class,
+		MemberStateWithdrawException.class,
+		CustomerEmailNotExistsException.class,
+		CustomerEmailAlreadyExistsException.class,
+		RegisterOAuthFailedException.class,
+		OrderProcessException.class,
+		ReviewAlreadyExistsException.class,
+		CartItemAlreadyExistsException.class,
+		ProductNotForSaleException.class,
+		ProductAlreadyExistsException.class,
+		ProductStockDecrementException.class,
+		PublisherAlreadyExistsException.class,
+		TagAlreadyExistsException.class,
+		CategoryAlreadyExistsException.class,
+		CategoryDeleteNotAllowedException.class,
+		ProductCategoryCreateNotAllowException.class
+	})
+	public ResponseEntity<GlobalErrorResponse> handleBadRequest(Exception ex) {
+		return GlobalErrorResponse.buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
 	}
 
 	/**
-	 * 찾지 못한 경우의 에러 핸들러
+	 * 404 NOT FOUND - 자원 없음
 	 */
-	@ExceptionHandler({CustomerNotFoundException.class, ProductNotFoundException.class,
-		CartItemNotFoundException.class, CartNotFoundException.class,
-		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
-		ReviewNotFoundException.class, TagNotFoundException.class,
-		NotFoundMemberException.class, PublisherNotFoundException.class, WrapperNotFoundException.class,
-		ReviewNotFoundException.class, MemberRoleException.class, CategoryNotFoundException.class,
-		NotFoundAddressException.class, OrderDetailNotFoundException.class, NotFoundMemberStateException.class,
-		OrderNotFoundException.class})
-	public ResponseEntity<GlobalErrorResponse> handleNotFoundException(Exception ex) {
-		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(),
-			LocalDateTime.now());
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+	@ExceptionHandler({
+		NotFoundAddressException.class,
+		NotFoundMemberException.class,
+		MemberRoleException.class,
+		NotFoundMemberStateException.class,
+		CustomerNotFoundException.class,
+		ProductNotFoundException.class,
+		PublisherNotFoundException.class,
+		WrapperNotFoundException.class,
+		TagNotFoundException.class,
+		CategoryNotFoundException.class,
+		OrderNotFoundException.class,
+		OrderDetailNotFoundException.class,
+		CartNotFoundException.class,
+		CartItemNotFoundException.class,
+		ReviewNotFoundException.class
+	})
+	public ResponseEntity<GlobalErrorResponse> handleNotFound(Exception ex) {
+		return GlobalErrorResponse.buildErrorResponse(ex, HttpStatus.NOT_FOUND);
 	}
 
 	/**
-	 * 값의 충돌
+	 * 409 CONFLICT - 리소스 충돌
 	 */
-	@ExceptionHandler({AlreadyExistsMemberIdException.class})
-	public ResponseEntity<GlobalErrorResponse> handleConflictException(Exception ex) {
-		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(),
-			LocalDateTime.now());
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+	@ExceptionHandler({
+		AlreadyExistsMemberIdException.class
+	})
+	public ResponseEntity<GlobalErrorResponse> handleConflict(Exception ex) {
+		return GlobalErrorResponse.buildErrorResponse(ex, HttpStatus.CONFLICT);
 	}
 
 	/**
-	 * 지원하지 않는 미디어 타입인 경우 에러 핸들러
+	 * 415 UNSUPPORTED MEDIA TYPE - 지원하지 않는 미디어 타입
 	 */
-	@ExceptionHandler({InvalidImageFormatException.class})
-	public ResponseEntity<GlobalErrorResponse> handleUnsupportedMediaTypeException(Exception ex) {
-		GlobalErrorResponse body = new GlobalErrorResponse(ex.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
-			LocalDateTime.now());
-		return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(body);
+	@ExceptionHandler({
+		InvalidImageFormatException.class
+	})
+	public ResponseEntity<GlobalErrorResponse> handleUnsupportedMediaType(Exception ex) {
+		return GlobalErrorResponse.buildErrorResponse(ex, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
+
+	/**
+	 * 500 INTERNAL SERVER ERROR - 처리되지 않은 기타 예외
+	 */
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<GlobalErrorResponse> handleUnhandledException(Exception ex) {
+		return GlobalErrorResponse.buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 }
