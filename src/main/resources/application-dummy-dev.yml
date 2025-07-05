@@ -1,0 +1,94 @@
+# 대량 데미 데이터가 들어간 dev 서버
+server:
+  port: 10236
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://s4.java21.net:13306/project_be9_team2_dev?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: project_be9_team2
+    password: "*gzxziN[g9kwl]Ln"
+
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 293
+
+  # RabbitMQ 사용한 이유 설명
+  # RabbitMQ 연결 설정 <-> Spring EventListener (비교적 가벼운 작업에 유리)
+  rabbitmq:
+    host: s4.java21.net
+    port: 5672
+    username: admin
+    password: nhnacademy123!
+    listener:
+      simple:
+        acknowledge-mode: auto
+        default-requeue-rejected: false
+    virtual-host: "e2bs_dev"
+
+  elasticsearch:
+    uris: s4.java21.net:9200
+    username: elastic
+    password: nhnacademy123!
+
+eureka:
+  client:
+    fetch-registry: true # Eureka에서 다른 서비스 정보를 받아올지 여부
+    register-with-eureka: true # 현재 애플리케이션을 Eureka에 등록할지 여부
+    service-url:
+      defaultZone: http://admin:1234@localhost:10230/eureka # 로컬 Eureka 서버의 주소
+  instance:
+    prefer-ip-address: true # 서비스 등록 시 도메인 대신 IP 주소로 등록
+
+order:
+  url:
+    toss: https://api.tosspayments.com/v1/payments
+  sc: Basic dGVzdF9za19aMWFPd1g3SzhtZTZENURnMnFqbTh5UXh6dk5QOg==
+
+search:
+  index:
+    name: e2bs_product_dev
+
+# minio 원격 접근 설정
+minio:
+  host: http://storage.java21.net:8000
+  access-key: OCO4F9OO5naKnVCpAPBZ
+  secret-key: 2ml0wTSrJbGcxG3oOnXB5tQH6AzRg4UZseONCOho
+  region: us-east-1
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace # SQL 파라미터 바인딩 로그를 trace 레벨로 출력
+    org.springframework.transaction.interceptor: trace # 트랜잭션 처리 로그를 trace 로 출력
+
+#spring:
+#  datasource:
+#    type: org.apache.commons.dbcp2.BasicDataSource # 명확하게 dbcp2 타입 지정
+#    url: jdbc:mysql://s4.java21.net:13306/be9-team2 # DB URL 설정
+#    driver-class-name: com.mysql.cj.jdbc.Driver # 최신 MySQL 드라이버 사용
+#    username: be9-team2
+#    password: "*gzxziN[g9kwl]Ln"
+#    dbcp2:
+#      initial-size: 5 # 초기에 커넥션 5개 생성
+#      max-total: 20 # 최대 20개 커넥션
+#      max-idle: 10 # 최대 유휴 커넥션
+#      min-idle: 5 # 최소 유휴 커넥션
+#      validation-query: SELECT 1 # 커넥션 유효성 확인 쿼리 적절
+#      test-on-borrow: true # 커넥션 가져올 때 유효성 검사
+#      test-while-idle: true # 유휴 상태 검사 활성화
+
+
+
+
+
+
+
+
+
+
+
+
+

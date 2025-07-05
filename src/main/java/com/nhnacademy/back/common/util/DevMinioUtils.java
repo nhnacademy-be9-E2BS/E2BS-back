@@ -23,7 +23,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @Component
-@Profile("dev")
+@Profile({"dev", "dummy-dev"})
 @RequiredArgsConstructor
 public class DevMinioUtils implements MinioUtils {
 
