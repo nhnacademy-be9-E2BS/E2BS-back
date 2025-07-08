@@ -1,10 +1,10 @@
 ### 장바구니 항목 추가 (회원)
-POST http://localhost:10236/api/members/carts/items
+POST http://localhost:10236/api/auth/members/carts/items
 Content-Type: application/json
 
 {
-  "memberId": "id123",
-  "productId": 1,
+  "memberId": "user",
+  "productId": 5,
   "quantity": 2
 }
 
@@ -17,11 +17,11 @@ Content-Type: application/json
 }
 
 ### 장바구니 항목 삭제 (회원)
-DELETE http://localhost:10236/api/members/carts/items/1
+DELETE http://localhost:10236/api/auth/members/carts/items/1
 Content-Type: application/json
 
 ### 고객 장바구니 항목 조회 (페이징 처리)
-GET http://localhost:10236/api/members/id123/carts?page=0&size=5
+GET http://localhost:10236/api/auth/members/user/carts
 Accept: application/json
 
 

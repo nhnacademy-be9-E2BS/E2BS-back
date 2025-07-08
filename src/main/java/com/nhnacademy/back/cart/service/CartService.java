@@ -11,7 +11,7 @@ import com.nhnacademy.back.cart.domain.dto.response.ResponseCartItemsForMemberDT
 
 public interface CartService {
 	void createCartForMember(String memberId);
-	int createCartItemForMember(RequestAddCartItemsDTO request);
+	Long createCartItemForMember(RequestAddCartItemsDTO request);
 	int updateCartItemForMember(long cartItemId, RequestUpdateCartItemsDTO request);
 	void deleteCartItemForMember(long cartItemId);
 	void deleteCartForMember(String memberId);

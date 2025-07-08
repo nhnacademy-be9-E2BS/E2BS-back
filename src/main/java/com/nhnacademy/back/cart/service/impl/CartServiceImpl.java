@@ -83,7 +83,7 @@ public class CartServiceImpl implements CartService {
 	 */
 	@Transactional
 	@Override
-	public int createCartItemForMember(RequestAddCartItemsDTO request) {
+	public Long createCartItemForMember(RequestAddCartItemsDTO request) {
 		// 비회원/회원, 상품 존재 검증
 		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
 		if (Objects.isNull(findMember)) {
@@ -113,13 +113,13 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(CartItemNotFoundException::new);
 
 			findCartItem.changeCartItemsQuantity(findCartItem.getCartItemsQuantity() + request.getQuantity());
-			return cart.getCartItems().size();
+			return findCartItem.getCartItemsId();
 		}
 
 		// 장바구니 아이템 생성
-		cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
+		CartItems savedCartItem = cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
 
-		return cartItemsRepository.countByCart(cart);
+		return savedCartItem.getCartItemsId();
 	}
 
 	/**
