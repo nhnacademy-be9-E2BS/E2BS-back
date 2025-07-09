@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
 		// 비회원/회원, 상품 존재 검증
 		Member findMember = memberRepository.getMemberByMemberId(request.getMemberId());
 		if (Objects.isNull(findMember)) {
-			throw new NotFoundMemberException(NOT_FOUND_MEMBER);
+			throw new NotFoundMemberException(NOT_FOUND_MEMBER + " " + request.getMemberId());
 		}
 		Customer findCustomer = customerRepository.findById(findMember.getCustomerId())
 			.orElseThrow(CustomerNotFoundException::new);
@@ -98,28 +98,22 @@ public class CartServiceImpl implements CartService {
 			throw new ProductNotForSaleException("현재 판매중인 상품이 아닙니다.");
 		}
 
-		Cart cart;
-		// 장바구니가 없으면 장바구니 생성
-		if (!cartRepository.existsByCustomer_CustomerId(findCustomer.getCustomerId())) {
-			cart = cartRepository.save(new Cart(findCustomer));
+		Cart cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId())
+			.orElseGet(() -> cartRepository.save(new Cart(findCustomer)));
+
+		// 존재 여부 체크
+		Optional<CartItems> existingCartItemOpt = cartItemsRepository.findByCartAndProduct(cart, findProduct);
+		if (existingCartItemOpt.isPresent()) {
+			// 있으면 수량 증가
+			CartItems existing = existingCartItemOpt.get();
+			existing.changeCartItemsQuantity(existing.getCartItemsQuantity() + request.getQuantity());
+			return existing.getCartItemsId();
 		} else {
-			cart = cartRepository.findByCustomer_CustomerId(findCustomer.getCustomerId())
-				.orElseThrow(CartNotFoundException::new);
+			// 없으면 새로 저장
+			CartItems newItem = new CartItems(cart, findProduct, request.getQuantity());
+			CartItems savedItem = cartItemsRepository.save(newItem);
+			return savedItem.getCartItemsId();
 		}
-
-		// 현재 고객이 장바구니 아이템을 가지고 있을 경우 병합
-		if (cartItemsRepository.existsByCartAndProduct(cart, findProduct)) {
-			CartItems findCartItem = cartItemsRepository.findByCartAndProduct(cart, findProduct)
-				.orElseThrow(CartItemNotFoundException::new);
-
-			findCartItem.changeCartItemsQuantity(findCartItem.getCartItemsQuantity() + request.getQuantity());
-			return findCartItem.getCartItemsId();
-		}
-
-		// 장바구니 아이템 생성
-		CartItems savedCartItem = cartItemsRepository.save(new CartItems(cart, findProduct, request.getQuantity()));
-
-		return savedCartItem.getCartItemsId();
 	}
 
 	/**
