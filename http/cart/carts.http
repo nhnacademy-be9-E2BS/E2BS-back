@@ -3,13 +3,13 @@ POST http://localhost:10236/api/auth/members/carts/items
 Content-Type: application/json
 
 {
-  "memberId": "user",
+  "memberId": "user2",
   "productId": 5,
   "quantity": 2
 }
 
 ### 장바구니 항목 수량 수정 (회원)
-PUT http://localhost:10236/api/members/carts/items/1
+PUT http://localhost:10236/api/auth/members/carts/items/1
 Content-Type: application/json
 
 {
@@ -20,8 +20,8 @@ Content-Type: application/json
 DELETE http://localhost:10236/api/auth/members/carts/items/1
 Content-Type: application/json
 
-### 고객 장바구니 항목 조회
-GET http://localhost:10236/api/auth/members/user/carts
+### 장바구니 항목 조회 (회원)
+GET http://localhost:10236/api/auth/members/user2/carts
 Accept: application/json
 
 
