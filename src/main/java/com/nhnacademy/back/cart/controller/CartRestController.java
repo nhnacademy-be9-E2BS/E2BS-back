@@ -78,7 +78,7 @@ public class CartRestController {
 			@ApiResponse(responseCode = "201", description = "장바구니 상품 추가 성공", content = @Content(schema = @Schema(implementation = Integer.class))),
 			@ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class)))
 		})
-	@Member
+	// @Member
 	@PostMapping("/api/auth/members/carts/items")
 	public ResponseEntity<Integer> createCartItemForMember(@Parameter(description = "상품 추가 DTO", required = true) @Valid @RequestBody RequestAddCartItemsDTO requestDto,
 		                                                   @Parameter(hidden = true) BindingResult bindingResult) {
@@ -117,7 +117,7 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 상품 삭제", description = "회원 장바구니의 특정 상품을 삭제합니다.")
 	@ApiResponse(responseCode = "204", description = "장바구니 항목 삭제 성공")
-	@Member
+	// @Member
 	@DeleteMapping("/api/auth/members/carts/items")
 	public ResponseEntity<Void> deleteCartItemForMember(@Parameter(description = "삭제 요청 DTO", required = true) @Valid @RequestBody RequestDeleteCartItemsForMemberDTO request,
 		                                                @Parameter(hidden = true) BindingResult bindingResult) {
@@ -140,7 +140,7 @@ public class CartRestController {
 
 	@Operation(summary = "회원 장바구니 조회", description = "회원의 장바구니 상품 목록을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "장바구니 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResponseCartItemsForMemberDTO.class))))
-	@Member
+	// @Member
 	@GetMapping("/api/auth/members/{memberId}/carts")
 	public ResponseEntity<List<ResponseCartItemsForMemberDTO>> getCartItemsByMember(@Parameter(description = "회원 ID", required = true) @PathVariable String memberId) {
 		List<ResponseCartItemsForMemberDTO> body = cartService.getCartItemsByMember(memberId);

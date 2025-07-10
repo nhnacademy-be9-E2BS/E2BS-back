@@ -30,8 +30,8 @@ VALUES ('NORMAL', 1, 0),
 INSERT INTO customer (customer_email,
                       customer_password,
                       customer_name)
-VALUES ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
-       ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자'),
+VALUES ('admin@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '관리자'),
+       ('user@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저'),
        ('user1@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저1'),
        ('user2@example.com', '$2a$10$uVFW.aTO5YgKVNm0g6YYi.cJpVD/tLxqQ2PNumx.PikXJOlWCR1c6', '유저2');
 
@@ -47,29 +47,29 @@ INSERT INTO member (customer_id,
                     member_role_id,
                     social_auth_id)
 VALUES (1,
-        'user',
+        'user1',
         '1990-01-01',
         '01012345678',
         '2024-01-01',
         '2025-06-01',
         1, -- NORMAL
         1, -- ACTIVE
-        2, -- Member
+        1, -- Admin
         1 -- PAYCO
        ),
        (2,
-        'admin',
+        'user2',
         '1990-01-01',
         '01012345678',
         '2024-01-01',
         '2024-05-01',
         1, -- NORMAL
         1, -- ACTIVE
-        1, -- Admin
+        2, -- Member
         1 -- PAYCO
        ),
        (3,
-        'user1',
+        'user3',
         '1990-05-01',
         '01012345678',
         '2024-01-01',
@@ -80,7 +80,7 @@ VALUES (1,
         1 -- PAYCO
        ),
        (4,
-        'user2',
+        'user4',
         '1990-05-01',
         '01012345678',
         '2024-01-01',
@@ -109,7 +109,7 @@ VALUES ('위워크 10층',
         '회사',
         true,
         CURRENT_TIMESTAMP,
-        1,
+        2,
         '김도윤',
         '010-9140-6307'),
        ('OO오피스텔 101호',
@@ -119,7 +119,7 @@ VALUES ('위워크 10층',
         '집',
         false,
         CURRENT_TIMESTAMP,
-        1,
+        2,
         '최종성',
         '010-1234-5678');
 
@@ -131,7 +131,7 @@ INSERT INTO point_history (point_amount,
 VALUES (5000,
         '2025-05-04',
         '회원가입',
-        1);
+        2);
 
 ------------------------ 도서 관련 데이터 --------------------------------
 -- Position
@@ -259,7 +259,7 @@ VALUES (1, 1),
 
 -- Cart
 INSERT INTO cart (cart_id, customer_id)
-VALUES (1, 1);
+VALUES (1, 2);
 
 -- CartItems
 INSERT INTO cart_items (cart_items_id, cart_id, product_id, cart_items_quantity)
@@ -270,30 +270,30 @@ VALUES (1, 1, 1, 5),
 
 -- Like
 INSERT INTO `like` (like_id, product_id, customer_id, like_created_at)
-VALUES (1, 1, 1, '2024-01-10T10:00:00'),
+VALUES (1, 1, 2, '2024-01-10T10:00:00'),
        (2, 1, 2, '2024-01-12T11:30:00'),
        (3, 1, 3, '2024-01-12T11:30:00'),
        (4, 1, 4, '2024-01-12T11:30:00'),
-       (5, 2, 1, '2024-02-01T09:45:00'),
+       (5, 2, 2, '2024-02-01T09:45:00'),
        (6, 2, 2, '2024-02-05T15:20:00'),
        (7, 2, 3, '2024-02-05T15:20:00'),
        (8, 2, 4, '2024-02-05T15:20:00'),
-       (9, 3, 1, '2024-03-10T16:10:00'),
+       (9, 3, 2, '2024-03-10T16:10:00'),
        (10, 3, 2, '2024-03-12T17:00:00'),
-       (11, 4, 1, '2024-04-10T12:25:00'),
+       (11, 4, 2, '2024-04-10T12:25:00'),
        (12, 4, 2, '2024-04-15T13:30:00'),
-       (13, 5, 1, '2024-05-01T14:40:00'),
+       (13, 5, 2, '2024-05-01T14:40:00'),
        (14, 5, 2, '2024-05-03T10:50:00'),
-       (15, 6, 1, '2024-06-20T09:30:00'),
+       (15, 6, 2, '2024-06-20T09:30:00'),
        (16, 6, 2, '2024-06-21T14:00:00'),
-       (17, 7, 1, '2024-07-25T16:35:00'),
+       (17, 7, 2, '2024-07-25T16:35:00'),
        (18, 7, 2, '2024-07-27T17:10:00'),
-       (19, 8, 1, '2024-08-01T10:00:00'),
+       (19, 8, 2, '2024-08-01T10:00:00'),
        (20, 8, 2, '2024-08-02T11:45:00');
 
 -- Review
 INSERT INTO review (product_id, customer_id, review_content, review_grade, review_created_at, review_image)
-VALUES (1, 1, '노트북 최고네요!', 5, '2025-05-07 16:30:00', 'review1.jpg'),
+VALUES (1, 2, '노트북 최고네요!', 5, '2025-05-07 16:30:00', 'review1.jpg'),
        (1, 2, '노트북 별로네요', 2, '2025-05-05 16:30:00', 'review1.jpg'),
        (1, 2, '노트북 별로네요', 2, '2025-05-05 16:30:00', 'review1.jpg'),
        (1, 2, '노트북 별로네요', 2, '2025-05-05 16:30:00', 'review1.jpg'),
@@ -311,9 +311,9 @@ VALUES (1, 1, '노트북 최고네요!', 5, '2025-05-07 16:30:00', 'review1.jpg'
        (1, 2, '노트북 별로네요', 2, '2025-05-05 16:30:00', 'review1.jpg'),
        (1, 2, '노트북 별로네요', 2, '2025-05-05 16:30:00', 'review1.jpg'),
        (2, 2, '스마트폰 별로', 1, '2025-05-07 18:30:00', 'review2.jpg'),
-       (7, 1, 'Machine Learning 좋네', 5, '2025-05-08 21:30:00', 'review3.jpg'),
+       (7, 2, 'Machine Learning 좋네', 5, '2025-05-08 21:30:00', 'review3.jpg'),
        (7, 2, 'Machine Learning 별로', 1, '2025-05-09 22:30:00', 'review3.jpg'),
-       (8, 1, 'Kubernetes 좋네', 4, '2025-05-10 18:30:00', 'review4.jpg'),
+       (8, 2, 'Kubernetes 좋네', 4, '2025-05-10 18:30:00', 'review4.jpg'),
        (8, 2, 'Kubernetes 별로', 1, '2025-05-11 20:30:00', 'review4.jpg');
 
 ----------------------- 주문 관련 데이터------------------------
@@ -383,11 +383,11 @@ INSERT INTO `order` (order_code, order_receiver_name, order_receiver_phone, orde
                      order_created_at, member_coupon_id, delivery_fee_id, customer_id, order_state_id,
                      order_reward_amount, order_pure_amount)
 VALUES ('TEST-ORDER-CODE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
-        1000, 5000, null, true, '2025-06-01', null, '2025-05-25 00:00:00.000000', null, 1, 1, 5, 160,
+        1000, 5000, null, true, '2025-06-01', null, '2025-05-25 00:00:00.000000', null, 1, 2, 5, 160,
         6000),
        ('TEST-DELIVERY-COMPLETE', 'name', '01012345678', null, '12345', 'info', null, 'extra',
         1000, 5000, null, true, '2025-06-01', '2025-05-30 00:00:00.000000',
-        '2025-05-29 00:00:00.000000', null, 1, 1, 2, 160, 6000);
+        '2025-05-29 00:00:00.000000', null, 1, 2, 2, 160, 6000);
 
 -- OrderDetail
 INSERT INTO order_detail (product_id, order_code, review_id, wrapper_id, order_quantity, order_detail_per_price)
