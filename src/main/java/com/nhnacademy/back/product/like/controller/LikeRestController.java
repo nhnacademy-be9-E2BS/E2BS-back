@@ -70,7 +70,7 @@ public class LikeRestController {
 
 	@Operation(summary = "회원이 좋아요한 상품 목록 조회", description = "특정 회원이 좋아요한 상품들을 페이징하여 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "좋아요 상품 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResponseLikedProductDTO.class))))
-	@Member
+	// @Member
 	@GetMapping("/api/products/likes")
 	public ResponseEntity<Page<ResponseLikedProductDTO>> getLikedProductsByCustomer(@Parameter(description = "회원 아이디", required = true) @RequestParam String memberId,
 		                                                                            @Parameter(hidden = true) Pageable pageable) {

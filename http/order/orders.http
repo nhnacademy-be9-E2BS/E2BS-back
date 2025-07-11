@@ -1,0 +1,3 @@
+### 주문 코드로 주문 조회
+GET http://localhost:10236/api/orders/TEST-ORDER-CODE
+Content-Type: application/json
