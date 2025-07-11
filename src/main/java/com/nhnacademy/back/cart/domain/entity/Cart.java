@@ -7,6 +7,7 @@ import com.nhnacademy.back.account.customer.domain.entity.Customer;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +29,7 @@ public class Cart {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long cartId;
 
-	@OneToOne(optional = false)
+	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
@@ -39,7 +40,7 @@ public class Cart {
 	 * - cascade = CascadeType.ALL  : 부모 엔티티(Cart)에 수행한 작업(persist, remove 등)을 자식(CartItems)에도 전파
 	 * - orphanRemoval = true	    : 부모 엔티티의 컬렉션(List 등)에서 자식 엔티티를 제거했을 때, 자식 엔티티를 DB 에서 삭제
 	 */
-	@OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<CartItems> cartItems = new ArrayList<>();
 
 	public Cart(Customer customer) {
