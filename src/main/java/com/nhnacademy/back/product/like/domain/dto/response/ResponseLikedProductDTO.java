@@ -40,5 +40,18 @@ public class ResponseLikedProductDTO {
 	@Schema(description = "좋아요 등록 시각", example = "2024-06-01T12:34:56")
 	private LocalDateTime likeCreatedAt;
 
+	public ResponseLikedProductDTO(Long productId, String productTitle, Long productSalePrice,
+		String publisherName, LocalDateTime likeCreatedAt,
+		long likeCount, double reviewAvg, long reviewCount) {
+		this.productId = productId;
+		this.productTitle = productTitle;
+		this.productSalePrice = productSalePrice;
+		this.publisherName = publisherName;
+		this.likeCreatedAt = likeCreatedAt;
+		this.likeCount = likeCount;
+		this.avgRating = reviewAvg;
+		this.reviewCount = (int)reviewCount;
+		this.productThumbnail = "";
+	}
 }
 
