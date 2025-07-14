@@ -14,7 +14,6 @@ import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
-import com.nhnacademy.back.product.image.domain.entity.ProductImage;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
 import com.nhnacademy.back.product.like.exception.LikeAlreadyExistsException;
@@ -104,39 +103,23 @@ public class LikeServiceImpl implements LikeService {
 
 		long customerId = findMember.getCustomerId();
 
-		Page<Product> likedProductsByCustomerId = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
+		Page<ResponseLikedProductDTO> dtoPage = likeRepository.findLikedProductsByCustomerId(customerId, pageable);
 
-		return likedProductsByCustomerId.map(product -> {
-			long likeCount = getLikeCount(product.getProductId());
-			double reviewAvg = reviewRepository.totalAvgReviewsByProductId(product.getProductId());
-			reviewAvg = Math.round(reviewAvg * 10) / 10.0;
+		return dtoPage.map(dto -> {
+			Product findProduct = productRepository.findById(dto.getProductId())
+				.orElseThrow(ProductNotFoundException::new);
 
-			Integer reviewCount = reviewRepository.countAllByProduct_ProductId(product.getProductId());
-			Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId,
-					product.getProductId())
-				.orElseThrow(LikeNotFoundException::new);
-
-			String productThumbnailImagePath = "";
-			if (Objects.nonNull(product.getProductImage().getFirst().getProductImagePath())) {
-				ProductImage thumbnailImage = product.getProductImage().getFirst();
-				if (thumbnailImage.getProductImagePath().startsWith("http")) {
-					productThumbnailImagePath = thumbnailImage.getProductImagePath();
+			String thumbnailPath = "";
+			if (dto.getProductThumbnail().isEmpty()) {
+				String imgPath = findProduct.getProductImage().getFirst().getProductImagePath();
+				if (imgPath.startsWith("http")) {
+					thumbnailPath = imgPath;
 				} else {
-					productThumbnailImagePath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, thumbnailImage.getProductImagePath());
+					thumbnailPath = minioUtils.getPresignedUrl(PRODUCT_BUCKET, imgPath);
 				}
 			}
-
-			return new ResponseLikedProductDTO(
-				product.getProductId(),
-				product.getProductTitle(),
-				product.getProductSalePrice(),
-				product.getPublisher().getPublisherName(),
-				productThumbnailImagePath,
-				likeCount,
-				reviewAvg,
-				reviewCount,
-				findLike.getLikeCreatedAt()
-			);
+			dto.setProductThumbnail(thumbnailPath);
+			return dto;
 		});
 	}
 
