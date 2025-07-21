@@ -14,6 +14,7 @@ import com.nhnacademy.back.account.member.domain.entity.Member;
 import com.nhnacademy.back.account.member.exception.NotFoundMemberException;
 import com.nhnacademy.back.account.member.repository.MemberJpaRepository;
 import com.nhnacademy.back.common.util.MinioUtils;
+import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikeDTO;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.domain.entity.Like;
 import com.nhnacademy.back.product.like.exception.LikeAlreadyExistsException;
@@ -129,6 +130,25 @@ public class LikeServiceImpl implements LikeService {
 	@Override
 	public long getLikeCount(long productId) {
 		return likeRepository.countAllByProduct_ProductId(productId);
+	}
+
+	/**
+	 * customerId와 productId 인덱스 설정 테스트
+	 */
+	@Override
+	public boolean isLiked(long customerId, long productId) {
+		return likeRepository.existsByProduct_ProductIdAndCustomer_CustomerId(customerId, productId);
+	}
+
+	/**
+	 * 인덱스 설정 테스트
+	 */
+	@Override
+	public ResponseLikeDTO findByCustomerIdAndProductId(long customerId, long productId) {
+		Like findLike = likeRepository.findByCustomer_CustomerIdAndProduct_ProductId(customerId, productId)
+			.orElseThrow(LikeNotFoundException::new);
+
+		return new ResponseLikeDTO(findLike.getLikeId(), findLike.getCustomer().getCustomerId(), findLike.getProduct().getProductId(), findLike.getLikeCreatedAt());
 	}
 
 }

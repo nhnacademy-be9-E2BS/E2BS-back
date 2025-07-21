@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.back.common.exception.ValidationFailedException;
 import com.nhnacademy.back.product.like.domain.dto.request.RequestCreateLikeDTO;
+import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikeDTO;
 import com.nhnacademy.back.product.like.domain.dto.response.ResponseLikedProductDTO;
 import com.nhnacademy.back.product.like.service.LikeService;
 
@@ -83,6 +84,19 @@ public class LikeRestController {
 	@GetMapping("/api/products/{productId}/likes/counts")
 	public ResponseEntity<Long> getLikeCounts(@Parameter(description = "좋아요 수를 조회할 상품 ID", required = true) @PathVariable long productId) {
 		long body = likeService.getLikeCount(productId);
+		return ResponseEntity.ok(body);
+	}
+
+
+	@GetMapping("/api/liked")
+	public ResponseEntity<Boolean> isLiked(@RequestParam long customerId, @RequestParam long productId) {
+		boolean body = likeService.isLiked(customerId, productId);
+		return ResponseEntity.ok(body);
+	}
+
+	@GetMapping("/api/findLiked")
+	public ResponseEntity<ResponseLikeDTO> findByCustomerIdAndProductId(@RequestParam long customerId, @RequestParam long productId) {
+		ResponseLikeDTO body = likeService.findByCustomerIdAndProductId(customerId, productId);
 		return ResponseEntity.ok(body);
 	}
 

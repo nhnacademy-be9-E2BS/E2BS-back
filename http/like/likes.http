@@ -16,3 +16,12 @@ Content-Type: application/json
 ### 상품 좋아요 개수 조회
 GET http://localhost:10236/api/products/1/likes/counts
 Content-Type: application/json
+
+
+### 회원, 상품 좋아요 여부 확인
+GET http://localhost:10236/api/liked?customerId=1&productId=3
+Content-Type: application/json
+
+### 회원, 상품 좋아요 단일 조회
+GET http://localhost:10236/api/findLiked?customerId=1&productId=3
+Content-Type: application/json
