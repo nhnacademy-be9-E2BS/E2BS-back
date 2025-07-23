@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,7 +18,6 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 	/**
 	 * 상품의 리뷰 내역 페이징 조회 메소드
 	 */
-	@EntityGraph(attributePaths = {"customer"})
 	Page<Review> findAllByProduct_ProductId(long productProductId, Pageable pageable);
 
 	/**
