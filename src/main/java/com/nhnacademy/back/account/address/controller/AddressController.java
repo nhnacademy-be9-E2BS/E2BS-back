@@ -76,7 +76,7 @@ public class AddressController {
 	/**
 	 * 회원의 배송지 정보를 수정하는 메서드
 	 */
-	@Operation(summary = "회원의 특정 배송지 정보 수정", description = "회원의 특정 배송지 정보 수정 기능",
+	@Operation(summary = "회원의 특정 배송지 정보 수정 ", description = "회원의 특정 배송지 정보 수정 기능",
 		responses = {
 			@ApiResponse(responseCode = "200", description = "회원의 특정 배송지 수정 성공"),
 			@ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(schema = @Schema(implementation = ValidationFailedException.class))),
